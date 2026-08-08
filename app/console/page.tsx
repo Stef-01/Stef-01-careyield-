@@ -29,12 +29,20 @@ export default async function ConsoleHome() {
         </span>
       </div>
 
-      <Link
-        href="/console/dashboard"
-        className="mt-4 inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
-      >
-        Incrementality dashboard
-      </Link>
+      <div className="mt-4 flex gap-4">
+        <Link
+          href="/console/dashboard"
+          className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
+        >
+          Incrementality dashboard
+        </Link>
+        <Link
+          href="/console/usefulness"
+          className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
+        >
+          Usefulness audit
+        </Link>
+      </div>
 
       <section className="mt-8 rounded-xl border border-stone-200 bg-white p-6">
         <div className="mb-4 flex items-baseline justify-between">
