@@ -35,7 +35,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W7 | done | builder-B | 2026-08-08T08:05Z | 2cf4107 | Playwright e2e added (pnpm e2e; not in CI — runner lacks pre-provisioned browser); mock rail behind /book/[token] |
 | W8 | done | builder-A | 2026-08-08T08:54Z | 548c25f | audit kind constraint extended in migration 0002 |
 | W9 | done | builder-A | 2026-08-08T17:46Z | de3da79 | definitions doc at docs/ATTRIBUTION.md (v1, doc+code versioned together) |
-| W10 | available | — | — | — | depends W2 |
+| W10 | claimed | builder-A | 2026-08-08T18:16Z | — | depends W2 |
 | W11 | available | — | — | — | depends W4 |
 | W12 | available | — | — | — | depends W7, W8, W9, W10 |
 | W13 | available | — | — | — | depends W1–W12 |
