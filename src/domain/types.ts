@@ -87,6 +87,7 @@ export interface OutcomeRecord {
 }
 
 export type AuditEventKind =
+  | "holdout_assigned"
   | "invitation_queued"
   | "invitation_sent"
   | "invitation_booked"
