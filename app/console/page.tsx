@@ -29,6 +29,13 @@ export default async function ConsoleHome() {
         </span>
       </div>
 
+      <Link
+        href="/console/dashboard"
+        className="mt-4 inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
+      >
+        Incrementality dashboard
+      </Link>
+
       <section className="mt-8 rounded-xl border border-stone-200 bg-white p-6">
         <div className="mb-4 flex items-baseline justify-between">
           <h2 className="font-medium text-stone-900">Eligibility rules</h2>
