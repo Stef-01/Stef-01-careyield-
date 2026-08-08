@@ -1,0 +1,99 @@
+// W7: booking page behind the tokenised deep link (mock rail, synthetic data only).
+// Copy discipline mirrors the W6 linter posture: availability language only —
+// no urgency, no clinical framing, no benefit claims.
+
+import { getStore } from "@/booking/store";
+import { verifyBookingToken } from "@/booking/token";
+import { confirmBooking } from "../actions";
+
+export const dynamic = "force-dynamic";
+
+function Panel({ heading, children }: { heading: string; children: React.ReactNode }) {
+  return (
+    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-4 px-6">
+      <h1 className="text-2xl font-semibold tracking-tight">{heading}</h1>
+      {children}
+    </main>
+  );
+}
+
+export default async function BookingPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params;
+  const invitationId = verifyBookingToken(token);
+  const store = getStore();
+  const invitation = invitationId
+    ? store.state.invitations.find((i) => i.id === invitationId)
+    : undefined;
+
+  if (!invitation) {
+    return (
+      <Panel heading="This booking link isn't valid">
+        <p className="text-stone-600">
+          The link may have been copied incompletely. Please contact the practice to book.
+        </p>
+      </Panel>
+    );
+  }
+
+  if (invitation.status === "booked") {
+    const appointment = store.state.appointments.find(
+      (a) => a.patientId === invitation.patientId && a.generatedByInvitation,
+    );
+    return (
+      <Panel heading="Your appointment is booked">
+        <p className="text-stone-600">
+          {store.clinicianName} at {store.practiceName}
+          {appointment ? ` — ${new Date(appointment.startsAt).toLocaleString("en-AU")}` : ""}.
+        </p>
+        <p className="text-sm text-stone-400">If you can no longer attend, please contact the practice.</p>
+      </Panel>
+    );
+  }
+
+  if (invitation.status === "expired") {
+    return (
+      <Panel heading="This appointment offer is no longer available">
+        <p className="text-stone-600">
+          The session has filled. No action is needed — you can contact {store.practiceName} any
+          time to arrange another appointment.
+        </p>
+      </Panel>
+    );
+  }
+
+  if (invitation.status === "opted_out") {
+    return (
+      <Panel heading="You've opted out">
+        <p className="text-stone-600">
+          You won't receive further availability messages from {store.practiceName}.
+        </p>
+      </Panel>
+    );
+  }
+
+  return (
+    <Panel heading="An appointment is available">
+      <p className="text-stone-600">
+        {store.clinicianName} at {store.practiceName} has appointment times available on{" "}
+        {new Date(`${invitation.sessionDate}T00:00:00`).toLocaleDateString("en-AU", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        })}
+        .
+      </p>
+      <form action={confirmBooking}>
+        <input type="hidden" name="token" value={token} />
+        <button
+          type="submit"
+          className="rounded-lg bg-stone-900 px-5 py-2.5 font-medium text-white hover:bg-stone-700"
+        >
+          Confirm booking
+        </button>
+      </form>
+      <p className="text-sm text-stone-400">
+        No action is needed if this time doesn't suit you.
+      </p>
+    </Panel>
+  );
+}
