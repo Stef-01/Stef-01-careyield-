@@ -117,6 +117,7 @@ export const DOMAIN_TABLES = [
   "invitations",
   "outcome_records",
   "audit_events",
+  "memberships", // W18 multi-tenancy
 ] as const;
 
 export type DomainTable = (typeof DOMAIN_TABLES)[number];

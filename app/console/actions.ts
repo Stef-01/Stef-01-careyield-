@@ -26,7 +26,7 @@ export async function signOut(): Promise<void> {
 export async function onboard(formData: FormData): Promise<void> {
   // Server actions are independently-invocable POST endpoints — authorize here,
   // not only in the page component that renders the form.
-  await requireSession();
+  const email = await requireSession();
   const errors = onboardPractice(
     {
       name: String(formData.get("name") ?? ""),
@@ -34,13 +34,14 @@ export async function onboard(formData: FormData): Promise<void> {
       holdoutPercent: Number(formData.get("holdoutPercent")),
     },
     new Date().toISOString(),
+    email,
   );
   if (Object.keys(errors).length > 0) redirect("/console/onboarding?error=1");
   redirect("/console");
 }
 
 export async function saveRules(formData: FormData): Promise<void> {
-  await requireSession();
+  const email = await requireSession();
   const config: EligibilityConfig = {
     minDaysSinceLastVisit: Number(formData.get("minDaysSinceLastVisit")),
     futureBookingBlockDays: Number(formData.get("futureBookingBlockDays")),
@@ -48,7 +49,7 @@ export async function saveRules(formData: FormData): Promise<void> {
     usualClinicianOnly: formData.get("usualClinicianOnly") === "on",
     chronicCareOnly: formData.get("chronicCareOnly") === "on",
   };
-  const errors = updateRules(config, new Date().toISOString());
+  const errors = updateRules(config, new Date().toISOString(), email);
   if (Object.keys(errors).length > 0) redirect("/console/rules?error=1");
   redirect("/console");
 }

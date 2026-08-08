@@ -6,12 +6,14 @@
 
 import { DEFAULT_CONFIG, type EligibilityConfig } from "@/engine/eligibility";
 import type { AuditEvent, Practice, PracticeId } from "@/domain/types";
+import { authorize, type Membership } from "@/tenancy/tenancy";
 
 export interface ConsoleState {
   practice: Practice | null;
   rulesConfig: EligibilityConfig;
   rulesVersion: number;
   auditEvents: AuditEvent[];
+  memberships: Membership[]; // W18 — whoever onboards becomes owner
 }
 
 export interface FieldErrors {
@@ -26,6 +28,7 @@ function initial(): ConsoleState {
     rulesConfig: { ...DEFAULT_CONFIG },
     rulesVersion: 1,
     auditEvents: [],
+    memberships: [],
   };
 }
 
@@ -57,7 +60,7 @@ export function validateOnboarding(input: OnboardingInput): FieldErrors {
   return errors;
 }
 
-export function onboardPractice(input: OnboardingInput, at: string): FieldErrors {
+export function onboardPractice(input: OnboardingInput, at: string, ownerEmail: string): FieldErrors {
   const errors = validateOnboarding(input);
   if (Object.keys(errors).length > 0) return errors;
   const state = getConsole();
@@ -68,6 +71,7 @@ export function onboardPractice(input: OnboardingInput, at: string): FieldErrors
     holdoutRate: input.holdoutPercent / 100,
   };
   state.practice = practice;
+  state.memberships.push({ practiceId: practice.id, email: ownerEmail, role: "owner" });
   state.auditEvents.push({
     practiceId: practice.id,
     kind: "config_changed",
@@ -92,11 +96,14 @@ export function validateRules(config: EligibilityConfig): FieldErrors {
   return errors;
 }
 
-export function updateRules(config: EligibilityConfig, at: string): FieldErrors {
+export function updateRules(config: EligibilityConfig, at: string, byEmail: string): FieldErrors {
   const errors = validateRules(config);
   if (Object.keys(errors).length > 0) return errors;
   const state = getConsole();
   if (!state.practice) return { form: "Onboard the practice before changing rules." };
+  // W18: rules changes are an owner/manager grant; clinicians and non-members are refused.
+  const decision = authorize(state.memberships, byEmail, state.practice.id, "edit_rules");
+  if (!decision.allowed) return { form: "Your role cannot change eligibility rules." };
   const changed = (Object.keys(config) as Array<keyof EligibilityConfig>)
     .filter((k) => state.rulesConfig[k] !== config[k])
     .map((k) => `${k}: ${String(state.rulesConfig[k])} -> ${String(config[k])}`);

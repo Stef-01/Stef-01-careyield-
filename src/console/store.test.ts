@@ -11,6 +11,7 @@ import {
 const NOW = "2026-08-08T18:00:00Z";
 
 const VALID_ONBOARDING = { name: "Demo Family Practice", timezone: "Australia/Sydney", holdoutPercent: 10 };
+const OWNER = "manager@demo.practice.example";
 
 beforeEach(() => {
   resetConsole();
@@ -18,7 +19,7 @@ beforeEach(() => {
 
 describe("onboarding", () => {
   it("creates the practice with holdout stored as a rate", () => {
-    expect(onboardPractice(VALID_ONBOARDING, NOW)).toEqual({});
+    expect(onboardPractice(VALID_ONBOARDING, NOW, OWNER)).toEqual({});
     const state = getConsole();
     expect(state.practice).toMatchObject({
       name: "Demo Family Practice",
@@ -32,19 +33,19 @@ describe("onboarding", () => {
   it("rejects bad input without touching state", () => {
     const errors = validateOnboarding({ name: "x", timezone: "nowhere", holdoutPercent: 90 });
     expect(Object.keys(errors).sort()).toEqual(["holdoutPercent", "name", "timezone"]);
-    expect(onboardPractice({ ...VALID_ONBOARDING, holdoutPercent: 90 }, NOW)).toHaveProperty("holdoutPercent");
+    expect(onboardPractice({ ...VALID_ONBOARDING, holdoutPercent: 90 }, NOW, OWNER)).toHaveProperty("holdoutPercent");
     expect(getConsole().practice).toBeNull();
   });
 });
 
 describe("rules config", () => {
   it("requires an onboarded practice", () => {
-    expect(updateRules({ ...DEFAULT_CONFIG, minDaysSinceLastVisit: 200 }, NOW)).toHaveProperty("form");
+    expect(updateRules({ ...DEFAULT_CONFIG, minDaysSinceLastVisit: 200 }, NOW, OWNER)).toHaveProperty("form");
   });
 
   it("bumps the version and audits the exact change", () => {
-    onboardPractice(VALID_ONBOARDING, NOW);
-    const errors = updateRules({ ...DEFAULT_CONFIG, minDaysSinceLastVisit: 240, chronicCareOnly: true }, NOW);
+    onboardPractice(VALID_ONBOARDING, NOW, OWNER);
+    const errors = updateRules({ ...DEFAULT_CONFIG, minDaysSinceLastVisit: 240, chronicCareOnly: true }, NOW, OWNER);
     expect(errors).toEqual({});
     const state = getConsole();
     expect(state.rulesVersion).toBe(2);
@@ -56,17 +57,17 @@ describe("rules config", () => {
   });
 
   it("does not bump the version for a no-op save", () => {
-    onboardPractice(VALID_ONBOARDING, NOW);
-    expect(updateRules({ ...DEFAULT_CONFIG }, NOW)).toEqual({});
+    onboardPractice(VALID_ONBOARDING, NOW, OWNER);
+    expect(updateRules({ ...DEFAULT_CONFIG }, NOW, OWNER)).toEqual({});
     expect(getConsole().rulesVersion).toBe(1);
     expect(getConsole().auditEvents).toHaveLength(1); // onboarding only
   });
 
   it("rejects out-of-range numbers", () => {
-    onboardPractice(VALID_ONBOARDING, NOW);
-    expect(updateRules({ ...DEFAULT_CONFIG, minDaysSinceLastVisit: -1 }, NOW)).toHaveProperty("minDaysSinceLastVisit");
-    expect(updateRules({ ...DEFAULT_CONFIG, maxInvitesPerQuarter: 99 }, NOW)).toHaveProperty("maxInvitesPerQuarter");
-    expect(updateRules({ ...DEFAULT_CONFIG, futureBookingBlockDays: 3.5 }, NOW)).toHaveProperty("futureBookingBlockDays");
+    onboardPractice(VALID_ONBOARDING, NOW, OWNER);
+    expect(updateRules({ ...DEFAULT_CONFIG, minDaysSinceLastVisit: -1 }, NOW, OWNER)).toHaveProperty("minDaysSinceLastVisit");
+    expect(updateRules({ ...DEFAULT_CONFIG, maxInvitesPerQuarter: 99 }, NOW, OWNER)).toHaveProperty("maxInvitesPerQuarter");
+    expect(updateRules({ ...DEFAULT_CONFIG, futureBookingBlockDays: 3.5 }, NOW, OWNER)).toHaveProperty("futureBookingBlockDays");
     expect(getConsole().rulesVersion).toBe(1);
   });
 });
