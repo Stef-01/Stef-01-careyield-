@@ -32,7 +32,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W4 | done | interactive-0808 | 2026-08-08T07:28Z | 316055b | — |
 | W5 | done | interactive-0808 | 2026-08-08T07:36Z | 193737a | — |
 | W6 | done | interactive-0808 | 2026-08-08T07:12Z | a1d4f1e | — |
-| W7 | available | — | — | — | depends W5, W6 |
+| W7 | claimed | builder-B | 2026-08-08T08:05Z | — | depends W5, W6 |
 | W8 | available | — | — | — | depends W4 |
 | W9 | available | — | — | — | depends W7, W8 |
 | W10 | available | — | — | — | depends W2 |
