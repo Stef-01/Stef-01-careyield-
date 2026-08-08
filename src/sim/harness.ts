@@ -22,6 +22,7 @@ import {
   offerableSlots,
   type SessionConfig,
 } from "@/session/config";
+import { ALL_CLEAR, canSend, type OpsSwitches } from "@/ops/switches";
 import { MockSmsAdapter } from "@/messaging/adapter";
 import { renderCompliant } from "@/messaging/templates";
 import { generatePractice, type SyntheticPractice } from "@/synthetic/generate";
@@ -46,6 +47,8 @@ export interface SimConfig {
   eligibility: EligibilityConfig;
   pool: PoolConfig;
   session: SessionConfig;
+  /** Operational safety switches (W19): a killed or paused practice sends nothing. */
+  switches: OpsSwitches;
   /** Probability a sent invitation books within its week. */
   responseRate: number;
   /** Probability a sent invitation triggers STOP instead. */
@@ -68,6 +71,7 @@ export const DEFAULT_SIM_CONFIG: SimConfig = {
   eligibility: DEFAULT_CONFIG,
   pool: DEFAULT_POOL_CONFIG,
   session: DEFAULT_SESSION_CONFIG,
+  switches: ALL_CLEAR,
   responseRate: 0.25,
   optOutRate: 0.01,
   dnaRate: 0.05,
@@ -160,7 +164,11 @@ export function runSim(config: SimConfig): SimResult {
     const patients = [...patientById.values()];
 
     // 1. Pool + compliant send, one session per clinician-date with open capacity.
+    // Operational switches gate sending: a kill-switch or a paused practice sends
+    // nothing this week (bookings from prior weeks still resolve below).
+    const sendingAllowed = canSend(config.switches, data.practice.id);
     for (const clinician of data.clinicians) {
+      if (!sendingAllowed) break;
       if (!clinician.participating) continue;
       if (!clinicianParticipates(config.session, clinician.id)) continue;
       const sessionDates = new Set(

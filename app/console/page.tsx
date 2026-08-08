@@ -42,6 +42,12 @@ export default async function ConsoleHome() {
         >
           Usefulness audit
         </Link>
+        <Link
+          href="/console/ops"
+          className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
+        >
+          Admin ops
+        </Link>
       </div>
 
       <section className="mt-8 rounded-xl border border-stone-200 bg-white p-6">
