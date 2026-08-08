@@ -39,7 +39,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W11 | done | builder-B | 2026-08-08T18:40Z | 807ae78 | mock auth (Supabase deferred — no prod credentials gate); design QA via manual checklist at docs/DESIGN-QA.md (impeccable/taste skills unavailable in loop env) |
 | W12 | done | builder-A | 2026-08-08T19:16Z | 34c66e5 | report artifact committed at reports/sim-26w.md; sim test regenerates it each run |
 | W13 | done | builder-B | 2026-08-08T19:40Z | 9353793 | Q1 security review dossier at docs/SECURITY-REVIEW-Q1.md; 3 findings (1 High server-action authz, 2 Medium) all fixed + regression-tested; code-review sweep clean. Zero criticals |
-| W14 | available | — | — | — | depends W9, W12 |
+| W14 | claimed | builder-A | 2026-08-08T20:16Z | — | depends W9, W12 |
 | W15 | available | — | — | — | depends W11 |
 | W16 | available | — | — | — | depends W12 |
 | W17 | available | — | — | — | depends W11 |
