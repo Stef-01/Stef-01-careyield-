@@ -33,7 +33,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W5 | done | interactive-0808 | 2026-08-08T07:36Z | 193737a | — |
 | W6 | done | interactive-0808 | 2026-08-08T07:12Z | a1d4f1e | — |
 | W7 | claimed | builder-B | 2026-08-08T08:05Z | — | depends W5, W6 |
-| W8 | claimed | builder-A | 2026-08-08T08:54Z | — | depends W4 |
+| W8 | done | builder-A | 2026-08-08T08:54Z | 548c25f | audit kind constraint extended in migration 0002 |
 | W9 | available | — | — | — | depends W7, W8 |
 | W10 | available | — | — | — | depends W2 |
 | W11 | available | — | — | — | depends W4 |
