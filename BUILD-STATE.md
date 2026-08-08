@@ -42,7 +42,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W14 | done | builder-A | 2026-08-08T20:16Z | 2717256 | e2e runs in loop env via PW_CHROMIUM_PATH=/opt/pw-browsers/chromium (6/6 green — updates W7 note) |
 | W15 | done | builder-B | 2026-08-08T20:40Z | a1f900b | one-tap audit at /console/usefulness; mock store (synthetic); outcome_records/OutcomeRecord from W2 reused; tally feeds later dashboard/guardrails |
 | W16 | done | builder-A | 2026-08-08T21:15Z | 1dafcac | monitors pure over metrics; complaint log typed here, full workflow arrives at W43; W19/W20 surface alerts |
-| W17 | available | — | — | — | depends W11 |
+| W17 | claimed | builder-B | 2026-08-08T21:40Z | — | depends W11 |
 | W18 | available | — | — | — | [P] depends W11 |
 | W19 | available | — | — | — | depends W11 |
 | W20 | available | — | — | — | depends W14 |
