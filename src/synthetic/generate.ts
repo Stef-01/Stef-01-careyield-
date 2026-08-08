@@ -114,6 +114,10 @@ export function generatePractice(opts: GeneratorOptions): SyntheticPractice {
           const open = chance(rng, CALIBRATION.openSlotRate);
           const hour = 8 + Math.floor(slot / 4);
           const minute = (slot % 4) * 15;
+          // Type mix (W17 fillable-types) assigned deterministically from the slot
+          // index — it must NOT draw from `rng`, or it would shift the seeded stream
+          // every downstream unit relies on.
+          const apptType = apptSeq % 8 === 0 ? "telehealth" : apptSeq % 3 === 0 ? "long" : "standard";
           appointments.push({
             id: `apt-${apptSeq++}` as AppointmentId,
             practiceId,
@@ -122,6 +126,7 @@ export function generatePractice(opts: GeneratorOptions): SyntheticPractice {
             status: open ? "open" : "booked",
             patientId: open ? null : pick(rng, patients).id,
             generatedByInvitation: false,
+            appointmentType: apptType,
           });
         }
       }

@@ -4,7 +4,11 @@ import { defineConfig } from "@playwright/test";
 // environment the browser is pre-provisioned; PW_CHROMIUM_PATH overrides discovery.
 export default defineConfig({
   testDir: "e2e",
+  // The mock rail/console/audit stores are process-global singletons (synthetic
+  // phase). Run e2e single-worker so one spec's reset can't clobber another's
+  // state mid-run; fullyParallel:false alone only serializes within a file.
   fullyParallel: false,
+  workers: 1,
   use: {
     baseURL: "http://127.0.0.1:3100",
     launchOptions: process.env.PW_CHROMIUM_PATH

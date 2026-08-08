@@ -41,6 +41,9 @@ export type AppointmentStatus =
   | "dna" // did not attend
   | "cancelled";
 
+/** Bookable appointment kinds a session config can choose to fill (W17). */
+export type AppointmentType = "standard" | "long" | "telehealth";
+
 export interface Appointment {
   id: AppointmentId;
   practiceId: PracticeId;
@@ -49,6 +52,8 @@ export interface Appointment {
   status: AppointmentStatus;
   patientId: PatientId | null;
   generatedByInvitation: boolean; // booked via a CareYield invitation
+  /** Optional: untyped slots (undefined) are always fillable; typed slots honour session config. */
+  appointmentType?: AppointmentType;
 }
 
 export type InvitationStatus =

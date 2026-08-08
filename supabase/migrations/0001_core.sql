@@ -39,7 +39,8 @@ create table appointments (
   starts_at timestamptz not null,
   status text not null check (status in ('open','booked','attended','dna','cancelled')),
   patient_id uuid references patients(id),
-  generated_by_invitation boolean not null default false
+  generated_by_invitation boolean not null default false,
+  appointment_type text check (appointment_type in ('standard','long','telehealth'))
 );
 
 create table invitations (

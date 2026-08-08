@@ -16,6 +16,12 @@ import {
 import { assignHoldout } from "@/engine/holdout";
 import { countAttribution, type AttributionResult } from "@/engine/attribution";
 import { buildInvitationPool, DEFAULT_POOL_CONFIG, type PoolConfig } from "@/engine/pool";
+import {
+  clinicianParticipates,
+  DEFAULT_SESSION_CONFIG,
+  offerableSlots,
+  type SessionConfig,
+} from "@/session/config";
 import { MockSmsAdapter } from "@/messaging/adapter";
 import { renderCompliant } from "@/messaging/templates";
 import { generatePractice, type SyntheticPractice } from "@/synthetic/generate";
@@ -39,6 +45,7 @@ export interface SimConfig {
   todayIso: string;
   eligibility: EligibilityConfig;
   pool: PoolConfig;
+  session: SessionConfig;
   /** Probability a sent invitation books within its week. */
   responseRate: number;
   /** Probability a sent invitation triggers STOP instead. */
@@ -60,6 +67,7 @@ export const DEFAULT_SIM_CONFIG: SimConfig = {
   todayIso: "2026-08-08",
   eligibility: DEFAULT_CONFIG,
   pool: DEFAULT_POOL_CONFIG,
+  session: DEFAULT_SESSION_CONFIG,
   responseRate: 0.25,
   optOutRate: 0.01,
   dnaRate: 0.05,
@@ -154,6 +162,7 @@ export function runSim(config: SimConfig): SimResult {
     // 1. Pool + compliant send, one session per clinician-date with open capacity.
     for (const clinician of data.clinicians) {
       if (!clinician.participating) continue;
+      if (!clinicianParticipates(config.session, clinician.id)) continue;
       const sessionDates = new Set(
         rail.appointments
           .filter(
@@ -178,13 +187,19 @@ export function runSim(config: SimConfig): SimResult {
           isoDaysFrom(config.todayIso, week * 7),
           capsMap,
         );
-        const pool = buildInvitationPool(
-          sessionDate,
-          clinician,
-          rail.appointments,
-          eligible,
-          config.pool,
+        // Honour the session config: only offer participating clinicians' slots
+        // of a fillable type, in-window, after reserving protected capacity.
+        const offerable = offerableSlots(
+          rail.appointments.filter(
+            (a) =>
+              a.clinicianId === clinician.id &&
+              a.status === "open" &&
+              a.startsAt.slice(0, 10) === sessionDate,
+          ),
+          config.session,
         );
+        if (offerable.length === 0) continue;
+        const pool = buildInvitationPool(sessionDate, clinician, offerable, eligible, config.pool);
         if (pool.length === 0) continue;
         totals.sessionsPooled++;
         const sent: Invitation[] = [];
