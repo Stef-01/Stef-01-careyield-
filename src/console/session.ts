@@ -4,13 +4,14 @@
 // provider behind CAREYIELD_AUTH_PROVIDER without touching session handling.
 
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { signingSecret } from "@/lib/secret";
 
 export const SESSION_COOKIE = "cy_session";
 
-const SECRET = process.env.CAREYIELD_TOKEN_SECRET ?? "careyield-synthetic-dev-secret";
-
 function sig(payload: string): string {
-  return createHmac("sha256", `session:${SECRET}`).update(payload).digest("base64url");
+  // Domain-separated from booking tokens: distinct HMAC key prevents a booking
+  // token from ever validating as a session cookie or vice versa.
+  return createHmac("sha256", `session:${signingSecret()}`).update(payload).digest("base64url");
 }
 
 export function signSession(email: string): string {

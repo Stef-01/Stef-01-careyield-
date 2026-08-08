@@ -4,11 +4,10 @@
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { InvitationId } from "@/domain/types";
-
-const SECRET = process.env.CAREYIELD_TOKEN_SECRET ?? "careyield-synthetic-dev-secret";
+import { signingSecret } from "@/lib/secret";
 
 function sig(payload: string): string {
-  return createHmac("sha256", SECRET).update(payload).digest("base64url");
+  return createHmac("sha256", signingSecret()).update(payload).digest("base64url");
 }
 
 export function signBookingToken(invitationId: InvitationId): string {

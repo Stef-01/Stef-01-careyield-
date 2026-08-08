@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { getStore, resetStore } from "@/booking/store";
 import { signBookingToken } from "@/booking/token";
+import { assertMockRoutesEnabled } from "@/lib/mock-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -28,10 +29,12 @@ function snapshot() {
 }
 
 export async function GET() {
+  assertMockRoutesEnabled();
   return NextResponse.json(snapshot());
 }
 
 export async function POST() {
+  assertMockRoutesEnabled();
   resetStore();
   return NextResponse.json(snapshot());
 }

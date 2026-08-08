@@ -16,5 +16,11 @@ export default defineConfig({
     url: "http://127.0.0.1:3100",
     timeout: 240_000,
     reuseExistingServer: false,
+    // The e2e drives a production build, so supply the signing secret (fail-closed
+    // in prod) and opt the mock introspection routes in explicitly.
+    env: {
+      CAREYIELD_TOKEN_SECRET: "e2e-signing-secret",
+      CAREYIELD_ENABLE_MOCK_ROUTES: "1",
+    },
   },
 });

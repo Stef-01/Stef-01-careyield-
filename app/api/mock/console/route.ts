@@ -3,13 +3,16 @@
 
 import { NextResponse } from "next/server";
 import { getConsole, resetConsole } from "@/console/store";
+import { assertMockRoutesEnabled } from "@/lib/mock-guard";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  assertMockRoutesEnabled();
   return NextResponse.json(getConsole());
 }
 
 export async function POST() {
+  assertMockRoutesEnabled();
   return NextResponse.json(resetConsole());
 }

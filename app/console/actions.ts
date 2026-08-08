@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { SESSION_COOKIE, signSession } from "@/console/session";
 import { onboardPractice, updateRules } from "@/console/store";
 import type { EligibilityConfig } from "@/engine/eligibility";
+import { requireSession } from "./guard";
 
 // Mock auth provider: any staff email signs in (synthetic phase — founder gate
 // blocks production credentials; Supabase auth replaces this action's body).
@@ -23,6 +24,9 @@ export async function signOut(): Promise<void> {
 }
 
 export async function onboard(formData: FormData): Promise<void> {
+  // Server actions are independently-invocable POST endpoints — authorize here,
+  // not only in the page component that renders the form.
+  await requireSession();
   const errors = onboardPractice(
     {
       name: String(formData.get("name") ?? ""),
@@ -36,6 +40,7 @@ export async function onboard(formData: FormData): Promise<void> {
 }
 
 export async function saveRules(formData: FormData): Promise<void> {
+  await requireSession();
   const config: EligibilityConfig = {
     minDaysSinceLastVisit: Number(formData.get("minDaysSinceLastVisit")),
     futureBookingBlockDays: Number(formData.get("futureBookingBlockDays")),
