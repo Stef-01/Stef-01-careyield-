@@ -56,7 +56,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W28 | available | — | — | — | depends W27 |
 | W29 | available | — | — | — | depends W27 |
 | W30 | available | — | — | — | depends W27 |
-| W31 | available | — | — | — | [P] depends W6 |
+| W31 | claimed | builder-A | 2026-08-09T02:36Z | — | [P] depends W6 |
 | W32 | available | — | — | — | depends W27 |
 | W33 | available | — | — | — | [P] depends W10 |
 | W34 | claimed | interactive-0809 | 2026-08-09T02:42Z | — | depends W9 |
