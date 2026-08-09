@@ -7,3 +7,5 @@ next-env.d.ts
 !.env.example
 test-results/
 playwright-report/
+# test-regenerated binary artifact (zip timestamps make it non-deterministic)
+reports/weekly-w8.docx
