@@ -10,7 +10,7 @@
 ## 0. Operating model
 
 - **Unit of work = one plan week.** Each loop firing claims exactly one week-unit from the `BUILD-STATE.md` ledger (unit definitions: §5 below) via the claim protocol in that file, builds it to its verify gate, commits, and records the outcome. Long builds span multiple firings (status `in-progress` + continuation notes); parallel firings claim *different* units — that is the clash-protection design.
-- **Verify gate is hard.** A unit is `done` only when its stated verification passes (typecheck + tests + build at minimum). Partial work commits green (behind flags) with continuation notes — never a red main.
+- **Verify gate is hard.** A unit is `done` only when its stated verification passes (`pnpm verify` — typecheck + tests + build + dependency-audit gate — at minimum). Partial work commits green (behind flags) with continuation notes — never a red main.
 - **Karpathy laws apply** (think before coding · simplicity first · surgical changes · goal-driven execution). Minimum code that passes the gate; no speculative flexibility.
 - **Synthetic-first, founder-gated production.** The loop NEVER handles real patient data, never sends real SMS, never touches production credentials. Everything builds and proves against the synthetic practice engine. Crossing to real data/messages/pilots requires the founder gates in §4 — the loop builds *up to* each gate and flags it.
 - **Home**: `stef-01/stef-01-careyield-`, branch `main` (W-MIGRATE completed 2026-08-08).
@@ -230,4 +230,4 @@ first enters the product. Two W51 process findings are units in their own right 
 
 ## 7. Definition of done (every unit)
 
-`pnpm typecheck && pnpm test && pnpm build` green · verify gate stated in the unit passes · BUILD-STATE updated (done + SHA, or in-progress + continuation notes) · commit message references the unit ID · no founder gate crossed · one-line session log in Stefan-Brain `wiki/_log/` (skip-note in commit message if vault unavailable).
+`pnpm verify` green (typecheck · test · build · audit:gate) · verify gate stated in the unit passes · BUILD-STATE updated (done + SHA, or in-progress + continuation notes) · commit message references the unit ID · no founder gate crossed · one-line session log in Stefan-Brain `wiki/_log/` (skip-note in commit message if vault unavailable).
