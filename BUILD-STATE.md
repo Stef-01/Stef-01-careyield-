@@ -84,7 +84,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 > **Year 2 — Condition Yield** (expanded by W52, 2026-08-09; definitions in docs/FIVE-YEAR-PLAN.md §5b).
 
 | W53 | done | builder-B | 2026-08-09T08:47Z | 0be0a57 | `pnpm audit` in the gate + CI via `pnpm verify` (typecheck·test·build·audit:gate). Accepted risks live in src/security/audit-allowlist.ts, where the AllowlistEntry TYPE makes reason+reviewBy mandatory — the compiler enforces "rationale + review date", and past reviewBy the acceptance stops working. Evaluator is a pure function over the audit JSON so the unit's verification is 13 unit tests, not a manual observation; also confirmed end-to-end through the CLI (drop an acceptance → exit 1, restore → exit 0). Fail-closed on unknown severity, malformed advisory, bad date, and unreadable report (no network ⇒ FAIL, not skip). Stale entries warn but never block. Runner is scripts/audit-gate.mts under node 22 type stripping, so it is typechecked like the tree (needed tsconfig allowImportingTsExtensions). Gate doc updated in all 3 sites per W50. NOTE: the 2 image-size acceptances expire 2026-11-09 — the gate will start failing then, by design |
-| W54 | available | — | — | — | W51 §Process |
+| W54 | claimed | builder-B | 2026-08-09T09:47Z | — | W51 §Process |
 | W55 | available | — | — | — | — |
 | W56 | available | — | — | — | W55 |
 | W57 | available | — | — | — | W55, W56 |
