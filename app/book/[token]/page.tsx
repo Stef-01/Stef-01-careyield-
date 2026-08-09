@@ -2,7 +2,7 @@
 // Copy discipline mirrors the W6 linter posture: availability language only —
 // no urgency, no clinical framing, no benefit claims.
 
-import { getStore } from "@/booking/store";
+import { getStore, sessionAppointmentType } from "@/booking/store";
 import { verifyBookingToken } from "@/booking/token";
 import { confirmBooking } from "../actions";
 
@@ -35,17 +35,24 @@ export default async function BookingPage({ params }: { params: Promise<{ token:
     );
   }
 
+  const isTelehealth = sessionAppointmentType(store, invitation) === "telehealth";
+  const kind = isTelehealth ? "video appointment" : "appointment";
+
   if (invitation.status === "booked") {
     const appointment = store.state.appointments.find(
       (a) => a.patientId === invitation.patientId && a.generatedByInvitation,
     );
     return (
-      <Panel heading="Your appointment is booked">
+      <Panel heading={`Your ${kind} is booked`}>
         <p className="text-stone-600">
           {store.clinicianName} at {store.practiceName}
           {appointment ? ` — ${new Date(appointment.startsAt).toLocaleString("en-AU")}` : ""}.
         </p>
-        <p className="text-sm text-stone-400">If you can no longer attend, please contact the practice.</p>
+        <p className="text-sm text-stone-400">
+          {isTelehealth
+            ? "The practice will call you at this time. If you can no longer attend, please contact the practice."
+            : "If you can no longer attend, please contact the practice."}
+        </p>
       </Panel>
     );
   }
@@ -72,9 +79,10 @@ export default async function BookingPage({ params }: { params: Promise<{ token:
   }
 
   return (
-    <Panel heading="An appointment is available">
+    <Panel heading={isTelehealth ? "A video appointment is available" : "An appointment is available"}>
       <p className="text-stone-600">
-        {store.clinicianName} at {store.practiceName} has appointment times available on{" "}
+        {store.clinicianName} at {store.practiceName} has{" "}
+        {isTelehealth ? "telehealth (phone/video) appointment times" : "appointment times"} available on{" "}
         {new Date(`${invitation.sessionDate}T00:00:00`).toLocaleDateString("en-AU", {
           weekday: "long",
           day: "numeric",

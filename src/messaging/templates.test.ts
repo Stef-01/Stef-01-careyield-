@@ -48,6 +48,15 @@ describe("W6 messaging + compliance linter", () => {
     );
   });
 
+  it("W25: the telehealth variant is distinct and still passes lint", () => {
+    const inPerson = renderAvailabilityInvitation(CTX);
+    const telehealth = renderAvailabilityInvitation({ ...CTX, telehealth: true });
+    expect(telehealth).not.toBe(inPerson);
+    expect(telehealth.toLowerCase()).toContain("telehealth");
+    expect(lintMessage(telehealth, CTX)).toEqual([]);
+    expect(renderCompliant({ ...CTX, telehealth: true })).toBe(telehealth);
+  });
+
   it("mock adapter records sends without side effects", async () => {
     const adapter = new MockSmsAdapter();
     await adapter.send({ to: "synthetic-pat-1", body: renderCompliant(CTX), invitationId: "inv-1" });

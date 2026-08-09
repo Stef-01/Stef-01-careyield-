@@ -11,6 +11,8 @@ test.beforeEach(async ({ page, request }) => {
   await page.getByLabel("Practice name").fill("Demo Family Practice");
   await page.getByLabel("Holdout share (%)").fill("10");
   await page.getByRole("button", { name: "Create practice" }).click();
+  // Wait for the onboarding redirect to settle before the test navigates.
+  await page.waitForURL(/\/console$/);
 });
 
 test("dashboard renders the north star and both arms from sim data", async ({ page }) => {

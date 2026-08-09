@@ -5,6 +5,7 @@
 import { bookInvitation, type BookingResult, type RailState } from "@/booking/rail";
 import type {
   AppointmentId,
+  AppointmentType,
   ClinicianId,
   InvitationId,
   PatientId,
@@ -17,12 +18,16 @@ export interface RailStore {
   clinicianName: string;
 }
 
+/** W25: seed the rail with an in-person or a telehealth session (same shape). */
+export type RailScenario = "standard" | "telehealth";
+
 export const SEED_SESSION_DATE = "2026-09-01";
 
 const PRACTICE_ID = "prac-demo" as PracticeId;
 const CLINICIAN_ID = "clin-demo" as ClinicianId;
 
-function seed(): RailStore {
+function seed(scenario: RailScenario = "standard"): RailStore {
+  const appointmentType: AppointmentType = scenario === "telehealth" ? "telehealth" : "standard";
   const slot = (n: number, time: string) => ({
     id: `apt-${n}` as AppointmentId,
     practiceId: PRACTICE_ID,
@@ -31,6 +36,7 @@ function seed(): RailStore {
     status: "open" as const,
     patientId: null,
     generatedByInvitation: false,
+    appointmentType,
   });
   const invitation = (label: string, patient: number) => ({
     id: `inv-${label}` as InvitationId,
@@ -59,9 +65,17 @@ export function getStore(): RailStore {
   return globalStore.__careyieldRail;
 }
 
-export function resetStore(): RailStore {
-  globalStore.__careyieldRail = seed();
+export function resetStore(scenario: RailScenario = "standard"): RailStore {
+  globalStore.__careyieldRail = seed(scenario);
   return globalStore.__careyieldRail;
+}
+
+/** The appointment type offered in an invitation's session (telehealth vs in-person). */
+export function sessionAppointmentType(store: RailStore, invitation: { clinicianId: string; sessionDate: string }): AppointmentType | undefined {
+  const inSession = store.state.appointments.find(
+    (a) => a.clinicianId === invitation.clinicianId && a.startsAt.slice(0, 10) === invitation.sessionDate,
+  );
+  return inSession?.appointmentType;
 }
 
 /** Book against the shared store, committing the new state on success or refusal. */

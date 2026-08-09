@@ -2,8 +2,8 @@
 // this route exposes the in-memory seed (and its signed booking links) so tests can
 // drive the flow; it is removed when the mock rail is replaced by real persistence.
 
-import { NextResponse } from "next/server";
-import { getStore, resetStore } from "@/booking/store";
+import { NextRequest, NextResponse } from "next/server";
+import { getStore, resetStore, type RailScenario } from "@/booking/store";
 import { signBookingToken } from "@/booking/token";
 import { assertMockRoutesEnabled } from "@/lib/mock-guard";
 
@@ -23,6 +23,7 @@ function snapshot() {
       status: a.status,
       startsAt: a.startsAt,
       generatedByInvitation: a.generatedByInvitation,
+      appointmentType: a.appointmentType,
     })),
     auditEvents: store.state.auditEvents,
   };
@@ -33,8 +34,11 @@ export async function GET() {
   return NextResponse.json(snapshot());
 }
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   assertMockRoutesEnabled();
-  resetStore();
+  // W25: ?scenario=telehealth reseeds a telehealth session; default is in-person.
+  const scenario: RailScenario =
+    request.nextUrl.searchParams.get("scenario") === "telehealth" ? "telehealth" : "standard";
+  resetStore(scenario);
   return NextResponse.json(snapshot());
 }

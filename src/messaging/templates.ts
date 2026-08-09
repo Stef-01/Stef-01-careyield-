@@ -10,6 +10,8 @@ export interface MessageContext {
   practiceName: string;
   sessionWindow: string; // e.g. "after 5pm this week" — availability language only
   bookingUrl: string;
+  /** W25: telehealth variant swaps "appointment" for "telehealth (phone/video) appointment". */
+  telehealth?: boolean;
 }
 
 export interface LintViolation {
@@ -50,8 +52,11 @@ export function lintMessage(text: string, ctx: MessageContext): LintViolation[] 
 
 /** The canonical availability invitation (venture brief §Phase 1 wording). */
 export function renderAvailabilityInvitation(ctx: MessageContext): string {
+  const offer = ctx.telehealth
+    ? "has telehealth (phone/video) appointments available"
+    : "has appointments available";
   return (
-    `Hi ${ctx.patientFirstName}, ${ctx.clinicianDisplayName} has appointments available ` +
+    `Hi ${ctx.patientFirstName}, ${ctx.clinicianDisplayName} ${offer} ` +
     `${ctx.sessionWindow} at ${ctx.practiceName}. Book: ${ctx.bookingUrl} — or reply STOP to opt out.`
   );
 }
