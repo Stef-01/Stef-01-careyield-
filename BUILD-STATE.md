@@ -66,7 +66,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W38 | done | builder-B | 2026-08-09T04:05Z | 7993f5b | drift detection at src/pms/drift.ts (per-vendor declared shape; additive change is not drift, removal/retype/null/unknown-enum/missing-collection are) + error taxonomy at src/integration/errors.ts unifying W36/W29/W28/drift failures with severity + blocksSending + operator action. Suite green (gate): 8 drift + 11 taxonomy tests |
 | W39 | claimed | builder-A | 2026-08-09T04:06Z | — | depends W37, W38 |
 | W40 | done | interactive-0809 | 2026-08-09T03:39Z | 7589c38 | docs unit; success criteria pre-registered incl. holdout non-negotiable + stop rules |
-| W41 | available | — | — | — | depends W17, W19 |
+| W41 | claimed | builder-B | 2026-08-09T04:25Z | — | depends W17, W19 |
 | W42 | available | — | — | — | depends W14, W20 |
 | W43 | available | — | — | — | [P] depends W16 |
 | W44 | done | interactive-0809 | 2026-08-09T03:52Z | dfae8bf | FINDING: sim defaults show generated-DNA worse than organic (~ratio>1.25) — calibration owner should review the generated-booking DNA model (W3/W12); real answer comes from pilot holdout |
