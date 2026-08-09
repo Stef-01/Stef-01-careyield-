@@ -74,7 +74,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W46 | claimed | builder-B | 2026-08-09T05:20Z | — | [P] no deps |
 | W47 | done | interactive-0809 | 2026-08-09T04:08Z | 2880cbf | agreement is a skeleton for a lawyer, not a contract; pricing encodes the no-fee-splitting posture |
 | W48 | done | builder-A | 2026-08-09T05:16Z | 708a6be | 100×(1.5k pat, 4w) fleet: 12.4s total, p95 week 37ms (budget 150), backfill p95 1ms (budget 50), sends 0.74× priced envelope; W26's indexed-rail idea measured unnecessary at this scale; report regenerated per run (gitignored) |
-| W49 | available | — | — | — | depends W41, W42 |
+| W49 | claimed | builder-A | 2026-08-09T05:22Z | — | depends W41, W42 |
 | W50 | done | interactive-0809 | 2026-08-09T05:18Z | 23635ae | 8 surfaces mapped, zero unmapped in app/; update-in-same-commit rule established |
 | W51 | available | — | — | — | depends W40–W50 |
 | W52 | available | — | — | — | depends W51 |
