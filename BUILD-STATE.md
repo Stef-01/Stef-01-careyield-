@@ -131,7 +131,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W57 | available | — | — | — | W55, W56 |
 | W58 | available | — | — | — | W57 |
 | W59 | available | — | — | — | W58 |
-| W60 | available | — | — | — | [P] W55 |
+| W60 | claimed | builder-B | 2026-08-09T11:48Z | — | [P] W55 |
 | W61 | available | — | — | — | W59 |
 | W62 | available | — | — | — | [P] W56 |
 | W63 | available | — | — | — | W59, W61 |
