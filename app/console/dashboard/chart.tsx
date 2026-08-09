@@ -9,16 +9,46 @@
 import { useMemo, useState } from "react";
 import type { WeeklyPoint } from "@/sim/dashboard-data";
 
+// W42: labels are overridable so the practice-facing page can reuse this chart with
+// plain-English series names. Colours are fixed — identity follows the entity, and
+// these two slots are the validated categorical pair (never repick per page).
 const SERIES = {
   invite: { label: "Invite arm", color: "#2a78d6" }, // categorical slot 1
   holdout: { label: "Holdout arm", color: "#eb6834" }, // categorical slot 2
 } as const;
 
+export interface ChartLabels {
+  invite: string;
+  holdout: string;
+  /** Sentence under the plot; also the SVG's accessible name. */
+  caption: string;
+  /** Y-axis unit, used in the accessible name. */
+  unit: string;
+}
+
+const DEFAULT_LABELS: ChartLabels = {
+  invite: SERIES.invite.label,
+  holdout: SERIES.holdout.label,
+  caption:
+    "Attended appointments per 1,000 arm patients per week. Both arms share the same organic " +
+    "process; the gap is the generated lift.",
+  unit: "per 1,000 arm patients",
+};
+
 const W = 720;
 const H = 300;
 const M = { top: 16, right: 96, bottom: 28, left: 44 };
 
-export function WeeklyArmsChart({ weekly }: { weekly: WeeklyPoint[] }) {
+export function WeeklyArmsChart({
+  weekly,
+  labels = DEFAULT_LABELS,
+  /** Divide the stored per-1,000 values by this for display (W42 shows per 100). */
+  scale = 1,
+}: {
+  weekly: WeeklyPoint[];
+  labels?: ChartLabels;
+  scale?: number;
+}) {
   const [hover, setHover] = useState<number | null>(null);
 
   const { xFor, yFor, yTicks, invitePath, holdoutPath } = useMemo(() => {
@@ -58,7 +88,10 @@ export function WeeklyArmsChart({ weekly }: { weekly: WeeklyPoint[] }) {
   return (
     <figure>
       <div className="mb-3 flex items-center gap-5" aria-hidden="true">
-        {Object.values(SERIES).map((s) => (
+        {[
+          { label: labels.invite, color: SERIES.invite.color },
+          { label: labels.holdout, color: SERIES.holdout.color },
+        ].map((s) => (
           <span key={s.label} className="flex items-center gap-1.5 text-xs text-stone-500">
             <span className="inline-block h-0.5 w-4 rounded" style={{ background: s.color }} />
             {s.label}
@@ -70,7 +103,7 @@ export function WeeklyArmsChart({ weekly }: { weekly: WeeklyPoint[] }) {
           viewBox={`0 0 ${W} ${H}`}
           className="w-full"
           role="img"
-          aria-label="Attended appointments per 1,000 arm patients, weekly, invite arm versus holdout arm"
+          aria-label={`Attended appointments ${labels.unit}, weekly, ${labels.invite} versus ${labels.holdout}`}
           onMouseMove={onMove}
           onMouseLeave={() => setHover(null)}
         >
@@ -85,7 +118,7 @@ export function WeeklyArmsChart({ weekly }: { weekly: WeeklyPoint[] }) {
                 strokeWidth={1}
               />
               <text x={M.left - 8} y={yFor(t) + 3.5} textAnchor="end" fontSize={11} fill="#898781">
-                {t}
+                {scale === 1 ? t : +(t / scale).toFixed(1)}
               </text>
             </g>
           ))}
@@ -108,10 +141,10 @@ export function WeeklyArmsChart({ weekly }: { weekly: WeeklyPoint[] }) {
           {last && (
             <>
               <text x={W - M.right + 8} y={yFor(last.invitePer1000) + 3.5} fontSize={11} fill="#52514e">
-                Invite
+                {labels.invite.split(" ")[0]}
               </text>
               <text x={W - M.right + 8} y={yFor(last.holdoutPer1000) + 3.5} fontSize={11} fill="#52514e">
-                Holdout
+                {labels.holdout.split(" ")[0]}
               </text>
             </>
           )}
@@ -145,21 +178,18 @@ export function WeeklyArmsChart({ weekly }: { weekly: WeeklyPoint[] }) {
             <div className="mt-1 space-y-0.5 tabular-nums text-stone-500">
               <div>
                 <span className="mr-1 inline-block h-2 w-2 rounded-full align-baseline" style={{ background: SERIES.invite.color }} />
-                Invite {hovered.invitePer1000.toFixed(1)}
+                {labels.invite} {(hovered.invitePer1000 / scale).toFixed(1)}
               </div>
               <div>
                 <span className="mr-1 inline-block h-2 w-2 rounded-full align-baseline" style={{ background: SERIES.holdout.color }} />
-                Holdout {hovered.holdoutPer1000.toFixed(1)}
+                {labels.holdout} {(hovered.holdoutPer1000 / scale).toFixed(1)}
               </div>
-              <div className="text-stone-900">Δ {hovered.incrementalPer1000.toFixed(1)}</div>
+              <div className="text-stone-900">Difference {(hovered.incrementalPer1000 / scale).toFixed(1)}</div>
             </div>
           </div>
         )}
       </div>
-      <figcaption className="mt-2 text-xs text-stone-400">
-        Attended appointments per 1,000 arm patients per week. Both arms share the same organic
-        process; the gap is the generated lift.
-      </figcaption>
+      <figcaption className="mt-2 text-xs text-stone-400">{labels.caption}</figcaption>
     </figure>
   );
 }

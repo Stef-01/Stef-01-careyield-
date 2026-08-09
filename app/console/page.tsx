@@ -45,6 +45,12 @@ export default async function ConsoleHome() {
 
       <div className="mt-4 flex gap-4">
         <Link
+          href="/console/results"
+          className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
+        >
+          Your results
+        </Link>
+        <Link
           href="/console/dashboard"
           className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
         >
