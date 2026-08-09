@@ -55,7 +55,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W27 | done | builder-B | 2026-08-09T02:40Z | dca1644 | PmsReadAdapter + reusable contract suite (src/pms/contract.ts); SyntheticPmsAdapter passes it (gate); read-only/credential-free (G1); real BP/Halo adapters reuse the contract at W28. Also fixed 2 cold-cache perf-flakes (W14 unit timeout, dashboard e2e nav timeout) |
 | W28 | done | builder-B | 2026-08-09T03:00Z | c4d617b | VendorPmsAdapter (src/pms/vendors.ts) maps BP + Halo raw shapes to W27 contract; both pass contract on recorded fixtures (gate); G1 enforced in constructor (live hosts refused); live HTTP client + field reconciliation = W38/W39 follow-up |
 | W29 | done | builder-B | 2026-08-09T03:20Z | da1e0cc | buildBookingLink (src/booking/deeplink.ts): internal/hotdoc/healthengine behind per-practice flags, falls back to internal link with recorded reason; https-only + no-patient-identifier guard enforced in code; link-format tests are the gate. Vendor URL shapes configurable, reconciled at W39; not yet wired into sim (same posture as W28 skeletons — wiring lands at W38) |
-| W30 | claimed | builder-A | 2026-08-09T03:16Z | — | depends W27 |
+| W30 | done | builder-A | 2026-08-09T03:16Z | 322ee34 | fast path behind lateCancellationRate (default 0 — goldens stable); latency budget max<100ms p50<25ms met in sim; PMS cancellation feed wiring joins W32/W36 |
 | W31 | done | builder-A | 2026-08-09T02:36Z | e43eea5 | G3 enforced in constructor (twilio.com refused); integration tests use in-process fake API; real Twilio sandbox creds + live wiring = founder gate follow-up (W39 dossier) |
 | W32 | available | — | — | — | depends W27 |
 | W33 | available | — | — | — | [P] depends W10 |
