@@ -1,4 +1,14 @@
-# Year-1 full-system review (W51)
+# Year-1 full-system review — second pass (W51 follow-up)
+
+**Relationship to `docs/AUDIT-W51.md`.** Two Year-1 audits ran. The first (that document)
+was run by the interactive session after reclaiming W51 from builder-A under the staleness
+rule; it swept for the defect classes that matter at the founder gates and found two, both
+fixed. This one is builder-A's audit, which had already started when the row was reclaimed
+and which finished afterwards. It went wider — six dimensions, adversarial verification of
+every serious finding — and it found defects the first pass did not, including two
+criticals. Neither audit is redundant: the first asked "what breaks when this meets real
+patients?", this one asked "what is wrong with the code as written?". The findings do not
+overlap. Both should be read.
 
 Scope: everything built in W1–W50 — the measurement and eligibility engines, the booking
 rail, the console and its server actions, the privacy/complaints/ops surfaces, the
@@ -23,7 +33,7 @@ synthetic sim — no real patient data exists in this tree (founder gate G2).
 | 3 | High | `app/console/results/page.tsx` | The practice-facing results page evaluated guardrails with a hardcoded empty complaints list, so the zero-tolerance complaints monitor could never fire there — the page printed "Nothing needs your attention" with a complaint open. The intended contract is stated in `src/complaints/store.ts`: banner and monitor read the same count. | Reads `getComplaints().complaints`. |
 | 4 | High | `app/console/usefulness/actions.ts` | `submitUsefulness` checked only for a session, never the `record_usefulness` grant, and `recordOutcome` takes no caller identity at all — so any signed-in email, including a non-member, could write outcome records that feed the clinician-judged-reasonable rate. | Authorizes `record_usefulness` against the practice's memberships before writing; new e2e proves a signed-in non-member is refused. |
 | 5 | High | `app/console/complaints/actions.ts`, `page.tsx` | Complaint intake mutates the rail — it applies terminal opt-outs — behind a session check only, and the complaints list (operator-entered, patient-linked data) was readable by any authenticated session. | Both take the lowest grant every member holds (`view_dashboard`), which keeps intake open to front desk while closing it to non-members. Triage/resolve keep `pause_sending`. |
-| 6 | High | `src/console/store.ts` | `saveClinicians` reassigned ids positionally on every roster save, so deleting or blanking a row slid every later clinician onto a predecessor's id. The session-config allowlist's cleanup is existence-based, so a migrated id was silently kept — and the practice's "these clinicians participate" choice quietly became a different person. | Identity is carried by name (validated unique, and the only identity the form submits); anyone new takes a fresh id from a monotonic counter, so a removed clinician's id is never reused. Regression test covers delete-a-row and add-a-new-hire. |
+| 6 | High | `src/console/store.ts` | *(Independently found and fixed on main before this landed — recorded because two audits reaching it separately is a signal about the defect, not noise.)* `saveClinicians` reassigned ids positionally on every roster save, so deleting or blanking a row slid every later clinician onto a predecessor's id. The session-config allowlist's cleanup is existence-based, so a migrated id was silently kept — and the practice's "these clinicians participate" choice quietly became a different person. | Fixed on main by the W41 review pass: rows carry an explicit `id`, and `nextClinicianSeq` never reissues a retired one. That fix is better than the name-matching one drafted here (a rename keeps identity), so this audit's version was dropped in favour of it. |
 | 7 | High | `src/pilot/casestudy.ts`, `src/pilot/report.ts` | The case study and pilot report labelled the north star "incremental attended appointments per 1,000 **eligible** patients", but `countAttribution`'s denominator is the whole invite arm — and the case study defines "eligibility rules" as the practice's own W4 filter two paragraphs earlier. On the committed golden the mislabel is ~4.6× (≈700 ever-eligible vs 3,254 invite-arm): the printed 61.4 would read ≈285 against the label's own denominator. This is the document that becomes the G4 pilot template. | Relabelled "per 1,000 patients in the messaged group" everywhere (generator, report, golden, and the pinning test), and `docs/PILOT-PLAYBOOK.md` §6 now states the denominator explicitly and says why intention-to-treat holds it fixed. The engine was correct throughout — `docs/ATTRIBUTION.md` has always said "per 1,000 arm patients"; only the labels lied, in the conservative direction. |
 | 8 | Medium | `src/complaints/store.ts` | The `patient_opted_out` audit event was attributed to `rail.state.invitations[0].practiceId` — the first invitation in the rail, which is not necessarily the practice acting. | Uses the console practice id, falling back as before. |
 
@@ -80,8 +90,15 @@ duplication, or a scope question that deserves its own unit. The clusters:
 
 ## Verification
 
-`pnpm typecheck && pnpm test && pnpm build` green; 399 unit tests across 51 files (six new
-regression tests, one pre-existing assertion widened for the new deletion field).
-`PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm e2e` green, 42 tests including the new
-non-member deny path. Founder gates unchanged: synthetic data only, no live SMS, no
+`pnpm verify` (typecheck · test · build · audit:gate) green: 446 unit tests across 55 files
+— five new regression tests, one pre-existing assertion widened for the new deletion field —
+and the W53 dependency gate passes with its two accepted advisories.
+`PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm e2e` green, including the new non-member
+deny path.
+
+One flake was found and closed while re-verifying: the W49 axe sweep intermittently reported
+`document-title` on the booking confirmation page, which has a title pinned. axe reads the
+title once, instantaneously, so the confirm action's revalidation swap can be caught
+mid-flight. `expectNoViolations` now asserts a non-empty title first — the same requirement
+with a retry, so a genuinely title-less page still fails, and fails more legibly. Founder gates unchanged: synthetic data only, no live SMS, no
 production credentials, no symptom-based triage, no public directory copy.

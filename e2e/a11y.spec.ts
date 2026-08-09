@@ -11,6 +11,12 @@ interface MockState {
 }
 
 async function expectNoViolations(page: Page, label: string) {
+  // Assert the title before scanning. axe's document-title rule takes a single
+  // instantaneous reading, so a server action's revalidation swap — the confirm-booking
+  // one in particular — can be caught mid-flight and reported as a missing <title> on a
+  // page that has one pinned (W49 follow-up). This is the same requirement with a
+  // retry, so a genuinely title-less page still fails, and fails more legibly.
+  await expect(page, `${label} must have a document title`).toHaveTitle(/.+/);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();
