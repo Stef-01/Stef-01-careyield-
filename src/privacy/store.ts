@@ -3,40 +3,20 @@
 // suppression list; the patient-touching dataset itself lives in the rail store.
 
 import { getStore } from "@/booking/store";
+import { complaintsForPatient, scrubPatientFromComplaints } from "@/complaints/store";
+import type { ComplaintRecord } from "@/complaints/workflow";
 import {
   applyRetention,
-  DEFAULT_RETENTION,
   deletePatient,
   exportPatientData,
   isSuppressed,
   type DeletionRecord,
   type PatientExport,
   type PrivacyDataset,
-  type RetentionConfig,
-  type SuppressionEntry,
 } from "./privacy";
+import { getPrivacy } from "./state";
 
-export interface PrivacyState {
-  retention: RetentionConfig;
-  deletions: DeletionRecord[];
-  suppressions: SuppressionEntry[];
-}
-
-const globalStore = globalThis as { __careyieldPrivacy?: PrivacyState };
-
-function initial(): PrivacyState {
-  return { retention: { ...DEFAULT_RETENTION }, deletions: [], suppressions: [] };
-}
-
-export function getPrivacy(): PrivacyState {
-  globalStore.__careyieldPrivacy ??= initial();
-  return globalStore.__careyieldPrivacy;
-}
-
-export function resetPrivacy(): PrivacyState {
-  globalStore.__careyieldPrivacy = initial();
-  return globalStore.__careyieldPrivacy;
-}
+export { getPrivacy, resetPrivacy, type PrivacyState } from "./state";
 
 function railDataset(): PrivacyDataset {
   const rail = getStore();
@@ -48,9 +28,19 @@ function railDataset(): PrivacyDataset {
   };
 }
 
-export function exportForPatient(patientId: string, nowIso: string): PatientExport & { suppressed: boolean } {
+export interface ConsoleExport extends PatientExport {
+  suppressed: boolean;
+  /** W51: complaints live in their own store; an access request covers them too. */
+  complaints: ComplaintRecord[];
+}
+
+export function exportForPatient(patientId: string, nowIso: string): ConsoleExport {
+  const railExport = exportPatientData(railDataset(), patientId, nowIso);
+  const complaints = complaintsForPatient(patientId);
   return {
-    ...exportPatientData(railDataset(), patientId, nowIso),
+    ...railExport,
+    held: railExport.held || complaints.length > 0,
+    complaints,
     suppressed: isSuppressed(getPrivacy().suppressions, patientId),
   };
 }
@@ -63,10 +53,18 @@ export function deletePatientEverywhere(patientId: string, nowIso: string): Dele
     appointments: result.dataset.appointments,
     auditEvents: result.dataset.auditEvents,
   };
+  // W51: "delete everywhere" means everywhere. The complaints store keeps its own
+  // records, so the pure rail deletion is composed with a complaints scrub here —
+  // otherwise a raw patientId survives an erasure the console reports as complete.
+  const complaints = scrubPatientFromComplaints(patientId, nowIso);
+  const deletion: DeletionRecord = {
+    ...result.deletion,
+    removed: { ...result.deletion.removed, complaints },
+  };
   const privacy = getPrivacy();
-  privacy.deletions.push(result.deletion);
+  privacy.deletions.push(deletion);
   privacy.suppressions.push(result.suppression);
-  return result.deletion;
+  return deletion;
 }
 
 export function runRetention(nowIso: string): void {

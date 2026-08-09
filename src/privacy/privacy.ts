@@ -94,7 +94,14 @@ export interface DeletionRecord {
   /** Hashed reference — the record proves deletion without retaining the identifier. */
   ref: string;
   at: string;
-  removed: { invitations: number; appointments: number; auditEvents: number; outcomes: number };
+  removed: {
+    invitations: number;
+    appointments: number;
+    auditEvents: number;
+    outcomes: number;
+    /** W43 complaint links scrubbed. Composed by the store — this dataset has none. */
+    complaints: number;
+  };
 }
 
 export interface DeletionResult {
@@ -121,6 +128,7 @@ export function deletePatient(
     appointments: ownAppointments.length,
     auditEvents: auditToRemove.size,
     outcomes: dataset.outcomes.filter((o) => appointmentIds.has(o.appointmentId as string)).length,
+    complaints: 0, // filled by deletePatientEverywhere, which owns the complaints store
   };
   return {
     dataset: {

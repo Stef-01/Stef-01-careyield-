@@ -2,7 +2,10 @@
 // complaints are the practice notification: they banner here and on the console
 // home, and the W16 guardrail treats any open complaint as critical.
 
+import { redirect } from "next/navigation";
 import { getComplaints } from "@/complaints/store";
+import { getConsole } from "@/console/store";
+import { authorize } from "@/tenancy/tenancy";
 import { requireSession } from "../guard";
 import { ConsoleShell, inputClass, primaryButtonClass } from "../ui";
 import { intake, resolve, triage } from "./actions";
@@ -21,6 +24,13 @@ export default async function ComplaintsPage({
   searchParams: Promise<{ received?: string; error?: string }>;
 }) {
   const email = await requireSession();
+  // W51: the list is operator-entered, patient-linked data — reading it takes
+  // membership, not merely a session.
+  const state = getConsole();
+  if (!state.practice) redirect("/console/onboarding");
+  if (!authorize(state.memberships, email, state.practice.id, "view_dashboard").allowed) {
+    redirect("/console");
+  }
   const params = await searchParams;
   const { complaints } = getComplaints();
   const open = complaints.filter((c) => c.status === "open");
@@ -96,6 +106,11 @@ export default async function ComplaintsPage({
                     {c.optOutApplied && (
                       <span className="ml-2 rounded bg-stone-100 px-2 py-0.5 text-xs text-stone-500">
                         opt-out applied
+                      </span>
+                    )}
+                    {c.optOutApplied && c.optOutMatchedPatient === false && (
+                      <span className="ml-2 rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-900">
+                        identifier matched no record — check it
                       </span>
                     )}
                   </span>

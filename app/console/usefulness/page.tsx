@@ -17,6 +17,7 @@ const ERROR_COPY: Record<string, string> = {
   reasonable_requires_action: "To mark a visit worthwhile, record at least one thing that happened.",
   unknown_visit: "That visit is no longer in the queue.",
   already_recorded: "That visit was already audited.",
+  denied: "Your role cannot record visit outcomes.",
 };
 
 export default async function UsefulnessPage({

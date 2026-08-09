@@ -10,6 +10,7 @@
 //   - the estimate is labelled an estimate, and the demonstration data is labelled.
 
 import Link from "next/link";
+import { getComplaints } from "@/complaints/store";
 import { DEFAULT_GUARDRAILS, evaluateGuardrails, metricsFromSim } from "@/guardrails/monitors";
 import { getDashboardData } from "@/sim/dashboard-data";
 import { DEFAULT_SIM_CONFIG, runSim } from "@/sim/harness";
@@ -39,8 +40,11 @@ export default async function ResultsPage() {
   const email = await requireSession();
   const data = getDashboardData();
   // Guardrails read the sim result itself; the dashboard cache holds the shaped view.
+  // Complaints come from the live store (W51): an empty list here would make the
+  // zero-tolerance complaints monitor unfireable and print "nothing needs attention"
+  // over an open complaint.
   const alerts = evaluateGuardrails(
-    metricsFromSim(runSim(DEFAULT_SIM_CONFIG), []),
+    metricsFromSim(runSim(DEFAULT_SIM_CONFIG), getComplaints().complaints),
     DEFAULT_GUARDRAILS,
   );
   const r = buildPracticeResults(data, alerts, {

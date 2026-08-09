@@ -11,8 +11,8 @@ contact so the effect could be measured rather than assumed.
 
 ## What was measured
 
-- **61.4 incremental attended appointments per 1,000 eligible patients** — the
-  attendance rate above what the holdout group did on its own.
+- **61.4 incremental attended appointments per 1,000 patients in the messaged
+  group** — the attendance rate above what the holdout group did on its own.
 - 200 incremental attended appointments over the period
   (point estimate; every patient counted in their originally assigned group).
 - 1,487 invitations sent, 305 booked

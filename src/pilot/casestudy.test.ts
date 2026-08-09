@@ -36,7 +36,7 @@ describe("W45 case-study generator", () => {
 
   it("the golden carries the honest-numbers structure and the synthetic marker", () => {
     const text = renderCaseStudy(report, CONTEXT);
-    expect(text).toContain("incremental attended appointments per 1,000 eligible");
+    expect(text).toContain("incremental attended appointments per 1,000 patients in the messaged\n  group");
     expect(text).toContain("would have claimed");
     expect(text).toContain("Synthetic-data rehearsal");
     expect(text).toContain("makes no claims about anyone's health");

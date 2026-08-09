@@ -12,6 +12,16 @@ async function signIn(page: import("@playwright/test").Page) {
   await page.waitForURL(/\/console(\/onboarding)?$/);
 }
 
+/** W51: recording an outcome takes the record_usefulness grant, so the auditing
+ *  clinician has to be a member of a practice — a session alone is not enough. */
+async function signInAsMember(page: import("@playwright/test").Page) {
+  await signIn(page);
+  await page.getByLabel("Practice name").fill("Demo Family Practice");
+  await page.getByLabel("Holdout share (%)").fill("10");
+  await page.getByRole("button", { name: "Create practice" }).click();
+  await page.waitForURL(/\/console$/);
+}
+
 test.beforeEach(async ({ request }) => {
   await request.post("/api/mock/usefulness");
   // Also clears the W37 sign-in rate limiter (see the mock console route).
@@ -24,7 +34,7 @@ test("signed-out access to the audit page redirects to sign-in", async ({ page }
 });
 
 test("captures a usefulness audit and persists it", async ({ page, request }) => {
-  await signIn(page);
+  await signInAsMember(page);
   await page.goto("/console/usefulness");
 
   const before = await (await request.get("/api/mock/usefulness")).json();
@@ -49,7 +59,7 @@ test("captures a usefulness audit and persists it", async ({ page, request }) =>
 });
 
 test("marking a visit worthwhile with no action is refused", async ({ page, request }) => {
-  await signIn(page);
+  await signInAsMember(page);
   await page.goto("/console/usefulness");
 
   // Submit with "worthwhile" checked (the default) but no action tapped.
@@ -57,6 +67,25 @@ test("marking a visit worthwhile with no action is refused", async ({ page, requ
   await firstCard.getByRole("button", { name: "Save" }).click();
 
   await expect(page.getByText(/record at least one thing that happened/)).toBeVisible();
+  const after = await (await request.get("/api/mock/usefulness")).json();
+  expect(after.outcomes).toHaveLength(0);
+});
+
+test("a signed-in non-member cannot record an outcome (W51)", async ({ page, request }) => {
+  // The clinician onboards the practice; a different signed-in email is not a member.
+  await signInAsMember(page);
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await page.waitForURL(/\/console\/signin$/);
+  await page.getByLabel("Work email").fill("stranger@elsewhere.example");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.waitForURL(/\/console$/);
+
+  await page.goto("/console/usefulness");
+  const firstCard = page.locator("form").filter({ has: page.getByRole("button", { name: "Save" }) }).first();
+  await firstCard.getByText("Medication reviewed").click();
+  await firstCard.getByRole("button", { name: "Save" }).click();
+
+  await expect(page.getByText(/Your role cannot record visit outcomes/)).toBeVisible();
   const after = await (await request.get("/api/mock/usefulness")).json();
   expect(after.outcomes).toHaveLength(0);
 });

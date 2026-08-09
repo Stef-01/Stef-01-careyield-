@@ -17,7 +17,7 @@ import { mulberry32, pick } from "@/synthetic/rng";
 
 export interface PilotReport {
   weeksSimulated: number;
-  /** North star: incremental attended appointments per 1,000 eligible (null without holdout). */
+  /** North star: incremental attended per 1,000 messaged-arm patients (null without holdout). */
   northStarIncrementalPer1000: number | null;
   incrementalAttended: number | null;
   naiveGeneratedAttended: number; // contrast figure only — never impact
@@ -102,7 +102,7 @@ export function renderPilotReportMarkdown(r: PilotReport): string {
     `# CareYield pilot report (${r.weeksSimulated} weeks, synthetic)`,
     ``,
     `## North star`,
-    `Incremental attended appointments per 1,000 eligible: **${r.northStarIncrementalPer1000 ?? "n/a (no holdout)"}**`,
+    `Incremental attended appointments per 1,000 patients in the messaged group: **${r.northStarIncrementalPer1000 ?? "n/a (no holdout)"}**`,
     `Incremental attended (scaled): ${r.incrementalAttended ?? "n/a"} · naive generated (contrast only): ${r.naiveGeneratedAttended}`,
     ``,
     `## Funnel`,

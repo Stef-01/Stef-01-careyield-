@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { getStore, resetStore } from "@/booking/store";
+import { getConsole, onboardPractice, resetConsole } from "@/console/store";
 import { evaluateGuardrails, DEFAULT_GUARDRAILS } from "@/guardrails/monitors";
+import { isSuppressed } from "@/privacy/privacy";
+import { getPrivacy, resetPrivacy } from "@/privacy/state";
+import { deletePatientEverywhere, exportForPatient } from "@/privacy/store";
 import {
   getComplaints,
   openComplaintCount,
@@ -88,5 +92,84 @@ describe("W43 store + opt-out side effect", () => {
     triageInStore("cmp-1", "low", AT, STAFF);
     expect(resolveInStore("cmp-1", "Explained and apologised", AT, STAFF)).toEqual({});
     expect(openComplaintCount()).toBe(0);
+  });
+});
+
+// W51 audit fixes. Each test pins a confirmed finding: "no further contact" has to be
+// durable and honestly reported, and "delete everywhere" has to reach this store.
+describe("W51 complaint opt-out is durable and honestly reported", () => {
+  beforeEach(() => {
+    resetComplaints();
+    resetStore();
+    resetPrivacy();
+  });
+
+  it("records a suppression that survives re-ingest, not just today's offers", () => {
+    submitComplaint(
+      { channel: "sms_reply", summary: "Do not message me again", patientId: "pat-1", wantsOptOut: true },
+      AT,
+    );
+    expect(isSuppressed(getPrivacy().suppressions, "pat-1")).toBe(true);
+    expect(getComplaints().complaints[0]).toMatchObject({
+      optOutApplied: true,
+      optOutMatchedPatient: true,
+    });
+  });
+
+  it("an identifier that matched nothing is flagged, never reported as a clean opt-out", () => {
+    submitComplaint(
+      { channel: "phone", summary: "Stop contacting me", patientId: "pat 1", wantsOptOut: true },
+      AT,
+    );
+    const record = getComplaints().complaints[0]!;
+    expect(record.optOutMatchedPatient).toBe(false);
+    expect(record.timeline.at(-1)?.event).toMatch(/matched no held record/);
+    // The real patient's offers are untouched — which is exactly why staff are told.
+    expect(getStore().state.invitations.some((i) => i.patientId === "pat-1" && i.status === "sent")).toBe(true);
+  });
+
+  it("attributes the opt-out audit event to the console practice", () => {
+    resetConsole();
+    onboardPractice({ name: "Demo Family Practice", timezone: "Australia/Sydney", holdoutPercent: 10 }, AT, STAFF);
+    submitComplaint(
+      { channel: "phone", summary: "Please stop", patientId: "pat-1", wantsOptOut: true },
+      AT,
+    );
+    expect(getStore().state.auditEvents.at(-1)?.practiceId).toBe(getConsole().practice?.id);
+  });
+});
+
+describe("W51 patient erasure reaches the complaints store", () => {
+  beforeEach(() => {
+    resetComplaints();
+    resetStore();
+    resetPrivacy();
+  });
+
+  it("exports complaints held under the identifier and scrubs them on erasure", () => {
+    submitComplaint(
+      { channel: "front_desk", summary: "Unhappy about the message wording", patientId: "pat-1", wantsOptOut: false },
+      AT,
+    );
+    expect(exportForPatient("pat-1", AT).complaints).toHaveLength(1);
+
+    const deletion = deletePatientEverywhere("pat-1", AT);
+    expect(deletion.removed.complaints).toBe(1);
+    // The raw identifier must not survive an erasure the console reports as complete.
+    expect(getComplaints().complaints.every((c) => c.patientId !== "pat-1")).toBe(true);
+    expect(JSON.stringify(getComplaints().complaints)).not.toContain("pat-1");
+    const after = exportForPatient("pat-1", AT);
+    expect(after.complaints).toEqual([]);
+    expect(after.held).toBe(false);
+  });
+
+  it("an erased patient with only a complaint is still reported as held before erasure", () => {
+    submitComplaint(
+      { channel: "email", summary: "Complaint from a patient with no offers", patientId: "pat-unknown", wantsOptOut: false },
+      AT,
+    );
+    expect(exportForPatient("pat-unknown", AT).held).toBe(true);
+    deletePatientEverywhere("pat-unknown", AT);
+    expect(exportForPatient("pat-unknown", AT).held).toBe(false);
   });
 });

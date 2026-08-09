@@ -89,8 +89,9 @@ export default async function PrivacyPage({
       <section className="mt-8 rounded-xl border border-stone-200 bg-white p-6">
         <h2 className="font-medium text-stone-900">Delete a patient&apos;s data</h2>
         <p className="mt-1 text-sm text-stone-500">
-          Removes their invitations, visit links, and audit trail entries. A hashed deletion
-          record is kept as proof, and the identifier is suppressed from all future contact.
+          Removes their invitations, visit links, audit trail entries, and the patient link
+          on any complaint held about them. A hashed deletion record is kept as proof, and the
+          identifier is suppressed from all future contact.
         </p>
         <form action={erasePatient} className="mt-4 flex items-end gap-3">
           <label className="flex flex-col gap-1.5">
@@ -124,7 +125,8 @@ export default async function PrivacyPage({
                 <span className="font-mono text-xs text-stone-500">{d.ref.slice(0, 16)}…</span>{" "}
                 <span className="text-stone-700">
                   removed {d.removed.invitations} invitation(s), {d.removed.appointments}{" "}
-                  visit link(s), {d.removed.auditEvents} audit event(s)
+                  visit link(s), {d.removed.auditEvents} audit event(s),{" "}
+                  {d.removed.complaints} complaint link(s)
                 </span>{" "}
                 <span className="text-stone-500">{d.at.slice(0, 10)}</span>
               </li>

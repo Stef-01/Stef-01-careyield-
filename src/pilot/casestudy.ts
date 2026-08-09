@@ -70,8 +70,8 @@ contact so the effect could be measured rather than assumed.
 
 ## What was measured
 
-- **${northStar} incremental attended appointments per 1,000 eligible patients** — the
-  attendance rate above what the holdout group did on its own.
+- **${northStar} incremental attended appointments per 1,000 patients in the messaged
+  group** — the attendance rate above what the holdout group did on its own.
 - ${report.incrementalAttended?.toFixed(0)} incremental attended appointments over the period
   (point estimate; every patient counted in their originally assigned group).
 - ${report.invitationsSent.toLocaleString("en-AU")} invitations sent, ${report.booked} booked
