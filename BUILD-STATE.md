@@ -73,7 +73,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W45 | done | builder-A | 2026-08-09T04:56Z | 64bbb7c | golden at reports/case-study-w45.md; de-identification + W23 copy-lint + no-holdout-refusal enforced in code; synthetic marker until G4 |
 | W46 | claimed | builder-B | 2026-08-09T05:20Z | — | [P] no deps |
 | W47 | done | interactive-0809 | 2026-08-09T04:08Z | 2880cbf | agreement is a skeleton for a lawyer, not a contract; pricing encodes the no-fee-splitting posture |
-| W48 | available | — | — | — | depends W38 |
+| W48 | claimed | builder-A | 2026-08-09T05:16Z | — | depends W38 |
 | W49 | available | — | — | — | depends W41, W42 |
 | W50 | available | — | — | — | depends W33, W37 |
 | W51 | available | — | — | — | depends W40–W50 |
