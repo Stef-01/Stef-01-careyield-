@@ -131,7 +131,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W57 | available | — | — | — | W55, W56 |
 | W58 | available | — | — | — | W57 |
 | W59 | available | — | — | — | W58 |
-| W60 | claimed | builder-B | 2026-08-09T11:48Z | — | [P] W55 |
+| W60 | done | builder-B | 2026-08-09T11:48Z | 5d72a95 | /console/registers + src/registers/store.ts. Isolation is held by the DATA SHAPE (enable/disable keyed by practice id), so one practice cannot change what another sees; not observable from the browser (console signs in as one practice) so it is unit-tested directly with two practices. G5: W56 was blocked ~1h before this claim, so the catalogue ships PLACEHOLDERS asserting nothing clinical (neutral names; provenance literally says "not clinical guidance"), and a test asserts the shipped catalogue names no real condition/guideline — shipping realistic registers here would have pre-empted an escalated founder decision by the back door. Gap counts are CARRIED by the store, not computed: detection is W58, and this store is the seam W58 becomes the real source for. W13 authz inside the server action (reuses edit_rules, no new grant); W41 error-keys-not-messages; W50 dossier row added (9 surfaces); joined the W49 axe sweep. Verify: 4 e2e + isolation unit tests. NOTE: my first copy test passed VACUOUSLY against the onboarding redirect — it now asserts the page identity before scanning; worth copying that guard into other copy-scan specs |
 | W61 | available | — | — | — | W59 |
 | W62 | available | — | — | — | [P] W56 |
 | W63 | available | — | — | — | W59, W61 |
