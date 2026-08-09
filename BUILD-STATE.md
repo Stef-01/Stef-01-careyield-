@@ -72,7 +72,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W44 | done | interactive-0809 | 2026-08-09T03:52Z | dfae8bf | FINDING: sim defaults show generated-DNA worse than organic (~ratio>1.25) — calibration owner should review the generated-booking DNA model (W3/W12); real answer comes from pilot holdout |
 | W45 | available | — | — | — | depends W35 |
 | W46 | available | — | — | — | [P] no deps |
-| W47 | available | — | — | — | [P] no deps |
+| W47 | claimed | interactive-0809 | 2026-08-09T04:08Z | — | [P] no deps |
 | W48 | available | — | — | — | depends W38 |
 | W49 | available | — | — | — | depends W41, W42 |
 | W50 | available | — | — | — | depends W33, W37 |
