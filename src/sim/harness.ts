@@ -25,7 +25,7 @@ import {
 } from "@/session/config";
 import { ALL_CLEAR, canSend, type OpsSwitches } from "@/ops/switches";
 import { isoDaysFrom } from "@/lib/dates";
-import { handleStop, MockSmsAdapter } from "@/messaging/adapter";
+import { assertFireAndForgetSafe, handleStop, MockSmsAdapter } from "@/messaging/adapter";
 import { renderCompliant } from "@/messaging/templates";
 import { generatePractice, type SyntheticPractice } from "@/synthetic/generate";
 import { chance, intBetween, mulberry32 } from "@/synthetic/rng";
@@ -130,6 +130,9 @@ export function runSim(config: SimConfig): SimResult {
     todayIso: config.todayIso,
   });
   const sms = new MockSmsAdapter();
+  // Fail closed: this harness discards send promises (see SmsAdapter.fireAndForgetSafe).
+  // An adapter that can actually fail must never run through it — W51 audit finding A1.
+  assertFireAndForgetSafe(sms);
   let log: EventLog = EMPTY_LOG;
 
   // Arm assignment first — the measurement design precedes any contact.
