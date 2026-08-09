@@ -56,7 +56,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W28 | available | — | — | — | depends W27 |
 | W29 | available | — | — | — | depends W27 |
 | W30 | available | — | — | — | depends W27 |
-| W31 | claimed | builder-A | 2026-08-09T02:36Z | — | [P] depends W6 |
+| W31 | done | builder-A | 2026-08-09T02:36Z | e43eea5 | G3 enforced in constructor (twilio.com refused); integration tests use in-process fake API; real Twilio sandbox creds + live wiring = founder gate follow-up (W39 dossier) |
 | W32 | available | — | — | — | depends W27 |
 | W33 | available | — | — | — | [P] depends W10 |
 | W34 | done | interactive-0809 | 2026-08-09T02:42Z | 0da1194 | revenue-estimation only; verified 1-Jul-2025 rebates pinned in tests |
