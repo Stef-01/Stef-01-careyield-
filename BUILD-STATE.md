@@ -68,7 +68,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W40 | done | interactive-0809 | 2026-08-09T03:39Z | 7589c38 | docs unit; success criteria pre-registered incl. holdout non-negotiable + stop rules |
 | W41 | done | builder-B | 2026-08-09T04:25Z | 596fdce | 5-step wizard at /console/setup/[step]; lands the W17 deferral (clinician roster + persisted SessionConfig + validateSessionConfig) and setupCompletedAt. /console/onboarding left intact (6 redirect sites + 3 specs drive it) — collapsing it into a redirect to the wizard is a clean follow-up, filed for W49/W50. Adversarial review found + fixed 2 defects in my own code: reflected error string in console chrome, and completion attesting to never-reviewed defaults. Timed e2e asserts structure (≤5 steps, real persisted config) + wall-clock ceiling |
 | W42 | claimed | builder-B | 2026-08-09T04:45Z | — | depends W14, W20 |
-| W43 | available | — | — | — | [P] depends W16 |
+| W43 | claimed | builder-A | 2026-08-09T04:35Z | — | [P] depends W16 |
 | W44 | done | interactive-0809 | 2026-08-09T03:52Z | dfae8bf | FINDING: sim defaults show generated-DNA worse than organic (~ratio>1.25) — calibration owner should review the generated-booking DNA model (W3/W12); real answer comes from pilot holdout |
 | W45 | available | — | — | — | depends W35 |
 | W46 | available | — | — | — | [P] no deps |
