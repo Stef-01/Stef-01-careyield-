@@ -48,6 +48,12 @@ export default async function ConsoleHome() {
         >
           Admin ops
         </Link>
+        <Link
+          href="/console/roi"
+          className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
+        >
+          ROI calculator
+        </Link>
       </div>
 
       <section className="mt-8 rounded-xl border border-stone-200 bg-white p-6">
