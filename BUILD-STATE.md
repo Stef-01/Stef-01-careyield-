@@ -77,6 +77,6 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W49 | done | builder-A | 2026-08-09T05:22Z | bb879e2 | axe (WCAG 2.1 A/AA) e2e over all surfaces, zero violations enforced; contrast sweep stone-400→500 (14 files); manual checklist at docs/A11Y-W49.md; post-G2 re-run required |
 | W50 | done | interactive-0809 | 2026-08-09T05:18Z | 23635ae | 8 surfaces mapped, zero unmapped in app/; update-in-same-commit rule established |
 | W51 | done | interactive-0809 | 2026-08-09T07:50Z | 1038ab4 | audit at docs/AUDIT-W51.md — 2 findings both FIXED (A1 fire-and-forget send could log unsent-as-sent at G3, guarded fail-closed; A2 pnpm audit never run: 5/7 transitive advisories fixed via overrides, 2 image-size DoS accepted with rationale), 8 controls confirmed clean. Process: add pnpm audit to the gate + builders are a single-model SPOF (see report §Process) |
-| W52 | available | — | — | — | depends W51 |
+| W52 | claimed | interactive-0809 | 2026-08-09T08:05Z | — | depends W51 |
 
 > Y2–Y5 rows are appended by the expansion rule (plan §6) at W52/W104/W156/W208 or when the backlog runs dry.
