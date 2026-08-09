@@ -3,6 +3,7 @@
 
 import { NextResponse } from "next/server";
 import { getConsole, resetConsole } from "@/console/store";
+import { resetPrivacy } from "@/privacy/store";
 import { assertMockRoutesEnabled } from "@/lib/mock-guard";
 
 export const dynamic = "force-dynamic";
@@ -14,5 +15,6 @@ export async function GET() {
 
 export async function POST() {
   assertMockRoutesEnabled();
+  resetPrivacy(); // W33 state rides along with the console reset in e2e
   return NextResponse.json(resetConsole());
 }
