@@ -83,7 +83,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 
 > **Year 2 — Condition Yield** (expanded by W52, 2026-08-09; definitions in docs/FIVE-YEAR-PLAN.md §5b).
 
-| W53 | available | — | — | — | W51 finding A2 |
+| W53 | claimed | builder-B | 2026-08-09T08:47Z | — | W51 finding A2 |
 | W54 | available | — | — | — | W51 §Process |
 | W55 | available | — | — | — | — |
 | W56 | available | — | — | — | W55 |
