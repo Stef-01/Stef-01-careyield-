@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import {
+  acknowledgeSetupStep,
   completeSetup,
   onboardPractice,
   saveClinicians,
@@ -73,7 +74,11 @@ export async function saveStepSessions(formData: FormData): Promise<void> {
       endHour: Number(formData.get("endHour")),
     },
   };
-  onwards("sessions", saveSessionConfig(config, new Date().toISOString(), email));
+  const errors = saveSessionConfig(config, new Date().toISOString(), email);
+  // Saving the step is what proves the practice chose these settings rather than
+  // inheriting defaults — record it only on success.
+  if (Object.keys(errors).length === 0) acknowledgeSetupStep("sessions", email);
+  onwards("sessions", errors);
 }
 
 export async function saveStepRules(formData: FormData): Promise<void> {
@@ -85,7 +90,11 @@ export async function saveStepRules(formData: FormData): Promise<void> {
     usualClinicianOnly: formData.get("usualClinicianOnly") === "on",
     chronicCareOnly: formData.get("chronicCareOnly") === "on",
   };
-  onwards("rules", updateRules(config, new Date().toISOString(), email));
+  const errors = updateRules(config, new Date().toISOString(), email);
+  // updateRules no-ops when nothing changed, so acknowledgement is recorded here
+  // rather than inside it: submitting the step IS the practice accepting the values.
+  if (Object.keys(errors).length === 0) acknowledgeSetupStep("rules", email);
+  onwards("rules", errors);
 }
 
 export async function finishSetup(): Promise<void> {

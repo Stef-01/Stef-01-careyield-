@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  acknowledgeSetupStep,
   completeSetup,
   getConsole,
   onboardPractice,
@@ -176,9 +177,35 @@ describe("W41 readiness and completion", () => {
     expect(getConsole().setupCompletedAt).toBeNull();
   });
 
+  it("refuses completion when sessions and rules were never reviewed", () => {
+    // The seeded defaults validate clean, so validity alone must not count as
+    // configured — otherwise finishing setup attests to wide-open defaults
+    // (all appointment types, 0% protected, 24h window) nobody ever saw.
+    saveClinicians(ROSTER, NOW, OWNER);
+    expect(setupReadiness()).toMatchObject({ clinicians: true, sessions: false, rules: false });
+    expect(completeSetup(NOW, OWNER)).toHaveProperty("fillableTypes");
+    expect(getConsole().setupCompletedAt).toBeNull();
+
+    acknowledgeSetupStep("sessions", OWNER);
+    expect(completeSetup(NOW, OWNER)).toHaveProperty("minDaysSinceLastVisit");
+
+    acknowledgeSetupStep("rules", OWNER);
+    expect(completeSetup(NOW, OWNER)).toEqual({});
+  });
+
+  it("acknowledgement is idempotent and needs the grant", () => {
+    expect(acknowledgeSetupStep("sessions", OUTSIDER)).toHaveProperty("form");
+    expect(getConsole().acknowledgedSteps).toEqual([]);
+    acknowledgeSetupStep("sessions", OWNER);
+    acknowledgeSetupStep("sessions", OWNER);
+    expect(getConsole().acknowledgedSteps).toEqual(["sessions"]);
+  });
+
   it("completes once every prerequisite is met, and is idempotent", () => {
     saveClinicians(ROSTER, NOW, OWNER);
     updateRules({ ...DEFAULT_CONFIG, minDaysSinceLastVisit: 200 }, NOW, OWNER);
+    acknowledgeSetupStep("sessions", OWNER);
+    acknowledgeSetupStep("rules", OWNER);
     expect(completeSetup(NOW, OWNER)).toEqual({});
     const completedAt = getConsole().setupCompletedAt;
     expect(completedAt).toBe(NOW);
@@ -191,12 +218,16 @@ describe("W41 readiness and completion", () => {
 
   it("refuses completion from a caller without the grant", () => {
     saveClinicians(ROSTER, NOW, OWNER);
+    acknowledgeSetupStep("sessions", OWNER);
+    acknowledgeSetupStep("rules", OWNER);
     expect(completeSetup(NOW, OUTSIDER)).toHaveProperty("form");
     expect(getConsole().setupCompletedAt).toBeNull();
   });
 
   it("readiness reports each prerequisite independently", () => {
     saveClinicians(ROSTER, NOW, OWNER);
+    acknowledgeSetupStep("sessions", OWNER);
+    acknowledgeSetupStep("rules", OWNER);
     const readiness = setupReadiness();
     expect(readiness).toMatchObject({ practice: true, clinicians: true, sessions: true, rules: true });
   });

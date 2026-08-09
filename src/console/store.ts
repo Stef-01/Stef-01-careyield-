@@ -29,6 +29,12 @@ export interface ConsoleState {
   memberships: Membership[]; // W18 — whoever onboards becomes owner
   clinicians: ClinicianRecord[]; // W41 — the roster W17 deferred
   sessionConfig: SessionConfig; // W41 — W17's dials, now practice-editable
+  /**
+   * W41: wizard steps the practice has explicitly saved. Seeded defaults validate
+   * clean, so validity alone cannot prove a practice chose its settings — without
+   * this, finishing setup would attest to wide-open defaults nobody ever saw.
+   */
+  acknowledgedSteps: string[];
   /** Set when the practice finishes the setup wizard; null while still in setup. */
   setupCompletedAt: string | null;
 }
@@ -48,6 +54,7 @@ function initial(): ConsoleState {
     memberships: [],
     clinicians: [],
     sessionConfig: { ...DEFAULT_SESSION_CONFIG },
+    acknowledgedSteps: [],
     setupCompletedAt: null,
   };
 }
@@ -259,11 +266,18 @@ export interface SetupReadiness {
   complete: boolean;
 }
 
+/**
+ * A step counts as ready only when it is BOTH valid AND explicitly saved by the
+ * practice. Validity alone would pass on seeded defaults, letting a practice
+ * "complete" setup while never seeing the settings it is being credited with.
+ */
 export function setupReadiness(state: ConsoleState = getConsole()): SetupReadiness {
+  const acknowledged = (step: string) => state.acknowledgedSteps.includes(step);
   const practice = state.practice !== null;
   const clinicians = state.clinicians.length > 0 && state.clinicians.some((c) => c.participating);
-  const sessions = Object.keys(validateSessionConfig(state.sessionConfig)).length === 0;
-  const rules = Object.keys(validateRules(state.rulesConfig)).length === 0;
+  const sessions =
+    acknowledged("sessions") && Object.keys(validateSessionConfig(state.sessionConfig)).length === 0;
+  const rules = acknowledged("rules") && Object.keys(validateRules(state.rulesConfig)).length === 0;
   return {
     practice,
     clinicians,
@@ -271,6 +285,15 @@ export function setupReadiness(state: ConsoleState = getConsole()): SetupReadine
     rules,
     complete: state.setupCompletedAt !== null,
   };
+}
+
+/** Record that the practice explicitly saved a wizard step. Idempotent. */
+export function acknowledgeSetupStep(step: string, byEmail: string): FieldErrors {
+  const state = getConsole();
+  const denied = requireEditRules(state, byEmail);
+  if (denied) return denied;
+  if (!state.acknowledgedSteps.includes(step)) state.acknowledgedSteps.push(step);
+  return {};
 }
 
 /** Finish setup — refused while any prerequisite is unmet, so "ready" means ready. */
