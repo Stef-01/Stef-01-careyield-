@@ -192,7 +192,7 @@ export function WeeklyArmsChart({
           </div>
         )}
       </div>
-      <figcaption className="mt-2 text-xs text-stone-400">{labels.caption}</figcaption>
+      <figcaption className="mt-2 text-xs text-stone-500">{labels.caption}</figcaption>
     </figure>
   );
 }

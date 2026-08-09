@@ -30,7 +30,7 @@ export default async function ComplaintsPage({
     <ConsoleShell email={email}>
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Complaints</h1>
-        <span className="text-sm text-stone-400" data-testid="open-count">
+        <span className="text-sm text-stone-500" data-testid="open-count">
           {open.length} open
         </span>
       </div>
@@ -99,7 +99,7 @@ export default async function ComplaintsPage({
                       </span>
                     )}
                   </span>
-                  <span className="text-xs text-stone-400">
+                  <span className="text-xs text-stone-500">
                     {c.channel} · {c.at.slice(0, 16).replace("T", " ")}
                   </span>
                 </div>
@@ -144,7 +144,7 @@ export default async function ComplaintsPage({
             {resolved.map((c) => (
               <li key={c.id} className="py-2.5">
                 <span className="text-stone-700">{c.summary}</span>{" "}
-                <span className="text-stone-400">— {c.resolution}</span>
+                <span className="text-stone-500">— {c.resolution}</span>
               </li>
             ))}
           </ul>

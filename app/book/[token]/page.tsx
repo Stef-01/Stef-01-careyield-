@@ -48,7 +48,7 @@ export default async function BookingPage({ params }: { params: Promise<{ token:
           {store.clinicianName} at {store.practiceName}
           {appointment ? ` — ${new Date(appointment.startsAt).toLocaleString("en-AU")}` : ""}.
         </p>
-        <p className="text-sm text-stone-400">
+        <p className="text-sm text-stone-500">
           {isTelehealth
             ? "The practice will call you at this time. If you can no longer attend, please contact the practice."
             : "If you can no longer attend, please contact the practice."}
@@ -99,7 +99,7 @@ export default async function BookingPage({ params }: { params: Promise<{ token:
           Confirm booking
         </button>
       </form>
-      <p className="text-sm text-stone-400">
+      <p className="text-sm text-stone-500">
         No action is needed if this time doesn't suit you.
       </p>
     </Panel>

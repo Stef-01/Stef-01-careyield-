@@ -30,7 +30,7 @@ function Tile({ label, value, detail }: { label: string; value: string; detail: 
     <div className="rounded-xl border border-stone-200 bg-white p-5">
       <div className="text-sm text-stone-500">{label}</div>
       <div className="mt-1 text-3xl font-semibold tabular-nums text-stone-900">{value}</div>
-      <div className="mt-1 text-xs text-stone-400">{detail}</div>
+      <div className="mt-1 text-xs text-stone-500">{detail}</div>
     </div>
   );
 }
@@ -141,7 +141,7 @@ export default async function ResultsPage() {
             ))}
           </ul>
         )}
-        <p className="mt-3 text-xs text-stone-400">{C.guardrails.continuityNote}</p>
+        <p className="mt-3 text-xs text-stone-500">{C.guardrails.continuityNote}</p>
       </section>
 
       {/* Two-group chart — reuses the W14 component with plain-English labels. */}
@@ -218,7 +218,7 @@ export default async function ResultsPage() {
         </dl>
       </details>
 
-      <p className="mt-6 text-xs text-stone-400">{C.footer}</p>
+      <p className="mt-6 text-xs text-stone-500">{C.footer}</p>
       <div className="mt-4 flex gap-4">
         <Link href="/console" className="text-sm font-medium text-stone-700 underline hover:text-stone-900">
           Back to the console

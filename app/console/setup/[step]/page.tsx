@@ -69,7 +69,7 @@ function ProgressRail({ current }: { current: SetupStepSlug }) {
                 ? "border-stone-800 bg-stone-900 text-white"
                 : state === "done"
                   ? "border-stone-300 text-stone-700"
-                  : "border-stone-200 text-stone-400")
+                  : "border-stone-200 text-stone-500")
             }
           >
             {i + 1}. {step.title}

@@ -68,7 +68,7 @@ export default async function UsefulnessPage({
               <input type="hidden" name="appointmentId" value={visit.appointmentId} />
               <div className="mb-4 flex items-baseline justify-between">
                 <span className="font-medium text-stone-900">{visit.patientLabel}</span>
-                <span className="text-xs text-stone-400">
+                <span className="text-xs text-stone-500">
                   {new Date(visit.attendedAt).toLocaleString("en-AU")}
                 </span>
               </div>

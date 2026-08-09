@@ -25,7 +25,7 @@ export default function Home() {
       <main className="mx-auto max-w-5xl px-6">
         {/* Hero */}
         <section className="py-20 sm:py-28">
-          <p className="text-sm font-medium uppercase tracking-wide text-stone-400">{C.hero.eyebrow}</p>
+          <p className="text-sm font-medium uppercase tracking-wide text-stone-500">{C.hero.eyebrow}</p>
           <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
             {C.hero.heading}
           </h1>
@@ -58,7 +58,7 @@ export default function Home() {
           <ol className="mt-8 grid gap-6 sm:grid-cols-3">
             {C.steps.map((step, i) => (
               <li key={step.title} className="rounded-xl border border-stone-200 p-6">
-                <div className="text-sm font-semibold text-stone-400">{i + 1}</div>
+                <div className="text-sm font-semibold text-stone-500">{i + 1}</div>
                 <h3 className="mt-2 font-medium text-stone-900">{step.title}</h3>
                 <p className="mt-2 text-sm text-stone-600">{step.body}</p>
               </li>
@@ -100,7 +100,7 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-stone-100">
-        <div className="mx-auto flex max-w-5xl flex-col gap-1 px-6 py-8 text-sm text-stone-400">
+        <div className="mx-auto flex max-w-5xl flex-col gap-1 px-6 py-8 text-sm text-stone-500">
           <span>{C.footer.tagline}</span>
           <span>{C.footer.note}</span>
         </div>

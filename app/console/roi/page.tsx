@@ -64,7 +64,7 @@ export default async function RoiPage({
             <div className="mt-1 text-2xl font-semibold text-stone-900" data-testid={`roi-${label}`}>
               {value}
             </div>
-            {hint && <div className="mt-1 text-xs text-stone-400">{hint}</div>}
+            {hint && <div className="mt-1 text-xs text-stone-500">{hint}</div>}
           </div>
         ))}
       </div>
@@ -108,7 +108,7 @@ export default async function RoiPage({
             </div>
           ))}
         </dl>
-        <p className="mt-4 text-xs text-stone-400">
+        <p className="mt-4 text-xs text-stone-500">
           Fixed assumptions: {Math.round(BRIEF_ASSUMPTIONS.openSlotRate * 100)}% of capacity unfilled,{" "}
           {Math.round(BRIEF_ASSUMPTIONS.fillRate * 100)}% of offered slots booked,{" "}
           {Math.round(BRIEF_ASSUMPTIONS.dnaRate * 100)}% DNA,{" "}
