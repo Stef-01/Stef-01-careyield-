@@ -8,6 +8,12 @@ import { confirmBooking } from "../actions";
 
 export const dynamic = "force-dynamic";
 
+// W49 follow-up: pin a route-level <title>. The confirm action revalidates this
+// route, and during that swap the inherited layout title can be momentarily absent —
+// axe caught it as a document-title violation (WCAG 2.4.2). A patient-facing page
+// reached from an SMS deserves its own title regardless.
+export const metadata = { title: "Your appointment — CareYield" };
+
 function Panel({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-4 px-6">

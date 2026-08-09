@@ -11,6 +11,11 @@ async function signIn(page: import("@playwright/test").Page) {
   await page.waitForURL(/\/console(\/onboarding)?$/);
 }
 
+// Reset clears the W37 sign-in rate limiter too, so a long suite cannot trip it.
+test.beforeEach(async ({ request }) => {
+  await request.post("/api/mock/console");
+});
+
 test("signed-out access to the ROI calculator redirects to sign-in", async ({ page }) => {
   await page.goto("/console/roi");
   await expect(page).toHaveURL(/\/console\/signin$/);

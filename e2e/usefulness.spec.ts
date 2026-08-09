@@ -14,6 +14,8 @@ async function signIn(page: import("@playwright/test").Page) {
 
 test.beforeEach(async ({ request }) => {
   await request.post("/api/mock/usefulness");
+  // Also clears the W37 sign-in rate limiter (see the mock console route).
+  await request.post("/api/mock/console");
 });
 
 test("signed-out access to the audit page redirects to sign-in", async ({ page }) => {
