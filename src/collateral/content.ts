@@ -10,6 +10,12 @@
 export interface Slide {
   title: string;
   bullets: string[];
+  /**
+   * "cards" renders each bullet as a stat card whose leading token is the big
+   * number — so every bullet on a card slide MUST begin with a {{figure}}
+   * placeholder (asserted in collateral.test.ts). Default is icon-and-text rows.
+   */
+  layout?: "cards" | "rows";
   /** Speaker note — context for whoever presents, never shown to the audience. */
   note?: string;
 }
@@ -46,10 +52,11 @@ export const DECK: { title: string; subtitle: string; slides: Slide[] } = {
     },
     {
       title: "What a {{assumption.gp-count}}-GP practice can expect",
+      layout: "cards",
       bullets: [
         "{{roi.incremental-visits-year}} incremental attended appointments a year.",
         "{{roi.net-annual-benefit}} net annual benefit, after the CareYield subscription.",
-        "A {{roi.multiple}} return on the subscription.",
+        "{{roi.multiple}} return on the CareYield subscription.",
       ],
       note: "Every input is on the next slide. These are modelled, not measured — say so.",
     },
@@ -113,8 +120,8 @@ export const ONE_PAGER = {
       heading: "Assumptions",
       body:
         "{{assumption.open-slot-rate}} of capacity unfilled; {{assumption.incremental-share}} of " +
-        "generated visits genuinely incremental; billing per visit set by the practice, against an " +
-        "Level B rebate of {{mbs.item23}}.",
+        "generated visits genuinely incremental; billing per visit set by the practice, against a " +
+        "standard Level B rebate of {{mbs.item23}}.",
     },
     {
       heading: "Compliance",
