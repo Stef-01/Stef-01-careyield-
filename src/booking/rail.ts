@@ -23,23 +23,41 @@ export type BookingResult =
   | { ok: true; state: RailState; appointmentId: AppointmentId }
   | { ok: false; state: RailState; reason: BookingRefusal };
 
-function sessionSlots(state: RailState, invitation: Invitation): Appointment[] {
+function sessionSlots(
+  state: RailState,
+  invitation: Invitation,
+  allowedSlotIds?: ReadonlySet<string>,
+): Appointment[] {
   return state.appointments.filter(
     (a) =>
       a.clinicianId === invitation.clinicianId &&
       a.status === "open" &&
-      a.startsAt.startsWith(invitation.sessionDate),
+      a.startsAt.startsWith(invitation.sessionDate) &&
+      (allowedSlotIds === undefined || allowedSlotIds.has(a.id)),
   );
 }
 
-export function bookInvitation(state: RailState, invitationId: string, at: string): BookingResult {
+/**
+ * Book one invitation into its session. `allowedSlotIds`, when given, is the session's
+ * offerable set fixed at pool time (W17 session config: fillable types, scheduling window,
+ * protected capacity) — bookings may never land outside it, and the session counts as full
+ * for expiry once that set is exhausted, even while protected slots remain open.
+ */
+export function bookInvitation(
+  state: RailState,
+  invitationId: string,
+  at: string,
+  allowedSlotIds?: ReadonlySet<string>,
+): BookingResult {
   const invitation = state.invitations.find((i) => i.id === invitationId);
   if (!invitation) return { ok: false, state, reason: "not_found" };
   if (invitation.status === "booked") return { ok: false, state, reason: "already_booked" };
   if (invitation.status === "expired") return { ok: false, state, reason: "expired" };
   if (invitation.status === "opted_out") return { ok: false, state, reason: "opted_out" };
 
-  const open = sessionSlots(state, invitation).sort((a, b) => (a.startsAt < b.startsAt ? -1 : 1));
+  const open = sessionSlots(state, invitation, allowedSlotIds).sort((a, b) =>
+    a.startsAt < b.startsAt ? -1 : 1,
+  );
   const slot = open[0];
   if (!slot) return { ok: false, state, reason: "session_full" };
 

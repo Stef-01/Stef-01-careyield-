@@ -29,7 +29,9 @@ export function WeeklyArmsChart({ weekly }: { weekly: WeeklyPoint[] }) {
       1,
     );
     const yMax = Math.ceil(yMaxRaw / 20) * 20;
-    const xFor = (week: number) => M.left + ((week - 1) / (weekly.length - 1)) * innerW;
+    // A 1-point series must not divide by zero (NaN path data); it renders centred.
+    const span = Math.max(weekly.length - 1, 1);
+    const xFor = (week: number) => M.left + ((week - 1) / span) * innerW;
     const yFor = (v: number) => M.top + innerH - (v / yMax) * innerH;
     const path = (pick: (p: WeeklyPoint) => number) =>
       weekly.map((p, i) => `${i === 0 ? "M" : "L"}${xFor(p.week).toFixed(1)},${yFor(pick(p)).toFixed(1)}`).join("");
@@ -87,7 +89,9 @@ export function WeeklyArmsChart({ weekly }: { weekly: WeeklyPoint[] }) {
               </text>
             </g>
           ))}
-          {[1, 7, 13, 19, 26].map((w) => (
+          {[...new Set([1, 0.25, 0.5, 0.75, 1.0].map((f, i) => (i === 0 ? 1 : Math.round(weekly.length * f))))]
+            .filter((w) => w >= 1 && w <= weekly.length)
+            .map((w) => (
             <text
               key={w}
               x={xFor(w)}

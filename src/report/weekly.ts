@@ -53,15 +53,19 @@ export interface WeeklyReport {
   alerts: GuardrailAlert[];
 }
 
-/** Shape one week of a sim run into the report object. Weeks are 1-based. */
-export function buildWeeklyReport(
-  result: SimResult,
-  week: number,
-  options: ReportOptions,
-): WeeklyReport {
+/**
+ * Shape the FINAL week of the supplied run into the report object. The report's
+ * "this week" is always the last simulated week, and every cumulative figure is
+ * the run so far — the live cadence generates each Monday's report from a data
+ * snapshot that ends that week, so a run and a report week are the same thing.
+ * (Retro-reporting an interior week from a longer run would silently mix that
+ * week's rates with end-of-run totals; refuse the shape instead of lying.)
+ */
+export function buildWeeklyReport(result: SimResult, options: ReportOptions): WeeklyReport {
+  const week = result.totals.weeksSimulated;
   const dashboard = buildDashboardData(result);
   const point = dashboard.weekly[week - 1];
-  if (!point) throw new Error(`week ${week} outside the simulated range`);
+  if (!point) throw new Error("cannot report on a run with no completed weeks");
   const attr = result.attribution;
   const incrementalEstimateAud =
     attr.incrementalAttended === null

@@ -14,7 +14,7 @@ const REPORTS_DIR = path.resolve(__dirname, "../../reports");
 
 // The golden world: 8 deterministic weeks, report for week 8.
 const result = runSim({ ...DEFAULT_SIM_CONFIG, weeks: 8 });
-const report = buildWeeklyReport(result, 8, DEFAULT_REPORT_OPTIONS);
+const report = buildWeeklyReport(result, DEFAULT_REPORT_OPTIONS);
 
 describe("W20 weekly practice report — golden from sim data", () => {
   it("markdown matches the committed golden byte for byte", () => {
@@ -41,13 +41,15 @@ describe("W20 weekly practice report — golden from sim data", () => {
 
   it("guardrail alerts flow into the report (healthy world is clear; unhealthy alerts)", () => {
     expect(report.alerts).toEqual([]);
-    const noisy = buildWeeklyReport(runSim({ ...DEFAULT_SIM_CONFIG, weeks: 8, optOutRate: 0.06 }), 8, DEFAULT_REPORT_OPTIONS);
+    const noisy = buildWeeklyReport(runSim({ ...DEFAULT_SIM_CONFIG, weeks: 8, optOutRate: 0.06 }), DEFAULT_REPORT_OPTIONS);
     expect(noisy.alerts).toMatchObject([{ monitor: "opt_out_rate", severity: "critical" }]);
     expect(renderWeeklyReportMarkdown(noisy)).toContain("CRITICAL");
   });
 
-  it("asking for a week outside the run refuses", () => {
-    expect(() => buildWeeklyReport(result, 9, DEFAULT_REPORT_OPTIONS)).toThrow("outside");
+  it("a run with no completed weeks refuses to report", () => {
+    expect(() => buildWeeklyReport(runSim({ ...DEFAULT_SIM_CONFIG, weeks: 0 }), DEFAULT_REPORT_OPTIONS)).toThrow(
+      "no completed weeks",
+    );
   });
 
   it("docx artifact carries the same content", async () => {

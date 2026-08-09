@@ -23,7 +23,8 @@ import {
   type SessionConfig,
 } from "@/session/config";
 import { ALL_CLEAR, canSend, type OpsSwitches } from "@/ops/switches";
-import { MockSmsAdapter } from "@/messaging/adapter";
+import { isoDaysFrom } from "@/lib/dates";
+import { handleStop, MockSmsAdapter } from "@/messaging/adapter";
 import { renderCompliant } from "@/messaging/templates";
 import { generatePractice, type SyntheticPractice } from "@/synthetic/generate";
 import { chance, intBetween, mulberry32 } from "@/synthetic/rng";
@@ -106,12 +107,6 @@ export interface SimResult {
   sentWeeksByPatient: Map<string, number[]>;
 }
 
-function isoDaysFrom(anchor: string, days: number): string {
-  const d = new Date(`${anchor}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
-
 export function runSim(config: SimConfig): SimResult {
   const rng = mulberry32(config.seed ^ 0x5eed);
   const data = generatePractice({
@@ -126,23 +121,27 @@ export function runSim(config: SimConfig): SimResult {
 
   // Arm assignment first — the measurement design precedes any contact.
   const assigned = assignHoldout(data.patients, data.practice, `${config.todayIso}T00:00:00Z`);
+  const patientById = new Map(assigned.patients.map((p) => [p.id, { ...p }]));
+  // Arm read structurally from the assigned flag, never parsed out of audit prose.
   log = appendAll(
     log,
-    assigned.auditEvents.map(
-      (e): SpineEvent => ({
+    assigned.auditEvents.map((e): SpineEvent => {
+      const patient = patientById.get(e.subjectId as Patient["id"]);
+      if (!patient) throw new Error(`holdout audit event for unknown patient ${e.subjectId}`);
+      return {
         kind: "holdout_assigned",
         at: e.at,
-        patientId: e.subjectId as Patient["id"],
-        arm: e.detail.includes("arm=holdout") ? "holdout" : "invite",
-      }),
-    ),
+        patientId: patient.id,
+        arm: patient.holdout ? "holdout" : "invite",
+      };
+    }),
   );
-
-  const patientById = new Map(assigned.patients.map((p) => [p.id, { ...p }]));
   let rail: RailState = { appointments: data.appointments, invitations: [], auditEvents: [] };
   const organicVisits: Appointment[] = [];
   const sentWeeksByPatient = new Map<string, number[]>();
   const lastGeneratedVisitWeek = new Map<string, number>();
+  /** clinicianId|sessionDate → the W17-offerable slot ids fixed at pool time. */
+  const offerableIdsBySession = new Map<string, Set<string>>();
 
   const totals = {
     weeksSimulated: 0,
@@ -209,6 +208,12 @@ export function runSim(config: SimConfig): SimResult {
         if (offerable.length === 0) continue;
         const pool = buildInvitationPool(sessionDate, clinician, offerable, eligible, config.pool);
         if (pool.length === 0) continue;
+        // The offerable set is fixed at pool time; bookings are confined to it below,
+        // so protected/out-of-window/wrong-type slots stay untouched by the loop.
+        offerableIdsBySession.set(
+          `${clinician.id}|${sessionDate}`,
+          new Set(offerable.map((a) => a.id as string)),
+        );
         totals.sessionsPooled++;
         const sent: Invitation[] = [];
         for (const inv of pool) {
@@ -241,16 +246,12 @@ export function runSim(config: SimConfig): SimResult {
       if (!patient) throw new Error("invitation for unknown patient");
       if (patient.optedOut) continue; // STOP earlier this week closed their other offers
       if (chance(rng, config.optOutRate)) {
-        patientById.set(patient.id, { ...patient, optedOut: true });
+        // STOP semantics live in ONE place (W6 handleStop) — the sim rehearses the
+        // real message path, it does not re-implement it.
         const before = rail.invitations;
-        rail = {
-          ...rail,
-          invitations: rail.invitations.map((i) =>
-            i.patientId === patient.id && (i.status === "queued" || i.status === "sent")
-              ? { ...i, status: "opted_out" as const }
-              : i,
-          ),
-        };
+        const stopped = handleStop(patient, rail.invitations);
+        patientById.set(patient.id, stopped.patient);
+        rail = { ...rail, invitations: stopped.invitations };
         log = append(log, { kind: "patient_opted_out", at, patientId: patient.id });
         for (const [idx, i] of rail.invitations.entries()) {
           if (i.status === "opted_out" && before[idx]?.status !== "opted_out") {
@@ -262,7 +263,12 @@ export function runSim(config: SimConfig): SimResult {
       }
       if (chance(rng, config.responseRate)) {
         const before = rail.invitations;
-        const result = bookInvitation(rail, inv.id, at);
+        const result = bookInvitation(
+          rail,
+          inv.id,
+          at,
+          offerableIdsBySession.get(`${inv.clinicianId}|${inv.sessionDate}`),
+        );
         if (result.ok) {
           log = appendAll(log, bookingEvents(before, result, at));
           rail = result.state;
@@ -399,6 +405,18 @@ export function checkInvariants(result: SimResult): string[] {
   }
   if (result.smsSentCount !== result.totals.invitationsSent) {
     violations.push("SMS count diverges from sent invitations");
+  }
+  // W17/W26: no generated booking may sit on a slot the session config excludes.
+  const { fillableTypes, schedulingWindow } = result.config.session;
+  for (const a of result.appointments) {
+    if (!a.generatedByInvitation) continue;
+    if (a.appointmentType !== undefined && !fillableTypes.includes(a.appointmentType)) {
+      violations.push(`generated booking ${a.id} on non-fillable type ${a.appointmentType}`);
+    }
+    const hour = Number(a.startsAt.slice(11, 13));
+    if (hour < schedulingWindow.startHour || hour >= schedulingWindow.endHour) {
+      violations.push(`generated booking ${a.id} outside the scheduling window`);
+    }
   }
   return violations;
 }

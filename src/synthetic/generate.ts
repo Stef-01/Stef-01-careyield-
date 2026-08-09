@@ -12,6 +12,7 @@ import type {
   Practice,
   PracticeId,
 } from "@/domain/types";
+import { isoDaysFrom } from "@/lib/dates";
 import { chance, intBetween, mulberry32, pick, type Rng } from "./rng";
 
 export interface GeneratorOptions {
@@ -42,13 +43,6 @@ const CALIBRATION = {
   clinicDaysPerWeek: 5,
   maxMonthsSinceLastVisit: 36,
 } as const;
-
-function isoDaysFrom(anchor: string, days: number): string {
-  const d = new Date(`${anchor}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  const iso = d.toISOString().slice(0, 10);
-  return iso;
-}
 
 function generatePatient(
   rng: Rng,

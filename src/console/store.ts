@@ -64,6 +64,9 @@ export function onboardPractice(input: OnboardingInput, at: string, ownerEmail: 
   const errors = validateOnboarding(input);
   if (Object.keys(errors).length > 0) return errors;
   const state = getConsole();
+  // W26 hardening: onboarding is create-only. Re-running it would overwrite the
+  // practice AND seat the caller as a fresh owner — a bypass of the W18 role model.
+  if (state.practice) return { form: "This practice is already set up." };
   const practice: Practice = {
     id: "prac-console" as PracticeId,
     name: input.name.trim(),

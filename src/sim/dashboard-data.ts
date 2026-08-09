@@ -3,6 +3,7 @@
 // exists; one cached run serves every request because the seed fixes the world.
 
 import { countAttribution, type AttributionResult } from "@/engine/attribution";
+import { isoDaysFrom } from "@/lib/dates";
 import { DEFAULT_SIM_CONFIG, runSim, type SimResult } from "./harness";
 
 export interface WeeklyPoint {
@@ -21,12 +22,6 @@ export interface DashboardData {
   optOutRatePct: number;
   patientCount: number;
   weeks: number;
-}
-
-function isoDaysFrom(anchor: string, days: number): string {
-  const d = new Date(`${anchor}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
 }
 
 export function buildDashboardData(result: SimResult): DashboardData {

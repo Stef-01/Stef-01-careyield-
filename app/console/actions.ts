@@ -31,7 +31,12 @@ export async function onboard(formData: FormData): Promise<void> {
     {
       name: String(formData.get("name") ?? ""),
       timezone: String(formData.get("timezone") ?? ""),
-      holdoutPercent: Number(formData.get("holdoutPercent")),
+      // Missing/blank must fail validation, not coerce to 0 and silently
+      // disable the holdout arm (Number(null) === 0).
+      holdoutPercent:
+        formData.get("holdoutPercent") === null || formData.get("holdoutPercent") === ""
+          ? Number.NaN
+          : Number(formData.get("holdoutPercent")),
     },
     new Date().toISOString(),
     email,
