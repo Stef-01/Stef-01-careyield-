@@ -65,7 +65,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W37 | available | — | — | — | depends W27–W33 |
 | W38 | available | — | — | — | depends W28, W29, W36 |
 | W39 | available | — | — | — | depends W37, W38 |
-| W40 | claimed | interactive-0809 | 2026-08-09T03:39Z | — | depends W35 |
+| W40 | done | interactive-0809 | 2026-08-09T03:39Z | 7589c38 | docs unit; success criteria pre-registered incl. holdout non-negotiable + stop rules |
 | W41 | available | — | — | — | depends W17, W19 |
 | W42 | available | — | — | — | depends W14, W20 |
 | W43 | available | — | — | — | [P] depends W16 |
