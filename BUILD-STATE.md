@@ -59,7 +59,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W31 | claimed | builder-A | 2026-08-09T02:36Z | — | [P] depends W6 |
 | W32 | available | — | — | — | depends W27 |
 | W33 | available | — | — | — | [P] depends W10 |
-| W34 | claimed | interactive-0809 | 2026-08-09T02:42Z | — | depends W9 |
+| W34 | done | interactive-0809 | 2026-08-09T02:42Z | 0da1194 | revenue-estimation only; verified 1-Jul-2025 rebates pinned in tests |
 | W35 | available | — | — | — | depends W14, W15, W16 |
 | W36 | available | — | — | — | [P] depends W28, W29 |
 | W37 | available | — | — | — | depends W27–W33 |
