@@ -36,6 +36,43 @@ export const DEFAULT_SESSION_CONFIG: SessionConfig = {
   schedulingWindow: { startHour: 0, endHour: 24 },
 };
 
+/**
+ * W41: validate a session config before it is stored. W17 built these dials for the
+ * sim, where values came from code; the onboarding wizard now lets a practice type
+ * them in, so out-of-range input has to be refused rather than silently producing a
+ * nonsense offer set (a fraction above 1 would offer negative slots; an inverted
+ * window would offer none). Keys mirror the form field names.
+ */
+export function validateSessionConfig(config: SessionConfig): Record<string, string> {
+  const errors: Record<string, string> = {};
+  const { protectedCapacityFraction: fraction, schedulingWindow: window } = config;
+
+  if (!Number.isFinite(fraction) || fraction < 0 || fraction > 1) {
+    errors.protectedCapacityFraction = "Protected capacity must be between 0 and 100 percent.";
+  }
+  for (const [key, hour] of [
+    ["startHour", window.startHour],
+    ["endHour", window.endHour],
+  ] as const) {
+    if (!Number.isInteger(hour) || hour < 0 || hour > 24) {
+      errors[key] = "Hours must be whole numbers between 0 and 24.";
+    }
+  }
+  if (!errors.startHour && !errors.endHour && window.startHour >= window.endHour) {
+    errors.endHour = "The window must end after it starts.";
+  }
+  if (config.fillableTypes.length === 0) {
+    errors.fillableTypes = "Choose at least one appointment type to fill.";
+  }
+  for (const type of config.fillableTypes) {
+    if (!APPOINTMENT_TYPES.includes(type)) errors.fillableTypes = "Unknown appointment type.";
+  }
+  if (config.participatingClinicianIds !== "all" && config.participatingClinicianIds.length === 0) {
+    errors.participatingClinicianIds = "Choose at least one participating clinician.";
+  }
+  return errors;
+}
+
 export function clinicianParticipates(config: SessionConfig, clinicianId: ClinicianId): boolean {
   return (
     config.participatingClinicianIds === "all" ||

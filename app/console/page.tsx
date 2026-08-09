@@ -60,6 +60,12 @@ export default async function ConsoleHome() {
         >
           Privacy
         </Link>
+        <Link
+          href="/console/setup/practice"
+          className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
+        >
+          {state.setupCompletedAt ? "Setup" : "Finish setup"}
+        </Link>
       </div>
 
       <section className="mt-8 rounded-xl border border-stone-200 bg-white p-6">
