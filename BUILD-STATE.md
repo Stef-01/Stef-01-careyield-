@@ -70,7 +70,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W42 | claimed | builder-B | 2026-08-09T04:45Z | — | depends W14, W20 |
 | W43 | done | builder-A | 2026-08-09T04:35Z | 234a535 | workflow at src/complaints + /console/complaints; opt-out terminal at intake (rail offers close immediately); open complaints banner console home + feed W16 monitor; intake open to all staff, triage/resolve behind pause_sending grant |
 | W44 | done | interactive-0809 | 2026-08-09T03:52Z | dfae8bf | FINDING: sim defaults show generated-DNA worse than organic (~ratio>1.25) — calibration owner should review the generated-booking DNA model (W3/W12); real answer comes from pilot holdout |
-| W45 | claimed | builder-A | 2026-08-09T04:56Z | — | depends W35 |
+| W45 | done | builder-A | 2026-08-09T04:56Z | 64bbb7c | golden at reports/case-study-w45.md; de-identification + W23 copy-lint + no-holdout-refusal enforced in code; synthetic marker until G4 |
 | W46 | available | — | — | — | [P] no deps |
 | W47 | done | interactive-0809 | 2026-08-09T04:08Z | 2880cbf | agreement is a skeleton for a lawyer, not a contract; pricing encodes the no-fee-splitting posture |
 | W48 | available | — | — | — | depends W38 |
