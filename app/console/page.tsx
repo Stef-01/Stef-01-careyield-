@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { openComplaintCount } from "@/complaints/store";
 import { getConsole } from "@/console/store";
 import { requireSession } from "./guard";
 import { ConsoleShell } from "./ui";
@@ -20,6 +21,8 @@ export default async function ConsoleHome() {
     ["Ongoing-care patients only", rules.chronicCareOnly ? "Yes" : "No"],
   ];
 
+  const openComplaints = openComplaintCount();
+
   return (
     <ConsoleShell email={email}>
       <div className="flex items-baseline justify-between">
@@ -28,6 +31,17 @@ export default async function ConsoleHome() {
           {state.practice.timezone} · holdout {Math.round(state.practice.holdoutRate * 100)}%
         </span>
       </div>
+
+      {openComplaints > 0 && (
+        <Link
+          href="/console/complaints"
+          data-testid="complaint-banner"
+          className="mt-4 block rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900 hover:bg-amber-100"
+        >
+          {openComplaints} open complaint{openComplaints === 1 ? "" : "s"} — review now. Sending
+          pauses are one click away in Admin ops.
+        </Link>
+      )}
 
       <div className="mt-4 flex gap-4">
         <Link
@@ -59,6 +73,12 @@ export default async function ConsoleHome() {
           className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
         >
           Privacy
+        </Link>
+        <Link
+          href="/console/complaints"
+          className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
+        >
+          Complaints
         </Link>
         <Link
           href="/console/setup/practice"

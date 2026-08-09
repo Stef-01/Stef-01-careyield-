@@ -11,6 +11,7 @@ import { resetStore } from "@/booking/store";
 import { SESSION_COOKIE, signSession } from "@/console/session";
 import { onboardPractice, resetConsole } from "@/console/store";
 import { resetOps } from "@/ops/store";
+import { resetComplaints } from "@/complaints/store";
 import { assertDemoEnabled } from "@/lib/demo-guard";
 import { resetPrivacy } from "@/privacy/store";
 
@@ -23,6 +24,7 @@ export async function launchDemo(): Promise<void> {
   resetOps();
   resetAudit();
   resetPrivacy();
+  resetComplaints();
   const errors = onboardPractice(
     { name: "Demo Family Practice", timezone: "Australia/Sydney", holdoutPercent: 20 },
     new Date().toISOString(),
