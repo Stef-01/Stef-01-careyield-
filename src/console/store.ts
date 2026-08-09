@@ -35,6 +35,8 @@ export interface ConsoleState {
    * this, finishing setup would attest to wide-open defaults nobody ever saw.
    */
   acknowledgedSteps: string[];
+  /** Monotonic clinician id counter — never reuses a retired id (W41 review fix). */
+  nextClinicianSeq: number;
   /** Set when the practice finishes the setup wizard; null while still in setup. */
   setupCompletedAt: string | null;
 }
@@ -55,6 +57,7 @@ function initial(): ConsoleState {
     clinicians: [],
     sessionConfig: { ...DEFAULT_SESSION_CONFIG },
     acknowledgedSteps: [],
+    nextClinicianSeq: 0,
     setupCompletedAt: null,
   };
 }
@@ -175,6 +178,8 @@ function audit(state: ConsoleState, at: string, subjectId: string, detail: strin
 }
 
 export interface ClinicianInput {
+  /** Existing clinician id when this row edits a saved clinician; absent for new rows. */
+  id?: ClinicianId;
   displayName: string;
   participating: boolean;
 }
@@ -193,7 +198,24 @@ export function validateClinicians(inputs: readonly ClinicianInput[]): FieldErro
   return errors;
 }
 
-/** Replace the roster wholesale — the wizard edits it as one list. */
+/**
+ * Replace the roster wholesale — the wizard edits it as one list.
+ *
+ * Two W41 review findings are fixed here, both about the same hazard: the session
+ * allowlist names clinicians by id, and it records a consent decision about who may
+ * have appointments offered on their behalf.
+ *
+ *   1. IDS MUST BE STABLE. Ids were previously minted from the submission's array
+ *      index, so clearing a row shifted every id below it and the allowlist silently
+ *      re-pointed at a DIFFERENT clinician. Ids are now carried forward by identity
+ *      (the caller passes the existing id) and new rows take a monotonic counter that
+ *      never reuses a retired id.
+ *   2. AN EMPTIED ALLOWLIST MUST FAIL CLOSED. It previously collapsed to "all" — the
+ *      most permissive value — turning a deliberate narrowing into a grant-everyone.
+ *      It now keeps the empty list, which validateSessionConfig rejects, and the
+ *      sessions step loses its acknowledgement so setup cannot certify the practice
+ *      until a human re-confirms who is included.
+ */
 export function saveClinicians(
   inputs: readonly ClinicianInput[],
   at: string,
@@ -205,21 +227,38 @@ export function saveClinicians(
   const denied = requireEditRules(state, byEmail);
   if (denied) return denied;
 
-  state.clinicians = inputs.map((c, i) => ({
-    id: `clin-${i + 1}` as ClinicianId,
-    displayName: c.displayName.trim(),
-    participating: c.participating,
-  }));
-  // Drop allowlisted ids that no longer exist, so session config can't reference
-  // a clinician the practice just removed.
+  state.clinicians = inputs.map((c) => {
+    if (c.id && state.clinicians.some((existing) => existing.id === c.id)) {
+      return { id: c.id, displayName: c.displayName.trim(), participating: c.participating };
+    }
+    state.nextClinicianSeq += 1;
+    return {
+      id: `clin-${state.nextClinicianSeq}` as ClinicianId,
+      displayName: c.displayName.trim(),
+      participating: c.participating,
+    };
+  });
+
+  // Drop allowlisted ids that no longer exist. Ids are stable, so a survivor here is
+  // genuinely the same clinician the practice picked.
   const ids = new Set(state.clinicians.map((c) => c.id as string));
   const allowlist = state.sessionConfig.participatingClinicianIds;
   if (allowlist !== "all") {
     const kept = allowlist.filter((id) => ids.has(id));
-    state.sessionConfig = {
-      ...state.sessionConfig,
-      participatingClinicianIds: kept.length > 0 ? kept : "all",
-    };
+    if (kept.length !== allowlist.length) {
+      state.sessionConfig = { ...state.sessionConfig, participatingClinicianIds: kept };
+      // Fail closed: an empty allowlist is invalid, so the sessions step is no longer
+      // acknowledged and completeSetup will refuse until it is re-confirmed.
+      if (kept.length === 0) {
+        state.acknowledgedSteps = state.acknowledgedSteps.filter((s) => s !== "sessions");
+      }
+      audit(
+        state,
+        at,
+        "setup:sessions",
+        `offering allowlist narrowed to ${kept.length} clinician(s) after a roster change`,
+      );
+    }
   }
   audit(state, at, "setup:clinicians", `roster set to ${state.clinicians.length} clinician(s)`);
   return {};

@@ -164,6 +164,8 @@ export default async function SetupStepPage({
               return (
                 <div key={i} className="flex items-end gap-3">
                   <div className="flex-1">
+                    {/* Carries the saved id so edits keep clinician identity stable. */}
+                    <input type="hidden" name="clinicianId" value={existing?.id ?? ""} />
                     <Field label={`Clinician ${i + 1}`}>
                       <input
                         name="clinicianName"

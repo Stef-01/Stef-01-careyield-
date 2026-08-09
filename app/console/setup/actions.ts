@@ -51,8 +51,11 @@ export async function saveStepPractice(formData: FormData): Promise<void> {
 export async function saveStepClinicians(formData: FormData): Promise<void> {
   const email = await requireSession();
   const names = formData.getAll("clinicianName").map(String);
+  const ids = formData.getAll("clinicianId").map(String);
   const inputs: ClinicianInput[] = names
     .map((displayName, i) => ({
+      // Empty id = a new row; a present id keeps that clinician's identity (W41 fix).
+      id: (ids[i] || undefined) as ClinicianInput["id"],
       displayName,
       // An unchecked box submits nothing, so participation is read positionally.
       participating: formData.getAll("participating").map(String).includes(String(i)),
