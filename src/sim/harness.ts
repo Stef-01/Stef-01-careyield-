@@ -13,6 +13,7 @@ import {
   eligibleForClinician,
   type EligibilityConfig,
 } from "@/engine/eligibility";
+import { buildBackfillPool } from "@/engine/backfill";
 import { assignHoldout } from "@/engine/holdout";
 import { countAttribution, type AttributionResult } from "@/engine/attribution";
 import { buildInvitationPool, DEFAULT_POOL_CONFIG, type PoolConfig } from "@/engine/pool";
@@ -52,6 +53,12 @@ export interface SimConfig {
   switches: OpsSwitches;
   /** Probability a sent invitation books within its week. */
   responseRate: number;
+  /**
+   * W30: probability a booked organic appointment in the current week late-cancels,
+   * triggering the near-real-time backfill fast path. 0 disables the path entirely
+   * (no RNG draws), keeping earlier goldens byte-stable.
+   */
+  lateCancellationRate: number;
   /** Probability a sent invitation triggers STOP instead. */
   optOutRate: number;
   /** DNA probability on generated bookings. */
@@ -74,6 +81,7 @@ export const DEFAULT_SIM_CONFIG: SimConfig = {
   session: DEFAULT_SESSION_CONFIG,
   switches: ALL_CLEAR,
   responseRate: 0.25,
+  lateCancellationRate: 0,
   optOutRate: 0.01,
   dnaRate: 0.05,
   organicWeeklyRate: 0.05,
@@ -101,10 +109,15 @@ export interface SimResult {
     attendedGenerated: number;
     dnaGenerated: number;
     organicVisits: number;
+    backfillEvents: number;
+    backfillSent: number;
+    backfillBooked: number;
   };
   attribution: AttributionResult;
   /** Sent-week indexes per patient, for cap auditing. */
   sentWeeksByPatient: Map<string, number[]>;
+  /** Wall-clock ms from late-cancellation to backfill offers queued+sent (one per event). */
+  backfillLatenciesMs: number[];
 }
 
 export function runSim(config: SimConfig): SimResult {
@@ -153,7 +166,11 @@ export function runSim(config: SimConfig): SimResult {
     attendedGenerated: 0,
     dnaGenerated: 0,
     organicVisits: 0,
+    backfillEvents: 0,
+    backfillSent: 0,
+    backfillBooked: 0,
   };
+  const backfillLatenciesMs: number[] = [];
 
   for (let week = 0; week < config.weeks; week++) {
     const weekDates = new Set(
@@ -278,6 +295,89 @@ export function runSim(config: SimConfig): SimResult {
       }
     }
 
+    // 2.5 (W30): late cancellations → near-real-time backfill, same step as the event.
+    // Guarded so a zero rate draws no randomness (stream-stable for earlier goldens).
+    if (config.lateCancellationRate > 0 && canSend(config.switches, data.practice.id)) {
+      const lateCancelled = rail.appointments.filter(
+        (a) =>
+          a.status === "booked" &&
+          !a.generatedByInvitation &&
+          a.patientId !== null &&
+          weekDates.has(a.startsAt.slice(0, 10)) &&
+          chance(rng, config.lateCancellationRate),
+      );
+      for (const slot of lateCancelled) {
+        const clinician = data.clinicians.find((c) => c.id === slot.clinicianId);
+        if (!clinician || !clinician.participating) continue;
+        if (!clinicianParticipates(config.session, clinician.id)) continue;
+        // The cancellation itself: the slot reopens.
+        const freed = { ...slot, status: "open" as const, patientId: null };
+        rail = {
+          ...rail,
+          appointments: rail.appointments.map((a) => (a.id === slot.id ? freed : a)),
+        };
+        totals.backfillEvents++;
+
+        const t0 = performance.now();
+        const capsMap = new Map(
+          [...sentWeeksByPatient].map(([id, weeks]) => [
+            id,
+            weeks.filter((w) => week - w < 13).length,
+          ]),
+        );
+        const backfill = buildBackfillPool(
+          freed,
+          clinician,
+          [...patientById.values()],
+          config.eligibility,
+          config.session,
+          config.pool,
+          isoDaysFrom(config.todayIso, week * 7),
+          capsMap,
+          at,
+        );
+        const sent: Invitation[] = [];
+        for (const inv of backfill.invitations) {
+          log = append(log, { kind: "invitation_queued", at, invitation: inv });
+          const body = renderCompliant({
+            patientFirstName: `Patient-${inv.patientId}`,
+            clinicianDisplayName: clinician.displayName,
+            practiceName: data.practice.name,
+            sessionWindow: `on ${inv.sessionDate}`,
+            bookingUrl: `https://book.careyield.test/${inv.id}`,
+          });
+          void sms.send({ to: `synthetic:${inv.patientId}`, body, invitationId: inv.id });
+          log = append(log, { kind: "invitation_sent", at, invitationId: inv.id });
+          sent.push({ ...inv, status: "sent", sentAt: at });
+          sentWeeksByPatient.set(inv.patientId, [
+            ...(sentWeeksByPatient.get(inv.patientId) ?? []),
+            week,
+          ]);
+          totals.invitationsSent++;
+          totals.backfillSent++;
+        }
+        rail = { ...rail, invitations: [...rail.invitations, ...sent] };
+        backfillLatenciesMs.push(performance.now() - t0);
+
+        // Responses to the backfill offers, still within the fast-path step.
+        const freedOnly = new Set([freed.id as string]);
+        for (const inv of sent) {
+          const patient = patientById.get(inv.patientId);
+          if (!patient || patient.optedOut) continue;
+          if (!chance(rng, config.responseRate)) continue;
+          const before = rail.invitations;
+          const result = bookInvitation(rail, inv.id, at, freedOnly);
+          if (result.ok) {
+            log = appendAll(log, bookingEvents(before, result, at));
+            rail = result.state;
+            totals.booked++;
+            totals.backfillBooked++;
+            patientById.set(patient.id, { ...patient, futureBookingAt: inv.sessionDate });
+          }
+        }
+      }
+    }
+
     // 3. Week-end expiry: an offer is for this week's session; unanswered ones lapse.
     {
       const before = rail.invitations;
@@ -370,6 +470,7 @@ export function runSim(config: SimConfig): SimResult {
     totals,
     attribution,
     sentWeeksByPatient,
+    backfillLatenciesMs,
   };
 }
 
