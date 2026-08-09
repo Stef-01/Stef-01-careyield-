@@ -75,7 +75,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W47 | done | interactive-0809 | 2026-08-09T04:08Z | 2880cbf | agreement is a skeleton for a lawyer, not a contract; pricing encodes the no-fee-splitting posture |
 | W48 | claimed | builder-A | 2026-08-09T05:16Z | — | depends W38 |
 | W49 | available | — | — | — | depends W41, W42 |
-| W50 | available | — | — | — | depends W33, W37 |
+| W50 | claimed | interactive-0809 | 2026-08-09T05:18Z | — | depends W33, W37 |
 | W51 | available | — | — | — | depends W40–W50 |
 | W52 | available | — | — | — | depends W51 |
 
