@@ -2,7 +2,9 @@
 // record + suppression) over the mock dataset, plus the retention config in force.
 
 import Link from "next/link";
+import { getConsole } from "@/console/store";
 import { getPrivacy, exportForPatient } from "@/privacy/store";
+import { authorize } from "@/tenancy/tenancy";
 import { requireSession } from "../guard";
 import { ConsoleShell, inputClass, primaryButtonClass } from "../ui";
 import { erasePatient, exportPatient } from "./actions";
@@ -17,9 +19,14 @@ export default async function PrivacyPage({
   const email = await requireSession();
   const params = await searchParams;
   const privacy = getPrivacy();
-  const exported = params.export
-    ? exportForPatient(params.export, new Date().toISOString())
-    : null;
+  // W39 review finding: the ?export= render is itself a data disclosure — it takes the
+  // same stewardship grant as the action that links here, not just a session.
+  const console_ = getConsole();
+  const mayExport =
+    console_.practice !== null &&
+    authorize(console_.memberships, email, console_.practice.id, "edit_rules").allowed;
+  const exported =
+    params.export && mayExport ? exportForPatient(params.export, new Date().toISOString()) : null;
 
   return (
     <ConsoleShell email={email}>
