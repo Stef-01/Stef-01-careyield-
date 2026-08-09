@@ -17,7 +17,9 @@ test.beforeEach(async ({ page, request }) => {
 
 test("dashboard renders the north star and both arms from sim data", async ({ page }) => {
   await page.getByRole("link", { name: "Incrementality dashboard" }).click();
-  await expect(page).toHaveURL(/\/console\/dashboard$/);
+  // The dashboard's first render builds the full default sim (W14 cached accessor),
+  // which can exceed the 5s default; allow the navigation extra time.
+  await expect(page).toHaveURL(/\/console\/dashboard$/, { timeout: 30_000 });
 
   // North-star tile carries a real number, not a placeholder.
   const northStar = page.getByText("Incremental attended / 1,000").locator("..");

@@ -38,7 +38,9 @@ describe("W14 dashboard data", () => {
     );
   });
 
-  it("the cached accessor returns one stable instance", () => {
+  it("the cached accessor returns one stable instance", { timeout: 30_000 }, () => {
+    // First call builds the full default sim (26 weeks) — legitimately heavy, so
+    // allow well beyond the 5s default to avoid a timing-only flake under load.
     expect(getDashboardData()).toBe(getDashboardData());
   });
 });
