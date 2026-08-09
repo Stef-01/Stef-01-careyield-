@@ -33,3 +33,24 @@ impeccable/taste-skill pass when those skills aren't installed in the building s
 - [x] Signed-out access to any console page redirects to sign-in (e2e-verified).
 - [x] Console with no practice routes to onboarding, not an empty dashboard (e2e-verified).
 - [x] Booking page renders a designed state for every invitation status (offer/booked/expired/opted-out/invalid).
+
+## Landing page (W23) — public B2B marketing site (`/`)
+
+Pass 2026-08-09, builder-B — all items checked manually (taste-skill unavailable in loop env).
+
+### Positioning & audience
+- [x] Audience is general-practice owners/managers — B2B throughout; no patient-directed copy.
+- [x] Positioning per venture brief §Phase 1: measured filling of unused appointment capacity.
+- [x] Measurement (holdout, incremental-per-1,000) is a first-class section, not a footnote.
+
+### Copy compliance (regulated-advertising exposure = zero)
+- [x] No clinical/therapeutic claims, no condition targeting — enforced by `lintLandingCopy` (src/compliance/landing.ts), gated in CI via the copy bundle test.
+- [x] No testimonials or ratings anywhere (CLAUDE.md law 6) — linter-enforced.
+- [x] No superlatives, guarantees, urgency, or "specialist" — linter-enforced.
+- [x] Footer states the B2B scope explicitly ("Not patient medical advice").
+
+### Design & accessibility
+- [x] One type scale and stone palette shared with the console; single primary CTA per section.
+- [x] Semantic landmarks (`header`/`nav`/`main`/`footer`), ordered list for the steps, in-page anchors.
+- [x] Focus-visible on all links/buttons; text contrast ≥ 4.5:1; responsive (single-column on mobile).
+- [x] Public — renders with no auth; CTAs route to /demo and /console/signin (e2e-verified).
