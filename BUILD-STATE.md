@@ -7,13 +7,54 @@
 1. `git pull --rebase` the working branch (see **Home resolution** below) so this file is current.
 2. Pick ONE unit, in this priority order:
    a. an `in-progress` unit whose continuation notes you can finish;
-   b. a `claimed` unit whose `claimed_at` is **older than 6 hours** (stale — the session died; reclaim it);
+   b. a `claimed`/`in-progress` unit that the **staleness rule** below says you may reclaim;
    c. the lowest-numbered `available` unit whose dependencies are `done` (units marked `[P]` in the plan are claimable out of order).
 3. Claim it: set status `claimed`, your session id (short), and UTC timestamp in this table. **Commit and push this claim edit immediately, before building.**
 4. If the push is rejected (another session claimed simultaneously): `git pull --rebase`, pick the *next* eligible unit, repeat. Never fight over a row.
-5. Build the unit to its verify gate. Commit work incrementally (green only).
+5. Build the unit to its verify gate. Commit work incrementally (green only). **If a unit runs
+   long, push something at least every 90 minutes** — a green WIP commit, or a heartbeat edit to
+   your own row. That push is what tells other sessions you are alive; without it your row is
+   reclaimable after 90 minutes (see the staleness rule).
 6. Finish: set status `done` + commit SHA, or `in-progress` + concrete continuation notes (what's left, where, how to verify), or `blocked` + reason (e.g. founder gate). Push with rebase-retry (up to 4 attempts).
 7. Parallelisation is expected: overlapping sessions hold different rows. Never edit another session's non-stale claimed row.
+
+## Staleness — when you may reclaim someone else's row (W54)
+
+A flat window cannot tell a slow holder from a dead one. On 2026-08-09 builder-A hit a model
+limit mid-claim on W51; because the only rule was "6 hours", its dead row idled *both* routines
+for over two hours and two firings found nothing to do. The rule is now **evidence-based**:
+
+| Holder has… | Window | Measured from |
+|---|---|---|
+| pushed nothing since claiming | **90 minutes** | the claim time |
+| pushed a commit / heartbeat | **6 hours** | its last push |
+| visibly failed (model limit, dead session) | **none — reclaim now** | — |
+
+Progress, not elapsed time, is the liveness signal: a holder that has pushed something has proven
+it is running and keeps the long leash; one that has pushed nothing has proven nothing. Both are
+checkable from `git log` alone, so no session needs to ping another.
+
+Two deliberate refusals: a claimed row whose timestamp is **missing or unreadable** is left alone
+and flagged (stealing a live claim is worse than an idle row), and a claim timestamped in the
+future is never reclaimed on clock skew.
+
+The normative definition is `classifyClaim` in `src/loop/claims.ts`, simulated against this
+incident's real timestamps in `src/loop/claims.test.ts`. Change the rule there and here together.
+
+## Fleet — builders run on different models (W54)
+
+W51 §Process: a single-model fleet is a single point of failure. When builder-A exhausted its
+model limit, it did not fail loudly — it held a claim and stopped, which is the worst failure
+mode for a ledger-locked loop.
+
+- **Run the builders on different models.** One provider limit, one model deprecation or one
+  capacity incident must not be able to stop every builder at once.
+- **Record the model in the session id** where it helps (`builder-A`, `builder-B`, …) and name
+  the model in the session log entry, so a post-mortem can see which model stalled.
+- **A builder that hits its limit is `knownDead`** — any other session may reclaim its row
+  immediately under the staleness rule; there is nothing to wait for.
+- **Routines outlive sessions.** A routine firing into a dead session is wasted, so a fleet of
+  two on one model is worth less than a fleet of two on two models.
 
 ## Home
 
