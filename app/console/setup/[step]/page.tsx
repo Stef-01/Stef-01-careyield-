@@ -27,6 +27,32 @@ const TYPE_LABELS: Record<string, string> = {
   telehealth: "Telehealth (phone/video)",
 };
 
+// Errors arrive as a KEY in the query string and are mapped to copy here, so a
+// crafted link can never render arbitrary text inside the console.
+const SETUP_ERROR_COPY: Record<string, string> = {
+  form: "That step couldn't be saved — please check the values and try again.",
+  name: "Enter a practice name of at least two characters.",
+  timezone: "Use an IANA timezone like Australia/Sydney.",
+  holdoutPercent: "Holdout must be between 0 and 50 percent.",
+  clinicians: "Add at least one clinician, with unique names, and at least one participating.",
+  fillableTypes: "Choose at least one appointment type to fill.",
+  protectedCapacityFraction: "Protected capacity must be between 0 and 100 percent.",
+  startHour: "Hours must be whole numbers between 0 and 24.",
+  endHour: "The offering window must end after it starts.",
+  participatingClinicianIds: "Choose at least one participating clinician.",
+  minDaysSinceLastVisit: "Minimum days since last visit must be a whole number.",
+  futureBookingBlockDays: "The existing-booking window must be a whole number of days.",
+  maxInvitesPerQuarter: "The invitation cap must be a whole number between 0 and 12.",
+};
+
+const SETUP_ERROR_FALLBACK = SETUP_ERROR_COPY.form!;
+
+function errorCopy(key: string | undefined): string | null {
+  if (!key) return null;
+  if (key.startsWith("clinician-")) return "Each clinician's name must be at least two characters.";
+  return SETUP_ERROR_COPY[key] ?? SETUP_ERROR_FALLBACK;
+}
+
 function ProgressRail({ current }: { current: SetupStepSlug }) {
   const index = stepIndex(current);
   return (
@@ -85,12 +111,12 @@ export default async function SetupStepPage({
           <ProgressRail current={step} />
         </div>
 
-        {error && (
+        {errorCopy(error) && (
           <p
             data-testid="setup-error"
             className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
           >
-            {error}
+            {errorCopy(error)}
           </p>
         )}
 

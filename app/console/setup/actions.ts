@@ -21,8 +21,12 @@ import { requireSession } from "../guard";
 
 function onwards(step: SetupStepSlug, errors: Record<string, string>): never {
   if (Object.keys(errors).length > 0) {
-    const first = Object.values(errors)[0] ?? "1";
-    redirect(`/console/setup/${step}?error=${encodeURIComponent(first)}`);
+    // Redirect with the error KEY, never the message. Reflecting a caller-supplied
+    // string would let anyone craft a link that renders arbitrary text inside the
+    // authenticated console; the page maps keys to its own fixed copy instead
+    // (same convention as /console/usefulness).
+    const key = Object.keys(errors)[0] ?? "form";
+    redirect(`/console/setup/${step}?error=${encodeURIComponent(key)}`);
   }
   const next = nextStep(step);
   redirect(next ? `/console/setup/${next}` : "/console");

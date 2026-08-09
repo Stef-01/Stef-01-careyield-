@@ -96,7 +96,7 @@ test("the wizard refuses to finish while a prerequisite is unmet", async ({ page
   // Skip the roster entirely and try to finish.
   await page.goto("/console/setup/review");
   await page.getByRole("button", { name: "Finish setup" }).click();
-  await expect(page.getByTestId("setup-error")).toContainText(/participating clinician/i);
+  await expect(page.getByTestId("setup-error")).toContainText(/at least one clinician/i);
 
   const state = await (await request.get("/api/mock/console")).json();
   expect(state.setupCompletedAt).toBeNull();
@@ -122,4 +122,13 @@ test("invalid session settings are refused with the reason shown", async ({ page
 test("signed-out access to the wizard redirects to sign-in", async ({ page }) => {
   await page.goto("/console/setup/practice");
   await expect(page).toHaveURL(/\/console\/signin$/);
+});
+
+test("a crafted error link cannot render attacker-supplied text in the console", async ({ page }) => {
+  await signIn(page, "owner@demo.practice.example");
+  const injected = "Your account is suspended, call 1800-000-000";
+  await page.goto(`/console/setup/practice?error=${encodeURIComponent(injected)}`);
+  // The page maps error KEYS to its own copy — an unknown key falls back.
+  await expect(page.getByTestId("setup-error")).toBeVisible();
+  await expect(page.getByTestId("setup-error")).not.toContainText("1800-000-000");
 });

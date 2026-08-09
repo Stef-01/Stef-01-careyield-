@@ -278,10 +278,11 @@ export function completeSetup(at: string, byEmail: string): FieldErrors {
   const state = getConsole();
   const denied = requireEditRules(state, byEmail);
   if (denied) return denied;
+  // Keyed by the unmet prerequisite, so the wizard can name what is missing.
   const readiness = setupReadiness(state);
-  if (!readiness.clinicians) return { form: "Add at least one participating clinician first." };
-  if (!readiness.sessions) return { form: "Session settings are incomplete." };
-  if (!readiness.rules) return { form: "Eligibility rules are incomplete." };
+  if (!readiness.clinicians) return { clinicians: "Add at least one participating clinician first." };
+  if (!readiness.sessions) return { fillableTypes: "Session settings are incomplete." };
+  if (!readiness.rules) return { minDaysSinceLastVisit: "Eligibility rules are incomplete." };
   if (state.setupCompletedAt !== null) return {}; // idempotent
   state.setupCompletedAt = at;
   audit(state, at, "setup:complete", "practice setup completed");

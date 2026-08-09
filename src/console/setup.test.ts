@@ -171,7 +171,8 @@ describe("W41 readiness and completion", () => {
   it("a fresh practice is not ready until a roster exists", () => {
     const before = setupReadiness();
     expect(before).toMatchObject({ practice: true, clinicians: false, complete: false });
-    expect(completeSetup(NOW, OWNER)).toHaveProperty("form");
+    // Keyed by the unmet prerequisite, not a generic form error.
+    expect(completeSetup(NOW, OWNER)).toHaveProperty("clinicians");
     expect(getConsole().setupCompletedAt).toBeNull();
   });
 
