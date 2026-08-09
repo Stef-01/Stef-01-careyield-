@@ -80,3 +80,58 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W52 | claimed | interactive-0809 | 2026-08-09T08:05Z | — | depends W51 |
 
 > Y2–Y5 rows are appended by the expansion rule (plan §6) at W52/W104/W156/W208 or when the backlog runs dry.
+
+> **Year 2 — Condition Yield** (expanded by W52, 2026-08-09; definitions in docs/FIVE-YEAR-PLAN.md §5b).
+
+| W53 | available | — | — | — | W51 finding A2 |
+| W54 | available | — | — | — | W51 §Process |
+| W55 | available | — | — | — | — |
+| W56 | available | — | — | — | W55 |
+| W57 | available | — | — | — | W55, W56 |
+| W58 | available | — | — | — | W57 |
+| W59 | available | — | — | — | W58 |
+| W60 | available | — | — | — | [P] W55 |
+| W61 | available | — | — | — | W59 |
+| W62 | available | — | — | — | [P] W56 |
+| W63 | available | — | — | — | W59, W61 |
+| W64 | available | — | — | — | [P] W63 |
+| W65 | available | — | — | — | W53–W64 |
+| W66 | available | — | — | — | W65 |
+| W67 | available | — | — | — | W66 |
+| W68 | available | — | — | — | W66 |
+| W69 | blocked | — | — | — | FOUNDER GATE G5 (clinical content sign-off) — workspace may be built, content stays unusable until sign-off; W68 |
+| W70 | available | — | — | — | [P] W66 |
+| W71 | available | — | — | — | W58 |
+| W72 | available | — | — | — | [P] W64 |
+| W73 | available | — | — | — | W68 |
+| W74 | available | — | — | — | [P] W66 |
+| W75 | available | — | — | — | W71, W73 |
+| W76 | available | — | — | — | [P] W72 |
+| W77 | available | — | — | — | W66–W76 |
+| W78 | available | — | — | — | W66–W77 |
+| W79 | available | — | — | — | W78 |
+| W80 | available | — | — | — | W79 |
+| W81 | available | — | — | — | W79 |
+| W82 | available | — | — | — | W80, W81 |
+| W83 | available | — | — | — | [P] W79 |
+| W84 | available | — | — | — | W82 |
+| W85 | available | — | — | — | W84 |
+| W86 | available | — | — | — | [P] W84 |
+| W87 | available | — | — | — | W84, W85 |
+| W88 | available | — | — | — | [P] W80 |
+| W89 | available | — | — | — | W79 |
+| W90 | available | — | — | — | [P] W78 |
+| W91 | available | — | — | — | W79–W90 |
+| W92 | available | — | — | — | W91 |
+| W93 | available | — | — | — | W92 |
+| W94 | available | — | — | — | [P] W92 |
+| W95 | available | — | — | — | W93 |
+| W96 | available | — | — | — | [P] W93 |
+| W97 | available | — | — | — | W91 |
+| W98 | available | — | — | — | [P] W97 |
+| W99 | available | — | — | — | W97 |
+| W100 | available | — | — | — | [P] W96 |
+| W101 | available | — | — | — | W97 |
+| W102 | available | — | — | — | W95, W97 |
+| W103 | available | — | — | — | W92–W102 |
+| W104 | available | — | — | — | W103 |
