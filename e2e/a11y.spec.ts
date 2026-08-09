@@ -44,6 +44,7 @@ test("console surfaces pass WCAG A/AA", async ({ page }) => {
     "/console/roi",
     "/console/privacy",
     "/console/complaints",
+    "/console/registers", // W60
     "/console/setup/practice",
   ];
   for (const path of surfaces) {

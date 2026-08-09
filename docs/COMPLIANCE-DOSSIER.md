@@ -32,6 +32,7 @@ surface without a row here does not ship. Regulatory basis: the venture research
 | Landing page (`app/page.tsx`) | W23 | 3 | B2B copy only (practices, not patients); copy-compliance linter from W23; no outcome claims, no testimonials |
 | Complaint/opt-out workflow | W43 (`src/ops`) | 1, 2, 3 | intake → triage → practice notification; Sev-1 pause-first rule (`docs/SUPPORT-RUNBOOK.md`); event-spine replay resolves "STOP not honoured" claims with evidence |
 | Sales assets (deck/one-pager) | W46 | 3 | factual credential/figure claims traceable to the research page; no "specialist-equivalent" language anywhere |
+| Register console (`app/console/registers`) | W60 (`src/registers/*`) | 2, 3 | enable/disable is keyed by practice id, so one practice cannot change what another sees (isolation unit-tested); scheduling-only copy asserted in e2e ("needs", "at risk", "requires", "should be seen" all banned); register membership is non-inferential by construction — the W55 CHECK constraint and union type admit no symptom-derived source (G7) |
 
 ## Standing prohibitions (structural, not policy)
 
@@ -51,3 +52,8 @@ linter rules; TGA CDSS guidance updates (carve-outs expected to narrow); commenc
 remaining Privacy Act tranche-2 reforms. Each review appends a dated line here.
 
 - 2026-08-09 — v1 established (W50). All eight surfaces mapped; zero unmapped surfaces in `app/`.
+- 2026-08-09 — W60 adds the register console (nine surfaces). Its catalogue ships **placeholders
+  only**: the real guideline intervals are W56, blocked pending a founder ruling on whether
+  transcribed national guidance is G5 clinical content. A test asserts the shipped catalogue
+  names no real condition or guideline, so clinical values cannot reach a practice-facing surface
+  ahead of that ruling.

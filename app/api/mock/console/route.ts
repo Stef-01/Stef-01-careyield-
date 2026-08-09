@@ -7,6 +7,7 @@ import { getConsole, resetConsole } from "@/console/store";
 import { resetPrivacy } from "@/privacy/store";
 import { assertMockRoutesEnabled } from "@/lib/mock-guard";
 import { resetRateLimits } from "@/lib/rate-limit";
+import { resetRegisters } from "@/registers/store";
 
 export const dynamic = "force-dynamic";
 
@@ -25,5 +26,6 @@ export async function POST() {
   // limiter's production behaviour untouched.
   resetRateLimits();
   resetComplaints(); // W43 likewise
+  resetRegisters(); // W60 likewise
   return NextResponse.json(resetConsole());
 }
