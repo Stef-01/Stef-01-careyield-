@@ -63,7 +63,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W35 | done | interactive-0809 | 2026-08-09T03:15Z | c3d8cfe | composition only — no metric recomputed; synthetic usefulness records stand in until G4 |
 | W36 | done | builder-B | 2026-08-09T03:50Z | e4e79e5 | ResilientPmsReader at src/pms/resilience.ts: failure isolation (throw/hang/malformed → degrade, never raise), stale-data guard fails CLOSED past freshness budget, circuit breaker, readFleet isolation. 12 chaos tests are the gate; clock injected. Wiring into the send path lands with W38 |
 | W37 | available | — | — | — | depends W27–W33 |
-| W38 | available | — | — | — | depends W28, W29, W36 |
+| W38 | claimed | builder-B | 2026-08-09T04:05Z | — | depends W28, W29, W36 |
 | W39 | available | — | — | — | depends W37, W38 |
 | W40 | done | interactive-0809 | 2026-08-09T03:39Z | 7589c38 | docs unit; success criteria pre-registered incl. holdout non-negotiable + stop rules |
 | W41 | available | — | — | — | depends W17, W19 |
