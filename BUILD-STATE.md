@@ -62,7 +62,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W34 | done | interactive-0809 | 2026-08-09T02:42Z | 0da1194 | revenue-estimation only; verified 1-Jul-2025 rebates pinned in tests |
 | W35 | done | interactive-0809 | 2026-08-09T03:15Z | c3d8cfe | composition only — no metric recomputed; synthetic usefulness records stand in until G4 |
 | W36 | done | builder-B | 2026-08-09T03:50Z | e4e79e5 | ResilientPmsReader at src/pms/resilience.ts: failure isolation (throw/hang/malformed → degrade, never raise), stale-data guard fails CLOSED past freshness budget, circuit breaker, readFleet isolation. 12 chaos tests are the gate; clock injected. Wiring into the send path lands with W38 |
-| W37 | available | — | — | — | depends W27–W33 |
+| W37 | claimed | builder-A | 2026-08-09T03:51Z | — | depends W27–W33 |
 | W38 | done | builder-B | 2026-08-09T04:05Z | 7993f5b | drift detection at src/pms/drift.ts (per-vendor declared shape; additive change is not drift, removal/retype/null/unknown-enum/missing-collection are) + error taxonomy at src/integration/errors.ts unifying W36/W29/W28/drift failures with severity + blocksSending + operator action. Suite green (gate): 8 drift + 11 taxonomy tests |
 | W39 | available | — | — | — | depends W37, W38 |
 | W40 | done | interactive-0809 | 2026-08-09T03:39Z | 7589c38 | docs unit; success criteria pre-registered incl. holdout non-negotiable + stop rules |
