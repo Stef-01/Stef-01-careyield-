@@ -62,6 +62,15 @@ This repo — `stef-01/stef-01-careyield-`, branch `main` — is the permanent h
 completed 2026-08-08; the tree previously lived in Stefan-Brain `careyield/`, now a pointer).
 Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 
+
+> **⌛ LEDGER DRY 2026-08-09 14:10Z — EXPECTED, NOT A FAULT.** Zero units are claimable: the whole
+> Q5 chain (W57→W58→W59→W61→W63→W64→W65, and W62) sits transitively behind **W56, which is blocked
+> on a founder G5-scope ruling**. W60 was the last parallel unit and is done. Idle firings should do
+> the protocol fallback (re-verify the last done unit's gate, end quietly) — do **not** unblock W56,
+> invent units, or pull Y3 work forward to manufacture activity. Note for the plan owner: the W52
+> Y2 expansion chained Q5 far more tightly than Y1 was chained, which is why one blocked unit stops
+> everything; future expansions should keep more `[P]` units genuinely independent.
+
 ## Ledger — Year 1
 
 | Unit | Status | Session | Claimed (UTC) | SHA | Notes |
