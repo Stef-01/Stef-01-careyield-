@@ -11,11 +11,13 @@ import { resetStore } from "@/booking/store";
 import { SESSION_COOKIE, signSession } from "@/console/session";
 import { onboardPractice, resetConsole } from "@/console/store";
 import { resetOps } from "@/ops/store";
+import { assertDemoEnabled } from "@/lib/demo-guard";
 import { resetPrivacy } from "@/privacy/store";
 
 const DEMO_EMAIL = "presenter@demo.practice.example";
 
 export async function launchDemo(): Promise<void> {
+  assertDemoEnabled(); // W37: fails closed in production unless explicitly opted in
   resetConsole();
   resetStore();
   resetOps();

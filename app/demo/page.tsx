@@ -6,6 +6,7 @@
 import { getStore } from "@/booking/store";
 import { signBookingToken } from "@/booking/token";
 import { getConsole } from "@/console/store";
+import { assertDemoEnabled } from "@/lib/demo-guard";
 import { launchDemo } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +20,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default function DemoPage() {
+  assertDemoEnabled();
   const live = getConsole().practice !== null;
   const rail = getStore();
 

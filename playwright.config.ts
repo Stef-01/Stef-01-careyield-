@@ -25,6 +25,7 @@ export default defineConfig({
     env: {
       CAREYIELD_TOKEN_SECRET: "e2e-signing-secret",
       CAREYIELD_ENABLE_MOCK_ROUTES: "1",
+      CAREYIELD_ENABLE_DEMO: "1", // W37: demo fails closed in prod builds unless opted in
     },
   },
 });

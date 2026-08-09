@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, signSession } from "@/console/session";
+import { rateLimit } from "@/lib/rate-limit";
 import { onboardPractice, updateRules } from "@/console/store";
 import type { EligibilityConfig } from "@/engine/eligibility";
 import { requireSession } from "./guard";
@@ -12,6 +13,10 @@ import { requireSession } from "./guard";
 export async function signIn(formData: FormData): Promise<void> {
   const email = formData.get("email");
   if (typeof email !== "string" || !email.includes("@")) redirect("/console/signin?error=1");
+  // W37: sign-in is an unauthenticated endpoint — throttle per identifier.
+  if (!rateLimit("signin", email.toLowerCase(), { limit: 20, windowMs: 60_000 })) {
+    redirect("/console/signin?error=rate");
+  }
   const jar = await cookies();
   jar.set(SESSION_COOKIE, signSession(email), { httpOnly: true, sameSite: "lax", path: "/" });
   redirect("/console");
