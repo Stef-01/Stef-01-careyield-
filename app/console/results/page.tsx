@@ -156,6 +156,7 @@ export default async function ResultsPage() {
             holdout: C.chart.comparisonLabel,
             caption: C.chart.caption,
             unit: "per 100 patients",
+            difference: "Difference",
           }}
         />
       </section>

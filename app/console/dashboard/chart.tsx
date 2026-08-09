@@ -24,6 +24,8 @@ export interface ChartLabels {
   caption: string;
   /** Y-axis unit, used in the accessible name. */
   unit: string;
+  /** Tooltip label for the gap between the series. */
+  difference: string;
 }
 
 const DEFAULT_LABELS: ChartLabels = {
@@ -33,6 +35,7 @@ const DEFAULT_LABELS: ChartLabels = {
     "Attended appointments per 1,000 arm patients per week. Both arms share the same organic " +
     "process; the gap is the generated lift.",
   unit: "per 1,000 arm patients",
+  difference: "Δ",
 };
 
 const W = 720;
@@ -184,7 +187,7 @@ export function WeeklyArmsChart({
                 <span className="mr-1 inline-block h-2 w-2 rounded-full align-baseline" style={{ background: SERIES.holdout.color }} />
                 {labels.holdout} {(hovered.holdoutPer1000 / scale).toFixed(1)}
               </div>
-              <div className="text-stone-900">Difference {(hovered.incrementalPer1000 / scale).toFixed(1)}</div>
+              <div className="text-stone-900">{labels.difference} {(hovered.incrementalPer1000 / scale).toFixed(1)}</div>
             </div>
           </div>
         )}
