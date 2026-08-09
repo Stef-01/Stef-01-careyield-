@@ -13,7 +13,7 @@
 | Gate | Definition (plan §4) | Status | Code-level enforcement |
 |---|---|---|---|
 | G0 | dedicated repo | **CLEARED** 2026-08-08 | — |
-| G1 | real PMS/booking API credentials (Halo/Best Practice, HotDoc partner access) | CLOSED — built to the gate | `VendorPmsAdapter` constructor refuses live vendor hosts; no live HTTP client exists in the tree; vendor deep links ship disabled per practice |
+| G1 | real PMS/booking API credentials (Halo/Best Practice, HotDoc partner access) | CLOSED — built to the gate | `VendorPmsAdapter` constructor refuses live vendor hosts; no live HTTP client exists anywhere in `src/pms`; vendor deep links ship disabled per practice |
 | G2 | real patient data of any kind (privacy impact assessment first; APP 7 posture) | CLOSED — built to the gate | All stores in-memory/synthetic; RLS default-deny schema ready but no live database is wired |
 | G3 | live SMS to real patients (Spam Act consent verified; templates founder-approved) | CLOSED — built to the gate | `TwilioSmsAdapter` constructor refuses any `twilio.com` endpoint; only the mock adapter is wired |
 | G4 | pilot go-live (agreement + holdout consent design signed off) | CLOSED — W40 playbook pre-registers criteria | Downstream of G1–G3 |
@@ -42,10 +42,12 @@
   (`assertSafeLink`), and an internal tokenised fallback with the fallback reason recorded.
 
 **The lock, verbatim behavior.** `VendorPmsAdapter`'s constructor throws
-`founder gate G1: live PMS endpoints are not permitted in this phase` when the configured
-`baseUrl` hostname matches any of `bpsoftware.net`, `bestpractice`, `halohealth`,
-`haloconnect` (`LIVE_HOST_PATTERNS`, `src/pms/vendors.ts`). Regression-tested. Note the
-guard constrains *intent*: there is no network code to reach anything today.
+`founder gate G1: live PMS endpoints are not permitted in this phase (<hostname>)` when
+the configured `baseUrl` hostname matches any of `bpsoftware.net`, `bestpractice`,
+`halohealth`, `haloconnect` (`LIVE_HOST_PATTERNS`, `src/pms/vendors.ts`).
+Regression-tested. The guard constrains *intent*: within `src/pms` there is no network
+code to reach anything today. (The Twilio adapter elsewhere in the tree IS a real HTTP
+client — its own G3 guard covers it.)
 
 **Credentials the founder must obtain to open G1.**
 1. Best Practice (Titanium/Halo Connect) partner API credentials — practice-scoped API key
@@ -63,10 +65,16 @@ guard constrains *intent*: there is no network code to reach anything today.
 3. Narrow, then remove, the matching `LIVE_HOST_PATTERNS` entry — **this edit is the act
    of opening G1** and must ride with the founder's sign-off in the commit message.
 4. Wire `ResilientPmsReader` in front of the live client (already built, W36).
-5. For deep links: populate `PracticeLinkSettings` per practice (persistence for these
-   settings is small follow-up work — the type currently lives only in code), set
-   `enabled: true` per practice after verifying each produced URL resolves on the real
-   vendor listing. The `assertSafeLink` guard stays on every branch.
+5. For deep links, THREE things, not one: (a) wire `buildBookingLink` into the
+   invitation send path — today the module has **no runtime caller** (message bodies
+   use the internal token URL built inline in the harness), so flipping flags alone
+   would change nothing; (b) add persistence for `PracticeLinkSettings` (the type
+   currently lives only in code); (c) then set `enabled: true` per practice after
+   verifying each produced URL resolves on the real vendor listing. The
+   `assertSafeLink` guard covers every URL the module produces — note its scope:
+   it refuses non-https URLs and forbidden query-parameter **keys**; identifiers
+   smuggled into path segments or parameter values are not caught, so slug values
+   must be verified non-identifying when settings are populated.
 
 ## G2 — real patient data
 
@@ -148,7 +156,10 @@ into the sim and app surfaces.
 2. Build the two HTTP routes that do not exist yet: an inbound-SMS webhook route feeding
    the exact registered URL + raw form + `X-Twilio-Signature` header into
    `applyInboundStop`, and a status-callback route feeding `applyReceipt`. Both library
-   functions are built and tested; the routes are the missing wiring.
+   functions are built and tested; the routes are the missing wiring. Note: message
+   records (`TwilioSmsAdapter.messages`) are a per-instance in-memory Map — a working
+   status-callback route also needs a persistent message-record store (add it to the
+   G2 store-migration list; it is not among the six enumerated there).
 3. Configure the Twilio console: point the number's inbound webhook and StatusCallback
    at those routes (signature validation binds to the exact registered URL string).
 4. Send-to-self pilot list (founder's own numbers) before any patient number. Note the
@@ -160,6 +171,12 @@ into the sim and app surfaces.
    time.
 
 ## Production deployment checklist (whenever any gate opens)
+
+**Precondition for every row below: the deployment must run as a production build
+(`NODE_ENV=production`).** All three fail-closed guards branch on `NODE_ENV` — in any
+non-production build the mock routes and demo surface are enabled unconditionally and
+signing silently uses the committed dev fallback secret. A publicly reachable
+non-production deployment defeats every guarantee in this table.
 
 | Item | Setting | Source |
 |---|---|---|
