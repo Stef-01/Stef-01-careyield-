@@ -103,6 +103,15 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    // W176: declared as the register intends — a new fold site fails the suite until it is here.
+    module: "src/outcomes/time-to-escalation.ts",
+    folds: 1,
+    disposition: {
+      kind: "rationale",
+      why: "Takes the last element of a list sorted by day count and reads the NUMBER off it rather than returning the record. Two measurements tied on days give the same number either way round, so there is nothing to break — the same argument as src/pms/ingest.ts. The sort itself already tie-breaks by key.",
+    },
+  },
+  {
     module: "src/pathways/approval.ts",
     folds: 1,
     disposition: {
