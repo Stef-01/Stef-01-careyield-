@@ -8,8 +8,8 @@ export default function PracticesPage() {
         <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="text-lg font-semibold tracking-tight">CareYield</Link>
           <div className="flex items-center gap-6 text-sm text-stone-600">
-            <a href="#how" className="hover:text-stone-900">{C.nav.product}</a>
-            <a href="#measurement" className="hover:text-stone-900">{C.nav.measurement}</a>
+            <a href="#how" className="hidden hover:text-stone-900 sm:inline">{C.nav.product}</a>
+            <a href="#measurement" className="hidden hover:text-stone-900 sm:inline">{C.nav.measurement}</a>
             <Link href="/console/signin" className="font-medium text-stone-900 hover:underline">
               {C.nav.cta}
             </Link>

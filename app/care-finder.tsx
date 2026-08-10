@@ -28,7 +28,37 @@ type Stage =
   | "booking"
   | "confirmed";
 
-const exampleRequest = "Someone calm who takes time to explain.";
+const exampleRequest =
+  "I’m a young South Indian woman navigating PCOS and a difficult time with my mental health. I’d like a woman GP who understands the cultural and family side too.";
+const exampleHeadline =
+  "PCOS, cultural and mental-health care.";
+
+function getRequestHeadline(value: string, fallback: string) {
+  const words = value.toLowerCase();
+  const hasPcos = words.includes("pcos") || words.includes("polycystic");
+  const hasCulturalContext = ["south indian", "indian", "tamil", "malayalam", "culture", "cultural"].some((term) =>
+    words.includes(term),
+  );
+
+  return hasPcos && hasCulturalContext ? exampleHeadline : fallback;
+}
+
+function getRequestPriorities(value: string) {
+  const words = value.toLowerCase();
+  const priorities = [
+    { label: "PCOS expertise", terms: ["pcos", "polycystic"] },
+    { label: "Woman GP", terms: ["woman", "women", "female"] },
+    { label: "Mental-health care", terms: ["mental health", "emotion", "anxiety", "mood", "psychological"] },
+    { label: "South Indian context", terms: ["south indian", "tamil", "malayalam"] },
+    { label: "Cultural understanding", terms: ["indian", "culture", "cultural", "family"] },
+    { label: "Longer conversations", terms: ["time", "unhurried", "longer", "explain"] },
+  ];
+
+  return priorities
+    .filter((priority) => priority.terms.some((term) => words.includes(term)))
+    .map((priority) => priority.label)
+    .slice(0, 5);
+}
 
 function Wordmark() {
   return <span className="wordmark">CareYield</span>;
@@ -75,6 +105,11 @@ export function CareFinder() {
     if (!cleaned) return exampleRequest;
     return `${cleaned.charAt(0).toUpperCase()}${cleaned.slice(1)}.`;
   }, [request]);
+  const requestHeadline = useMemo(
+    () => getRequestHeadline(request, requestSummary),
+    [request, requestSummary],
+  );
+  const requestPriorities = useMemo(() => getRequestPriorities(request), [request]);
 
   function startListening() {
     setElapsed(0);
@@ -121,13 +156,13 @@ export function CareFinder() {
           <div className="screen voice-screen">
             <header className="minimal-header">
               <Wordmark />
-              <Link href="/practices" className="quiet-link">For practices</Link>
+              <Link href="/clinicians" className="quiet-link">Clinician view</Link>
             </header>
 
             <div className="voice-prompt">
               <p className="eyebrow">Find your fit</p>
               <h1>Who would you feel comfortable seeing?</h1>
-              <p className="example">Try: “A patient woman GP with ADHD experience near Fitzroy.”</p>
+              <p className="example">Try: “I’m a young South Indian woman navigating PCOS and a difficult time with my mental health. I’d like a woman GP who understands the cultural side too.”</p>
             </div>
 
             <div className="voice-actions">
@@ -154,7 +189,7 @@ export function CareFinder() {
             <div className="voice-prompt listening-copy">
               <p className="eyebrow">Listening</p>
               <h1>Describe the GP you’d feel comfortable with.</h1>
-              <p className="example">Focus, manner, location—whatever matters to you.</p>
+              <p className="example">Health needs, culture, emotional support—whatever matters to you.</p>
             </div>
 
             <div className="voice-actions">
@@ -186,7 +221,7 @@ export function CareFinder() {
                 id="doctor-request"
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
-                placeholder="For example: A GP who understands ADHD and explains medication clearly."
+                placeholder="For example: A woman GP with PCOS experience who understands South Indian family dynamics."
                 autoFocus
               />
             </div>
@@ -211,8 +246,16 @@ export function CareFinder() {
             </header>
 
             <div className="review-content">
-              <p className="eyebrow">You asked for</p>
-              <h1>{requestSummary}</h1>
+              <p className="eyebrow">What matters to you</p>
+              <h1>{requestHeadline}</h1>
+              {requestHeadline !== requestSummary && (
+                <p className="review-transcript">“{requestSummary}”</p>
+              )}
+              {requestPriorities.length > 0 && (
+                <div className="priority-list" aria-label="Matching priorities">
+                  {requestPriorities.map((priority) => <span key={priority}>{priority}</span>)}
+                </div>
+              )}
               <button className="refine-line" type="button" onClick={() => {
                 setDraft(request);
                 setStage("type");
@@ -236,7 +279,7 @@ export function CareFinder() {
             <div>
               <WaveformMark active />
               <h1>Finding the right fit…</h1>
-              <p>Looking across focus, manner and location.</p>
+              <p>Looking across clinical focus, cultural context and manner.</p>
             </div>
           </div>
         )}
@@ -253,7 +296,7 @@ export function CareFinder() {
 
             <div className="request-banner">
               <p className="eyebrow">You asked for</p>
-              <h1>{requestSummary}</h1>
+              <h1>{requestHeadline}</h1>
               <button className="refine-compact" type="button" onClick={() => {
                 setDraft(request);
                 setStage("type");
@@ -291,10 +334,14 @@ export function CareFinder() {
             <div className="match-details" key={clinician.id}>
               <h2>{clinician.name}</h2>
               <p className="clinician-meta">{clinician.title} · {clinician.suburb}</p>
-              <p className="match-line">{clinician.matchLine}</p>
+              <div className="fit-signal-row" aria-label="Key match reasons">
+                {clinician.fitSignals.slice(0, 3).map((signal) => <span key={signal}>{signal}</span>)}
+              </div>
+              <div className="practical-signal-row" aria-label="Practical appointment details">
+                {clinician.practicalSignals.slice(0, 2).map((signal) => <span key={signal}>{signal}</span>)}
+              </div>
               <p className="availability">Accepting new patients · Next: {clinician.nextAvailable.split(",")[0]}</p>
               <button className="primary-button" type="button" onClick={() => setStage("profile")}>View profile</button>
-              <button className="text-action next-match" type="button" onClick={() => moveMatch(1)}>Next match</button>
             </div>
           </div>
         )}
@@ -319,6 +366,7 @@ export function CareFinder() {
                   <span>
                     <strong>{item.name}</strong>
                     <small>{item.focus} · {item.suburb}</small>
+                    <small className="row-practical">{item.practicalSignals.slice(0, 2).join(" · ")}</small>
                     <small className="row-availability">Next: {item.nextAvailable}</small>
                   </span>
                   <CaretRight size={20} weight="light" aria-hidden="true" />
@@ -346,6 +394,12 @@ export function CareFinder() {
               <p className="eyebrow">Why this fit</p>
               <h1>{clinician.name}</h1>
               <p className="clinician-meta">{clinician.title} · {clinician.pronouns} · {clinician.suburb}</p>
+              <div className="fit-signal-row profile-fit-signals" aria-label="Key match reasons">
+                {clinician.fitSignals.map((signal) => <span key={signal}>{signal}</span>)}
+              </div>
+              <div className="practical-signal-row profile-practical-signals" aria-label="Practical appointment details">
+                {clinician.practicalSignals.map((signal) => <span key={signal}>{signal}</span>)}
+              </div>
 
               <div className="fit-list">
                 <p>{clinician.matchLine}</p>
