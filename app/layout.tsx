@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CareYield",
+  title: "CareYield — find a GP who fits",
   description:
-    "Continuity yield for general practice: fill unused appointments with the patients who should return.",
+    "Describe the kind of GP you want to see and explore tailored clinician profiles.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
