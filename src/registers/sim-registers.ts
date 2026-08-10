@@ -24,15 +24,25 @@ import { loadIntervals, type IntervalCatalogue } from "./intervals";
 import { deriveMemberships, type PmsConditionFlag } from "./membership";
 import { rankGapAware } from "./ranking";
 
-export interface RegisterSimConfig {
-  enabled: boolean;
+/** One register in the simulation. W63 ran exactly one; W75 runs several. */
+export interface RegisterConditionSpec {
   conditionCode: ConditionCode;
   /** Cadence of the FIXTURE interval, in months. Not a clinical value (see G5 note above). */
   intervalMonths: number;
   /** Share of the panel the synthetic PMS flags for this condition. */
   flaggedShare: number;
+}
+
+export interface RegisterSimConfig extends RegisterConditionSpec {
+  enabled: boolean;
   /** When true, only patients with an open gap may be invited (W59 narrowing). */
   requireCareGap: boolean;
+  /**
+   * W75: further registers running alongside the primary one. Defaults to none, so a W63
+   * single-register run is byte-identical — the multi-register path only exists when a
+   * caller asks for it.
+   */
+  additionalConditions?: readonly RegisterConditionSpec[];
 }
 
 export const DEFAULT_REGISTER_SIM: RegisterSimConfig = {
@@ -52,21 +62,29 @@ function flagged(patientId: string, seed: number, share: number): boolean {
   return (h % 10_000) / 10_000 < share;
 }
 
+/** Every register in this run, primary first. W63 configs yield a single-element list. */
+export function conditionsOf(config: RegisterSimConfig): RegisterConditionSpec[] {
+  return [
+    { conditionCode: config.conditionCode, intervalMonths: config.intervalMonths, flaggedShare: config.flaggedShare },
+    ...(config.additionalConditions ?? []),
+  ];
+}
+
 export function fixtureCatalogue(config: RegisterSimConfig): IntervalCatalogue {
-  return loadIntervals([
-    {
-      id: `iv-${config.conditionCode}`,
-      conditionCode: config.conditionCode,
+  return loadIntervals(
+    conditionsOf(config).map((spec) => ({
+      id: `iv-${spec.conditionCode}`,
+      conditionCode: spec.conditionCode,
       name: "Fixture cadence",
-      intervalMonths: config.intervalMonths,
+      intervalMonths: spec.intervalMonths,
       provenance: {
         citation: "Placeholder source for the W63 register simulation — not clinical guidance",
         url: "https://example.org/not-a-guideline",
         publishedOn: "2026-01-01",
         retrievedOn: "2026-08-10",
       },
-    },
-  ]);
+    })),
+  );
 }
 
 export interface RegisterLayer {
@@ -91,11 +109,16 @@ export function buildRegisterLayer(
   todayIso: string,
 ): RegisterLayer {
   const catalogue = fixtureCatalogue(config);
-  const flags: PmsConditionFlag[] = patients.map((p) => ({
-    patientId: p.id,
-    conditionCode: config.conditionCode,
-    present: flagged(p.id as string, seed, config.flaggedShare),
-  }));
+  const specs = conditionsOf(config);
+  // Each register gets its own seed offset, so two registers do not select an identical
+  // panel; still hash-based and RNG-free, so adding registers never shifts the sim stream.
+  const flags: PmsConditionFlag[] = specs.flatMap((spec, index) =>
+    patients.map((p) => ({
+      patientId: p.id,
+      conditionCode: spec.conditionCode,
+      present: flagged(p.id as string, seed + index * 7919, spec.flaggedShare),
+    })),
+  );
 
   const memberships = deriveMemberships(
     {
@@ -103,7 +126,7 @@ export function buildRegisterLayer(
       patients,
       conditionFlags: flags,
       confirmations: [],
-      enabledConditions: [config.conditionCode],
+      enabledConditions: specs.map((spec) => spec.conditionCode),
     },
     `${todayIso}T00:00:00Z`,
   );
