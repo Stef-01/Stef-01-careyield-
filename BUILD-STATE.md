@@ -167,7 +167,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W69 | blocked | — | — | — | FOUNDER GATE G5 (clinical content sign-off) — workspace may be built, content stays unusable until sign-off; W68 |
 | W70 | available | — | — | — | [P] W66 |
 | W71 | done | builder-B | 2026-08-10T05:10Z | 43bf85e | src/registers/recalls.ts + src/synthetic/recalls.ts. Dedup vs the practice's OWN recalls: same-condition open recall suppresses the gap; UNSCOPED open recall suppresses ALL that patient's gaps (fail-safe — a recall we cannot attribute might be about this gap, and guessing otherwise is what produces the duplicate contact); CLOSED recalls never suppress (else one completed cycle silences a register forever); legacy coarse patient.activeRecall still honoured. Suppression is REPORTED with a reason, never silent — ops must be able to tell a practice why a register with members produced no offers. Synthetic recalls in their OWN module with their OWN seed per the W17 lesson (drawing from the practice generator stream shifts every later draw); determinism pinned by test. Verify: 14 tests over 400 patients x 2 registers, incl. a fixture-integrity test that the generated spread actually contains open/unscoped/closed rows (a dedup test proves nothing against data with nothing to dedup), and both directions asserted — nothing survives that an open recall covers, nothing suppressed that none covers |
-| W72 | available | — | — | — | [P] W64 |
+| W72 | claimed | builder-B | 2026-08-10T05:15Z | — | [P] W64 |
 | W73 | available | — | — | — | W68 |
 | W74 | available | — | — | — | [P] W66 |
 | W75 | available | — | — | — | W71, W73 |
