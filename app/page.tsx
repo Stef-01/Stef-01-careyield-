@@ -3,23 +3,23 @@ import Link from "next/link";
 import { InterestForm } from "./interest-form";
 
 export const metadata: Metadata = {
-  title: "CareYield — recognise PMOS earlier in Blacktown",
+  title: "CareYield — earlier PMOS answers in Western Sydney",
   description:
-    "A community program helping South Asian women in Blacktown and neighbouring suburbs recognise PMOS, formerly PCOS, earlier.",
+    "A community program helping South Asian women in Western Sydney recognise PMOS, the condition long known as PCOS, earlier.",
 };
 
 const steps = [
   {
-    title: "Start in the community",
-    body: "Mothers and daughters together, in language, in the schools, temples, mosques and women’s groups people already trust.",
+    title: "Talk where people gather",
+    body: "Mothers and daughters together, in language and in trusted community spaces.",
   },
   {
-    title: "Take a self-check to your doctor",
-    body: "Because recognising the signs matters, but it only becomes useful when it leads to a proper conversation and assessment.",
+    title: "Take a self-check to a GP",
+    body: "A simple next step that turns recognition into a clinical conversation.",
   },
   {
-    title: "Find a clinician who understands",
-    body: "Someone who knows the condition and understands language, family pressure and what can make it hard to speak openly.",
+    title: "Find the right clinician",
+    body: "Someone who understands PMOS, culture, language and family pressure.",
   },
 ];
 
@@ -28,119 +28,136 @@ export default function Home() {
     <main className="community-home">
       <header className="community-header">
         <div className="community-wrap community-header-inner">
-          <Link href="/" className="community-wordmark" aria-label="CareYield home">CareYield</Link>
-          <Link href="/finder" className="community-demo-link">Open the early demo</Link>
+          <Link href="/" className="community-wordmark" aria-label="CareYield home">
+            CareYield
+          </Link>
+          <Link href="/finder" className="community-demo-link">
+            Early demo
+          </Link>
         </div>
       </header>
 
-      <section className="community-hero community-wrap" aria-labelledby="community-hero-title">
-        <p className="community-eyebrow">Blacktown and neighbouring suburbs · early community program</p>
-        <h1 id="community-hero-title">
-          Helping South Asian women in Blacktown and neighbouring suburbs find out they have PMOS (formerly PCOS) years earlier.
-        </h1>
-        <p className="community-hero-copy">
-          <strong>PMOS</strong> stands for polyendocrine metabolic ovarian syndrome.
-          It affects hormones, periods, skin, metabolism and mental wellbeing — not just ovaries or fertility.
-        </p>
-        <a className="community-primary-link" href="#register">Register interest</a>
-        <p className="community-synthetic-note">
-          <strong>We are early.</strong> The clinician demo profiles and availability are synthetic.
-          They show the idea, not a finished service. Community information and self-checks do not
-          diagnose PMOS; a clinician needs to assess the full picture.
-        </p>
+      <aside className="community-early-note">
+        <div className="community-wrap">
+          <strong>Early prototype.</strong> Demo clinician profiles and availability are synthetic.
+        </div>
+      </aside>
+
+      <section className="community-hero" aria-labelledby="community-hero-title">
+        <div className="community-wrap community-hero-grid">
+          <div>
+            <p className="community-eyebrow">A Western Sydney community program</p>
+            <h1 id="community-hero-title">
+              Helping South Asian women find <em>answers earlier.</em>
+            </h1>
+          </div>
+          <div className="community-hero-action">
+            <p>
+              We start with PMOS — the condition long known as PCOS — and the signs families
+              are too often told are normal.
+            </p>
+            <a className="community-primary-link" href="#register">
+              Register interest
+            </a>
+          </div>
+        </div>
       </section>
 
       <section className="community-section community-problem" aria-labelledby="problem-heading">
-        <div className="community-wrap">
-          <p className="community-eyebrow">Why this gets missed</p>
-          <h2 id="problem-heading" className="sr-only">The PMOS awareness problem</h2>
-          <div className="community-problem-block">
-            <p>Around <strong>1 in 8</strong> women of reproductive age has PMOS.</p>
-            <p>In one Australian cohort, about half who met the criteria did not know.</p>
+        <div className="community-wrap community-statement-grid">
+          <p className="community-eyebrow">The gap</p>
+          <div>
+            <h2 id="problem-heading">
+              One in eight women has PMOS. <em>Around half do not know.</em>
+            </h2>
+            <p className="community-supporting-copy">
+              Symptoms can run through a family. That makes them feel normal, not like signs
+              worth checking.
+            </p>
           </div>
+        </div>
+      </section>
+
+      <section className="community-quote" aria-label="A common experience">
+        <div className="community-wrap">
           <blockquote>
             “My mother had it. My sister has it. My friends have it. So I thought this was just
             how women in my family are.”
           </blockquote>
-          <div className="community-problem-block community-problem-last">
-            <p>It is not that women are hiding symptoms.</p>
-            <p>It is that nobody told them they were symptoms.</p>
-          </div>
         </div>
       </section>
 
       <section className="community-section" aria-labelledby="what-we-do-heading">
         <div className="community-wrap">
-          <div className="community-section-heading">
+          <div className="community-statement-grid">
             <p className="community-eyebrow">What we do</p>
-            <h2 id="what-we-do-heading">The community is the product.</h2>
-            <p>The software simply helps turn what happens in the room into something people can act on — and something we can measure.</p>
+            <h2 id="what-we-do-heading">
+              The community creates trust. <em>We make the next step clear.</em>
+            </h2>
           </div>
           <ol className="community-steps">
             {steps.map((step, index) => (
               <li key={step.title}>
                 <span aria-hidden="true">0{index + 1}</span>
-                <div>
-                  <h3>{step.title}</h3>
-                  <p>{step.body}</p>
-                </div>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
               </li>
             ))}
           </ol>
-          <p className="community-measure-note">
-            We will measure self-checks taken forward and assessments completed — not how many people saw a poster or sat in a room.
-          </p>
         </div>
       </section>
 
       <section className="community-section community-why" aria-labelledby="why-heading">
-        <div className="community-wrap">
-          <div className="community-section-heading">
-            <p className="community-eyebrow">Why it matters</p>
-            <h2 id="why-heading">This is whole-life health.</h2>
-            <p>
-              Women with PMOS have around three times the risk of type 2 diabetes and a higher risk of
-              gestational diabetes in pregnancy. In Australia, 24% reported waiting more than two years
-              for answers after first seeking help.
+        <div className="community-wrap community-statement-grid">
+          <p className="community-eyebrow">Why early matters</p>
+          <div>
+            <h2 id="why-heading">
+              An earlier answer can change <em>decades of health.</em>
+            </h2>
+            <p className="community-supporting-copy">
+              PMOS is linked with type 2 diabetes, gestational diabetes and metabolic health
+              through midlife. It does not stop at fertility.
             </p>
+            <details className="community-sources">
+              <summary>Sources and clinical context</summary>
+              <p>
+                Evidence: <a href="https://www.monash.edu/medicine/mchri/pcos/guideline">PMOS terminology update</a>,{" "}
+                <a href="https://academic.oup.com/humrep/article/36/8/2275/6272134">Australian cohort study</a>,{" "}
+                <a href="https://doi.org/10.1093/fampra/cmu028">Australian diagnosis study</a> and{" "}
+                <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10505534/">international guideline summary</a>.
+                A clinician must assess the full picture; a self-check cannot diagnose PMOS.
+              </p>
+            </details>
           </div>
-          <blockquote className="community-life-course">
-            PMOS does not stop at fertility. It is linked to gestational diabetes during pregnancy and
-            metabolic disease in midlife, and its effects can continue into perimenopause. Recognising it
-            at sixteen can change decades of care, not just a few years of fertility decisions.
-          </blockquote>
-          <aside className="community-trust-note">
-            <strong>A scan is not always needed.</strong>
-            <p>
-              Since the 2023 guideline, an adult with irregular cycles and signs of higher androgen activity
-              may be assessed without an ultrasound. A GP still needs to check the full picture and rule out other causes.
-            </p>
-          </aside>
-          <p className="community-sources">
-            Sources: <a href="https://www.monash.edu/medicine/mchri/pcos/guideline">2026 PMOS terminology update</a>,{" "}
-            <a href="https://academic.oup.com/humrep/article/36/8/2275/6272134">Australian cohort study</a>,{" "}
-            <a href="https://doi.org/10.1093/fampra/cmu028">Australian diagnosis-experience study</a> and{" "}
-            <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10505534/">2023 international guideline summary</a>.
-          </p>
         </div>
       </section>
 
       <section className="community-section community-team" aria-labelledby="team-heading">
         <div className="community-wrap">
-          <div className="community-section-heading">
+          <div className="community-statement-grid">
             <p className="community-eyebrow">Who we are</p>
-            <h2 id="team-heading">Built from lived experience.</h2>
+            <h2 id="team-heading">
+              Built from lived experience, <em>clinical training and research.</em>
+            </h2>
           </div>
           <div className="community-people">
             <article>
-              <p className="community-person-mark" aria-hidden="true">N</p>
+              <p className="community-person-role">Co-founder · Lived experience</p>
               <h3>Narayani</h3>
-              <p>Narayani has PMOS. She spent years assuming it was normal, because women around her were living with the same signs.</p>
+              <p>
+                Narayani has PMOS. She spent years undiagnosed, assuming it was normal. She
+                studied Clinical Science at Macquarie University, then completed first-class
+                honours research in VR stroke rehabilitation at the University of Sydney.
+              </p>
             </article>
             <article>
-              <p className="community-person-mark" aria-hidden="true">S</p>
+              <p className="community-person-role">Co-founder · Health systems</p>
               <h3>Stefan</h3>
-              <p>Stefan is building the simple infrastructure that helps community conversations lead to practical next steps and measurable follow-through.</p>
+              <p>
+                Stefan is a physician-in-training and health systems researcher at Stanford
+                Medicine. For five years, he has advised the federal government and researched
+                primary care, digital health and AI-enabled public health.
+              </p>
             </article>
           </div>
         </div>
@@ -149,9 +166,11 @@ export default function Home() {
       <section id="register" className="community-register" aria-labelledby="register-heading">
         <div className="community-wrap community-register-grid">
           <div>
-            <p className="community-eyebrow">Register interest</p>
-            <h2 id="register-heading">Tell us where you fit.</h2>
-            <p>We are starting in Blacktown, Seven Hills, Doonside, Toongabbie, Quakers Hill, Rooty Hill, Mount Druitt and nearby suburbs. Leave your details if you want to hear about a session or help test what comes next.</p>
+            <p className="community-eyebrow">Stay close</p>
+            <h2 id="register-heading">
+              Help shape what <em>comes next.</em>
+            </h2>
+            <p>Hear about community sessions or test the first self-check and directory.</p>
           </div>
           <InterestForm />
         </div>
@@ -159,9 +178,9 @@ export default function Home() {
 
       <footer className="community-footer">
         <div className="community-wrap">
-          <p>We are building a self-check tool and a clinician directory. Join the list to test them.</p>
+          <Link href="/" className="community-footer-wordmark">CareYield</Link>
           <div>
-            <a href="mailto:stefan.thottunkal@gmail.com">stefan.thottunkal@gmail.com</a>
+            <a href="mailto:stefan.thottunkal@gmail.com">Contact</a>
             <Link href="/privacy">Privacy</Link>
           </div>
         </div>

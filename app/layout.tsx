@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "CareYield — recognise PMOS earlier",
   description:
-    "A Blacktown community program helping South Asian women recognise PMOS, formerly PCOS, earlier.",
+    "A Western Sydney community program helping South Asian women recognise PMOS, formerly PCOS, earlier.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

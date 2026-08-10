@@ -15,7 +15,6 @@ import {
 } from "@phosphor-icons/react";
 import { AnimatePresence, MotionConfig, motion, useReducedMotion, type Variants } from "motion/react";
 import { useEffect, useMemo, useState, type ComponentProps, type ReactNode } from "react";
-import { DemoNavigator } from "./demo-navigator";
 import { careArchetypes } from "@/demo/care-archetypes";
 import { clinicians, getPersonalizedMatch, rankClinicians, type Clinician } from "@/demo/clinicians";
 
@@ -162,14 +161,14 @@ function getRequestPriorities(value: string) {
 }
 
 function Wordmark() {
-  return <DemoNavigator />;
+  return <Link href="/" className="wordmark finder-wordmark" aria-label="CareYield — back to main home">CareYield</Link>;
 }
 
 function FinderContext() {
   return (
     <aside className="finder-context">
-      <p>Part of a community program helping South Asian women in Blacktown and neighbouring suburbs recognise PMOS (formerly PCOS) earlier.</p>
-      <strong>Early demo: all clinician profiles and availability are synthetic.</strong>
+      <p>Early demo · Western Sydney</p>
+      <strong>All clinician profiles and availability are synthetic.</strong>
     </aside>
   );
 }
@@ -185,6 +184,7 @@ function WaveformMark({ active = false }: { active?: boolean }) {
 export function CareFinder() {
   const [stage, setStage] = useState<Stage>("welcome");
   const [archetypeIndex, setArchetypeIndex] = useState(0);
+  const [showScenarios, setShowScenarios] = useState(false);
   const [draft, setDraft] = useState("");
   const [request, setRequest] = useState(exampleRequest);
   const [matches, setMatches] = useState(() => rankClinicians(exampleRequest));
@@ -287,48 +287,75 @@ export function CareFinder() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <main className="care-app patient-v2">
+      <main className="care-app patient-v2" data-stage={stage}>
         <section className="care-shell" aria-live="polite">
           <AnimatePresence mode="wait" initial={false}>
         {stage === "welcome" && (
           <MotionScreen key="welcome" className="voice-screen">
+            <div className="finder-hero-image" aria-hidden="true">
+              <Image
+                src="/clinicians/priya-nair.png"
+                alt=""
+                fill
+                priority
+                sizes="(min-width: 820px) 1180px, 100vw"
+              />
+            </div>
+            <div className="finder-hero-veil" aria-hidden="true" />
+
             <header className="minimal-header">
               <Wordmark />
-              <Link href="/clinicians" className="quiet-link">Clinician view</Link>
+              <Link href="/" className="quiet-link finder-home-link">
+                <ArrowLeft size={15} weight="regular" aria-hidden="true" /> Home
+              </Link>
             </header>
 
             <FinderContext />
 
             <div className="voice-core">
               <div className="voice-prompt">
-                <h1>Who would you feel comfortable seeing?</h1>
+                <h1>
+                  <span>Who would you feel</span>
+                  <em>comfortable seeing?</em>
+                </h1>
               </div>
 
-              {/* The example and the archetype label are one idea; they used to sit apart with
-                  dead space between them. Merged into a single browsable example so the middle
-                  of the composition carries content instead of a gap. */}
-              <div className="archetype-switcher" role="group" aria-label="Demo care archetypes">
-                <Pressable type="button" onClick={() => cycleArchetype(-1)} aria-label="Previous care archetype">
-                  <CaretLeft size={19} weight="light" aria-hidden="true" />
-                </Pressable>
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
-                    className="archetype-switcher-copy"
-                    key={archetype.id}
-                    initial={{ opacity: 0, x: matchDirection * 7 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: matchDirection * -7 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <span>{archetypeIndex + 1} of {careArchetypes.length} · {archetype.eyebrow}</span>
-                    <strong>{archetype.title}</strong>
-                    <q className="example">{archetype.example}</q>
-                  </motion.div>
-                </AnimatePresence>
-                <Pressable type="button" onClick={() => cycleArchetype(1)} aria-label="Next care archetype">
-                  <CaretRight size={19} weight="light" aria-hidden="true" />
-                </Pressable>
-              </div>
+              <button
+                className="scenario-toggle"
+                type="button"
+                aria-expanded={showScenarios}
+                aria-controls="demo-scenarios"
+                onClick={() => setShowScenarios((current) => !current)}
+              >
+                <span>Try a demo scenario</span>
+                <small>{archetypeIndex + 1} of {careArchetypes.length}</small>
+                <CaretRight className={showScenarios ? "is-open" : ""} size={17} weight="bold" aria-hidden="true" />
+              </button>
+
+              {showScenarios && (
+                <div id="demo-scenarios" className="archetype-switcher" role="group" aria-label="Demo care scenarios">
+                  <Pressable type="button" onClick={() => cycleArchetype(-1)} aria-label="Previous care scenario">
+                    <CaretLeft size={19} weight="light" aria-hidden="true" />
+                  </Pressable>
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      className="archetype-switcher-copy"
+                      key={archetype.id}
+                      initial={{ opacity: 0, x: matchDirection * 7 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: matchDirection * -7 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <span>{archetype.eyebrow}</span>
+                      <strong>{archetype.title}</strong>
+                      <q className="example">{archetype.example}</q>
+                    </motion.div>
+                  </AnimatePresence>
+                  <Pressable type="button" onClick={() => cycleArchetype(1)} aria-label="Next care scenario">
+                    <CaretRight size={19} weight="light" aria-hidden="true" />
+                  </Pressable>
+                </div>
+              )}
             </div>
 
             <div className="voice-actions">
@@ -339,7 +366,6 @@ export function CareFinder() {
               <button className="text-action" type="button" onClick={() => setStage("type")}>Type instead</button>
             </div>
 
-            <footer className="micro-footer">Community program prototype · Blacktown area</footer>
           </MotionScreen>
         )}
 
@@ -387,7 +413,10 @@ export function CareFinder() {
             <div className="type-content">
               <FinderContext />
               <p className="eyebrow">In your own words</p>
-              <h1>Who would you feel comfortable seeing?</h1>
+              <h1>
+                <span>Who would you feel</span>
+                <em>comfortable seeing?</em>
+              </h1>
               <label className="sr-only" htmlFor="doctor-request">Describe the GP you want to see</label>
               <textarea
                 id="doctor-request"

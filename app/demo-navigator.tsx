@@ -80,6 +80,9 @@ export function DemoNavigator() {
 
       {open && (
         <nav id="careyield-demo-navigation" className="demo-nav-popover" aria-label="CareYield demo navigation">
+          <Link className="demo-nav-home" href="/" onClick={() => setOpen(false)}>
+            Back to main home
+          </Link>
           <div className="demo-nav-heading">
             <span>Demo map</span>
             <strong>{activeIndex + 1} of {demoStops.length}</strong>

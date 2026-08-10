@@ -39,7 +39,7 @@ export function saveInterestSignup(
     interests: [...new Set(input.interests)],
     consentedAt: createdAt,
     createdAt,
-    source: "blacktown-community-landing",
+    source: "western-sydney-community-landing",
   };
 
   mkdirSync(path.dirname(filePath), { recursive: true });

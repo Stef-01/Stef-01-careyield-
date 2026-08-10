@@ -13,7 +13,7 @@ export interface InterestSignup {
   interests: InterestReason[];
   consentedAt: string;
   createdAt: string;
-  source: "blacktown-community-landing";
+  source: "western-sydney-community-landing";
 }
 
 export interface InterestFormState {
