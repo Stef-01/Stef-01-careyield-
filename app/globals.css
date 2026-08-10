@@ -303,8 +303,8 @@ textarea:focus-visible {
 .voice-prompt {
   width: 100%;
   max-width: 390px;
-  margin: auto;
-  padding: 0 30px 22px;
+  margin: 0 auto;
+  padding: 0 30px;
   text-align: center;
 }
 
@@ -3167,3 +3167,51 @@ textarea:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   D1 (2026-08-10) — composition fix for the finder's opening screen.
+
+   Before: `.voice-prompt { margin: auto }` claimed every spare pixel above
+   itself, so the question floated to the optical centre and left a ~250px dead
+   band between the archetype switcher and the bottom-pinned CTA — on every
+   viewport, not just desktop. The example sentence also sat above the switcher
+   whose label described it, so one idea read as two orphans.
+
+   After: prompt + switcher are one `.voice-core` group that takes the free
+   space as a unit, and the example lives inside the switcher. Desktop stops
+   pretending to be a phone: at ≥900px the question and the CTA occupy a left
+   column while the browsable example holds the right, so the horizontal space
+   carries the composition instead of framing it in white.
+   --------------------------------------------------------------------------- */
+
+.patient-v2 .voice-core {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 26px;
+  min-height: 0;
+  padding: 24px 0;
+}
+.patient-v2 .archetype-switcher-copy .example {
+  display: block;
+  max-width: 34ch;
+  margin: 9px auto 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-style: normal;
+  line-height: 1.5;
+  quotes: "\201C" "\201D";
+  text-wrap: pretty;
+}
+.patient-v2 .archetype-switcher {
+  min-height: 0;
+  padding: 4px 0;
+}
+
+/* Deliberately NOT two-column on wide viewports: the finder renders inside a fixed
+   ~520px app shell shared by every stage, so a viewport-keyed media query splits that
+   520px in half and overflows the headline (tried it; the headline bled past its column
+   and the quote laddered one word per line). A real desktop composition means widening
+   the shell for every stage — a bigger change than this pass, and one that deserves its
+   own unit. Container queries on .voice-core are the right tool when that happens. */

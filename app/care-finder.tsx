@@ -288,43 +288,36 @@ export function CareFinder() {
               <Link href="/clinicians" className="quiet-link">Clinician view</Link>
             </header>
 
-            <div className="voice-prompt">
-              <p className="eyebrow">Find your fit</p>
-              <h1>Who would you feel comfortable seeing?</h1>
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.p
-                  className="example"
-                  key={archetype.id}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  Try: “{archetype.example}”
-                </motion.p>
-              </AnimatePresence>
-            </div>
+            <div className="voice-core">
+              <div className="voice-prompt">
+                <h1>Who would you feel comfortable seeing?</h1>
+              </div>
 
-            <div className="archetype-switcher" role="group" aria-label="Demo care archetypes">
-              <Pressable type="button" onClick={() => cycleArchetype(-1)} aria-label="Previous care archetype">
-                <CaretLeft size={19} weight="light" aria-hidden="true" />
-              </Pressable>
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  className="archetype-switcher-copy"
-                  key={archetype.id}
-                  initial={{ opacity: 0, x: matchDirection * 7 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: matchDirection * -7 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <span>{archetypeIndex + 1} of {careArchetypes.length} · {archetype.eyebrow}</span>
-                  <strong>{archetype.title}</strong>
-                </motion.div>
-              </AnimatePresence>
-              <Pressable type="button" onClick={() => cycleArchetype(1)} aria-label="Next care archetype">
-                <CaretRight size={19} weight="light" aria-hidden="true" />
-              </Pressable>
+              {/* The example and the archetype label are one idea; they used to sit apart with
+                  dead space between them. Merged into a single browsable example so the middle
+                  of the composition carries content instead of a gap. */}
+              <div className="archetype-switcher" role="group" aria-label="Demo care archetypes">
+                <Pressable type="button" onClick={() => cycleArchetype(-1)} aria-label="Previous care archetype">
+                  <CaretLeft size={19} weight="light" aria-hidden="true" />
+                </Pressable>
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    className="archetype-switcher-copy"
+                    key={archetype.id}
+                    initial={{ opacity: 0, x: matchDirection * 7 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: matchDirection * -7 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <span>{archetypeIndex + 1} of {careArchetypes.length} · {archetype.eyebrow}</span>
+                    <strong>{archetype.title}</strong>
+                    <q className="example">{archetype.example}</q>
+                  </motion.div>
+                </AnimatePresence>
+                <Pressable type="button" onClick={() => cycleArchetype(1)} aria-label="Next care archetype">
+                  <CaretRight size={19} weight="light" aria-hidden="true" />
+                </Pressable>
+              </div>
             </div>
 
             <div className="voice-actions">

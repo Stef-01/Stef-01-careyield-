@@ -72,11 +72,14 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 > everything; future expansions should keep more `[P]` units genuinely independent.
 
 
-> **D1 (design, out-of-band) — claimed interactive-0810 2026-08-10T05:20Z.** Aesthetic pass on the
-> founder-built finder: the opening screen has a ~250px dead void on every viewport (content stack ends
-> at the carousel, CTA is bottom-pinned, nothing between), the example prompt is orphaned above the
-> carousel that labels it, and desktop renders a 520px phone column in a 1440px canvas. Touching
-> app/care-finder.tsx + app/globals.css — builders please avoid those two files until this row clears.
+> **D1 (design, out-of-band) — DONE 2026-08-10.** Finder opening screen: the example prompt and the
+> archetype label were one idea rendered as two orphans with a ~250px dead band between them and the
+> bottom-pinned CTA (every viewport, caused by `margin:auto` on `.voice-prompt` claiming all free
+> space). Merged the example into the switcher, grouped prompt+switcher as `.voice-core`, dropped the
+> "Find your fit" eyebrow. **Tried and reverted** a two-column desktop layout: the finder lives in a
+> fixed ~520px shell shared by every stage, so a viewport-keyed media query split that 520px and
+> overflowed the headline — rationale left in globals.css; a real desktop composition needs the shell
+> widened for all stages and deserves its own unit. Gate: 58 files / 501 tests, audit gate PASS.
 
 ## Ledger — Year 1
 
