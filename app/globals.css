@@ -2315,12 +2315,8 @@ textarea:focus-visible {
   display: block;
 }
 
-/* The focus card sits on a tint (#f0f2eb), not --paper, and its text is 10px. The
-   cv2 tokens clear 4.5:1 on paper but land at 4.32:1 and 4.37:1 here, so this card
-   carries darkened variants rather than the tokens being darkened globally — every
-   other cv2 surface passes as-is. */
 .cv2-focus-card small {
-  color: #5f7043; /* --cv2-sage darkened for the tint: 4.8:1 */
+  color: var(--cv2-sage);
   font-size: 10px;
   font-weight: 700;
 }
@@ -2333,7 +2329,7 @@ textarea:focus-visible {
 
 .cv2-focus-card em {
   margin-top: 5px;
-  color: #6a6c66; /* --cv2-muted darkened for the tint: 4.7:1 */
+  color: var(--cv2-muted);
   font-size: 10px;
   font-style: normal;
   line-height: 1.4;
