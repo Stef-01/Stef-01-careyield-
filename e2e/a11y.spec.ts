@@ -95,8 +95,10 @@ test("patient booking states pass WCAG A/AA", async ({ page, request }) => {
 
 test("public pages pass WCAG A/AA", async ({ page }) => {
   // "/" is now the patient-facing care finder; the B2B landing moved to /practices and
-  // is still a public page, so it keeps its coverage under its new URL.
-  for (const path of ["/", "/clinicians", "/practices", "/privacy", "/privacy/automated-decisions", "/demo"]) {
+  // is still a public page, so it keeps its coverage under its new URL. /clinicians is
+  // the third public pathway and joins the sweep on the same rule W49 set: every public
+  // surface is scanned, and a new one is added when it lands, not when it breaks.
+  for (const path of ["/", "/practices", "/clinicians", "/privacy", "/privacy/automated-decisions", "/demo"]) {
     await page.goto(path);
     await expectNoViolations(page, path);
   }

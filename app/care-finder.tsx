@@ -17,7 +17,7 @@ import { AnimatePresence, MotionConfig, motion, useReducedMotion, type Variants 
 import { useEffect, useMemo, useState, type ComponentProps, type ReactNode } from "react";
 import { DemoNavigator } from "./demo-navigator";
 import { careArchetypes } from "@/demo/care-archetypes";
-import { clinicians, rankClinicians, type Clinician } from "@/demo/clinicians";
+import { clinicians, getPersonalizedMatch, rankClinicians, type Clinician } from "@/demo/clinicians";
 
 type Stage =
   | "welcome"
@@ -131,7 +131,7 @@ function getRequestPriorities(value: string) {
     { label: "Gestational diabetes", terms: ["gestational diabetes", "pregnancy diabetes"] },
     { label: "PCOS expertise", terms: ["pcos", "pmos", "polycystic"] },
     { label: "Post-birth recovery", terms: ["post-birth", "post birth", "postpartum", "after birth", "giving birth"] },
-    { label: "Psychological safety", terms: ["mental health", "emotion", "anxiety", "mood", "psychological", "trauma", "overwhelmed", "shame"] },
+    { label: "Psychological safety", terms: ["mental health", "emotion", "anxiety", "anxious", "mood", "psychological", "trauma", "overwhelmed", "shame"] },
     { label: "Language match", terms: ["tamil", "malayalam", "hindi", "punjabi", "spanish", "arabic", "vietnamese", "language"] },
     { label: "Disability rights", terms: ["disability", "disabled", "wheelchair", "autonomy", "accessible"] },
     { label: "Weight-respectful care", terms: ["weight stigma", "body image", "body shame", "without shame", "bounce back"] },
@@ -206,6 +206,7 @@ export function CareFinder() {
     [archetype.headline, archetype.request, request, requestSummary],
   );
   const requestPriorities = useMemo(() => getRequestPriorities(request), [request]);
+  const personalizedMatch = useMemo(() => getPersonalizedMatch(clinician, request), [clinician, request]);
 
   function startListening() {
     setElapsed(0);
@@ -528,7 +529,7 @@ export function CareFinder() {
                 <div className="match-details">
                   <h2>{clinician.name}</h2>
                   <p className="clinician-meta">{clinician.title} · {clinician.suburb}</p>
-                  <p className="match-reason">{clinician.matchLine}</p>
+                  <p className="match-reason">{personalizedMatch.reason}</p>
                   <div className="practical-signal-row" aria-label="Practical appointment details">
                     {clinician.practicalSignals.slice(0, 2).map((signal) => <span key={signal}>{signal}</span>)}
                   </div>
@@ -556,8 +557,10 @@ export function CareFinder() {
               <h1>{matches.length} GPs to explore</h1>
             </div>
             <div className="clinician-list">
-              {matches.map((item, index) => (
-                <motion.button
+              {matches.map((item, index) => {
+                const itemMatch = getPersonalizedMatch(item, request);
+                return (
+                  <motion.button
                   key={item.id}
                   className="clinician-row"
                   type="button"
@@ -570,13 +573,14 @@ export function CareFinder() {
                   <Image src={item.image} alt="" width={72} height={72} />
                   <span>
                     <strong>{item.name}</strong>
-                    <small>{item.focus} · {item.suburb}</small>
+                    <small>{itemMatch.signals.slice(0, 2).join(" · ") || item.focus} · {item.suburb}</small>
                     <small className="row-practical">{item.practicalSignals.slice(0, 2).join(" · ")}</small>
                     <small className="row-availability">Next: {item.nextAvailable}</small>
                   </span>
                   <CaretRight size={20} weight="light" aria-hidden="true" />
-                </motion.button>
-              ))}
+                  </motion.button>
+                );
+              })}
             </div>
           </MotionScreen>
         )}
@@ -604,15 +608,17 @@ export function CareFinder() {
               <p className="eyebrow">Why this fit</p>
               <h1>{clinician.name}</h1>
               <p className="clinician-meta">{clinician.title} · {clinician.pronouns} · {clinician.suburb}</p>
-              <div className="fit-signal-row profile-fit-signals" aria-label="Key match reasons">
-                {clinician.fitSignals.slice(0, 3).map((signal) => <span key={signal}>{signal}</span>)}
-              </div>
+              {personalizedMatch.signals.length > 0 && (
+                <div className="fit-signal-row profile-fit-signals" aria-label="Key match reasons">
+                  {personalizedMatch.signals.slice(0, 3).map((signal) => <span key={signal}>{signal}</span>)}
+                </div>
+              )}
               <div className="practical-signal-row profile-practical-signals" aria-label="Practical appointment details">
                 {clinician.practicalSignals.slice(0, 2).map((signal) => <span key={signal}>{signal}</span>)}
               </div>
 
               <div className="fit-list">
-                <p>{clinician.matchLine}</p>
+                <p>{personalizedMatch.reason}</p>
                 <p>{clinician.appointmentLength}</p>
                 <p>{clinician.distance}</p>
               </div>

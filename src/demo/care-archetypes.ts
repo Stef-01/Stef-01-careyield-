@@ -6,6 +6,12 @@ export type CareArchetype = {
   request: string;
   headline: string;
   expectedFirstMatch: string;
+  requirements: {
+    careAreas: string[];
+    preferredGender?: "woman";
+    languageOptions?: string[];
+    wheelchairAccessible?: boolean;
+  };
 };
 
 export const careArchetypes: CareArchetype[] = [
@@ -18,6 +24,11 @@ export const careArchetypes: CareArchetype[] = [
       "I’m a young South Indian woman navigating PCOS and a difficult time with my mental health. I want a woman GP who speaks Tamil or Malayalam, understands family pressure and gives me time without judgement.",
     headline: "PCOS, language and emotional safety.",
     expectedFirstMatch: "priya-nair",
+    requirements: {
+      careAreas: ["pcos", "perinatal-mental-health"],
+      preferredGender: "woman",
+      languageOptions: ["Tamil", "Malayalam"],
+    },
   },
   {
     id: "hindi-punjabi-pcos",
@@ -27,7 +38,12 @@ export const careArchetypes: CareArchetype[] = [
     request:
       "I want a calm woman GP for PCOS who speaks Hindi or Punjabi. I’m anxious about symptoms and family expectations, and I need someone collaborative who will explain choices slowly.",
     headline: "PCOS care that includes family and mood.",
-    expectedFirstMatch: "maya-singh",
+    expectedFirstMatch: "nisha-kapoor",
+    requirements: {
+      careAreas: ["pcos", "perinatal-mental-health"],
+      preferredGender: "woman",
+      languageOptions: ["Hindi", "Punjabi"],
+    },
   },
   {
     id: "spanish-gestational-diabetes",
@@ -38,6 +54,11 @@ export const careArchetypes: CareArchetype[] = [
       "I have gestational diabetes and would feel safer with a Spanish-speaking woman GP. I want practical support around food, work and blood sugar without weight stigma or shame.",
     headline: "Gestational diabetes without weight stigma.",
     expectedFirstMatch: "sofia-alvarez",
+    requirements: {
+      careAreas: ["gestational-diabetes"],
+      preferredGender: "woman",
+      languageOptions: ["Spanish"],
+    },
   },
   {
     id: "arabic-gestational-diabetes",
@@ -47,7 +68,12 @@ export const careArchetypes: CareArchetype[] = [
     request:
       "I’m managing gestational diabetes alongside other health needs. I want an Arabic-speaking woman GP who can coordinate with my hospital team, include my preferences and understand how anxious this feels.",
     headline: "Gestational diabetes with joined-up support.",
-    expectedFirstMatch: "aisha-rahman",
+    expectedFirstMatch: "leila-haddad",
+    requirements: {
+      careAreas: ["gestational-diabetes"],
+      preferredGender: "woman",
+      languageOptions: ["Arabic"],
+    },
   },
   {
     id: "post-birth-trauma",
@@ -57,7 +83,10 @@ export const careArchetypes: CareArchetype[] = [
     request:
       "Since giving birth I’ve felt anxious and disconnected from myself. I need a gentle GP who understands birth trauma and perinatal mental health, offers longer appointments and won’t rush me.",
     headline: "Post-birth emotional recovery, gently.",
-    expectedFirstMatch: "noah-williams",
+    expectedFirstMatch: "erin-walsh",
+    requirements: {
+      careAreas: ["post-birth", "perinatal-mental-health"],
+    },
   },
   {
     id: "post-birth-strength",
@@ -68,6 +97,9 @@ export const careArchetypes: CareArchetype[] = [
       "I want to feel healthier and rebuild strength and energy after giving birth. I need a GP who understands cardiometabolic health, body image and the emotional pressure to ‘bounce back’ without making weight the only goal.",
     headline: "Post-birth strength, without body shame.",
     expectedFirstMatch: "daniel-okafor",
+    requirements: {
+      careAreas: ["post-birth", "metabolic"],
+    },
   },
   {
     id: "neurodivergent-post-birth",
@@ -78,6 +110,9 @@ export const careArchetypes: CareArchetype[] = [
       "I’m neurodivergent and overwhelmed since having my baby. I want a GP with ADHD and women’s-health experience who uses clear steps, checks what is realistic and doesn’t interpret executive-function difficulty as not caring.",
     headline: "Post-birth care that works with your brain.",
     expectedFirstMatch: "tom-bennett",
+    requirements: {
+      careAreas: ["post-birth", "adhd"],
+    },
   },
   {
     id: "vietnamese-disability-rights",
@@ -88,6 +123,12 @@ export const careArchetypes: CareArchetype[] = [
       "I’m a disabled Vietnamese-speaking woman looking for reproductive and metabolic care. I need a wheelchair-accessible practice and a GP who understands disability rights, speaks Vietnamese and centres my consent and autonomy.",
     headline: "Accessible women’s care, on your terms.",
     expectedFirstMatch: "linh-nguyen",
+    requirements: {
+      careAreas: ["disability-rights"],
+      preferredGender: "woman",
+      languageOptions: ["Vietnamese"],
+      wheelchairAccessible: true,
+    },
   },
   {
     id: "post-birth-kidney-care",
@@ -97,7 +138,12 @@ export const careArchetypes: CareArchetype[] = [
     request:
       "I want support rebuilding my health after birth while managing kidney concerns. I would prefer a Vietnamese-speaking woman GP who can coordinate care, review medicines and explain decisions without rushing me.",
     headline: "Post-birth recovery with kidney-aware care.",
-    expectedFirstMatch: "linh-nguyen",
+    expectedFirstMatch: "hanh-tran",
+    requirements: {
+      careAreas: ["post-birth", "kidney"],
+      preferredGender: "woman",
+      languageOptions: ["Vietnamese"],
+    },
   },
   {
     id: "pcos-metabolic-reset",
@@ -108,5 +154,9 @@ export const careArchetypes: CareArchetype[] = [
       "I want to feel stronger and healthier while managing PCOS. I need a woman GP with metabolic-health experience who will talk about sleep, food, movement and mental wellbeing without shame or extreme targets.",
     headline: "PCOS and sustainable health, without shame.",
     expectedFirstMatch: "sofia-alvarez",
+    requirements: {
+      careAreas: ["pcos", "metabolic"],
+      preferredGender: "woman",
+    },
   },
 ];
