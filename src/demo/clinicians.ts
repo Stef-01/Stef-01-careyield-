@@ -38,18 +38,18 @@ export const clinicians: Clinician[] = [
     image: "/clinicians/maya-singh.png",
     nextAvailable: "Tuesday, 10:20 am",
     acceptingNewPatients: true,
-    focus: "PCOS & perinatal mental health",
+    focus: "PCOS & maternal mental health",
     matchLine: "PCOS care that makes room for mood, family expectations and unhurried decisions.",
     fitSignals: ["PCOS", "Hindi & Punjabi", "Perinatal mental health", "Women’s health"],
     practicalSignals: ["Bulk billing eligible", "22 min by tram", "Evening appointments"],
     about:
-      "Maya supports women navigating PCOS, pregnancy planning, post-birth change and emotional wellbeing. She takes a collaborative, plain-language approach and is comfortable discussing how family expectations and culture can shape care.",
-    experience: ["PCOS care", "Women’s health", "Perinatal mental health", "Reproductive health"],
+      "Maya supports women navigating PCOS, pregnancy planning, maternal depression and post-birth emotional change. She takes a collaborative, plain-language approach and coordinates perinatal mental-health support when care needs extend beyond general practice.",
+    experience: ["PCOS care", "Maternal and postnatal depression", "Perinatal mental health", "Reproductive health"],
     languages: ["English", "Hindi", "Punjabi"],
-    careAreas: ["pcos", "perinatal-mental-health", "post-birth"],
+    careAreas: ["pcos", "perinatal-mental-health", "maternal-depression", "post-birth"],
     wheelchairAccessible: false,
     appointmentLength: "Longer first appointments available",
-    keywords: ["pcos", "polycystic", "woman", "female", "women", "young", "calm", "explain", "mental health", "perinatal", "anxiety", "mood", "hindi", "punjabi", "indian", "south asian", "cultural", "culture", "family"],
+    keywords: ["pcos", "polycystic", "woman", "female", "women", "young", "calm", "explain", "mental health", "perinatal", "maternal depression", "postnatal depression", "depression after birth", "anxiety", "mood", "hindi", "punjabi", "indian", "south asian", "cultural", "culture", "family"],
   },
   {
     id: "daniel-okafor",
@@ -188,18 +188,18 @@ export const clinicians: Clinician[] = [
     image: "/clinicians/noah-williams.png",
     nextAvailable: "Wednesday, 1:20 pm",
     acceptingNewPatients: true,
-    focus: "Perinatal mental health",
+    focus: "Perinatal & complex mental-health shared care",
     matchLine: "Gentle, trauma-aware support for anxiety and emotional recovery after birth.",
     fitSignals: ["Perinatal mental health", "Birth trauma", "Longer visits"],
     practicalSignals: ["Bulk billing eligible", "28 min by tram", "Telehealth available"],
     about:
-      "Noah’s approach is calm and practical. He supports women experiencing anxiety, low mood, birth trauma or a changed sense of self during pregnancy and after birth as part of whole-person general practice care.",
-    experience: ["Perinatal mental health", "Birth trauma", "Anxiety and mood", "Sleep"],
+      "Noah provides trauma-informed general practice for anxiety, PTSD, bipolar disorder, maternal depression and emotional recovery around pregnancy. He coordinates with psychiatrists and perinatal teams; specialist medication decisions remain within shared care.",
+    experience: ["PTSD and bipolar shared care", "Maternal and postnatal depression", "Birth trauma", "Perinatal mental health"],
     languages: ["English"],
-    careAreas: ["perinatal-mental-health", "post-birth"],
+    careAreas: ["perinatal-mental-health", "trauma-informed", "complex-mental-health", "maternal-depression", "post-birth"],
     wheelchairAccessible: false,
     appointmentLength: "Longer appointments available",
-    keywords: ["mental health", "perinatal", "birth trauma", "trauma", "post-birth", "post birth", "postpartum", "after birth", "anxiety", "depression", "disconnected", "sleep", "gentle", "longer", "judgement"],
+    keywords: ["mental health", "perinatal", "birth trauma", "trauma", "trauma history", "trauma-informed", "ptsd", "bipolar", "psychiatrist", "psychiatric", "shared care", "medication", "maternal depression", "postnatal depression", "depression after birth", "post-birth", "post birth", "postpartum", "after birth", "anxiety", "depression", "disconnected", "sleep", "gentle", "longer", "judgement"],
   },
   {
     id: "priya-nair",
@@ -388,39 +388,39 @@ export const clinicians: Clinician[] = [
     image: "/clinicians/erin-walsh.png",
     nextAvailable: "Monday, 1:20 pm",
     acceptingNewPatients: true,
-    focus: "Birth trauma & perinatal mental health",
+    focus: "Trauma-informed & maternal mental health",
     matchLine: "Trauma-aware post-birth care with longer conversations and gentle, practical follow-up.",
     fitSignals: ["Birth trauma", "Perinatal mental health", "Post-birth care", "Longer visits"],
     practicalSignals: ["Bulk billing eligible", "23 min by tram", "Long appointments"],
     about:
-      "Erin supports people experiencing anxiety, low mood, birth trauma or disconnection after pregnancy. Appointments move at the patient’s pace and connect emotional recovery with sleep, physical health and everyday support.",
-    experience: ["Birth trauma", "Perinatal mental health", "Anxiety and mood", "Post-birth recovery"],
+      "Erin provides trauma-informed care for people experiencing PTSD, bipolar disorder, maternal depression, birth trauma or disconnection around pregnancy. Appointments prioritise consent and control, with psychiatrist and perinatal-team coordination for specialist treatment.",
+    experience: ["Trauma-informed GP care", "Maternal and postnatal depression", "PTSD and bipolar shared care", "Birth trauma"],
     languages: ["English"],
-    careAreas: ["perinatal-mental-health", "post-birth"],
+    careAreas: ["perinatal-mental-health", "trauma-informed", "complex-mental-health", "maternal-depression", "post-birth"],
     wheelchairAccessible: false,
     appointmentLength: "Longer appointments available",
-    keywords: ["birth trauma", "trauma", "perinatal", "post-birth", "post birth", "postpartum", "anxiety", "anxious", "depression", "disconnected", "gentle", "longer", "mental health", "unhurried"],
+    keywords: ["birth trauma", "trauma", "trauma history", "trauma-informed", "permission", "boundaries", "consent", "control", "ptsd", "bipolar", "psychiatrist", "shared care", "maternal depression", "postnatal depression", "depression after birth", "perinatal", "post-birth", "post birth", "postpartum", "anxiety", "anxious", "depression", "disconnected", "gentle", "longer", "mental health", "unhurried"],
   },
 ];
 
 export function rankClinicians(query: string): Clinician[] {
   const words = query.toLowerCase();
   const focusSignals: Record<string, Array<[string, number]>> = {
-    "maya-singh": [["pcos", 20], ["pmos", 20], ["polycystic", 20], ["hindi", 26], ["punjabi", 26], ["family expectations", 16], ["family", 8], ["mental health", 12], ["anxiety", 10], ["calm", 12], ["explain", 10], ["south asian", 12]],
+    "maya-singh": [["pcos", 20], ["pmos", 20], ["polycystic", 20], ["hindi", 26], ["punjabi", 26], ["family expectations", 16], ["family", 8], ["mental health", 12], ["maternal depression", 26], ["postnatal depression", 26], ["depression after birth", 24], ["perinatal", 16], ["anxiety", 10], ["calm", 12], ["explain", 10], ["south asian", 12]],
     "daniel-okafor": [["post-birth", 18], ["post birth", 18], ["postpartum", 18], ["strength", 22], ["energy", 18], ["cardiometabolic", 22], ["bounce back", 18], ["heart", 20], ["cardiac", 20], ["cardiovascular", 20], ["blood pressure", 14], ["cholesterol", 14]],
     "linh-nguyen": [["disability rights", 30], ["disabled", 24], ["wheelchair", 24], ["autonomy", 20], ["consent", 16], ["accessible", 18], ["vietnamese", 28], ["renal", 22], ["kidney", 22], ["nephrology", 22], ["medicines", 12]],
     "aisha-rahman": [["gestational diabetes", 26], ["pregnancy diabetes", 26], ["arabic", 28], ["complex", 14], ["hospital team", 18], ["coordinate", 14], ["dialysis", 24], ["renal", 14], ["kidney", 14]],
     "tom-bennett": [["adhd", 26], ["attention", 18], ["neurodivergent", 28], ["executive function", 24], ["clear steps", 18], ["overwhelmed", 12], ["shared care", 14]],
     "sofia-alvarez": [["gestational diabetes", 24], ["pregnancy diabetes", 24], ["spanish", 28], ["pcos", 22], ["pmos", 22], ["polycystic", 22], ["diabetes", 16], ["blood sugar", 16], ["metabolic", 18], ["weight stigma", 22], ["without shame", 18], ["weight", 10], ["sustainable", 14]],
-    "noah-williams": [["birth trauma", 30], ["trauma", 22], ["perinatal", 24], ["post-birth", 12], ["post birth", 12], ["postpartum", 12], ["disconnected", 18], ["mental health", 18], ["anxiety", 16], ["depression", 16], ["gentle", 12], ["longer", 10]],
+    "noah-williams": [["ptsd", 34], ["bipolar", 34], ["psychiatrist", 20], ["psychiatric", 20], ["shared care", 18], ["medicines", 15], ["medication", 15], ["maternal depression", 25], ["postnatal depression", 25], ["depression after birth", 24], ["birth trauma", 30], ["trauma history", 22], ["trauma", 22], ["perinatal", 24], ["post-birth", 12], ["post birth", 12], ["postpartum", 12], ["disconnected", 18], ["mental health", 18], ["anxiety", 16], ["depression", 16], ["gentle", 12], ["longer", 10]],
     "priya-nair": [["pcos", 22], ["pmos", 22], ["polycystic", 22], ["south indian", 28], ["malayalam", 28], ["tamil", 28], ["indian", 12], ["cultural", 14], ["culture", 14], ["family pressure", 18], ["family", 10], ["mental health", 14], ["anxiety", 10], ["woman", 8], ["young", 4]],
     "anjali-menon": [["pcos", 20], ["pmos", 20], ["polycystic", 20], ["south indian", 24], ["malayalam", 26], ["tamil", 26], ["cultural", 12], ["culture", 12], ["family pressure", 14], ["family", 8], ["mental health", 14], ["anxiety", 10], ["woman", 8], ["unhurried", 8]],
     "nisha-kapoor": [["pcos", 19], ["pmos", 19], ["polycystic", 19], ["hindi", 24], ["punjabi", 24], ["family expectations", 14], ["family", 8], ["mental health", 13], ["anxiety", 9], ["anxious", 9], ["calm", 10], ["explain", 9], ["slowly", 9], ["woman", 8]],
-    "camila-torres": [["gestational diabetes", 22], ["pregnancy diabetes", 22], ["spanish", 26], ["post-birth", 16], ["post birth", 16], ["postpartum", 16], ["metabolic", 15], ["blood sugar", 14], ["weight stigma", 18], ["without shame", 16], ["maternity", 12], ["coordinate", 10], ["woman", 8]],
+    "camila-torres": [["gestational diabetes", 22], ["pregnancy diabetes", 22], ["spanish", 26], ["post-birth", 16], ["post birth", 16], ["postpartum", 16], ["after birth", 18], ["follow-up", 14], ["realistic", 12], ["metabolic", 15], ["blood sugar", 14], ["weight stigma", 18], ["without shame", 16], ["maternity", 12], ["coordinate", 10], ["woman", 8]],
     "leila-haddad": [["gestational diabetes", 24], ["pregnancy diabetes", 24], ["arabic", 26], ["anxiety", 14], ["anxious", 14], ["mental health", 12], ["perinatal", 12], ["hospital team", 15], ["maternity", 14], ["coordinate", 12], ["family", 8], ["woman", 8]],
     "hanh-tran": [["disability rights", 28], ["disabled", 22], ["wheelchair", 22], ["autonomy", 18], ["consent", 15], ["accessible", 17], ["vietnamese", 26], ["renal", 20], ["kidney", 20], ["post-birth", 15], ["post birth", 15], ["postpartum", 15], ["medicines", 11], ["woman", 8]],
     "grace-chen": [["adhd", 24], ["attention", 16], ["neurodivergent", 26], ["executive function", 22], ["clear steps", 16], ["overwhelmed", 11], ["post-birth", 14], ["post birth", 14], ["postpartum", 14], ["pcos", 12], ["woman", 8]],
-    "erin-walsh": [["birth trauma", 27], ["trauma", 20], ["perinatal", 22], ["post-birth", 13], ["post birth", 13], ["postpartum", 13], ["disconnected", 16], ["mental health", 17], ["anxiety", 14], ["anxious", 14], ["depression", 14], ["gentle", 11], ["longer", 10], ["woman", 8]],
+    "erin-walsh": [["ptsd", 30], ["bipolar", 28], ["psychiatrist", 16], ["shared care", 16], ["maternal depression", 30], ["postnatal depression", 30], ["depression after birth", 28], ["trauma history", 32], ["permission", 24], ["boundaries", 22], ["consent", 20], ["control", 16], ["birth trauma", 27], ["trauma", 20], ["perinatal", 22], ["post-birth", 13], ["post birth", 13], ["postpartum", 13], ["disconnected", 16], ["mental health", 17], ["anxiety", 14], ["anxious", 14], ["depression", 14], ["gentle", 11], ["longer", 10], ["woman", 8]],
   };
 
   return [...clinicians].sort((a, b) => {
@@ -487,6 +487,15 @@ export function getPersonalizedMatch(clinician: Clinician, query: string) {
   if (hasAny(["metabolic", "strength", "energy", "sustainable", "healthier"]) && clinician.careAreas.includes("metabolic")) {
     signals.push("Metabolic health");
   }
+  if (hasAny(["trauma history", "trauma-informed", "trauma", "ptsd", "permission", "boundaries"]) && clinician.careAreas.includes("trauma-informed")) {
+    signals.push("Trauma-informed care");
+  }
+  if (hasAny(["ptsd", "bipolar", "psychiatrist", "psychiatric", "complex mental health"]) && clinician.careAreas.includes("complex-mental-health")) {
+    signals.push("Complex mental-health shared care");
+  }
+  if (hasAny(["maternal depression", "postnatal depression", "depression after birth", "persistently low"]) && clinician.careAreas.includes("maternal-depression")) {
+    signals.push("Maternal depression experience");
+  }
 
   const requestedLanguage = clinician.languages.find((language) =>
     language !== "English" && words.includes(language.toLowerCase()),
@@ -498,7 +507,7 @@ export function getPersonalizedMatch(clinician: Clinician, query: string) {
     || /\bsafer with (?:a\s+)?[^.]*woman gp\b/.test(words);
   if (requestsWoman && clinician.gender === "woman") signals.push("Woman GP");
 
-  if (hasAny(["mental health", "emotion", "anxiety", "anxious", "mood", "trauma", "overwhelmed"]) && clinician.careAreas.includes("perinatal-mental-health")) {
+  if (hasAny(["mental health", "mental-health", "emotion", "anxiety", "anxious", "mood", "trauma", "ptsd", "bipolar", "depression", "persistently low", "guilty", "overwhelmed"]) && clinician.careAreas.includes("perinatal-mental-health")) {
     signals.push("Psychological safety");
   }
   if (hasAny(["weight stigma", "body image", "body shame", "without shame", "bounce back"]) && clinician.keywords.some((keyword) => ["weight stigma", "body image", "without shame", "bounce back"].includes(keyword))) {

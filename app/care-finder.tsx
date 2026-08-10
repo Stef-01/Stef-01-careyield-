@@ -114,10 +114,22 @@ function getRequestHeadline(value: string, fallback: string) {
   const hasCulturalContext = ["south indian", "indian", "tamil", "malayalam", "culture", "cultural"].some((term) =>
     words.includes(term),
   );
+  const hasMaternalDepression = ["maternal depression", "postnatal depression", "depression after birth", "persistently low"].some((term) =>
+    words.includes(term),
+  );
+  const hasComplexMentalHealth = ["ptsd", "bipolar", "psychiatrist", "psychiatric"].some((term) =>
+    words.includes(term),
+  );
+  const hasTraumaContext = ["trauma history", "trauma-informed", "permission", "boundaries"].some((term) =>
+    words.includes(term),
+  );
 
   if (words.includes("disability") || words.includes("disabled") || words.includes("wheelchair")) {
     return "Accessible women’s care, on your terms.";
   }
+  if (hasMaternalDepression) return "Maternal mental health, without judgement.";
+  if (hasComplexMentalHealth) return "Joined-up reproductive and mental-health care.";
+  if (hasTraumaContext) return "Trauma-sensitive care, with you in control.";
   if (hasGestationalDiabetes) return "Gestational diabetes with whole-person support.";
   if (hasPostBirth) return "Post-birth health, strength and emotional care.";
   if (hasPcos && hasCulturalContext) return "PCOS, language and emotional safety.";
@@ -131,7 +143,10 @@ function getRequestPriorities(value: string) {
     { label: "Gestational diabetes", terms: ["gestational diabetes", "pregnancy diabetes"] },
     { label: "PCOS expertise", terms: ["pcos", "pmos", "polycystic"] },
     { label: "Post-birth recovery", terms: ["post-birth", "post birth", "postpartum", "after birth", "giving birth"] },
-    { label: "Psychological safety", terms: ["mental health", "emotion", "anxiety", "anxious", "mood", "psychological", "trauma", "overwhelmed", "shame"] },
+    { label: "Complex mental-health shared care", terms: ["ptsd", "bipolar", "psychiatrist", "psychiatric"] },
+    { label: "Maternal depression", terms: ["maternal depression", "postnatal depression", "depression after birth", "persistently low"] },
+    { label: "Trauma-informed care", terms: ["trauma history", "trauma-informed", "boundaries", "permission", "stay in control"] },
+    { label: "Psychological safety", terms: ["mental health", "emotion", "anxiety", "anxious", "mood", "psychological", "trauma", "ptsd", "bipolar", "depression", "overwhelmed", "shame", "boundaries", "permission"] },
     { label: "Language match", terms: ["tamil", "malayalam", "hindi", "punjabi", "spanish", "arabic", "vietnamese", "language"] },
     { label: "Disability rights", terms: ["disability", "disabled", "wheelchair", "autonomy", "accessible"] },
     { label: "Weight-respectful care", terms: ["weight stigma", "body image", "body shame", "without shame", "bounce back"] },

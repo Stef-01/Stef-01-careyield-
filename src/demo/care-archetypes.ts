@@ -159,4 +159,70 @@ export const careArchetypes: CareArchetype[] = [
       preferredGender: "woman",
     },
   },
+  {
+    id: "trauma-sensitive-womens-care",
+    title: "Trauma-sensitive women’s care",
+    eyebrow: "Consent, control and emotional safety",
+    example: "A trauma-informed GP who asks permission, explains each step and lets me stay in control.",
+    request:
+      "I have a trauma history and need a GP who is sensitive to how healthcare can feel. I want someone trauma-informed who asks permission, explains each step, respects boundaries and lets me stay in control without having to disclose everything at once.",
+    headline: "Trauma-sensitive care, with you in control.",
+    expectedFirstMatch: "erin-walsh",
+    requirements: {
+      careAreas: ["trauma-informed"],
+    },
+  },
+  {
+    id: "ptsd-bipolar-shared-care",
+    title: "PTSD or bipolar shared care",
+    eyebrow: "Complex mental health and reproductive care",
+    example: "A GP comfortable with PTSD or bipolar disorder who will coordinate with my psychiatrist and maternity team.",
+    request:
+      "I live with PTSD and bipolar disorder and I’m planning a pregnancy. I need a GP who is comfortable with complex mental health, will coordinate with my psychiatrist and maternity team, and can review physical health and medicines as part of shared care without changing treatment on their own.",
+    headline: "Joined-up reproductive and mental-health care.",
+    expectedFirstMatch: "noah-williams",
+    requirements: {
+      careAreas: ["complex-mental-health", "perinatal-mental-health"],
+    },
+  },
+  {
+    id: "maternal-depression",
+    title: "Maternal depression after birth",
+    eyebrow: "Postnatal mood and recovery",
+    example: "A woman GP experienced in maternal depression who will listen carefully and coordinate ongoing support.",
+    request:
+      "Since having my baby I’ve felt persistently low, guilty and unlike myself. I want a woman GP with experience in maternal or postnatal depression who offers longer conversations, checks my safety without judgement and can coordinate with perinatal mental-health support.",
+    headline: "Maternal mental health, without judgement.",
+    expectedFirstMatch: "erin-walsh",
+    requirements: {
+      careAreas: ["maternal-depression", "post-birth"],
+      preferredGender: "woman",
+    },
+  },
+  {
+    id: "post-gdm-metabolic-care",
+    title: "Health after gestational diabetes",
+    eyebrow: "Post-birth metabolic follow-up",
+    example: "A GP who understands follow-up after gestational diabetes and can build a realistic post-birth health plan.",
+    request:
+      "I had gestational diabetes and want thoughtful follow-up after birth. I need a GP who understands post-birth metabolic health, can coordinate blood-sugar checks and help me build realistic habits around sleep, food and movement without weight shame.",
+    headline: "Post-birth metabolic care after gestational diabetes.",
+    expectedFirstMatch: "camila-torres",
+    requirements: {
+      careAreas: ["gestational-diabetes", "post-birth", "metabolic"],
+    },
+  },
+  {
+    id: "pcos-adhd",
+    title: "PCOS care that works with ADHD",
+    eyebrow: "Hormonal health and executive function",
+    example: "A GP experienced in both PCOS and ADHD who gives me clear, realistic steps instead of an overwhelming plan.",
+    request:
+      "I have PCOS and ADHD and feel overwhelmed by complicated health plans. I want a GP experienced in both who understands executive-function barriers, gives me a few clear steps at a time and checks what is genuinely realistic for me.",
+    headline: "PCOS care that works with your brain.",
+    expectedFirstMatch: "grace-chen",
+    requirements: {
+      careAreas: ["pcos", "adhd"],
+    },
+  },
 ];

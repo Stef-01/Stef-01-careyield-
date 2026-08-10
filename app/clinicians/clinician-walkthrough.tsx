@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
+  CaretDown,
   Check,
   Clock,
   Target,
@@ -21,6 +22,17 @@ const stages: Array<{ id: Stage; label: string }> = [
   { id: "briefing", label: "Briefing" },
   { id: "practice", label: "Practice" },
 ];
+
+const womenHealthConditions = [
+  { id: "pcos", label: "PCOS", detail: "Demo anchor", locked: true },
+  { id: "gestational-diabetes", label: "Gestational diabetes", detail: "Pregnancy and follow-up" },
+  { id: "endometriosis", label: "Endometriosis & pelvic pain", detail: "Recognition and continuity" },
+  { id: "perinatal-mental-health", label: "Perinatal mental health", detail: "Depression, anxiety and shared care" },
+  { id: "postpartum-recovery", label: "Post-birth metabolic recovery", detail: "Sustainable recovery after birth" },
+  { id: "menopause", label: "Menopause & perimenopause", detail: "Whole-person midlife care" },
+] as const;
+
+const comingFocusAreas = ["Metabolic health", "Renal health", "Cardiac health", "Mental health", "Skin cancer"];
 
 const cases = [
   { label: "New PCOS assessment", detail: "Cycles · metabolic screen", time: "8:40" },
@@ -75,6 +87,8 @@ const resources = [
 export function ClinicianWalkthrough() {
   const [stage, setStage] = useState<Stage>("goal");
   const [target, setTarget] = useState(30);
+  const [isWomenHealthOpen, setIsWomenHealthOpen] = useState(true);
+  const [selectedConditions, setSelectedConditions] = useState<string[]>(["pcos"]);
   const [resourceIndex, setResourceIndex] = useState(0);
   const [reviewed, setReviewed] = useState<string[]>([]);
 
@@ -103,9 +117,18 @@ export function ClinicianWalkthrough() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function toggleCondition(id: string) {
+    if (id === "pcos") return;
+    setSelectedConditions((current) => current.includes(id)
+      ? current.filter((condition) => condition !== id)
+      : [...current, id]);
+  }
+
   function restart() {
     setStage("goal");
     setTarget(30);
+    setIsWomenHealthOpen(true);
+    setSelectedConditions(["pcos"]);
     setResourceIndex(0);
     setReviewed([]);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -148,15 +171,68 @@ export function ClinicianWalkthrough() {
               <p>Choose a focus. We’ll shape your case mix and learning around it.</p>
             </div>
 
-            <button className="cv2-focus-card" type="button" aria-pressed="true">
+            <button
+              className="cv2-focus-card"
+              type="button"
+              aria-expanded={isWomenHealthOpen}
+              aria-controls="women-health-conditions"
+              onClick={() => setIsWomenHealthOpen((current) => !current)}
+            >
               <span className="cv2-icon"><Target size={21} weight="bold" aria-hidden="true" /></span>
               <span>
-                <small>Your focus</small>
-                <strong>Women’s metabolic &amp; reproductive health</strong>
-                <em>PCOS · reproductive care · metabolic health</em>
+                <small>Available now</small>
+                <strong>Women’s health</strong>
+                <em>{selectedConditions.length} condition{selectedConditions.length === 1 ? "" : "s"} selected · choose the care you want to deepen</em>
               </span>
-              <span className="cv2-selected"><Check size={15} weight="bold" aria-hidden="true" /></span>
+              <span className={`cv2-focus-caret${isWomenHealthOpen ? " is-open" : ""}`}>
+                <CaretDown size={17} weight="bold" aria-hidden="true" />
+              </span>
             </button>
+
+            {isWomenHealthOpen && (
+              <fieldset id="women-health-conditions" className="cv2-condition-panel">
+                <legend>Choose conditions</legend>
+                <p>Select the areas you want progressively represented in your case mix and learning.</p>
+                <div className="cv2-condition-list">
+                  {womenHealthConditions.map((condition) => {
+                    const checked = selectedConditions.includes(condition.id);
+                    return (
+                      <label key={condition.id} className={checked ? "is-checked" : ""}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          disabled={"locked" in condition && condition.locked}
+                          onChange={() => toggleCondition(condition.id)}
+                        />
+                        <span className="cv2-checkbox" aria-hidden="true">
+                          {checked && <Check size={13} weight="bold" />}
+                        </span>
+                        <span>
+                          <strong>{condition.label}</strong>
+                          <small>{condition.detail}</small>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            )}
+
+            <div className="cv2-coming-section">
+              <div><span>Other clinical focus areas</span><small>More pathways are being built</small></div>
+              <div className="cv2-coming-grid">
+                {comingFocusAreas.map((focus, index) => {
+                  const tooltipId = `coming-focus-${index}`;
+                  return (
+                    <button key={focus} type="button" aria-disabled="true" aria-describedby={tooltipId}>
+                      <span>{focus}</span>
+                      <small>Soon</small>
+                      <span id={tooltipId} role="tooltip" className="cv2-coming-tooltip">Coming soon</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             <div className="cv2-mix-card">
               <div>

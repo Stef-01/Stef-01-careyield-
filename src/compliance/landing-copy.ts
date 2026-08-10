@@ -5,7 +5,7 @@
 // patients; no therapeutic advertising, no clinical claims, no testimonials.
 
 export const LANDING_COPY = {
-  nav: { product: "How it works", measurement: "Measurement", cta: "Practice sign-in" },
+  nav: { story: "Practice story", product: "How it works", measurement: "Measurement", cta: "Practice sign-in" },
   hero: {
     eyebrow: "For general practices",
     heading: "Turn unused appointment capacity into measured continuity of care.",
@@ -22,6 +22,62 @@ export const LANDING_COPY = {
       "Late cancellations and quiet mid-week sessions leave clinician time unused. Manual recalls " +
       "are slow, hard to target, and impossible to measure. Most tools count every booking they " +
       "touch as their own — which tells you nothing about real impact.",
+  },
+  practiceStory: {
+    eyebrow: "The practice story",
+    heading: "Let GPs choose the work they want to get better at.",
+    body:
+      "A GP opts into a clinical focus and chooses how much of their week it should become. " +
+      "CareYield then aligns appropriate cases, short learning and community education around that choice — " +
+      "giving the clinician more agency and the practice a clearer way to grow useful capability.",
+    goalLabel: "Clinician-set goal",
+    goalValue: "30%",
+    goalTitle: "Women’s metabolic and reproductive health",
+    goalBody: "Chosen by the GP. Adjustable at any time. Never assigned by an algorithm or manager.",
+    stages: [
+      {
+        title: "Choose the focus",
+        body: "The GP opts in, sets a target share of clinical work and can change or pause it.",
+      },
+      {
+        title: "Build depth deliberately",
+        body: "Suitable cases are progressively surfaced, paired with concise learning relevant to the next clinic day.",
+      },
+      {
+        title: "Teach beyond the room",
+        body: "Clinicians can opt into paid awareness talks that turn growing expertise into useful public education.",
+      },
+    ],
+    communityEyebrow: "From consulting room to community room",
+    communityHeading: "Pay GPs to educate the public — and help practices reach people earlier.",
+    communityBody:
+      "CareYield can coordinate clearly scoped talks with local community groups, workplaces and cultural organisations. " +
+      "The GP chooses the topic and audience, approves the material, and receives a transparent speaker fee for preparation and delivery.",
+    communityPoints: [
+      "An opportunity, never an obligation",
+      "General education, not individual medical advice",
+      "Speaker fees are never tied to leads or bookings",
+      "Practices extend reach by being genuinely useful",
+    ],
+    evidenceEyebrow: "Why concentrated capability matters",
+    evidenceHeading: "The current PCOS journey loses time, trust and information.",
+    evidenceBody:
+      "The studies quantify delay and clinician-hopping; an individual pathway can vary. The opportunity is to make a relevant GP easier to find and help that GP keep getting better through repeated, supported work.",
+    evidence: [
+      { value: "24%", label: "waited more than two years for PCOS to be recognised" },
+      { value: "39%", label: "saw three or more health professionals first" },
+      { value: "60%", label: "received no information when PCOS was identified" },
+      { value: "≈ half", label: "of cohort participants meeting PCOS criteria were not previously recognised by their early 30s" },
+    ],
+    evidenceNote:
+      "Australian studies: Family Practice 2014, n=210; Human Reproduction 2021, Adelaide cohort, n=974.",
+    pathwayEyebrow: "The real capability gap",
+    pathwayHeading: "Education exists. The practice pathway does not.",
+    pathwayBody:
+      "RACGP’s Sexual and Reproductive Health interest group explicitly includes PCOS, and ACRRM lists a PCOS learning activity. " +
+      "What is still missing is a clear practice-level route from a GP’s chosen focus to repeated cases, relevant learning and visible community contribution.",
+    pathwayNote:
+      "CareYield does not create a clinical credential. It makes a clinician-chosen focus and learning loop visible inside the practice.",
   },
   steps: [
     {

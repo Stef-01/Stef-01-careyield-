@@ -51,6 +51,32 @@ describe("demo clinician matching", () => {
       .toContain("Spanish-speaking");
   });
 
+  it.each([
+    ["trauma-informed", "Trauma-informed care"],
+    ["complex-mental-health", "Complex mental-health shared care"],
+    ["maternal-depression", "Maternal depression experience"],
+  ])("has multiple clinicians and a grounded explanation for %s", (careArea, expectedSignal) => {
+    const queryByArea: Record<string, string> = {
+      "trauma-informed": "I need trauma-informed care that respects boundaries and asks permission",
+      "complex-mental-health": "I live with PTSD and bipolar disorder and need psychiatrist shared care",
+      "maternal-depression": "I need support for maternal depression after birth",
+    };
+    const matches = clinicians.filter((clinician) => clinician.careAreas.includes(careArea));
+
+    expect(matches.length).toBeGreaterThanOrEqual(2);
+    expect(getPersonalizedMatch(matches[0]!, queryByArea[careArea]!).signals).toContain(expectedSignal);
+  });
+
+  it("describes complex mental-health care as coordinated shared care", () => {
+    const complexCareClinicians = clinicians.filter((clinician) =>
+      clinician.careAreas.includes("complex-mental-health"),
+    );
+
+    for (const clinician of complexCareClinicians) {
+      expect(clinician.about).toMatch(/coordinate|specialist|shared care/i);
+    }
+  });
+
   it("includes useful billing, travel and access details for every clinician", () => {
     for (const clinician of clinicians) {
       expect(clinician.practicalSignals).toHaveLength(3);

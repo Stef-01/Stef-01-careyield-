@@ -3,9 +3,9 @@ import { careArchetypes } from "./care-archetypes";
 import { cliniciansMatchingArchetype, rankClinicians } from "./clinicians";
 
 describe("women’s health demo archetypes", () => {
-  it("includes ten distinct qualitative journeys", () => {
-    expect(careArchetypes).toHaveLength(10);
-    expect(new Set(careArchetypes.map((archetype) => archetype.id)).size).toBe(10);
+  it("includes fifteen distinct qualitative journeys", () => {
+    expect(careArchetypes).toHaveLength(15);
+    expect(new Set(careArchetypes.map((archetype) => archetype.id)).size).toBe(15);
   });
 
   it.each(careArchetypes)("ranks the intended first match for $title", (archetype) => {
@@ -33,5 +33,15 @@ describe("women’s health demo archetypes", () => {
     expect(requests).toMatch(/vietnamese/);
     expect(requests).toMatch(/anxious|mental health|trauma|overwhelmed/);
     expect(requests).toMatch(/disability rights/);
+  });
+
+  it("includes distinct trauma, PTSD or bipolar, and maternal-depression cases", () => {
+    const byId = new Map(careArchetypes.map((archetype) => [archetype.id, archetype.request.toLowerCase()]));
+
+    expect(byId.get("trauma-sensitive-womens-care")).toMatch(/trauma|boundaries|permission/);
+    expect(byId.get("ptsd-bipolar-shared-care")).toMatch(/ptsd/);
+    expect(byId.get("ptsd-bipolar-shared-care")).toMatch(/bipolar/);
+    expect(byId.get("ptsd-bipolar-shared-care")).toMatch(/psychiatrist|shared care/);
+    expect(byId.get("maternal-depression")).toMatch(/maternal|postnatal depression/);
   });
 });
