@@ -196,9 +196,19 @@ export default async function ReferralsPage({
                     {REFERRAL_REASON_COPY[document.reason]} {REFERRAL_REQUEST_COPY[document.request]}
                   </p>
 
-                  {returned && (
+                  {returned.found && (
                     <p data-testid={`returned-${document.referralId}`} className="mt-2 text-sm text-stone-700">
-                      {RETURN_OUTCOME_COPY[returned.outcome]}
+                      {RETURN_OUTCOME_COPY[returned.report.outcome]}
+                    </p>
+                  )}
+                  {"ambiguous" in returned && (
+                    // W142: two different return reports share the latest date, so which is
+                    // current is unknowable. Shown as a question rather than resolved by
+                    // position — a superseded return report presented as current is a wrong
+                    // clinical communication, not an untidy one.
+                    <p data-testid={`return-ambiguous-${document.referralId}`} className="mt-2 text-sm text-amber-900">
+                      {returned.count} different return reports were filed on the same date for
+                      this referral. Check with the other practice which one stands.
                     </p>
                   )}
 

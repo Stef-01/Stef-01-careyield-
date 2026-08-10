@@ -85,9 +85,25 @@ export function acceptanceStatus(
   acts: readonly AcceptanceAct[],
   referralId: string,
 ): AcceptanceStatus {
+  // W142 finding. Sorting by date alone is stable, so acts sharing a date resolved by ARRAY
+  // ORDER — accept-then-decline gave `declined`, decline-then-accept gave `accepted`. W134's
+  // own commit claimed order-independence and tested four orderings, all with distinct dates:
+  // the claim was wider than the test, and a practice answering a referral and correcting it
+  // the same morning is ordinary rather than exotic.
+  //
+  // Dates here are day-granular, so a same-day tie is genuinely unorderable. The tie-break is
+  // therefore by SAFETY rather than by guess: among acts on the same day, the one that leaves
+  // the referring practice watching wins. Not knowing whether a practice took the patient on
+  // must never resolve to "they did" — the whole thesis of this unit.
+  const SAME_DAY_PRECEDENCE: Record<AcceptanceAct["kind"], number> = {
+    sent: 0,
+    accepted: 1,
+    handed_back: 2,
+    declined: 3,
+  };
   const mine = [...acts]
     .filter((act) => act.referralId === referralId)
-    .sort((a, b) => a.at.localeCompare(b.at));
+    .sort((a, b) => a.at.localeCompare(b.at) || SAME_DAY_PRECEDENCE[a.kind] - SAME_DAY_PRECEDENCE[b.kind]);
 
   const status: AcceptanceStatus = {
     state: "not_sent",

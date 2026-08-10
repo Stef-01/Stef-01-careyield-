@@ -192,3 +192,43 @@ describe("W134 an obligation here is never a clinical one", () => {
     }
   });
 });
+
+describe("W142 two acts on the same day cannot resolve by array order", () => {
+  // The finding: sorting by date alone is stable, so same-day acts resolved by array position —
+  // accept-then-decline gave `declined`, decline-then-accept gave `accepted`. W134's own commit
+  // claimed order-independence and tested four orderings, ALL with distinct dates. The claim was
+  // wider than the test, and a practice answering then correcting the same morning is ordinary.
+  const sameDayAccept = accepted("2026-02-05");
+  const sameDayDecline = declined("2026-02-05");
+
+  it.each([
+    ["accept then decline", [sent(), sameDayAccept, sameDayDecline]],
+    ["decline then accept", [sent(), sameDayDecline, sameDayAccept]],
+  ])("resolves to declined with %s", (_label, acts) => {
+    // Day-granular dates cannot order two events within a day, so the tie-break is by SAFETY:
+    // among same-day acts the one leaving the referring practice watching wins. Not knowing
+    // whether a practice took the patient on must never resolve to "they did".
+    expect(status(acts as AcceptanceAct[]).state).toBe("declined");
+  });
+
+  it("yields no obligation on a same-day conflict, in either order", () => {
+    for (const acts of [
+      [sent(), sameDayAccept, sameDayDecline],
+      [sent(), sameDayDecline, sameDayAccept],
+    ]) {
+      expect(acceptedReferral(status(acts as AcceptanceAct[]))).toBeNull();
+    }
+  });
+
+  it("leaves care with the referring practice on a same-day conflict", () => {
+    expect(careHolderWhile(status([sent(), sameDayAccept, sameDayDecline]))).toBe(
+      "referring_practice",
+    );
+  });
+
+  it("still lets a LATER acceptance win over an earlier decline", () => {
+    // The tie-break is for same-day acts only; a genuine change of mind on a later date is a
+    // fresh transfer and must still work.
+    expect(status([sent(), declined("2026-02-05"), accepted("2026-02-09")]).state).toBe("accepted");
+  });
+});

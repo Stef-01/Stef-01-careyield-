@@ -143,7 +143,7 @@ describe("W137 erasure reaches the rail, on both sides", () => {
     // A chain about a deleted referral is a dangling obligation nobody can act on.
     const removed = scrubPatientFromReferrals("pat-1");
     expect(removed).toEqual({ documents: 1, acts: 2, events: 1, returns: 1 });
-    expect(returnFor("ref-1")).toBeNull();
+    expect(returnFor("ref-1")).toEqual({ found: false });
   });
 
   it("leaves another patient's referral untouched", () => {
@@ -170,5 +170,60 @@ describe("W137 erasure reaches the rail, on both sides", () => {
       documents: 0, acts: 0, events: 0, returns: 0,
     });
     expect(sentBy(A)).toHaveLength(2);
+  });
+});
+
+describe("W142 a corrected return report is not lost to array order", () => {
+  const ret = (outcome: "seen_care_returned" | "seen_care_retained", at: string): ReturnReport => {
+    const result = recordReturn({
+      referralId: "ref-1", fromPracticeId: "prac-a", toPracticeId: "prac-b", patientId: "pat-1",
+      outcome, reportedAt: at, reportedBy: "clin-b", seenOn: "2026-02-10", narrative: null,
+      referralWrittenOn: "2026-02-01",
+    });
+    if (!result.ok) throw new Error(`fixture rejected: ${result.errors.join(", ")}`);
+    return result.report;
+  };
+
+  it("returns the LATEST report, whichever order it was stored in", () => {
+    // The finding: `.find()` took the first match, so a corrected report filed later was shown
+    // or hidden depending on how the two happened to be stored. A return report is a clinical
+    // communication — a superseded one presented as current is a wrong answer, not an untidy one.
+    for (const order of [
+      [ret("seen_care_returned", "2026-03-01"), ret("seen_care_retained", "2026-03-10")],
+      [ret("seen_care_retained", "2026-03-10"), ret("seen_care_returned", "2026-03-01")],
+    ]) {
+      resetReferralRail();
+      addReturnReports(order);
+      const found = returnFor("ref-1");
+      expect(found.found && found.report.outcome).toBe("seen_care_retained");
+    }
+  });
+
+  it("reports two DIFFERENT reports sharing the latest date as ambiguous, never picking one", () => {
+    // W111's rule: two matches are ambiguous, never the first one, because picking one attaches
+    // the wrong record to a patient. Day-granular dates cannot order two reports within a day.
+    resetReferralRail();
+    addReturnReports([ret("seen_care_returned", "2026-03-01"), ret("seen_care_retained", "2026-03-01")]);
+    expect(returnFor("ref-1")).toEqual({ found: false, ambiguous: true, count: 2 });
+  });
+
+  it("treats an identical duplicate as one report rather than a conflict", () => {
+    // A re-filed identical report is not a disagreement, and calling it one would send a
+    // practice chasing a difference that does not exist.
+    resetReferralRail();
+    addReturnReports([ret("seen_care_returned", "2026-03-01"), ret("seen_care_returned", "2026-03-01")]);
+    const found = returnFor("ref-1");
+    expect(found.found && found.report.outcome).toBe("seen_care_returned");
+  });
+
+  it("an earlier disagreement does not make a later single report ambiguous", () => {
+    resetReferralRail();
+    addReturnReports([
+      ret("seen_care_returned", "2026-03-01"),
+      ret("seen_care_retained", "2026-03-01"),
+      ret("seen_care_returned", "2026-03-05"),
+    ]);
+    const found = returnFor("ref-1");
+    expect(found.found && found.report.outcome).toBe("seen_care_returned");
   });
 });

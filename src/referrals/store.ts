@@ -157,7 +157,37 @@ export function scrubPatientFromReferrals(patientId: string): {
   return removed;
 }
 
-/** The return report for one referral, if one has come back. */
-export function returnFor(referralId: string): ReturnReport | null {
-  return state().returns.find((report) => report.referralId === referralId) ?? null;
+export type ReturnLookup =
+  | { found: false }
+  | { found: true; report: ReturnReport }
+  /**
+   * Two DIFFERENT return reports share the latest date, so which is current is unknowable
+   * from the data. Reported rather than guessed, for W111's reason: picking one attaches the
+   * wrong clinical communication to a patient, and a superseded return report shown as
+   * current is worse than showing none.
+   */
+  | { found: false; ambiguous: true; count: number };
+
+/**
+ * The current return report for one referral.
+ *
+ * W142 finding: this used `.find()`, which takes the FIRST match in array order. A corrected
+ * report filed later was therefore shown or hidden depending on how the two happened to be
+ * stored — and a return report is a clinical communication, so showing a superseded one is a
+ * live wrong answer rather than an untidy one.
+ *
+ * Now the latest by `reportedAt` wins, and a same-date disagreement is reported as ambiguous
+ * instead of resolved by position.
+ */
+export function returnFor(referralId: string): ReturnLookup {
+  const mine = state()
+    .returns.filter((report) => report.referralId === referralId)
+    .sort((a, b) => a.reportedAt.localeCompare(b.reportedAt));
+  const latest = mine.at(-1);
+  if (!latest) return { found: false };
+
+  const sameDate = mine.filter((report) => report.reportedAt === latest.reportedAt);
+  const distinct = new Set(sameDate.map((report) => JSON.stringify(report)));
+  if (distinct.size > 1) return { found: false, ambiguous: true, count: distinct.size };
+  return { found: true, report: latest };
 }
