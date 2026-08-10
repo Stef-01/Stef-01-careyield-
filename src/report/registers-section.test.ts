@@ -28,8 +28,8 @@ const closure: RegisterAnalytics = {
       withheld: "cohort_too_small",
     },
   ],
-  ambiguousClosures: 4,
-    ambiguousGapClosures: 4,
+  ambiguousClosures: 3,
+  ambiguousGapClosures: 4,
 };
 
 function armCount(patients: number, attended: number) {
@@ -123,7 +123,7 @@ describe("W76 register section — golden", () => {
 
   it("omits the overlap and ambiguity notes when there is nothing to disclose", () => {
     const clean = renderRegisterSection({
-      closure: { ...closure, ambiguousClosures: 0 },
+      closure: { ...closure, ambiguousClosures: 0, ambiguousGapClosures: 0 },
       attribution: { ...attribution, overlapCount: 0 },
       conditionNames: NAMES,
     });

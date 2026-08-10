@@ -47,9 +47,12 @@ export function renderRegisterSection(input: RegisterSectionInput): string {
     return `| ${name(c.conditionCode)} | ${c.cohort.inviteArm.patients} | ${c.cohort.holdoutArm.patients} | ${claim} |`;
   });
 
+  // W65 split this into events vs gaps. The sentence describes rows in the table above,
+  // which are CLOSED GAPS, so it must use the gap count — the event count would understate
+  // it whenever one visit closed gaps on several registers.
   const ambiguity =
-    input.closure.ambiguousClosures > 0
-      ? `\n${input.closure.ambiguousClosures} of the closures above were counted from a visit that could not be tied to one register, so they count toward every register that patient is on.\n`
+    input.closure.ambiguousGapClosures > 0
+      ? `\n${input.closure.ambiguousGapClosures} of the closures above were counted from a visit that could not be tied to one register, so they count toward every register that patient is on.\n`
       : "";
 
   const overlap =
