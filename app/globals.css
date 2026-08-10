@@ -2134,9 +2134,19 @@ textarea:focus-visible {
 /* Clinician pathway v2 — quiet, prompt-led and intentionally single-column. */
 .clinician-v2 {
   --cv2-ink: #1d2019;
-  --cv2-muted: #6f716b;
+  /* WCAG AA on the TINTED panels, not just the ground. Tuned against #fbfaf7 these
+     read fine, but .cv2-focus-card paints #f0f2eb, and at 10px the untinted values
+     (#6f716b / #66774a) measure 4.37:1 and 4.32:1 — under the 4.5:1 bar, with no
+     large-text concession at that size. Now 4.64:1 on the tint, 5.02:1 on the ground,
+     same hue; where --cv2-sage is a background under white text this only widens the
+     margin.
+     DO NOT revert as a duplicate: two sessions fixed this simultaneously — one at the
+     token, one per-rule — then each deferred to the other and removed both, putting
+     the failure straight back on main. This token fix is the single mechanism; there
+     are deliberately no per-rule colour overrides on .cv2-focus-card. */
+  --cv2-muted: #6b6d67;
   --cv2-soft: #f1f0e9;
-  --cv2-sage: #66774a;
+  --cv2-sage: #617247;
   --cv2-line: #dfded7;
   min-height: 100svh;
   padding: 0;
