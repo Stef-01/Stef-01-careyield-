@@ -56,12 +56,34 @@ test("the practice sees its registers, intervals and counts", async ({ page, req
   await expect(page.getByTestId("members-placeholder_register_a")).toHaveText("42");
   await expect(page.getByTestId("gaps-placeholder_register_a")).toHaveText("9");
 
-  // Every interval shows its source and when it was last reviewed (the W55 provenance
-  // contract, surfaced — W62 builds the full provenance UI on top of this).
+  // Every interval shows its source and when it was last reviewed.
   const card = page.getByTestId("register-placeholder_register_a");
   await expect(card).toContainText("every 12 months");
   await expect(card).toContainText("Source:");
-  await expect(card).toContainText("reviewed");
+  await expect(card).toContainText("last reviewed");
+});
+
+test("W62: no interval renders without provenance", async ({ page, request }) => {
+  await signInOnboardAndSeed(page, request);
+  await gotoRegisters(page);
+
+  const rows = page.getByTestId("interval-row");
+  const provenance = page.getByTestId("interval-provenance");
+
+  const rowCount = await rows.count();
+  // Guard against a vacuous pass: the gate means nothing if nothing rendered.
+  expect(rowCount).toBeGreaterThan(0);
+  // The gate itself — one provenance line per interval row, no exceptions.
+  expect(await provenance.count()).toBe(rowCount);
+
+  for (let i = 0; i < rowCount; i += 1) {
+    const line = provenance.nth(i);
+    await expect(line).toContainText("Source:");
+    await expect(line).toContainText("last reviewed");
+    // A real citation and a linked source, not a placeholder dash.
+    await expect(line.locator("a")).toHaveAttribute("href", /^https:\/\//);
+    expect(((await line.textContent()) ?? "").trim().length).toBeGreaterThan(20);
+  }
 });
 
 test("a register can be switched off and back on for this practice", async ({ page, request }) => {
