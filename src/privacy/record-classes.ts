@@ -89,6 +89,12 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
     rationale: "W137 holds patient-linked referral records on both sides of a GP-to-GP handover. On erasure the patient link must be removed from documents, acts, events and return reports alike — a referral naming a patient is patient identity wherever it sits, and the receiving practice holding a copy does not change that.",
   },
   {
+    module: "src/education/store.ts",
+    what: "Education library, case triggers and clinicians' CPD entries",
+    handling: "no_patient_identity",
+    rationale: "W151 holds CONTENT (material and triggers) plus CPD entries about CLINICIANS — what a person read and when. No entry carries a patient id: W148's triggers match fact CODES and W149's trail records an item, never the case that surfaced it. A patient erasure therefore has nothing to scrub here; the clinician's own rights over their trail are W149's, which makes it correctable by them and readable by nobody else.",
+  },
+  {
     module: "src/pathways/registry.ts",
     what: "Pathway catalogue and its sign-off attestations",
     handling: "no_patient_identity",

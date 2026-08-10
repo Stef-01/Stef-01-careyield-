@@ -123,6 +123,7 @@ export const EDUCATION_COPY_MODULES: readonly string[] = [
   "src/education/triggers.ts",
   "src/education/cpd.ts",
   "src/education/advice-lint.ts",
+  "src/education/console-copy.ts",
 ];
 
 export const ADVICE_RULE_COPY: Record<string, string> = {

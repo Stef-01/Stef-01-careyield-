@@ -52,6 +52,9 @@ test.beforeEach(async ({ page, request }) => {
   await request.post("/api/mock/credentials?linkEmail=manager@demo.practice.example");
   await request.post("/api/mock/pathways");
   await request.post("/api/mock/referrals");
+  // W151: linked, so the education page is scanned with a POPULATED reading record rather than
+  // with the unlinked refusal, which renders one paragraph and no list.
+  await request.post("/api/mock/education?linkEmail=manager@demo.practice.example");
 });
 
 test("console surfaces pass WCAG A/AA", async ({ page }) => {
@@ -74,6 +77,7 @@ test("console surfaces pass WCAG A/AA", async ({ page }) => {
     "/console/credentials", // W113
     "/console/pathways", // W127
     "/console/referrals", // W137
+    "/console/education", // W151
     "/console/setup/practice",
   ];
   for (const path of surfaces) {

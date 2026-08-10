@@ -116,6 +116,19 @@ describe("W145 may order, must not withhold", () => {
     expect(result.orderingBasis).toContain("suggestion about where to start");
     expect(describeCuration(result)[0]).toContain("all shown");
   });
+
+  it("describes the order it actually used, including when there was nothing to order against", () => {
+    // W151's library view supplies no recorded facts, so the sort key falls back to item id.
+    // Claiming the list reflects a patient's record in that case would be a false account of a
+    // real ordering — and a reader cannot check an account of the order that is not the order.
+    const withFacts = curate(ITEMS, context());
+    const withoutFacts = curate(ITEMS, { ...context(), recordedFactCodes: [] });
+    expect(withFacts.orderingBasis).toContain("this patient's recorded facts");
+    expect(withoutFacts.orderingBasis).toContain("Ordered by item id");
+    expect(withoutFacts.orderingBasis).not.toContain("this patient's recorded facts");
+    // The promise itself is unconditional; only the account of the sort key changes.
+    expect(withoutFacts.orderingBasis).toContain("nothing has been held back");
+  });
 });
 
 describe("W145 scoping on a practice fact is not withholding", () => {

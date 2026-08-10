@@ -119,12 +119,19 @@ export function curate(
     .sort((a, b) => b.matchingFactCount - a.matchingFactCount || a.item.itemId.localeCompare(b.item.itemId))
     .map((ranked, index) => ({ ...ranked, position: index + 1 }));
 
+  // W151: the basis has to describe the order that was actually used. A library view has no
+  // patient in it, and telling a reader the list reflects "this patient's recorded facts" when
+  // none were supplied is a false account of a real ordering — the sort key fell back to item id.
+  const basis =
+    facts.size === 0
+      ? "Ordered by item id, because no recorded facts were supplied to order against."
+      : "Ordered by how many of this patient's recorded facts each item speaks to, then by item id.";
+
   return {
     ordered,
     consideredCount: inScope.length,
     outOfScope,
-    orderingBasis:
-      "Ordered by how many of this patient's recorded facts each item speaks to, then by item id. Everything relevant to this practice's registers is listed — nothing has been held back, and the order is a suggestion about where to start rather than a judgement about what matters.",
+    orderingBasis: `${basis} Everything relevant to this practice's registers is listed — nothing has been held back, and the order is a suggestion about where to start rather than a judgement about what matters.`,
   };
 }
 

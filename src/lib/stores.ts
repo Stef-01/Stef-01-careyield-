@@ -17,6 +17,7 @@ import { resetCapability } from "@/capability/graph";
 import { resetInterestState } from "@/capability/store";
 import { resetComplaints } from "@/complaints/store";
 import { resetConsole } from "@/console/store";
+import { resetEducation } from "@/education/store";
 import { resetLedger } from "@/credentials/ledger";
 import { resetVault } from "@/credentials/vault";
 import { resetRateLimits } from "@/lib/rate-limit";
@@ -34,6 +35,7 @@ export const STORE_RESETTERS: Record<string, () => unknown> = {
   resetInterestState,
   resetComplaints,
   resetConsole,
+  resetEducation,
   resetLedger,
   resetVault,
   resetRateLimits,

@@ -16,6 +16,7 @@ import {
   renderCompliantEducationCopy,
   renderUpdateNotice,
 } from "./advice-lint";
+import { EDUCATION_CONSOLE_COPY } from "./console-copy";
 import { curate, describeCuration, CURATION_REJECTION_COPY } from "./curation";
 import { describeTriggers, triggersFor } from "./triggers";
 import { CPD_REJECTION_COPY, recordCpdEntry, renderCpdExport, trailFor } from "./cpd";
@@ -94,6 +95,14 @@ describe("W150 the linter reaches every education surface", () => {
     const rendered = renderCpdExport(trailFor([built.entry], "clin-1"), "2026-08-11");
     expect(lintEducationCopy(rendered)).toEqual([]);
     for (const copy of Object.values(CPD_REJECTION_COPY)) {
+      expect(lintEducationCopy(copy), copy).toEqual([]);
+    }
+  });
+
+  it("passes every fixed sentence W151's console renders", () => {
+    // The console's prose lives in src/education/ precisely so this loop can reach it. Copy
+    // written straight into the page's JSX would be copy no linter sees.
+    for (const copy of Object.values(EDUCATION_CONSOLE_COPY)) {
       expect(lintEducationCopy(copy), copy).toEqual([]);
     }
   });
