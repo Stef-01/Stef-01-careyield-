@@ -4565,26 +4565,6 @@ textarea:focus-visible {
   background: #171713;
 }
 
-.patient-v2 .finder-hero-image,
-.patient-v2 .finder-hero-veil {
-  position: absolute;
-  inset: 0;
-}
-
-.patient-v2 .finder-hero-image {
-  z-index: -2;
-}
-
-.patient-v2 .finder-hero-image img {
-  object-fit: cover;
-  object-position: 52% 50%;
-}
-
-.patient-v2 .finder-hero-veil {
-  z-index: -1;
-  background: rgb(12 11 9 / 60%);
-}
-
 .patient-v2[data-stage="welcome"] .minimal-header,
 .patient-v2[data-stage="welcome"] .finder-context,
 .patient-v2[data-stage="welcome"] .voice-core,
@@ -4717,10 +4697,6 @@ textarea:focus-visible {
     padding-inline: 46px;
   }
 
-  .patient-v2[data-stage="welcome"] .finder-hero-image img {
-    object-position: 72% 42%;
-  }
-
   .patient-v2[data-stage="welcome"] .voice-core {
     width: min(78%, 920px);
     align-items: flex-start;
@@ -4851,4 +4827,402 @@ textarea:focus-visible {
   .patient-v2[data-stage="type"] .bottom-action > p {
     text-align: left;
   }
+}
+
+/* ===========================================================================
+   Founder storybook landing (2026-08-10, rev.2 after Fable design pass).
+   First-person account, Narayani at the centre, one desktop-optimised page.
+   Minimalist: paper ground, one sage accent, Newsreader display, generous air,
+   three disciplined display tiers. Extends DESIGN.md rather than inventing anew.
+   =========================================================================== */
+.story {
+  --s-paper: #f7f3ea;
+  --s-paper-2: #f1ece1;
+  --s-ink: #1f221c;
+  --s-muted: #63665d;
+  --s-sage: #55663f;
+  --s-sage-soft: #e9ecdd;
+  --s-line: #e0ddd2;
+  --s-dark: #1b1c17;
+  /* Tokens the reused InterestForm (.community-*) reads; map to the story palette */
+  --community-ink: #1f221c;
+  --community-muted: #63665d;
+  --community-sage: #55663f;
+  min-height: 100dvh;
+  color: var(--s-ink);
+  background: var(--s-paper);
+  font-family: "Inter Variable", Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.story *,
+.story *::before,
+.story *::after { box-sizing: border-box; }
+
+.story-wrap { width: min(1280px, calc(100% - 80px)); margin-inline: auto; }
+
+/* Header ------------------------------------------------------------------ */
+.story-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--s-paper) 85%, transparent);
+  backdrop-filter: blur(10px);
+}
+.story-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 66px;
+}
+.story-wordmark {
+  color: var(--s-ink);
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+.story-demo-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 17px;
+  border: 1px solid #c9c6ba;
+  border-radius: 999px;
+  color: var(--s-ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.story-demo-link:hover,
+.story-demo-link:focus-visible {
+  border-color: var(--s-ink);
+  background: color-mix(in srgb, var(--s-ink) 5%, transparent);
+  outline: 2px solid transparent;
+}
+
+/* Shared eyebrow ---------------------------------------------------------- */
+.story-eyebrow {
+  margin: 0;
+  color: var(--s-sage);
+  font-size: 12px;
+  font-weight: 680;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Hero -------------------------------------------------------------------- */
+.story-hero { position: relative; overflow: hidden; }
+.story-hero-grid {
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr;
+  align-items: end;
+  gap: 32px;
+  min-height: calc(100dvh - 66px);
+  padding-top: 40px;
+}
+.story-hero-copy {
+  align-self: center;
+  padding-bottom: 7vh;
+  max-width: none;
+}
+.story-hero-copy h1 {
+  margin: 22px 0 0;
+  max-width: 15.5ch;
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: clamp(42px, 5vw, 78px);
+  font-weight: 430;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+.story-hero-sub {
+  max-width: 34ch;
+  margin: 30px 0 0;
+  color: var(--s-muted);
+  font-size: clamp(16px, 1.25vw, 19px);
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+.story-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 38px;
+}
+.story-primary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 0 30px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--s-ink);
+  font-size: 14.5px;
+  font-weight: 640;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.story-primary-link:hover { background: #34382d; }
+.story-primary-link:active { transform: translateY(1px); }
+.story-primary-link:focus-visible { outline: 3px solid #a9b592; outline-offset: 3px; }
+
+/* Hero portrait cut-out on paper ----------------------------------------- */
+.story-portrait {
+  position: relative;
+  align-self: end;
+  justify-self: center;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.story-portrait-img {
+  position: relative;
+  z-index: 1;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(82vh, 720px);
+  object-fit: contain;
+}
+
+/* Chapters ---------------------------------------------------------------- */
+.story-chapter {
+  padding-block: clamp(88px, 11vw, 168px);
+  border-top: 1px solid var(--s-line);
+}
+.story-chapter-open { border-top: 0; padding-top: clamp(40px, 5vw, 72px); }
+
+.story-heading {
+  margin: 0;
+  max-width: 18ch;
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: clamp(30px, 3.6vw, 52px);
+  font-weight: 435;
+  line-height: 1.04;
+  letter-spacing: -0.038em;
+  text-wrap: balance;
+}
+.story-heading-wide { max-width: 20ch; }
+
+.story-prose { margin-top: 28px; }
+.story-prose p {
+  max-width: 60ch;
+  margin: 0 0 18px;
+  color: var(--s-muted);
+  font-size: clamp(16px, 1.15vw, 18px);
+  line-height: 1.72;
+  text-wrap: pretty;
+}
+.story-prose p:last-child { margin-bottom: 0; }
+.story-prose-lead { max-width: 720px; }
+.story-prose-lead p:first-child { color: var(--s-ink); }
+
+/* Split chapters (02, 03) ------------------------------------------------- */
+.story-split {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(40px, 6vw, 96px);
+  align-items: center;
+}
+.story-split-reverse .story-split-lead { order: 2; }
+.story-split-reverse .story-pull { order: 1; }
+
+/* Stat rail (no boxes), numerals sit below the heading tier --------------- */
+.story-stats dl { margin: 0; display: grid; gap: 0; }
+.story-stats div {
+  padding: 22px 0;
+  border-top: 1px solid var(--s-line);
+}
+.story-stats div:last-child { border-bottom: 1px solid var(--s-line); }
+.story-stats dt {
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: clamp(28px, 2.6vw, 38px);
+  font-weight: 430;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--s-ink);
+}
+.story-stats dt.story-stat-award { font-size: clamp(24px, 2.2vw, 32px); color: var(--s-sage); }
+.story-stats dd {
+  margin: 9px 0 0;
+  color: var(--s-muted);
+  font-size: 14.5px;
+  line-height: 1.5;
+  max-width: 32ch;
+}
+
+/* Conviction pull-line (03) ---------------------------------------------- */
+.story-pull p {
+  margin: 0;
+  max-width: 16ch;
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: clamp(24px, 2.5vw, 34px);
+  font-weight: 430;
+  font-style: italic;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  color: var(--s-ink);
+  padding-bottom: 4px;
+}
+
+/* Through-line (dark moment) --------------------------------------------- */
+.story-throughline {
+  padding-block: clamp(104px, 13vw, 200px);
+  background: var(--s-dark);
+  color: #f4f1e8;
+}
+.story-throughline-line {
+  max-width: 20ch;
+  margin: 0;
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: clamp(34px, 5.2vw, 74px);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.story-throughline-line em { font-style: italic; }
+.story-throughline-sub { margin-top: 40px; }
+.story-throughline-sub p {
+  max-width: 54ch;
+  margin: 0;
+  color: #c3c4ba;
+  font-size: clamp(16px, 1.3vw, 19px);
+  line-height: 1.7;
+}
+
+/* Meherr pillars (vertical story beats, not a 3-up card row) -------------- */
+.story-eyebrow-block { margin-bottom: 18px; }
+.story-pillars {
+  margin: 60px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--s-line);
+}
+.story-pillars li {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: clamp(20px, 5vw, 72px);
+  align-items: baseline;
+  padding: 34px 0;
+  border-bottom: 1px solid var(--s-line);
+}
+.story-pillars h3 {
+  margin: 0;
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: clamp(24px, 2.4vw, 30px);
+  font-weight: 460;
+  letter-spacing: -0.025em;
+}
+.story-pillars p {
+  margin: 0;
+  color: var(--s-muted);
+  font-size: clamp(15px, 1.1vw, 17px);
+  line-height: 1.65;
+  max-width: 46ch;
+}
+.story-cofounder {
+  margin-top: 60px;
+  padding-top: 32px;
+  border-top: 1px solid var(--s-line);
+}
+.story-cofounder p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--s-muted);
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 1.7;
+}
+.story-cofounder strong { color: var(--s-ink); font-weight: 640; }
+
+/* Register ---------------------------------------------------------------- */
+.story-register {
+  padding-block: clamp(88px, 10vw, 148px);
+  border-top: 1px solid var(--s-line);
+  background: var(--s-sage-soft);
+}
+.story-register-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: clamp(40px, 6vw, 88px);
+  align-items: start;
+}
+.story-register-copy {
+  max-width: 40ch;
+  margin: 24px 0 0;
+  color: var(--s-muted);
+  font-size: clamp(16px, 1.2vw, 18px);
+  line-height: 1.65;
+}
+/* Legibility bumps for the reused form on the consumer-health close */
+.story .community-interest-options label > span { font-size: 12.5px; }
+.story .community-consent > span { font-size: 12.5px !important; }
+.story .community-form-privacy { font-size: 12px; }
+
+/* Footer ------------------------------------------------------------------ */
+.story-footer {
+  padding-block: 44px;
+  border-top: 1px solid var(--s-line);
+}
+.story-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.story-footer-wordmark {
+  color: var(--s-ink);
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+.story-footer-links { display: flex; gap: 26px; }
+.story-footer-links a {
+  color: var(--s-muted);
+  font-size: 14px;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.story-footer-links a:hover { color: var(--s-ink); text-decoration: underline; }
+
+/* Tablet ------------------------------------------------------------------ */
+@media (max-width: 900px) {
+  .story-wrap { width: min(100% - 44px, 1280px); }
+  .story-hero-grid {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 12px;
+    min-height: 0;
+    padding-top: 44px;
+    padding-bottom: 0;
+  }
+  .story-hero-copy { padding-bottom: 0; order: 1; }
+  .story-hero-copy h1 { max-width: none; }
+  .story-hero-sub { max-width: 40ch; }
+  .story-portrait { order: 2; justify-self: center; max-width: 360px; margin-top: 20px; }
+  .story-split { grid-template-columns: 1fr; gap: 40px; align-items: start; }
+  .story-split-reverse .story-split-lead { order: 1; }
+  .story-split-reverse .story-pull { order: 2; }
+  .story-pull p { max-width: 24ch; }
+  .story-pillars li { grid-template-columns: 1fr; gap: 8px; padding: 28px 0; }
+  .story-register-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+/* Phone ------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  .story-wrap { width: min(100% - 32px, 1280px); }
+  .story-hero-copy h1 { font-size: clamp(38px, 11.5vw, 54px); }
+  .story-hero-actions { gap: 12px; }
+  .story-primary-link { width: 100%; }
+  .story-footer-inner { flex-direction: column; align-items: flex-start; gap: 18px; }
 }

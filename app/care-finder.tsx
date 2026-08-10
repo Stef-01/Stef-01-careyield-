@@ -292,17 +292,6 @@ export function CareFinder() {
           <AnimatePresence mode="wait" initial={false}>
         {stage === "welcome" && (
           <MotionScreen key="welcome" className="voice-screen">
-            <div className="finder-hero-image" aria-hidden="true">
-              <Image
-                src="/clinicians/priya-nair.png"
-                alt=""
-                fill
-                priority
-                sizes="(min-width: 820px) 1180px, 100vw"
-              />
-            </div>
-            <div className="finder-hero-veil" aria-hidden="true" />
-
             <header className="minimal-header">
               <Wordmark />
               <Link href="/" className="quiet-link finder-home-link">

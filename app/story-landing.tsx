@@ -1,0 +1,301 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
+import { motion, useReducedMotion, type Variants } from "motion/react";
+import type { ReactNode } from "react";
+import { InterestForm } from "./interest-form";
+
+/**
+ * The founder storybook: a first-person account, in Narayani's voice, of the
+ * logical progression from overlooked women -> lymphoedema research -> VR rehab
+ * -> Meherr. One desktop-optimised page with scroll-revealed chapters.
+ *
+ * Portrait: /narayani.png is a background-removed cut-out sitting on the paper.
+ */
+const PORTRAIT_SRC = "/narayani.png";
+
+function Reveal({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      initial={reduce ? false : { opacity: 0, y: 26 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.35 }}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+const stagger: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09 } },
+};
+const item: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+};
+
+export function StoryLanding() {
+  const reduce = useReducedMotion();
+
+  return (
+    <main className="story">
+      <header className="story-header">
+        <div className="story-wrap story-header-inner">
+          <Link href="/" className="story-wordmark" aria-label="Meherr home">
+            Meherr
+          </Link>
+          <Link href="/finder" className="story-demo-link">
+            Early demo
+          </Link>
+        </div>
+      </header>
+
+      {/* Hero: asymmetric split, portrait cut-out on paper */}
+      <section className="story-hero" aria-labelledby="story-hero-title">
+        <div className="story-wrap story-hero-grid">
+          <motion.div
+            className="story-hero-copy"
+            initial={reduce ? false : "hidden"}
+            animate="show"
+            variants={stagger}
+          >
+            <motion.p className="story-eyebrow" variants={item}>
+              Why I founded Meherr
+            </motion.p>
+            <motion.h1 id="story-hero-title" variants={item}>
+              For years I met women the system overlooked. Then I understood I was one of them.
+            </motion.h1>
+            <motion.p className="story-hero-sub" variants={item}>
+              The short version of how a lymphoedema clinic, a VR headset and my own diagnosis
+              led me here.
+            </motion.p>
+            <motion.div className="story-hero-actions" variants={item}>
+              <a className="story-primary-link" href="#register">
+                Register interest
+              </a>
+            </motion.div>
+          </motion.div>
+
+          <motion.figure
+            className="story-portrait"
+            initial={reduce ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Image
+              src={PORTRAIT_SRC}
+              alt="Narayani, founder of Meherr"
+              width={439}
+              height={610}
+              priority
+              sizes="(min-width: 900px) 40vw, 78vw"
+              className="story-portrait-img"
+            />
+          </motion.figure>
+        </div>
+      </section>
+
+      {/* Chapter 01: the pattern that kept repeating */}
+      <section className="story-chapter story-chapter-open" aria-labelledby="ch1-title">
+        <div className="story-wrap">
+          <Reveal>
+            <h2 id="ch1-title" className="story-heading">
+              The same story kept repeating in front of me.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.05} className="story-prose story-prose-lead">
+            <p>
+              In my family the symptoms ran through every generation. My mother had them, my
+              sister had them, so we assumed this was simply how the women in our family were
+              built.
+            </p>
+            <p>
+              It took me years to learn that what felt normal was PMOS, the condition long known
+              as PCOS, going unnamed. Around half the women who have it never find out. I could
+              not stop noticing how often the answer was there, just never offered.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Chapter 02: lymphoedema research + PACE prize */}
+      <section className="story-chapter" aria-labelledby="ch2-title">
+        <div className="story-wrap story-split">
+          <div className="story-split-lead">
+            <Reveal>
+              <h2 id="ch2-title" className="story-heading">
+                So I went to where care actually breaks.
+              </h2>
+            </Reveal>
+            <Reveal delay={0.05} className="story-prose">
+              <p>
+                At Macquarie&rsquo;s ALERT lymphoedema clinic I worked inside a multidisciplinary
+                team on women&rsquo;s recovery before and after surgery, tracking dermal backflow
+                and the small measurements that decide whether someone is really healing.
+              </p>
+              <p>
+                So I rebuilt how that data was kept, and the work was recognised. What stayed with
+                me was how much good care quietly depends on one person caring enough to get the
+                details right.
+              </p>
+            </Reveal>
+          </div>
+
+          <Reveal delay={0.1} className="story-stats">
+            <motion.dl
+              initial={reduce ? false : "hidden"}
+              whileInView="show"
+              viewport={{ once: true, amount: 0.4 }}
+              variants={stagger}
+            >
+              <motion.div variants={item}>
+                <dt>~20%</dt>
+                <dd>more complete recovery datasets</dd>
+              </motion.div>
+              <motion.div variants={item}>
+                <dt>30 to 35%</dt>
+                <dd>fewer documentation errors</dd>
+              </motion.div>
+              <motion.div variants={item}>
+                <dt className="story-stat-award">PACE Prize</dt>
+                <dd>2024 Professor Judyth Sachs award, for placement excellence</dd>
+              </motion.div>
+            </motion.dl>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Chapter 03: VR rehab + USYD honours + scholarship */}
+      <section className="story-chapter" aria-labelledby="ch3-title">
+        <div className="story-wrap story-split story-split-reverse">
+          <div className="story-split-lead">
+            <Reveal>
+              <h2 id="ch3-title" className="story-heading">
+                Then I followed the question into rehabilitation.
+              </h2>
+            </Reveal>
+            <Reveal delay={0.05} className="story-prose">
+              <p>
+                For my honours year at the University of Sydney I designed, built and evaluated a
+                virtual-reality supermarket: a safe place to relearn how to move through the world
+                after a stroke or vision loss. I built it with Guide Dogs Australia and tested it
+                with the people who would actually use it. It earned first-class honours and a
+                University of Sydney scholarship.
+              </p>
+            </Reveal>
+          </div>
+
+          <Reveal delay={0.1} className="story-pull">
+            <p>
+              Technology is only worth building when it bends around the person, not the other way
+              around.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Chapter 04: the through-line, dark ground */}
+      <section className="story-throughline" aria-labelledby="through-title">
+        <div className="story-wrap">
+          <Reveal>
+            <p id="through-title" className="story-throughline-line">
+              Every project was the same problem wearing a different face. Care that never quite fit
+              the <em>person in front of it.</em>
+            </p>
+          </Reveal>
+          <Reveal delay={0.08} className="story-throughline-sub">
+            <p>
+              Lymphoedema patients. Stroke survivors. And South Asian women, like me, whose bodies
+              were treated as a footnote. At some point I stopped waiting for the system to notice
+              them.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Chapter 05: Meherr, and Stefan */}
+      <section className="story-chapter" aria-labelledby="meherr-title">
+        <div className="story-wrap">
+          <Reveal className="story-eyebrow-block">
+            <p className="story-eyebrow">What Meherr is</p>
+          </Reveal>
+          <Reveal>
+            <h2 id="meherr-title" className="story-heading story-heading-wide">
+              Meherr helps South Asian women in Western Sydney find answers earlier.
+            </h2>
+          </Reveal>
+
+          <motion.ol
+            className="story-pillars"
+            initial={reduce ? false : "hidden"}
+            whileInView="show"
+            viewport={{ once: true, amount: 0.25 }}
+            variants={stagger}
+          >
+            <motion.li variants={item}>
+              <h3>Community education</h3>
+              <p>Practical PMOS sessions in the language schools, temples, mosques and women&rsquo;s groups where women already gather.</p>
+            </motion.li>
+            <motion.li variants={item}>
+              <h3>A private self-check</h3>
+              <p>A calm way to recognise the signs and carry a clear summary into a conversation with a GP.</p>
+            </motion.li>
+            <motion.li variants={item}>
+              <h3>An appointment that fits</h3>
+              <p>A GP who understands PMOS alongside language, culture and family context.</p>
+            </motion.li>
+          </motion.ol>
+
+          <Reveal delay={0.05} className="story-cofounder">
+            <p>
+              <strong>I build Meherr with Stefan</strong>, a physician-in-training and
+              health-systems researcher who has spent years on primary-care innovation and public
+              health. He brings the systems. I keep us close to the women we are building for.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Register */}
+      <section id="register" className="story-register" aria-labelledby="register-heading">
+        <div className="story-wrap story-register-grid">
+          <div>
+            <h2 id="register-heading" className="story-heading">
+              Join the first community sessions.
+            </h2>
+            <p className="story-register-copy">
+              Hear about upcoming sessions, or be among the first to try the self-check and the
+              directory.
+            </p>
+          </div>
+          <InterestForm />
+        </div>
+      </section>
+
+      <footer className="story-footer">
+        <div className="story-wrap story-footer-inner">
+          <Link href="/" className="story-footer-wordmark">
+            Meherr
+          </Link>
+          <div className="story-footer-links">
+            <a href="mailto:stefan.thottunkal@gmail.com">Contact</a>
+            <Link href="/privacy">Privacy</Link>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}
