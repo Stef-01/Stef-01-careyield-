@@ -22,6 +22,7 @@ import type {
   ClinicianId,
   ClinicianInterest,
   ConditionCode,
+  PracticeId,
 } from "@/domain/types";
 
 export interface CompetenceFloor {
@@ -66,19 +67,41 @@ function credentialCurrent(competence: ClinicianCompetence | null, onIso: string
  * Absent experience counts as zero attended visits here — "unmeasured" cannot be treated as
  * "sufficient", or a clinician with no telemetry would clear every floor by default.
  */
+/**
+ * Records belonging to another practice are treated as ABSENT, not as valid.
+ *
+ * W91 found this missing: a Candidate carries experience/competence/interest records that
+ * each name a practice, and nothing checked them, so another practice's 500 attended visits
+ * could clear this practice's floor. Fail-closed is the only safe reading — a foreign record
+ * is not evidence about this panel.
+ */
+function ownedBy<T extends { practiceId: PracticeId }>(
+  record: T | null,
+  practiceId: PracticeId | undefined,
+): T | null {
+  if (record === null) return null;
+  if (practiceId !== undefined && record.practiceId !== practiceId) return null;
+  return record;
+}
+
 export function clearsFloor(
   candidate: Candidate,
   floor: CompetenceFloor,
   onIso: string,
+  /** Scope. Omit only for single-tenant data, per the convention W65 set. */
+  practiceId?: PracticeId,
 ): FloorVerdict {
   const failures: FloorFailure[] = [];
 
-  const attended = candidate.experience?.attendedVisits ?? 0;
+  const experience = ownedBy(candidate.experience, practiceId);
+  const competence = ownedBy(candidate.competence, practiceId);
+
+  const attended = experience?.attendedVisits ?? 0;
   if (attended < floor.minAttendedVisits) failures.push("insufficient_experience");
 
   if (floor.requireVerifiedCredential) {
-    if (candidate.competence === null) failures.push("no_verified_credential");
-    else if (!credentialCurrent(candidate.competence, onIso)) failures.push("credential_expired");
+    if (competence === null) failures.push("no_verified_credential");
+    else if (!credentialCurrent(competence, onIso)) failures.push("credential_expired");
   }
 
   return { clears: failures.length === 0, failures };
@@ -109,17 +132,20 @@ export function rankByCapability(
   candidates: readonly Candidate[],
   floor: CompetenceFloor,
   onIso: string,
+  practiceId?: PracticeId,
 ): RankedCandidate[] {
   const ranked: RankedCandidate[] = candidates.map((candidate) => {
-    const verdict = clearsFloor(candidate, floor, onIso);
+    const verdict = clearsFloor(candidate, floor, onIso, practiceId);
     return {
       clinicianId: candidate.clinicianId,
       clearsFloor: verdict.clears,
       failures: verdict.failures,
       // Interest is not merely ignored below the floor — it is not carried at all, so no
       // downstream consumer can reintroduce it into a comparison.
-      interestStrength: verdict.clears ? (candidate.interest?.strength ?? null) : null,
-      attendedVisits: candidate.experience?.attendedVisits ?? 0,
+      interestStrength: verdict.clears
+        ? (ownedBy(candidate.interest, practiceId)?.strength ?? null)
+        : null,
+      attendedVisits: ownedBy(candidate.experience, practiceId)?.attendedVisits ?? 0,
     };
   });
 

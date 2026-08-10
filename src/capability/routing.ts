@@ -63,14 +63,24 @@ export interface RouteInput {
   practiceId: PracticeId;
   conditionCode: ConditionCode;
   usualClinicianId: ClinicianId | null;
-  /** Candidates must already be this practice's clinicians — the caller owns that scope. */
+  /**
+   * Candidates for this practice. Records naming another practice are ignored rather than
+   * trusted (W91) — the caller no longer has to be right about scope for the result to be.
+   */
   candidates: readonly Candidate[];
   config: RoutingConfig;
   onIso: string;
 }
 
 export function routeFor(input: RouteInput): RoutingDecision {
-  const ranked = rankByCapability(input.candidates, input.config.floor, input.onIso);
+  // W91: scope the capability records to THIS practice. "In-panel" is the unit's whole
+  // claim, and it was previously trusted rather than enforced.
+  const ranked = rankByCapability(
+    input.candidates,
+    input.config.floor,
+    input.onIso,
+    input.practiceId,
+  );
   const base = {
     practiceId: input.practiceId,
     conditionCode: input.conditionCode,
@@ -90,7 +100,7 @@ export function routeFor(input: RouteInput): RoutingDecision {
 
   if (input.usualClinicianId !== null) {
     const usual = input.candidates.find((c) => c.clinicianId === input.usualClinicianId);
-    if (usual && clearsFloor(usual, input.config.floor, input.onIso).clears) {
+    if (usual && clearsFloor(usual, input.config.floor, input.onIso, input.practiceId).clears) {
       // Routing covers gaps; it does not optimise. If the patient's own GP clears the
       // floor there is no case for moving them, however good someone else's numbers are.
       return {

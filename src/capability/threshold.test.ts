@@ -251,3 +251,43 @@ describe("W82 PROPERTY: enthusiasm never outranks the floor", () => {
     for (const c of ranked) expect(c.failures.length).toBeGreaterThan(0);
   });
 });
+
+describe("W91 tenancy: a foreign record is not evidence about this panel", () => {
+  const OTHER = "prac-2" as PracticeId;
+
+  function foreign(id: string, visits: number): Candidate {
+    return {
+      clinicianId: id as ClinicianId,
+      experience: { ...experience(visits), practiceId: OTHER },
+      competence: { ...competence(null), practiceId: OTHER },
+      interest: { ...interest(5), practiceId: OTHER },
+    };
+  }
+
+  it("another practice's attended visits do not clear this practice's floor", () => {
+    // Found in W91's sweep: Candidate carries records that each name a practice, and
+    // nothing checked them, so 500 foreign visits cleared a local floor.
+    const floor: CompetenceFloor = { minAttendedVisits: 10, requireVerifiedCredential: false };
+    const candidate = foreign("outsider", 500);
+
+    expect(clearsFloor(candidate, floor, TODAY, PRACTICE).clears).toBe(false);
+    expect(clearsFloor(candidate, floor, TODAY, PRACTICE).failures).toContain("insufficient_experience");
+    // Unscoped call keeps the old permissive behaviour for single-tenant data.
+    expect(clearsFloor(candidate, floor, TODAY).clears).toBe(true);
+  });
+
+  it("another practice's credential does not satisfy a credential requirement", () => {
+    const floor: CompetenceFloor = { minAttendedVisits: 0, requireVerifiedCredential: true };
+    expect(clearsFloor(foreign("outsider", 0), floor, TODAY, PRACTICE).failures).toContain(
+      "no_verified_credential",
+    );
+  });
+
+  it("another practice's stated interest does not order this practice's ranking", () => {
+    const floor: CompetenceFloor = { minAttendedVisits: 0, requireVerifiedCredential: false };
+    const ranked = rankByCapability([foreign("outsider", 0)], floor, TODAY, PRACTICE);
+
+    expect(ranked[0]!.interestStrength).toBeNull();
+    expect(ranked[0]!.attendedVisits).toBe(0);
+  });
+});
