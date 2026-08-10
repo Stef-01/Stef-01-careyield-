@@ -29,7 +29,10 @@ surface without a row here does not ship. Regulatory basis: the venture research
 | Practice console (`app/console`) | `src/console/*`, `src/tenancy/*` | 2 | role-based access, practice isolation (W18 RLS + tests); config changes audit-logged to the event spine |
 | Weekly/pilot reports | `src/report/*`, `src/pilot/report.ts` | 4 | naive counts labelled contrast-only (`docs/ATTRIBUTION.md` "never counts"); revenue figures labelled estimation-only (`src/mbs/items.ts` header) |
 | Privacy page (`app/privacy`) | W33 | 2 | retention config + delete/export flows; ADM transparency statement (Dec 2026 requirement) shipped ahead of force date |
-| Landing page (`app/page.tsx`) | W23 | 3 | B2B copy only (practices, not patients); copy-compliance linter from W23; no outcome claims, no testimonials |
+| Landing page (`app/page.tsx`) | W23 → **now renders `CareFinder`** | 3 | ⚠ **ROW STALE — see the 2026-08-10 review line.** W23's B2B-only guarantee no longer describes this route: the root page is now the patient-facing finder |
+| Voice care-finder (`app/page.tsx` → `app/care-finder.tsx`) | founder commit 603219f | 2, 3, **G6, G7** | **UNMAPPED / UNCLEARED — no CareYield control applies to it yet.** Patient-facing: free-text/voice description of a desired GP → matched named clinician with photo and appointment times. Three exposures: patient states a clinical need ("a GP who understands ADHD") and is matched on it (G7/TGA — matching must key on clinician attributes, not patient symptoms); named clinicians + photos in a patient-facing directory (G6 + Ahpra advertising: credential claims must be accurate and supportable, no testimonials); the eight portraits in `public/clinicians/` are not verified real practitioners |
+| Clinician walkthrough (`app/clinicians`) | founder commit 603219f | 2, 3 | **UNMAPPED.** Renders condition-specific clinical content ("New PCOS assessment", "Metformin review", "COCP suitability") — the first surface in the tree carrying named conditions and drug classes, which is the territory G5 gates |
+| Practices page (`app/practices`) | founder commit 603219f | 3 | **UNMAPPED.** Assumed B2B; needs the W23 copy-lint applied |
 | Complaint/opt-out workflow | W43 (`src/ops`) | 1, 2, 3 | intake → triage → practice notification; Sev-1 pause-first rule (`docs/SUPPORT-RUNBOOK.md`); event-spine replay resolves "STOP not honoured" claims with evidence |
 | Sales assets (deck/one-pager) | W46 | 3 | factual credential/figure claims traceable to the research page; no "specialist-equivalent" language anywhere |
 | Register console (`app/console/registers`) | W60 (`src/registers/*`) | 2, 3 | enable/disable is keyed by practice id, so one practice cannot change what another sees (isolation unit-tested); scheduling-only copy asserted in e2e ("needs", "at risk", "requires", "should be seen" all banned); register membership is non-inferential by construction — the W55 CHECK constraint and union type admit no symptom-derived source (G7) |
@@ -52,6 +55,17 @@ linter rules; TGA CDSS guidance updates (carve-outs expected to narrow); commenc
 remaining Privacy Act tranche-2 reforms. Each review appends a dated line here.
 
 - 2026-08-09 — v1 established (W50). All eight surfaces mapped; zero unmapped surfaces in `app/`.
+- 2026-08-10 — **Four surfaces landed outside the loop** in founder commit 603219f (voice
+  care-finder now served at `/`, clinician walkthrough, practices page). They arrived without
+  dossier rows, so this document's prior claim of "zero unmapped surfaces in `app/`" was untrue
+  until this entry; the rows above now describe what is actually deployed, and the W23 landing-page
+  row is marked stale rather than silently left wrong. **No CareYield control has been applied to
+  any of them** — no copy lint, no G6/G7 assessment, no G5 review of the condition/drug content.
+  Awaiting the founder's ruling on whether these are design prototypes (in which case: mark
+  prototype-only, keep them off any patient-reachable deployment, and the exposures below stay
+  theoretical) or a shipping direction (in which case each needs its controls before traffic).
+  Recorded by the round-13 check-in; the gate is green (452 tests) — this is a governance gap,
+  not a broken build.
 - 2026-08-09 — W60 adds the register console (nine surfaces). Its catalogue ships **placeholders
   only**: the real guideline intervals are W56, blocked pending a founder ruling on whether
   transcribed national guidance is G5 clinical content. A test asserts the shipped catalogue
