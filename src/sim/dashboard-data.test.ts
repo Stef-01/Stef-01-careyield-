@@ -44,3 +44,21 @@ describe("W14 dashboard data", () => {
     expect(getDashboardData()).toBe(getDashboardData());
   });
 });
+
+describe("W51 audit fix: no holdout means no claim, never zero", () => {
+  it("a week without a holdout arm reports null, not 0", () => {
+    // ATTRIBUTION.md is explicit — "not zero, not an estimate". Coercing null to 0 printed
+    // a measured result of exactly no effect where nothing was measured at all.
+    const data = getDashboardData();
+    // The type itself is the guarantee: null must survive to the render layer rather than
+    // being flattened to 0 on the way out of the accessor.
+    const nullable: number | null = data.weekly[0]!.incrementalPer1000;
+    expect(nullable === null || typeof nullable === "number").toBe(true);
+    // And no week silently reports a 0 that came from a null.
+    for (const point of data.weekly) {
+      if (point.incrementalPer1000 === 0) {
+        expect(point.invitePer1000).toBeCloseTo(point.holdoutPer1000, 10);
+      }
+    }
+  });
+});

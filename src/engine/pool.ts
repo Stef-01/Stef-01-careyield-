@@ -35,8 +35,15 @@ export function rankCandidates(eligible: Patient[]): Patient[] {
 /** Smallest batch expected to fill `openSlots`, honouring the safety ceiling. */
 export function batchSize(openSlots: number, config: PoolConfig): number {
   if (openSlots <= 0) return 0;
+  // A non-positive or non-finite response rate makes `needed` negative, zero or NaN, and
+  // Math.min then hands slice() a value that invites nearly the whole eligible panel —
+  // the safety ceiling silently inverted into a mass send. Refuse instead: a rate that
+  // cannot size a batch is a misconfiguration, and sending nothing is the safe answer.
+  // (W51 audit, medium.)
+  if (!Number.isFinite(config.expectedResponseRate) || config.expectedResponseRate <= 0) return 0;
   const needed = Math.ceil(openSlots / config.expectedResponseRate);
-  return Math.min(needed, config.maxInvitesPerSession);
+  if (!Number.isFinite(needed) || needed <= 0) return 0;
+  return Math.min(needed, Math.max(0, config.maxInvitesPerSession));
 }
 
 export function buildInvitationPool(

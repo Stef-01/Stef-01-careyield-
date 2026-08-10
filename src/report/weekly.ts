@@ -37,7 +37,7 @@ export interface WeeklyReport {
   practiceName: string;
   week: number;
   weekStartIso: string;
-  weekly: { invitePer1000: number; holdoutPer1000: number; incrementalPer1000: number };
+  weekly: { invitePer1000: number; holdoutPer1000: number; incrementalPer1000: number | null };
   cumulative: {
     incrementalAttended: number | null;
     incrementalPer1000: number | null;
