@@ -71,6 +71,13 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 > Y2 expansion chained Q5 far more tightly than Y1 was chained, which is why one blocked unit stops
 > everything; future expansions should keep more `[P]` units genuinely independent.
 
+
+> **D1 (design, out-of-band) — claimed interactive-0810 2026-08-10T05:20Z.** Aesthetic pass on the
+> founder-built finder: the opening screen has a ~250px dead void on every viewport (content stack ends
+> at the carousel, CTA is bottom-pinned, nothing between), the example prompt is orphaned above the
+> carousel that labels it, and desktop renders a 520px phone column in a 1440px canvas. Touching
+> app/care-finder.tsx + app/globals.css — builders please avoid those two files until this row clears.
+
 ## Ledger — Year 1
 
 | Unit | Status | Session | Claimed (UTC) | SHA | Notes |
