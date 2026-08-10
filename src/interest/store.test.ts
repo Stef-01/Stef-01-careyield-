@@ -1,8 +1,16 @@
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { interestSignupsCsv, listInterestSignups, saveInterestSignup } from "./store";
+import {
+  eraseInterestSignups,
+  interestSignupsCsv,
+  interestSignupsFor,
+  listInterestSignups,
+  pruneInterestSignups,
+  saveInterestSignup,
+} from "./store";
+import type { InterestSignup } from "./types";
 
 const dirs: string[] = [];
 
@@ -49,5 +57,60 @@ describe("community interest store", () => {
     const csv = interestSignupsCsv({ filePath });
     expect(csv).toContain('"created_at","name","email","interests","source"');
     expect(csv).toContain("I think I might have this | I want to bring a session to my community");
+  });
+});
+
+describe("W106 access and retention for the interest register", () => {
+  // This register holds contact details for people who are NOT patients of a subscribing
+  // practice. Different collection to everything else in the tree, same rights.
+  const tmp = tempFile;
+
+  const REASON: InterestSignup["interests"][number] = "I think I might have this";
+  const save = (filePath: string, email: string, now: string) =>
+    saveInterestSignup({ name: "Test Person", email, interests: [REASON] }, { filePath, now: new Date(now) });
+
+  it("an access request returns exactly that person's rows", () => {
+    const filePath = tmp();
+    save(filePath, "a@example.test", "2026-01-01T00:00:00Z");
+    save(filePath, "b@example.test", "2026-01-02T00:00:00Z");
+    expect(interestSignupsFor("a@example.test", { filePath }).map((r) => r.email)).toEqual(["a@example.test"]);
+    // Case and whitespace must not become a way to miss someone's record.
+    expect(interestSignupsFor("  A@Example.Test ", { filePath })).toHaveLength(1);
+    expect(interestSignupsFor("nobody@example.test", { filePath })).toEqual([]);
+  });
+
+  it("erasure removes that person and leaves everyone else", () => {
+    const filePath = tmp();
+    save(filePath, "a@example.test", "2026-01-01T00:00:00Z");
+    save(filePath, "b@example.test", "2026-01-02T00:00:00Z");
+    expect(eraseInterestSignups("a@example.test", { filePath })).toBe(1);
+    expect(listInterestSignups({ filePath }).map((r) => r.email)).toEqual(["b@example.test"]);
+    // The identifier must be gone from the file, not merely filtered on read.
+    expect(readFileSync(filePath, "utf8")).not.toContain("a@example.test");
+    expect(eraseInterestSignups("a@example.test", { filePath })).toBe(0);
+  });
+
+  it("an empty identifier erases nothing", () => {
+    const filePath = tmp();
+    save(filePath, "a@example.test", "2026-01-01T00:00:00Z");
+    expect(eraseInterestSignups("   ", { filePath })).toBe(0);
+    expect(listInterestSignups({ filePath })).toHaveLength(1);
+  });
+
+  it("retention prunes signups past the window and keeps the rest", () => {
+    const filePath = tmp();
+    save(filePath, "old@example.test", "2025-01-01T00:00:00Z");
+    save(filePath, "new@example.test", "2026-08-01T00:00:00Z");
+    expect(pruneInterestSignups(365, "2026-08-10", { filePath })).toBe(1);
+    expect(listInterestSignups({ filePath }).map((r) => r.email)).toEqual(["new@example.test"]);
+  });
+
+  it("keeps a row whose date is unreadable rather than losing data to a parsing bug", () => {
+    const filePath = tmp();
+    save(filePath, "x@example.test", "2026-01-01T00:00:00Z");
+    // Corrupt the stored date to simulate a malformed row.
+    writeFileSync(filePath, readFileSync(filePath, "utf8").replace(/"createdAt":"[^"]*"/, '"createdAt":"whenever"'));
+    expect(pruneInterestSignups(1, "2026-08-10", { filePath })).toBe(0);
+    expect(listInterestSignups({ filePath })).toHaveLength(1);
   });
 });

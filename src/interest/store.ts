@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import type { InterestReason, InterestSignup } from "./types";
 
@@ -69,4 +69,64 @@ export function interestSignupsCsv(options: { filePath?: string } = {}): string 
       signup.source,
     ].map(csvCell).join(",")),
   ].join("\n");
+}
+
+/** Rewrite the whole file. Used only by the erasure/retention paths below. */
+function writeAll(rows: readonly InterestSignup[], options: { filePath?: string }): void {
+  const filePath = options.filePath ?? defaultStorePath();
+  mkdirSync(path.dirname(filePath), { recursive: true });
+  writeFileSync(filePath, rows.map((r) => `${JSON.stringify(r)}\n`).join(""), {
+    encoding: "utf8",
+    mode: 0o600,
+  });
+}
+
+/**
+ * W106: the community interest register under APP 12 and APP 11.
+ *
+ * This register holds contact details for people who are NOT patients of a subscribing
+ * practice, which the Y2 gate dossier flagged as a different collection to everything else in
+ * the tree. Different collection, same rights: someone who signed up can ask what is held
+ * and can ask for it to be removed, and neither is served by the rail-based flows because
+ * this store is file-backed and keyed by email rather than patient id.
+ */
+export function interestSignupsFor(email: string, options: { filePath?: string } = {}): InterestSignup[] {
+  const wanted = email.trim().toLowerCase();
+  if (wanted === "") return [];
+  return listInterestSignups(options).filter((row) => row.email.trim().toLowerCase() === wanted);
+}
+
+/** Remove every signup for an email. Returns how many rows went. */
+export function eraseInterestSignups(email: string, options: { filePath?: string } = {}): number {
+  const wanted = email.trim().toLowerCase();
+  if (wanted === "") return 0;
+  const rows = listInterestSignups(options);
+  const kept = rows.filter((row) => row.email.trim().toLowerCase() !== wanted);
+  if (kept.length === rows.length) return 0;
+  writeAll(kept, options);
+  return rows.length - kept.length;
+}
+
+/**
+ * Prune signups older than `retentionDays` (APP 11).
+ *
+ * Consent to be contacted about a service is not consent to be held indefinitely, and this
+ * register has no practice relationship to justify a long tail.
+ */
+export function pruneInterestSignups(
+  retentionDays: number,
+  nowIso: string,
+  options: { filePath?: string } = {},
+): number {
+  const rows = listInterestSignups(options);
+  const cutoff = new Date(`${nowIso.slice(0, 10)}T00:00:00Z`).getTime() - retentionDays * 86_400_000;
+  const kept = rows.filter((row) => {
+    const at = Date.parse(row.createdAt);
+    // An unreadable date is KEPT, not pruned: deleting a record because its timestamp is
+    // malformed would be losing data to a parsing bug.
+    return Number.isNaN(at) || at >= cutoff;
+  });
+  if (kept.length === rows.length) return 0;
+  writeAll(kept, options);
+  return rows.length - kept.length;
 }
