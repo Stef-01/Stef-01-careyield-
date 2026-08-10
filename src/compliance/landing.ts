@@ -32,6 +32,9 @@ const BANNED_PATTERNS: Array<{ rule: string; pattern: RegExp }> = [
   { rule: "no-urgency", pattern: /\b(urgent\w*|act now|limited time|don'?t miss|hurry)\b/i },
 ];
 
+/** The rule names this linter can report. Exported so a caller can assert it reached all of them. */
+export const LANDING_RULES: readonly string[] = BANNED_PATTERNS.map((p) => p.rule);
+
 export function lintLandingCopy(text: string): LandingViolation[] {
   const violations: LandingViolation[] = [];
   for (const { rule, pattern } of BANNED_PATTERNS) {

@@ -38,12 +38,29 @@ const REQUIRED_CHECKS: Array<{ rule: string; ok: (text: string, ctx: MessageCont
   { rule: "has-booking-link", ok: (t, c) => t.includes(c.bookingUrl) },
 ];
 
-export function lintMessage(text: string, ctx: MessageContext): LintViolation[] {
+/** The rule names this linter can report, for callers asserting coverage rather than guessing. */
+export const MESSAGE_BANNED_RULES: readonly string[] = BANNED_PATTERNS.map((p) => p.rule);
+
+/**
+ * The banned-language half of the message lint, without the structural checks.
+ *
+ * W114 needs these rules to reach a credential's scope label, and a scope label has no
+ * practice name, opt-out or booking link — running the whole lint over one would report three
+ * violations that mean nothing. Splitting it here rather than copying the patterns is what
+ * makes the reach REAL: a rule added to BANNED_PATTERNS reaches scope labels the same day,
+ * with nobody remembering to mirror it.
+ */
+export function lintMessageText(text: string): LintViolation[] {
   const violations: LintViolation[] = [];
   for (const { rule, pattern } of BANNED_PATTERNS) {
     const match = text.match(pattern);
     if (match) violations.push({ rule, match: match[0] });
   }
+  return violations;
+}
+
+export function lintMessage(text: string, ctx: MessageContext): LintViolation[] {
+  const violations: LintViolation[] = lintMessageText(text);
   for (const { rule, ok } of REQUIRED_CHECKS) {
     if (!ok(text, ctx)) violations.push({ rule, match: "(missing)" });
   }
