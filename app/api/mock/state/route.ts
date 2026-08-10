@@ -16,6 +16,7 @@ function snapshot() {
       id: i.id,
       status: i.status,
       sessionDate: i.sessionDate,
+      patientId: i.patientId, // W74: preferences are keyed by patient, not invitation
       token: signBookingToken(i.id),
     })),
     appointments: store.state.appointments.map((a) => ({

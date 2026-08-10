@@ -11,11 +11,18 @@ import type {
   PatientId,
   PracticeId,
 } from "@/domain/types";
+import {
+  DEFAULT_PREFERENCES,
+  validatePreferences,
+  type ContactPreferences,
+} from "@/messaging/preferences";
 
 export interface RailStore {
   state: RailState;
   practiceName: string;
   clinicianName: string;
+  /** W74: contact preferences the patient set for themselves, keyed by patient id. */
+  contactPreferences: Record<string, ContactPreferences>;
 }
 
 /** W25: seed the rail with an in-person or a telehealth session (same shape). */
@@ -55,6 +62,7 @@ function seed(scenario: RailScenario = "standard"): RailStore {
       invitations: [invitation("a", 1), invitation("b", 2), invitation("c", 3)],
       auditEvents: [],
     },
+    contactPreferences: {},
   };
 }
 
@@ -76,6 +84,25 @@ export function sessionAppointmentType(store: RailStore, invitation: { clinician
     (a) => a.clinicianId === invitation.clinicianId && a.startsAt.slice(0, 10) === invitation.sessionDate,
   );
   return inSession?.appointmentType;
+}
+
+/**
+ * W74: record what a patient said about being contacted. Refuses an invalid window
+ * rather than storing something that would silence them or open a 24-hour one.
+ */
+export function saveContactPreferences(
+  patientId: string,
+  prefs: ContactPreferences,
+): { ok: boolean; errors: string[] } {
+  const validation = validatePreferences(prefs);
+  if (!validation.ok) return { ok: false, errors: validation.errors };
+  getStore().contactPreferences[patientId] = prefs;
+  return { ok: true, errors: [] };
+}
+
+/** What we may do for this patient — their own answer, or the conservative default. */
+export function contactPreferencesFor(patientId: string): ContactPreferences {
+  return getStore().contactPreferences[patientId] ?? DEFAULT_PREFERENCES;
 }
 
 /** Book against the shared store, committing the new state on success or refusal. */
