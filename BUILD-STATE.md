@@ -179,7 +179,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W86 | available | — | — | — | [P] W84 |
 | W87 | available | — | — | — | W84, W85 |
 | W88 | available | — | — | — | [P] W80 |
-| W89 | claimed | builder-A | 2026-08-10T12:15Z | — | specialist-supervision hooks, DESIGN ONLY (G5-gated) |
+| W89 | done | builder-A | 2026-08-10T12:15Z | (pending) | docs/SUPERVISION-HOOKS-W89.md. Design only, no code. The governing rule, argued rather than asserted: a supervision hook may make specialist KNOWLEDGE available but may never make a specialist a party to an individual patient's care unless that specialist has explicitly accepted that patient — because software that appears to put a specialist between a GP and a decision both invites the GP to defer on a decision that stays theirs AND exposes a specialist to responsibility for a patient they have never seen, and neither is fixed by a disclaimer. Three hooks in increasing commitment: (1) content authorship = W69, already built and empty, specialist relates to CONTENT not patients; (2) cohort review = de-identified aggregates only, output attaches to the REGISTER not a patient, structurally not procedurally; (3) named-patient consultation = crosses the line and would make CareYield a referral-adjacent clinical service, needing recorded specialist acceptance, APP 6 patient consent, verified indemnity, and an answer to whose medical record it is. Written down precisely so a future unit cannot arrive at (3) by incremental extension of (2) — the path where every step looks small and the destination is a regulated clinical service nobody decided to build. Two blocked rows added below. |
 | W90 | available | — | — | — | [P] W78 |
 | W91 | available | — | — | — | W79–W90 |
 | W92 | available | — | — | — | W91 |
@@ -195,3 +195,5 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W102 | available | — | — | — | W95, W97 |
 | W103 | available | — | — | — | W92–W102 |
 | W104 | available | — | — | — | W103 |
+| SUP-1 | blocked | — | — | — | Cohort-level specialist review (W89 hook 2) — FOUNDER GATE G5. Buildable only as a de-identified aggregate view whose output is register content; not buildable as anything patient-linked. See docs/SUPERVISION-HOOKS-W89.md |
+| SUP-2 | blocked | — | — | — | Named-patient specialist consultation (W89 hook 3) — FOUNDER GATE G5 **plus** a company-direction decision: whether CareYield is willing to become a party to individual clinical care. Not a clinical-content question and should not be answered as one. See docs/SUPERVISION-HOOKS-W89.md |
