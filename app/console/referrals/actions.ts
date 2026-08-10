@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { getConsole } from "@/console/store";
 import { acceptanceStatus } from "@/referrals/acceptance";
-import { addAcceptanceActs, allActs, sentTo } from "@/referrals/store";
+import { actsFor, addAcceptanceActs, sentTo } from "@/referrals/store";
 import { authorize } from "@/tenancy/tenancy";
 import { requireSession } from "../guard";
 
@@ -37,7 +37,7 @@ export async function answerReferral(formData: FormData): Promise<void> {
 
   // Silence is not acceptance and neither is a second answer: a referral already answered is
   // not re-answered from a stale page.
-  if (acceptanceStatus(allActs(), referralId as string).state !== "awaiting_acceptance") {
+  if (acceptanceStatus(actsFor(practiceId), referralId as string).state !== "awaiting_acceptance") {
     redirect("/console/referrals?error=already_answered");
   }
 

@@ -30,7 +30,7 @@ import {
 import { REFERRAL_REASON_COPY, REFERRAL_REQUEST_COPY } from "@/referrals/document";
 import { detectLeakage } from "@/referrals/leakage";
 import { RETURN_OUTCOME_COPY } from "@/referrals/return-report";
-import { allActs, allEvents, returnFor, sentBy, sentTo } from "@/referrals/store";
+import { actsFor, eventsFor, returnFor, sentBy, sentTo } from "@/referrals/store";
 import { describeOutstanding, trackReferral } from "@/referrals/tracking";
 import { authorize } from "@/tenancy/tenancy";
 import { requireSession } from "../guard";
@@ -77,8 +77,8 @@ export default async function ReferralsPage({
   const { error, saved } = await searchParams;
 
   const practiceId = console_.practice.id;
-  const acts = allActs();
-  const events = allEvents();
+  const acts = actsFor(practiceId);
+  const events = eventsFor(practiceId);
   const leakage = detectLeakage(events, practiceId);
 
   const sent = sentBy(practiceId).map((document) => ({

@@ -54,12 +54,39 @@ export function addReturnReports(reports: readonly ReturnReport[]): void {
   state().returns.push(...reports);
 }
 
-export function allActs(): readonly AcceptanceAct[] {
-  return state().acts;
+/**
+ * Every referral id this practice is party to, on either side.
+ *
+ * The scoping primitive the two reads below are built on: a practice is party to a referral it
+ * sent or was sent, and to nothing else.
+ */
+function referralIdsFor(practiceId: PracticeId): Set<string> {
+  return new Set(
+    state()
+      .documents.filter((d) => d.fromPracticeId === practiceId || d.toPracticeId === practiceId)
+      .map((d) => d.referralId),
+  );
 }
 
-export function allEvents(): readonly ReferralEvent[] {
-  return state().events;
+/**
+ * Acceptance acts for referrals this practice is party to.
+ *
+ * W140 finding: this used to be `allActs()`, returning the whole rail, with the console
+ * narrowing afterwards by referral id. That was correct in the path that existed and wrong in
+ * shape — the safety depended on the PROVENANCE of the referral id rather than on any check, so
+ * a caller passing an id from anywhere would have resolved another practice's acceptance. The
+ * narrowing now happens at the source, which is W123's rule: a filter applied later is a line
+ * somebody can delete, and the deletion looks like a simplification.
+ */
+export function actsFor(practiceId: PracticeId): AcceptanceAct[] {
+  const mine = referralIdsFor(practiceId);
+  return state().acts.filter((act) => mine.has(act.referralId));
+}
+
+/** Chain events for referrals this practice is party to. Same reasoning as `actsFor`. */
+export function eventsFor(practiceId: PracticeId): ReferralEvent[] {
+  const mine = referralIdsFor(practiceId);
+  return state().events.filter((event) => mine.has(event.referralId));
 }
 
 /**
