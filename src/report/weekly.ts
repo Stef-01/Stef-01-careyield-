@@ -20,18 +20,11 @@ import { evaluateGuardrails, metricsFromSim, DEFAULT_GUARDRAILS, type Complaint,
 import { buildDashboardData } from "@/sim/dashboard-data";
 import type { SimResult } from "@/sim/harness";
 
-export interface ReportOptions {
-  /** Practice-configurable billing assumption per attended GP visit (AUD). */
-  revenuePerAttendedVisit: number;
-  guardrails: GuardrailConfig;
-  complaints: Complaint[];
-}
-
-export const DEFAULT_REPORT_OPTIONS: ReportOptions = {
-  revenuePerAttendedVisit: 80,
-  guardrails: DEFAULT_GUARDRAILS,
-  complaints: [],
-};
+// W107: `ReportOptions`/`DEFAULT_REPORT_OPTIONS` moved to ./options so the console can read
+// them without importing this module, which pulls in docx. Re-exported here because callers
+// that already render a document want them in the same place.
+import { DEFAULT_REPORT_OPTIONS, type ReportOptions } from "./options";
+export { DEFAULT_REPORT_OPTIONS, type ReportOptions };
 
 export interface WeeklyReport {
   practiceName: string;

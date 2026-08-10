@@ -36,6 +36,27 @@ export interface AuditReport {
  * reviewer's diligence — is what guarantees each acceptance carries a rationale
  * and a review date.
  */
+/**
+ * W107: one recorded re-review of an acceptance.
+ *
+ * `reviewBy` alone made an acceptance expire, but nothing stopped the date being pushed
+ * forward on its own — the cheapest possible response to a failing gate, and indistinguishable
+ * in a diff from an acceptance that was genuinely re-argued. `extendedTo` closes that: the
+ * evaluator requires `reviewBy` to equal the newest review's `extendedTo`, so moving the
+ * deadline without writing down what you checked leaves the two out of step and the acceptance
+ * stops working.
+ */
+export interface AllowlistReview {
+  /** YYYY-MM-DD the review was carried out. */
+  readonly on: string;
+  /** Who or what carried it out — a unit id is fine, "someone" is not. */
+  readonly by: string;
+  /** What was checked and what was concluded. Not a restatement of `reason`. */
+  readonly finding: string;
+  /** The `reviewBy` this review set. Unchanged when a review extends nothing. */
+  readonly extendedTo: string;
+}
+
 export interface AllowlistEntry {
   /** GitHub advisory id (GHSA-…). Stable, unlike pnpm's numeric registry id. */
   readonly advisory: string;
@@ -45,6 +66,11 @@ export interface AllowlistEntry {
   readonly reason: string;
   /** YYYY-MM-DD (inclusive). Past this date the acceptance stops working. */
   readonly reviewBy: string;
+  /**
+   * Every review of this acceptance, oldest first. The tuple type requires at least one, so
+   * an acceptance cannot exist without someone having looked at it once.
+   */
+  readonly reviews: readonly [AllowlistReview, ...AllowlistReview[]];
 }
 
 export type BlockReason =
@@ -52,6 +78,7 @@ export type BlockReason =
   | "acceptance_expired"
   | "module_mismatch"
   | "unparseable_review_date"
+  | "review_date_unexplained"
   | "unknown_severity";
 
 export interface BlockingAdvisory {
@@ -145,6 +172,14 @@ export function evaluateAudit(
       block("acceptance_expired");
       continue;
     }
+    // W107: the deadline must be the one a recorded review set. Bumping `reviewBy` without
+    // adding a review leaves these out of step, and the acceptance stops working — which is
+    // the same fail-closed direction as every other check here.
+    const newest = entry.reviews[entry.reviews.length - 1];
+    if (!newest || newest.extendedTo !== entry.reviewBy) {
+      block("review_date_unexplained");
+      continue;
+    }
     acceptedCount += 1;
   }
 
@@ -160,6 +195,8 @@ const BLOCK_EXPLANATION: Record<BlockReason, string> = {
   acceptance_expired: "the accepted-risk entry has passed its review date — re-review it",
   module_mismatch: "the allowlist entry names a different package",
   unparseable_review_date: "the allowlist entry's reviewBy is not a YYYY-MM-DD date",
+  review_date_unexplained:
+    "the allowlist entry's reviewBy does not match the date its newest review set — record what you checked, do not just move the date",
   unknown_severity: "unrecognised severity — treated as in-scope",
 };
 

@@ -10,6 +10,10 @@
 
 import type { AllowlistEntry } from "./audit-gate.ts";
 
+// W107: every entry carries its review history, and the gate requires `reviewBy` to be the
+// date the newest review set. Pushing the deadline forward on its own — the cheapest response
+// to a failing gate — now breaks the acceptance instead of renewing it.
+
 export const AUDIT_ALLOWLIST: readonly AllowlistEntry[] = [
   {
     advisory: "GHSA-w3rx-r6r6-pgpr",
@@ -21,6 +25,23 @@ export const AUDIT_ALLOWLIST: readonly AllowlistEntry[] = [
       "assets, never parses untrusted input, and is absent from the deployed app. Do not ship " +
       "pptxgenjs into any request-serving path.",
     reviewBy: "2026-11-09",
+    reviews: [
+      {
+        on: "2026-08-10",
+        by: "W107",
+        finding:
+          "Re-checked against live advisory data (advisory last updated 2026-08-07): still no " +
+          "patched release — patched range is <0.0.0 and the registry recommendation is None — " +
+          "so there is still nothing to bump to. Confirmed pptxgenjs remains a devDependency, " +
+          "and the 'absent from the deployed app' half of the argument is now ENFORCED rather " +
+          "than asserted by src/security/reachability.test.ts, which walks the import graph " +
+          "from app/ and fails if any request-serving path can reach it. DELIBERATELY NOT " +
+          "EXTENDED: the November date exists to force a look near the deadline, and moving it " +
+          "in August because the answer has not changed would spend the forcing function for " +
+          "nothing.",
+        extendedTo: "2026-11-09",
+      },
+    ],
   },
   {
     advisory: "GHSA-5p2g-fcmc-qvqq",
@@ -30,5 +51,16 @@ export const AUDIT_ALLOWLIST: readonly AllowlistEntry[] = [
       "accepted on the same grounds as GHSA-w3rx-r6r6-pgpr: no patched release, build-time only, " +
       "own inputs only, not in the deployed app.",
     reviewBy: "2026-11-09",
+    reviews: [
+      {
+        on: "2026-08-10",
+        by: "W107",
+        finding:
+          "Reviewed with GHSA-w3rx-r6r6-pgpr; same package, same path, same conclusion. Still " +
+          "no patched release. Reachability now enforced by test rather than argued. Not " +
+          "extended.",
+        extendedTo: "2026-11-09",
+      },
+    ],
   },
 ];

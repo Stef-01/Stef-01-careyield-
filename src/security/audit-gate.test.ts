@@ -94,6 +94,7 @@ describe("W53 audit gate", () => {
       module: "image-size",
       reason: "test",
       reviewBy: "2026-11-09",
+      reviews: [{ on: "2026-08-10", by: "test", finding: "fixture", extendedTo: "2026-11-09" }],
     };
     const onTheDay = new Date("2026-11-09T23:59:00Z");
     const nextDay = new Date("2026-11-10T00:00:01Z");
@@ -109,6 +110,7 @@ describe("W53 audit gate", () => {
       module: "some-other-package",
       reason: "entry drifted onto the wrong package",
       reviewBy: "2026-11-09",
+      reviews: [{ on: "2026-08-10", by: "test", finding: "fixture", extendedTo: "2026-11-09" }],
     };
     const verdict = evaluateAudit(
       report(advisory({ github_advisory_id: "GHSA-w3rx-r6r6-pgpr" })),
@@ -120,12 +122,55 @@ describe("W53 audit gate", () => {
     expect(verdict.blocking[0]?.reason).toBe("module_mismatch");
   });
 
+  it("W107: refuses a reviewBy that no recorded review set", () => {
+    // The cheapest possible response to a failing gate is to push the date forward, and in a
+    // diff that is indistinguishable from an acceptance somebody actually re-argued. Moving
+    // reviewBy now leaves it out of step with the newest review's extendedTo, and the
+    // acceptance stops working until the review is written down.
+    const bumped: AllowlistEntry = {
+      advisory: "GHSA-w3rx-r6r6-pgpr",
+      module: "image-size",
+      reason: "still fine, honest",
+      reviewBy: "2027-11-09", // moved forward...
+      reviews: [
+        { on: "2026-08-10", by: "test", finding: "looked once", extendedTo: "2026-11-09" },
+      ], // ...but nothing says why
+    };
+    const one = report(advisory({ github_advisory_id: "GHSA-w3rx-r6r6-pgpr" }));
+    const verdict = evaluateAudit(one, [bumped], NOW);
+
+    expect(verdict.ok).toBe(false);
+    expect(verdict.blocking[0]?.reason).toBe("review_date_unexplained");
+
+    // Adding the review that explains the new date makes it valid again — the mechanism asks
+    // for a sentence, not for the answer to be different.
+    const explained: AllowlistEntry = {
+      ...bumped,
+      reviews: [
+        ...bumped.reviews,
+        { on: "2026-11-01", by: "test", finding: "re-checked, still no patch", extendedTo: "2027-11-09" },
+      ] as AllowlistEntry["reviews"],
+    };
+    expect(evaluateAudit(one, [explained], NOW).ok).toBe(true);
+  });
+
+  it("W107: every shipped acceptance carries a review that set its date", () => {
+    for (const entry of AUDIT_ALLOWLIST) {
+      const newest = entry.reviews[entry.reviews.length - 1]!;
+      expect(newest.extendedTo, `${entry.advisory} reviewBy is unexplained`).toBe(entry.reviewBy);
+      expect(newest.finding.length, `${entry.advisory} review says nothing`).toBeGreaterThan(40);
+      expect(newest.by.trim()).not.toBe("");
+    }
+    expect(AUDIT_ALLOWLIST.length).toBeGreaterThan(0);
+  });
+
   it("refuses an unparseable review date rather than ignoring it", () => {
     const entry: AllowlistEntry = {
       advisory: "GHSA-w3rx-r6r6-pgpr",
       module: "image-size",
       reason: "malformed date",
       reviewBy: "whenever",
+      reviews: [{ on: "2026-08-10", by: "test", finding: "fixture", extendedTo: "whenever" }],
     };
     const verdict = evaluateAudit(
       report(advisory({ github_advisory_id: "GHSA-w3rx-r6r6-pgpr" })),

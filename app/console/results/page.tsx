@@ -16,7 +16,7 @@ import { getDashboardData } from "@/sim/dashboard-data";
 import { DEFAULT_SIM_CONFIG, runSim } from "@/sim/harness";
 import { RESULTS_COPY as C } from "@/console/results-copy";
 import { buildPracticeResults, shortDate, weeklyExtras } from "@/console/results";
-import { DEFAULT_REPORT_OPTIONS } from "@/report/weekly";
+import { DEFAULT_REPORT_OPTIONS } from "@/report/options";
 import { WeeklyArmsChart } from "../dashboard/chart";
 import { requireSession } from "../guard";
 import { ConsoleShell } from "../ui";
