@@ -8,6 +8,7 @@ import { resetPrivacy } from "@/privacy/store";
 import { assertMockRoutesEnabled } from "@/lib/mock-guard";
 import { resetRateLimits } from "@/lib/rate-limit";
 import { resetRegisters } from "@/registers/store";
+import { resetInterestState } from "@/capability/store";
 
 export const dynamic = "force-dynamic";
 
@@ -27,5 +28,6 @@ export async function POST() {
   resetRateLimits();
   resetComplaints(); // W43 likewise
   resetRegisters(); // W60 likewise
+  resetInterestState(); // W81 likewise
   return NextResponse.json(resetConsole());
 }

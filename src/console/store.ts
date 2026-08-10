@@ -19,6 +19,13 @@ export interface ClinicianRecord {
   displayName: string;
   /** Opted into availability invitations at all (the clinician's own choice). */
   participating: boolean;
+  /**
+   * W81: the sign-in identity this clinician is, when known. Optional and null by default,
+   * so existing rosters and the W41 wizard are unaffected. Needed because stating a case-mix
+   * interest requires knowing WHICH clinician is signed in — an interest recorded for
+   * someone else is not their preference.
+   */
+  email?: string | null;
 }
 
 export interface ConsoleState {
