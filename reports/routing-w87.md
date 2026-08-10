@@ -2,7 +2,7 @@
 
 Both arms are the SAME seeded run (20260808), so every difference below is the routing layer and not a different random world.
 
-Floor for this comparison: 504 attended visits (this run's median per clinician), no credential required. 5 of 10 clinicians sit below it. The floor is derived from the run rather than hard-coded, because a floor everyone clears makes the two arms identical and the comparison meaningless.
+Floor for this comparison: 510 attended visits (this run's median per clinician), no credential required. 5 of 10 clinicians sit below it. The floor is derived from the run rather than hard-coded, because a floor everyone clears makes the two arms identical and the comparison meaningless.
 
 | Measure | Routing off | Routing on |
 |---|---|---|

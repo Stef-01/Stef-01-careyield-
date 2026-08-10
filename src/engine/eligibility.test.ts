@@ -130,3 +130,45 @@ describe("W4 eligibility rules engine", () => {
     }
   });
 });
+
+describe("W51 audit fix: a stale booking date is not a future booking", () => {
+  const clinician = { id: "clin-1" as ClinicianId, practiceId: "prac-1" as PracticeId, displayName: "Dr Lee", participating: true };
+  const base = {
+    id: "pat-1" as PatientId, practiceId: "prac-1" as PracticeId, usualClinicianId: "clin-1" as ClinicianId,
+    smsConsent: true, optedOut: false, lastAttendedAt: "2025-01-10",
+    futureBookingAt: null as string | null, activeRecall: false, chronicCare: true, holdout: false,
+  };
+  const config = { ...DEFAULT_CONFIG, usualClinicianOnly: false, chronicCareOnly: false };
+
+  it("excludes a patient whose booking is genuinely upcoming", () => {
+    const patient = { ...base, futureBookingAt: "2026-08-15" };
+    expect(evaluateEligibility(patient, clinician, config, "2026-08-10", 0)).toEqual({
+      eligible: false, reason: "future_booking",
+    });
+  });
+
+  it("excludes on the day of the booking", () => {
+    const patient = { ...base, futureBookingAt: "2026-08-10" };
+    expect(evaluateEligibility(patient, clinician, config, "2026-08-10", 0).eligible).toBe(false);
+  });
+
+  it("does NOT exclude on a booking date that has passed", () => {
+    // The defect: a stale date meant this patient could never be contacted again, and the
+    // audit trail said "future_booking", which was untrue.
+    const patient = { ...base, futureBookingAt: "2025-06-01" };
+    expect(evaluateEligibility(patient, clinician, config, "2026-08-10", 0)).toEqual({ eligible: true });
+  });
+
+  it("does not exclude a booking beyond the block window", () => {
+    const patient = { ...base, futureBookingAt: "2027-01-01" };
+    expect(evaluateEligibility(patient, clinician, config, "2026-08-10", 0)).toEqual({ eligible: true });
+  });
+
+  it("a year-old stale date is treated the same as no booking at all", () => {
+    const stale = { ...base, futureBookingAt: "2025-08-10" };
+    const none = { ...base, futureBookingAt: null };
+    expect(evaluateEligibility(stale, clinician, config, "2026-08-10", 0)).toEqual(
+      evaluateEligibility(none, clinician, config, "2026-08-10", 0),
+    );
+  });
+});

@@ -112,6 +112,29 @@ const aud = (n: number | null) => (n === null ? "n/a" : `$${n.toLocaleString("en
  * W76: the register section is optional and appended, never interleaved — a practice with
  * no registers gets byte-identical output to the v1 report, so the W20 golden stays valid.
  */
+/**
+ * Why the naive count is not the reported figure.
+ *
+ * The usual reason is displacement — part of the generated attendance would have happened
+ * anyway — and the copy said exactly that. But the incremental figure is a holdout-based
+ * ESTIMATE, and an estimate can land ABOVE the naive count in a given window. When it does,
+ * "part of it is displaced organic attendance" is a non-sequitur attached to a smaller
+ * number, and a practice manager reading it would rightly be confused.
+ *
+ * So the reason given matches the direction actually observed. Neither branch changes which
+ * number is reported: the holdout estimate is the answer either way.
+ */
+function naiveNote(r: WeeklyReport): string {
+  const naive = r.revenue.naiveWouldClaimAud;
+  const estimate = r.revenue.incrementalEstimateAud;
+  if (estimate === null) return "";
+  if (naive > estimate) return ", because part of it is displaced organic attendance";
+  return (
+    ", because it counts bookings rather than measuring them — in this window the holdout" +
+    " comparison came out higher, which a raw count cannot show either way"
+  );
+}
+
 export function renderWeeklyReportMarkdown(
   r: WeeklyReport,
   registers?: RegisterSectionInput,
@@ -146,7 +169,7 @@ incremental visits only.
 
 Counting every invitation-generated booking (${r.cumulative.naiveGeneratedAttended} visits)
 would claim ${aud(r.revenue.naiveWouldClaimAud)} — Meherr does not report that number as
-impact, because part of it is displaced organic attendance.
+impact${naiveNote(r)}.
 
 ## Guardrails
 
@@ -213,7 +236,7 @@ export async function renderWeeklyReportDocx(r: WeeklyReport): Promise<Buffer> {
           ),
           p(
             `Counting every generated booking (${r.cumulative.naiveGeneratedAttended} visits) would claim ` +
-              `${aud(r.revenue.naiveWouldClaimAud)} — not reported as impact (displacement).`,
+              `${aud(r.revenue.naiveWouldClaimAud)} — not reported as impact${naiveNote(r)}.`,
           ),
           h("Guardrails", HeadingLevel.HEADING_2),
           ...(r.alerts.length === 0

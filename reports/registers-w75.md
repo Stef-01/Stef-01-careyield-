@@ -6,14 +6,14 @@ more than one register, and the double-contact and double-counting that invites.
 
 | Register | Cadence | Flagged share | Open gaps at start |
 |---|---|---|---|
-| placeholder_register_a | 12 months | 30% | 91 |
-| placeholder_register_b | 6 months | 25% | 115 |
-| placeholder_register_c | 24 months | 20% | 38 |
+| placeholder_register_a | 12 months | 30% | 99 |
+| placeholder_register_b | 6 months | 25% | 107 |
+| placeholder_register_c | 24 months | 20% | 35 |
 
-Register members: 2,289, of whom 30 are on more than one register. Their appointments count toward every register they are on, which is why cohort figures are never summed to a practice total.
+Register members: 2,289, of whom 32 are on more than one register. Their appointments count toward every register they are on, which is why cohort figures are never summed to a practice total.
 
-Invitations sent: 1,051.
-Opt-outs: 6. Generated bookings attended: 205.
+Invitations sent: 1,177.
+Opt-outs: 8. Generated bookings attended: 237.
 
 Invariants: held — checked with the same checkInvariants() the fleet run uses, not asserted in prose.
 

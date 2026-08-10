@@ -67,11 +67,17 @@ export function evaluateEligibility(
   if (!patient.smsConsent) return { eligible: false, reason: "no_sms_consent" };
   if (patient.holdout) return { eligible: false, reason: "holdout_arm" };
   if (patient.activeRecall) return { eligible: false, reason: "active_recall" };
-  if (
-    patient.futureBookingAt !== null &&
-    daysBetween(todayIso, patient.futureBookingAt) <= config.futureBookingBlockDays
-  ) {
-    return { eligible: false, reason: "future_booking" };
+  if (patient.futureBookingAt !== null) {
+    const daysUntil = daysBetween(todayIso, patient.futureBookingAt);
+    // A booking in the PAST is not a future booking. daysUntil goes negative for a stale
+    // date, and negative is <= the block window, so the old check excluded such a patient
+    // for ever — silently, and logged as "future_booking", which was false. Stale
+    // futureBookingAt values are ordinary in PMS data (an appointment that happened, or was
+    // cancelled without the field being cleared), so this was a patient who could never be
+    // contacted again and no report would say why. (W51 audit.)
+    if (daysUntil >= 0 && daysUntil <= config.futureBookingBlockDays) {
+      return { eligible: false, reason: "future_booking" };
+    }
   }
   if (patient.lastAttendedAt === null) {
     // Established-patient product: someone who has never attended is not "returning".

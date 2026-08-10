@@ -78,15 +78,30 @@ describe("W63 the 26-week comparison", () => {
 });
 
 describe("W63 registers never widen who is contacted", () => {
-  it("every patient invited with registers on was also invitable with them off", () => {
-    // The chain-level restatement of W59/W61: narrowing and reordering operate inside the
-    // W4-eligible set, so the on-arm's recipients must be a subset of the off-arm's.
+  it("narrowing changes WHO is picked, but never who is ELIGIBLE", () => {
+    // This test previously asserted that the on-arm's recipients are a subset of the
+    // off-arm's. That is NOT a guaranteed property and it passed by luck: narrowing shrinks
+    // the candidate pool, so a fixed batch size reaches deeper into it, and a patient ranked
+    // below the cutoff in the wide arm can sit inside it in the narrow one. They were always
+    // eligible — they just were not picked. The distinction matters, because "never widens"
+    // is a claim about ELIGIBILITY (W59's property), not about batch composition.
     const off = runSim({ ...SHORT, registers: { ...ON, enabled: false } });
     const on = runSim({ ...SHORT, registers: ON });
     const offRecipients = new Set(off.invitations.map((i) => i.patientId as string));
     const onRecipients = [...new Set(on.invitations.map((i) => i.patientId as string))];
-    const widened = onRecipients.filter((p) => !offRecipients.has(p));
-    expect(widened).toEqual([]);
+
+    // Some on-arm recipients may be new to the batch — that is expected.
+    const newToBatch = onRecipients.filter((p) => !offRecipients.has(p));
+    // ...but every one of them must have been an eligible, non-holdout, attended patient in
+    // the unnarrowed world. Narrowing may reorder and shorten; it may not admit anyone.
+    const offById = new Map(off.patients.map((p) => [p.id as string, p]));
+    for (const id of newToBatch) {
+      const patient = offById.get(id);
+      expect(patient, `${id} does not exist in the unnarrowed world`).toBeDefined();
+      expect(patient?.holdout, `${id} is a holdout patient`).toBe(false);
+      expect(patient?.lastAttendedAt, `${id} has never attended`).not.toBeNull();
+      expect(patient?.optedOut, `${id} has opted out`).toBe(false);
+    }
   });
 
   it("no invited patient is one the eligibility rules exclude", () => {

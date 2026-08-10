@@ -35,8 +35,22 @@ describe("W20 weekly practice report — golden from sim data", () => {
     expect(revenue.naiveWouldClaimAud).toBe(
       cumulative.naiveGeneratedAttended * revenue.perVisitAssumptionAud,
     );
-    // The whole point: the naive claim overstates the honest estimate.
-    expect(revenue.naiveWouldClaimAud).toBeGreaterThan(revenue.incrementalEstimateAud ?? 0);
+    // This previously asserted that the naive claim always OVERSTATES the honest estimate.
+    // It usually does — displacement means some booked-from-message visits would have
+    // happened anyway — but it is not a law, and asserting it as one was wrong. The
+    // incremental figure is a holdout-based ESTIMATE: ATTRIBUTION.md says it may be
+    // fractional or negative and is "reported as computed, never clamped", which necessarily
+    // also means it may land above the naive count in a given window. Pinning an ordering
+    // the estimator does not guarantee would eventually push someone to clamp the estimate
+    // to keep a test green, which is the exact dishonesty the rule exists to prevent.
+    //
+    // What IS invariant is that the two are computed from different things and labelled
+    // differently — the naive figure is contrast, never impact.
+    expect(revenue.naiveWouldClaimAud).not.toBe(revenue.incrementalEstimateAud);
+    const rendered = renderWeeklyReportMarkdown(report);
+    // The naive figure appears only as something the report explicitly declines to claim.
+    expect(rendered).toMatch(/would claim/i);
+    expect(rendered).toMatch(/does not report that number/i);
   });
 
   it("guardrail alerts flow into the report (healthy world is clear; unhealthy alerts)", () => {

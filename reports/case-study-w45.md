@@ -11,24 +11,24 @@ contact so the effect could be measured rather than assumed.
 
 ## What was measured
 
-- **61.4 incremental attended appointments per 1,000 patients in the messaged
+- **109.1 incremental attended appointments per 1,000 patients in the messaged
   group** — the attendance rate above what the holdout group did on its own.
-- 200 incremental attended appointments over the period
+- 355 incremental attended appointments over the period
   (point estimate; every patient counted in their originally assigned group).
-- 1,487 invitations sent, 305 booked
-  (20.5% conversion), non-attendance on generated bookings 5.9%.
-- 15 opt-outs (1.0% of messages sent). Every opt-out is permanent.
+- 1,709 invitations sent, 350 booked
+  (20.5% conversion), non-attendance on generated bookings 6.3%.
+- 18 opt-outs (1.1% of messages sent). Every opt-out is permanent.
 
 ## How the counting stays honest
 
 Counting every booking that followed an invitation would have claimed
-287 attended visits. Part of that attendance would have
+328 attended visits. Part of that attendance would have
 happened anyway; the holdout comparison removes it. The smaller number above is the
 one Meherr reports, because it is the one the practice actually gained.
 
 ## What the visits contained
 
-Of the generated visits audited by the practice's GPs, 87.5% were judged
+Of the generated visits audited by the practice's GPs, 86.9% were judged
 a reasonable use of the appointment. The most common outcomes were routine
 follow-up, medicines management, and preventive care — ordinary general practice,
 delivered to patients who had drifted off the books.
