@@ -10,6 +10,12 @@
    b. a `claimed`/`in-progress` unit that the **staleness rule** below says you may reclaim;
    c. the lowest-numbered `available` unit whose dependencies are `done` (units marked `[P]` in the plan are claimable out of order).
 3. Claim it: set status `claimed`, your session id (short), and UTC timestamp in this table. **Commit and push this claim edit immediately, before building.**
+3b. **Validate your own timestamp before you write it.** A claim stamped in the FUTURE is never
+   reclaimable — W54's rule refuses to steal live claims on clock skew — so a typo (observed
+   2026-08-10: W151 stamped `2026-08-11T13:20Z`) plus a dying holder equals a row locked forever.
+   That one self-closed; the next might not. Stamp the real UTC time, and if you find a
+   future-dated claim whose holder is demonstrably FAILED, correct the timestamp to its real
+   claim time first and then apply the normal rule — repairing a dead row, never stealing a live one.
 4. If the push is rejected (another session claimed simultaneously): `git pull --rebase`, pick the *next* eligible unit, repeat. Never fight over a row.
 5. Build the unit to its verify gate. Commit work incrementally (green only). **If a unit runs
    long, push something at least every 90 minutes** — a green WIP commit, or a heartbeat edit to
