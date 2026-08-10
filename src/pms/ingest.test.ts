@@ -115,6 +115,70 @@ describe("W32 consent provenance", () => {
     expect(state.conflicts).toHaveLength(1);
     expect(state.conflicts[0]?.patientId).toBe(platformPatientId(base.name, target.id));
   });
+
+  // W155 finding Y3-1. The test above is named "instead of silently picking one" and only ever
+  // asserted that the conflict was RECORDED. The effective flag was still picked — by array
+  // position, from a comparator that never returned 0 — so the assertion and the name were about
+  // different things. These two cover what the name claims.
+  it("W155: an ambiguous latest capture resolves to NO CONTACT, not to whichever row came first", async () => {
+    // Absence of a clear yes is not a yes (W120/W125's rule, applied to the flag that decides
+    // whether a real person is contacted).
+    const base = makeAdapter();
+    const patients = await base.listPatients();
+    const target = patients.find((p) => !p.optedOut)!;
+    const originals = await base.listConsents();
+    const targetConsent = originals.find((c) => c.patientId === target.id)!;
+
+    const withPair = (order: readonly boolean[]): PmsReadAdapter => ({
+      ...base,
+      listPatients: () => base.listPatients(),
+      listOpenSlots: (r) => base.listOpenSlots(r),
+      listCancellations: (r) => base.listCancellations(r),
+      listConsents: async () => [
+        ...originals.filter((c) => c.patientId !== target.id),
+        ...order.map((smsConsent, index) => ({
+          ...targetConsent,
+          smsConsent,
+          capturedAt: "2026-08-09T09:00:00Z",
+          source: `pms:form-${index}`,
+        })),
+      ],
+    });
+
+    const platformId = platformPatientId(base.name, target.id);
+    for (const order of [[true, false], [false, true]]) {
+      const state = await ingestFromAdapter(withPair(order), emptyIngestState(), AT);
+      expect(state.patients.get(platformId)?.smsConsent, `order ${order.join(",")}`).toBe(false);
+      expect(state.conflicts.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("W155: an unambiguous latest capture still wins, in either input order", async () => {
+    // The fix must not turn every patient into a refusal — only a genuinely undecidable one.
+    const base = makeAdapter();
+    const patients = await base.listPatients();
+    const target = patients.find((p) => !p.optedOut)!;
+    const originals = await base.listConsents();
+    const targetConsent = originals.find((c) => c.patientId === target.id)!;
+    const platformId = platformPatientId(base.name, target.id);
+
+    const rows = [
+      { ...targetConsent, smsConsent: false, capturedAt: "2026-08-01T00:00:00Z", source: "pms:old" },
+      { ...targetConsent, smsConsent: true, capturedAt: "2026-08-09T09:00:00Z", source: "pms:new" },
+    ];
+    for (const order of [rows, [...rows].reverse()]) {
+      const adapter: PmsReadAdapter = {
+        ...base,
+        listPatients: () => base.listPatients(),
+        listOpenSlots: (r) => base.listOpenSlots(r),
+        listCancellations: (r) => base.listCancellations(r),
+        listConsents: async () => [...originals.filter((c) => c.patientId !== target.id), ...order],
+      };
+      const state = await ingestFromAdapter(adapter, emptyIngestState(), AT);
+      expect(state.patients.get(platformId)?.smsConsent).toBe(true);
+      expect(state.conflicts).toEqual([]);
+    }
+  });
 });
 
 describe("W32 the one-way door", () => {

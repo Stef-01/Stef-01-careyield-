@@ -140,15 +140,27 @@ export async function ingestFromAdapter(
   }
 
   // 4. Effective consent = latest capture per patient — gated by the one-way door.
+  //
+  // W155 finding Y3-1. This sorted by `capturedAt` with a comparator that returned 1 rather than
+  // 0 for equal keys, then took the last row. Two observations captured at the SAME instant with
+  // OPPOSITE values — a batch export that stamps every row with the export time is enough — were
+  // therefore resolved by whatever order the PMS happened to return them in. Step 3 already
+  // RECORDED that disagreement as a conflict; step 4 never read it, so the product filed the
+  // ambiguity and then resolved it anyway.
+  //
+  // Now the ambiguity decides. Absence of a clear yes is not a yes (W120/W125's rule), and this
+  // is the flag that decides whether a real person is contacted, so an undecidable latest capture
+  // resolves to NO CONTACT. Note there is no sort left at all: the maximum is taken directly, so
+  // there is no comparator to be inconsistent and no position for a tie to be resolved by.
   for (const [platformId, patient] of patients) {
-    const records = provenance
-      .filter((r) => r.patientId === platformId)
-      .sort((a, b) => (a.capturedAt < b.capturedAt ? -1 : 1));
-    const latest = records[records.length - 1];
-    if (!latest) continue;
+    const records = provenance.filter((r) => r.patientId === platformId);
+    if (records.length === 0) continue;
+    const newest = records.reduce((max, r) => (r.capturedAt > max ? r.capturedAt : max), records[0]!.capturedAt);
+    const values = new Set(records.filter((r) => r.capturedAt === newest).map((r) => r.smsConsent));
+    const effective = values.size === 1 ? [...values][0]! : false;
     patients.set(platformId, {
       ...patient,
-      smsConsent: patient.optedOut ? false : latest.smsConsent,
+      smsConsent: patient.optedOut ? false : effective,
     });
   }
 

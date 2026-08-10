@@ -197,3 +197,58 @@ describe("W93 practice summary", () => {
     }
   });
 });
+
+describe("W155 Y3-2: a same-day chain is not resolved by storage order", () => {
+  // The ordinary case, not an edge one: the patient books at reception on the way out, so the
+  // referral and the appointment carry the same date. Delivered booked-first, the fold used to
+  // reject the booking and report a referral that went nowhere.
+  const same = (kind: ReferralEventKind): ReferralEvent => ({
+    practiceId: "prac-1" as PracticeId,
+    patientId: "pat-1" as PatientId,
+    referralId: "ref-1",
+    kind,
+    at: "2026-03-01",
+  });
+
+  it("reaches the same verdict whichever order the rows arrive in", () => {
+    const rows = [same("referral_written"), same("appointment_recorded")];
+    for (const order of [rows, [...rows].reverse()]) {
+      const timeline = replayReferral("ref-1", order, "prac-1" as PracticeId);
+      expect(timeline.stage).toBe("attended_no_completion");
+      expect(timeline.rejected).toEqual([]);
+      expect(timeline.applied.map((e) => e.kind)).toEqual([
+        "referral_written",
+        "appointment_recorded",
+      ]);
+    }
+  });
+
+  it("still completes a same-day written-booked-completed chain in either order", () => {
+    const rows = [
+      same("completion_recorded"),
+      same("referral_written"),
+      same("appointment_recorded"),
+    ];
+    for (const order of [rows, [...rows].reverse()]) {
+      const timeline = replayReferral("ref-1", order, "prac-1" as PracticeId);
+      expect(timeline.stage).toBe("completed");
+      expect(timeline.leaked).toBe(false);
+      expect(timeline.rejected).toEqual([]);
+    }
+  });
+
+  it("does not reorder events that carry different dates", () => {
+    // The tie-break must apply to ties only — a booking dated before its referral is a real
+    // disagreement in the record and must stay visible as one.
+    const timeline = replayReferral(
+      "ref-1",
+      [
+        { ...same("appointment_recorded"), at: "2026-02-01" },
+        { ...same("referral_written"), at: "2026-03-01" },
+      ],
+      "prac-1" as PracticeId,
+    );
+    expect(timeline.rejected.map((r) => r.reason)).toEqual(["out_of_order"]);
+    expect(timeline.stage).toBe("written_no_appointment");
+  });
+});

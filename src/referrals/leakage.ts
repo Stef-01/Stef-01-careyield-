@@ -89,11 +89,38 @@ function nextStage(current: LeakageStage, kind: ReferralEventKind): LeakageStage
 }
 
 /**
+ * Where each kind sits in the chain, used ONLY to order events that share a timestamp.
+ *
+ * W155 finding Y3-2. The sort broke ties by leaving them alone, which is stable and therefore
+ * deterministic — but deterministic on STORAGE ORDER, which nothing guarantees matches the order
+ * things happened. `at` is a date in practice, and a referral written and an appointment booked
+ * the same day is the ordinary case, not an edge one: the patient books at reception on the way
+ * out. Delivered booked-first, the fold rejected the booking as `out_of_order` and reported
+ * `written_no_appointment` with `leaked: true` — a referral that went nowhere, about a patient
+ * who was sitting in the waiting room.
+ *
+ * Ranking by chain position is not inventing information. The state machine below already
+ * declares that a referral must exist before anything can happen to it; this stops an arbitrary
+ * row order from contradicting a constraint the model states.
+ *
+ * What it does NOT resolve: two events of the SAME kind at one timestamp, or a same-day
+ * cancel-and-rebook, where the true order is genuinely unrecoverable from the data. Those keep
+ * storage order — see docs/AUDIT-Y3.md, filed rather than guessed at.
+ */
+const CHAIN_RANK: Record<ReferralEventKind, number> = {
+  referral_written: 0,
+  appointment_recorded: 1,
+  appointment_cancelled: 2,
+  completion_recorded: 3,
+  referral_cancelled: 4,
+};
+
+/**
  * Replay one referral's events into a stage.
  *
- * Events are applied in recorded order after a stable sort by time; an event that cannot
- * apply is rejected with a reason rather than skipped, because a replay that silently
- * discards input is not a replay.
+ * Events are applied in recorded order after a sort by time, ties broken by chain position; an
+ * event that cannot apply is rejected with a reason rather than skipped, because a replay that
+ * silently discards input is not a replay.
  */
 export function replayReferral(
   referralId: string,
@@ -103,7 +130,7 @@ export function replayReferral(
   const mine = events
     .filter((e) => e.referralId === referralId && e.practiceId === practiceId)
     .slice()
-    .sort((a, b) => (a.at === b.at ? 0 : a.at < b.at ? -1 : 1));
+    .sort((a, b) => (a.at === b.at ? CHAIN_RANK[a.kind] - CHAIN_RANK[b.kind] : a.at < b.at ? -1 : 1));
 
   let stage: LeakageStage = "not_written";
   const applied: ReferralEvent[] = [];
