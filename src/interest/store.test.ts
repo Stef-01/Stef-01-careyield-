@@ -58,6 +58,24 @@ describe("community interest store", () => {
     expect(csv).toContain('"created_at","name","email","interests","source"');
     expect(csv).toContain("I think I might have this | I want to bring a session to my community");
   });
+
+  it("W153: a signup name cannot become a formula in the operator's spreadsheet", () => {
+    // The export is served to Meherr staff and the text in it was typed by anyone on the
+    // internet. Quoting made the file safe to PARSE; it was still executable on open.
+    const filePath = tempFile();
+    saveInterestSignup({
+      name: '=HYPERLINK("http://evil.invalid","Payroll")',
+      email: "formula@example.com",
+      interests: ["I think I might have this"],
+    }, { filePath, now: new Date("2026-08-10T01:00:00.000Z") });
+    const csv = interestSignupsCsv({ filePath });
+    expect(csv).toContain(`"'=HYPERLINK(""http://evil.invalid"",""Payroll"")"`);
+    // No cell begins a formula. Checked over EVERY cell rather than the one this test seeded,
+    // because a guard that covers the field somebody remembered is the bug being fixed.
+    for (const cell of csv.split("\n").flatMap((line) => line.split('","'))) {
+      expect(cell.replace(/^"/, "")[0] ?? "", cell).not.toMatch(/[=+\-@]/);
+    }
+  });
 });
 
 describe("W106 access and retention for the interest register", () => {

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { neutraliseSpreadsheetFormula } from "@/security/untrusted";
 import type { InterestReason, InterestSignup } from "./types";
 
 function defaultStorePath(): string {
@@ -52,8 +53,20 @@ export function listInterestSignups(options: { filePath?: string } = {}): Intere
     .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 }
 
+/**
+ * One CSV cell.
+ *
+ * W153 finding: quoting alone made this file safe to PARSE and left it unsafe to OPEN. A signup
+ * name of `=HYPERLINK("http://evil.invalid","Payroll")` is a valid quoted cell and an executable
+ * formula the moment an operator double-clicks the download — the export is served to Meherr
+ * staff from `/api/interest/export`, and the text in it was typed by anyone on the internet.
+ *
+ * Neutralising happens HERE, to every cell, rather than to the fields somebody judged risky. The
+ * name is the obvious one today; the next column added would not be, and a guard that covers what
+ * was remembered is the failure this tree keeps finding.
+ */
 function csvCell(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
+  return `"${neutraliseSpreadsheetFormula(value).replaceAll('"', '""')}"`;
 }
 
 export function interestSignupsCsv(options: { filePath?: string } = {}): string {

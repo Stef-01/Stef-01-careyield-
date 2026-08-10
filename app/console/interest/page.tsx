@@ -9,6 +9,10 @@ import { ConsoleShell } from "../ui";
 import { requireSession } from "../guard";
 import { listInterestSignups } from "@/interest/store";
 import { isMeherrStaff, STAFF_REFUSAL_COPY } from "@/tenancy/staff";
+import { attributionFor, ingested, quoteForOperator } from "@/security/untrusted";
+
+/** W153: whose words the names below are. Written by us; a signup cannot forge it. */
+const ATTRIBUTION = attributionFor("public_form");
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Community interest — Meherr" };
@@ -54,11 +58,22 @@ export default async function CommunityInterestPage() {
       {signups.length === 0 ? (
         <p className="mt-8 rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-500">No registrations yet.</p>
       ) : (
-        <ul className="mt-8 divide-y divide-stone-200 border-y border-stone-200">
+        <>
+        <p data-testid="interest-attribution" className="mt-8 text-sm text-stone-500">
+          {ATTRIBUTION}
+        </p>
+        <ul className="mt-2 divide-y divide-stone-200 border-y border-stone-200">
           {signups.map((signup) => (
             <li key={signup.id} className="grid gap-2 py-5 sm:grid-cols-[1fr_auto]">
               <div>
-                <strong className="text-sm">{signup.name}</strong>
+                {/* W153: a name typed into a public form. Carried verbatim — editing somebody's
+                    name to defend against a machine that does not exist yet is a real harm
+                    traded for a hypothetical one — with the attribution stated once above the
+                    list, so "Meherr Support (verified)" reads as a signup calling itself that
+                    rather than as the product saying it. */}
+                <strong className="text-sm">
+                  {quoteForOperator(ingested(signup.name, "public_form")).text}
+                </strong>
                 <a href={`mailto:${signup.email}`} className="ml-2 text-sm text-stone-500 underline">{signup.email}</a>
                 <p className="mt-2 text-sm text-stone-600">{signup.interests.join(" · ")}</p>
               </div>
@@ -66,6 +81,7 @@ export default async function CommunityInterestPage() {
             </li>
           ))}
         </ul>
+        </>
       )}
     </ConsoleShell>
   );
