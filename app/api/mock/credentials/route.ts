@@ -13,7 +13,7 @@ const TODAY = "2026-08-10";
 
 export async function GET() {
   assertMockRoutesEnabled();
-  const practiceId = getConsole().practice?.id;
+  const practiceId = getConsole().practices[0]?.practice.id;
   return NextResponse.json({
     log: practiceId ? logFor(practiceId) : [],
     credentials: practiceId ? practiceCredentials(practiceId, TODAY) : [],
@@ -30,17 +30,19 @@ export async function POST(request: NextRequest) {
   assertMockRoutesEnabled();
   resetLedger();
   const console_ = getConsole();
-  const practiceId = console_.practice?.id;
+  // W166: a mock route acts for the seeded practice — the first one, deterministically.
+  const record = console_.practices[0];
+  const practiceId = record!.practice.id;
   const email = request.nextUrl.searchParams.get("linkEmail");
 
-  if (console_.clinicians.length < 2) {
-    console_.clinicians.length = 0;
-    console_.clinicians.push(
+  if (record!.clinicians.length < 2) {
+    record!.clinicians.length = 0;
+    record!.clinicians.push(
       { id: "clin-1" as ClinicianId, displayName: "Dr Demo One", participating: true, email: null },
       { id: "clin-2" as ClinicianId, displayName: "Dr Demo Two", participating: true, email: null },
     );
   }
-  const mine = console_.clinicians[0];
+  const mine = record!.clinicians[0];
   if (mine && email) mine.email = email;
 
   if (practiceId && mine) {
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
       subjectClinicianId: mine.id, submittedBy: "manager@demo.practice.example",
     });
     // A colleague's, which must never appear on this clinician's page.
-    const other = console_.clinicians[1];
+    const other = record!.clinicians[1];
     if (other) {
       recordEvent(practiceId, {
         kind: "submitted", at: "2026-02-01", credentialId: "cred-colleague",
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({
-    clinicians: console_.clinicians,
+    clinicians: record!.clinicians,
     credentials: practiceId ? practiceCredentials(practiceId, TODAY) : [],
   });
 }

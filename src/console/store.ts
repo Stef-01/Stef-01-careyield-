@@ -28,12 +28,23 @@ export interface ClinicianRecord {
   email?: string | null;
 }
 
-export interface ConsoleState {
-  practice: Practice | null;
+/**
+ * Everything that belongs to ONE practice.
+ *
+ * W166: these fields lived on `ConsoleState` directly, alongside a single nullable practice and a
+ * hardcoded `prac-console` id. That shape made a defect unrepresentable in tests and inevitable in
+ * production — Y2 finding B2 and Y3 audit item 6, open for two years: console-side scoping could
+ * not be tested end to end because a second practice could not exist.
+ *
+ * Note what moved and why. A practice's ELIGIBILITY RULES, ROSTER, SESSION DIALS and SETUP
+ * PROGRESS are its own; two practices sharing one rules config would be a silent cross-tenant
+ * leak of exactly the kind W57/B1 turned out to be. `auditEvents` and `memberships` stay on the
+ * state because both already carry a `practiceId` and are queried across practices by design.
+ */
+export interface PracticeRecord {
+  practice: Practice;
   rulesConfig: EligibilityConfig;
   rulesVersion: number;
-  auditEvents: AuditEvent[];
-  memberships: Membership[]; // W18 — whoever onboards becomes owner
   clinicians: ClinicianRecord[]; // W41 — the roster W17 deferred
   sessionConfig: SessionConfig; // W41 — W17's dials, now practice-editable
   /**
@@ -48,6 +59,14 @@ export interface ConsoleState {
   setupCompletedAt: string | null;
 }
 
+export interface ConsoleState {
+  practices: PracticeRecord[];
+  auditEvents: AuditEvent[];
+  memberships: Membership[]; // W18 — whoever onboards becomes owner
+  /** Monotonic practice id counter. Ids are generated, never a literal (W166). */
+  nextPracticeSeq: number;
+}
+
 export interface FieldErrors {
   [field: string]: string;
 }
@@ -55,18 +74,61 @@ export interface FieldErrors {
 const globalStore = globalThis as { __careyieldConsole?: ConsoleState };
 
 function initial(): ConsoleState {
+  return { practices: [], auditEvents: [], memberships: [], nextPracticeSeq: 0 };
+}
+
+function newRecord(practice: Practice): PracticeRecord {
   return {
-    practice: null,
+    practice,
     rulesConfig: { ...DEFAULT_CONFIG },
     rulesVersion: 1,
-    auditEvents: [],
-    memberships: [],
     clinicians: [],
     sessionConfig: { ...DEFAULT_SESSION_CONFIG },
     acknowledgedSteps: [],
     nextClinicianSeq: 0,
     setupCompletedAt: null,
   };
+}
+
+/** One practice's record, or null. Takes the id as the QUERY — W123's rule. */
+export function practiceRecord(practiceId: PracticeId, state: ConsoleState = getConsole()): PracticeRecord | null {
+  return state.practices.find((r) => r.practice.id === practiceId) ?? null;
+}
+
+/**
+ * The practices an email may act for, oldest first.
+ *
+ * Derived from memberships rather than stored, so there is no second place for the answer to
+ * drift from. An email with no membership gets an empty list, never everybody's.
+ */
+export function practicesFor(email: string, state: ConsoleState = getConsole()): PracticeRecord[] {
+  const wanted = email.trim().toLowerCase();
+  const mine = new Set(
+    state.memberships
+      .filter((m) => m.email.trim().toLowerCase() === wanted)
+      .map((m) => m.practiceId as string),
+  );
+  return state.practices.filter((r) => mine.has(r.practice.id as string));
+}
+
+/**
+ * Which practice a session is acting for.
+ *
+ * `requested` is a SELECTION, not a grant: it is honoured only when the email already belongs to
+ * that practice, so the cookie carrying it cannot widen access — at worst it picks among practices
+ * the user already has. With no valid request, the first practice they belong to, deterministically.
+ */
+export function activePracticeFor(
+  email: string,
+  requested?: string | null,
+  state: ConsoleState = getConsole(),
+): PracticeRecord | null {
+  const mine = practicesFor(email, state);
+  if (requested) {
+    const chosen = mine.find((r) => (r.practice.id as string) === requested);
+    if (chosen) return chosen;
+  }
+  return mine[0] ?? null;
 }
 
 export function getConsole(): ConsoleState {
@@ -101,16 +163,23 @@ export function onboardPractice(input: OnboardingInput, at: string, ownerEmail: 
   const errors = validateOnboarding(input);
   if (Object.keys(errors).length > 0) return errors;
   const state = getConsole();
-  // W26 hardening: onboarding is create-only. Re-running it would overwrite the
-  // practice AND seat the caller as a fresh owner — a bypass of the W18 role model.
-  if (state.practice) return { form: "This practice is already set up." };
+  // W26 hardening, restated for the plural model: onboarding must not overwrite an existing
+  // practice or re-seat its owner. Appending never can — but an email that already owns a
+  // practice creating another is a real multi-site case, so what is refused is narrower now: a
+  // SECOND practice with the same name for the same owner, which is the shape a double-submit
+  // takes. A genuinely different practice is allowed, and that is the point of the unit.
+  const duplicate = practicesFor(ownerEmail, state).some(
+    (r) => r.practice.name.trim().toLowerCase() === input.name.trim().toLowerCase(),
+  );
+  if (duplicate) return { form: "This practice is already set up." };
+  state.nextPracticeSeq += 1;
   const practice: Practice = {
-    id: "prac-console" as PracticeId,
+    id: `prac-${state.nextPracticeSeq}` as PracticeId,
     name: input.name.trim(),
     timezone: input.timezone,
     holdoutRate: input.holdoutPercent / 100,
   };
-  state.practice = practice;
+  state.practices.push(newRecord(practice));
   state.memberships.push({ practiceId: practice.id, email: ownerEmail, role: "owner" });
   state.auditEvents.push({
     practiceId: practice.id,
@@ -136,25 +205,33 @@ export function validateRules(config: EligibilityConfig): FieldErrors {
   return errors;
 }
 
-export function updateRules(config: EligibilityConfig, at: string, byEmail: string): FieldErrors {
+export function updateRules(
+  practiceId: PracticeId,
+  config: EligibilityConfig,
+  at: string,
+  byEmail: string,
+): FieldErrors {
   const errors = validateRules(config);
   if (Object.keys(errors).length > 0) return errors;
   const state = getConsole();
-  if (!state.practice) return { form: "Onboard the practice before changing rules." };
+  const record = practiceRecord(practiceId, state);
+  if (!record) return { form: "Onboard the practice before changing rules." };
   // W18: rules changes are an owner/manager grant; clinicians and non-members are refused.
-  const decision = authorize(state.memberships, byEmail, state.practice.id, "edit_rules");
+  // W166: authorized against the practice being EDITED, not against whichever practice happened
+  // to be the only one — the check now means something it could not mean before.
+  const decision = authorize(state.memberships, byEmail, practiceId, "edit_rules");
   if (!decision.allowed) return { form: "Your role cannot change eligibility rules." };
   const changed = (Object.keys(config) as Array<keyof EligibilityConfig>)
-    .filter((k) => state.rulesConfig[k] !== config[k])
-    .map((k) => `${k}: ${String(state.rulesConfig[k])} -> ${String(config[k])}`);
+    .filter((k) => record.rulesConfig[k] !== config[k])
+    .map((k) => `${k}: ${String(record.rulesConfig[k])} -> ${String(config[k])}`);
   if (changed.length === 0) return {};
-  state.rulesConfig = { ...config };
-  state.rulesVersion += 1;
+  record.rulesConfig = { ...config };
+  record.rulesVersion += 1;
   state.auditEvents.push({
-    practiceId: state.practice.id,
+    practiceId,
     kind: "config_changed",
     at,
-    subjectId: `rules-v${state.rulesVersion}`,
+    subjectId: `rules-v${record.rulesVersion}`,
     detail: changed.join("; "),
   });
   return {};
@@ -166,22 +243,25 @@ export function updateRules(config: EligibilityConfig, at: string, byEmail: stri
 // widening the W18 action set. Every change is audited, like every other config
 // change in this store.
 
-function requireEditRules(state: ConsoleState, byEmail: string): FieldErrors | null {
-  if (!state.practice) return { form: "Set up the practice before configuring it." };
-  const decision = authorize(state.memberships, byEmail, state.practice.id, "edit_rules");
+function requireEditRules(
+  state: ConsoleState,
+  practiceId: PracticeId,
+  byEmail: string,
+): FieldErrors | null {
+  if (!practiceRecord(practiceId, state)) return { form: "Set up the practice before configuring it." };
+  const decision = authorize(state.memberships, byEmail, practiceId, "edit_rules");
   if (!decision.allowed) return { form: "Your role cannot change this configuration." };
   return null;
 }
 
-function audit(state: ConsoleState, at: string, subjectId: string, detail: string): void {
-  if (!state.practice) return;
-  state.auditEvents.push({
-    practiceId: state.practice.id,
-    kind: "config_changed",
-    at,
-    subjectId,
-    detail,
-  });
+function audit(
+  state: ConsoleState,
+  practiceId: PracticeId,
+  at: string,
+  subjectId: string,
+  detail: string,
+): void {
+  state.auditEvents.push({ practiceId, kind: "config_changed", at, subjectId, detail });
 }
 
 export interface ClinicianInput {
@@ -224,6 +304,7 @@ export function validateClinicians(inputs: readonly ClinicianInput[]): FieldErro
  *      until a human re-confirms who is included.
  */
 export function saveClinicians(
+  practiceId: PracticeId,
   inputs: readonly ClinicianInput[],
   at: string,
   byEmail: string,
@@ -231,16 +312,19 @@ export function saveClinicians(
   const errors = validateClinicians(inputs);
   if (Object.keys(errors).length > 0) return errors;
   const state = getConsole();
-  const denied = requireEditRules(state, byEmail);
+  const denied = requireEditRules(state, practiceId, byEmail);
   if (denied) return denied;
+  const record = practiceRecord(practiceId, state)!;
 
-  state.clinicians = inputs.map((c) => {
-    if (c.id && state.clinicians.some((existing) => existing.id === c.id)) {
+  record.clinicians = inputs.map((c) => {
+    if (c.id && record.clinicians.some((existing) => existing.id === c.id)) {
       return { id: c.id, displayName: c.displayName.trim(), participating: c.participating };
     }
-    state.nextClinicianSeq += 1;
+    record.nextClinicianSeq += 1;
+    // W166: the counter is per practice, so two practices can hold `clin-1` — which is correct,
+    // because a clinician id is only ever resolved inside the practice that minted it.
     return {
-      id: `clin-${state.nextClinicianSeq}` as ClinicianId,
+      id: `clin-${record.nextClinicianSeq}` as ClinicianId,
       displayName: c.displayName.trim(),
       participating: c.participating,
     };
@@ -248,30 +332,32 @@ export function saveClinicians(
 
   // Drop allowlisted ids that no longer exist. Ids are stable, so a survivor here is
   // genuinely the same clinician the practice picked.
-  const ids = new Set(state.clinicians.map((c) => c.id as string));
-  const allowlist = state.sessionConfig.participatingClinicianIds;
+  const ids = new Set(record.clinicians.map((c) => c.id as string));
+  const allowlist = record.sessionConfig.participatingClinicianIds;
   if (allowlist !== "all") {
     const kept = allowlist.filter((id) => ids.has(id));
     if (kept.length !== allowlist.length) {
-      state.sessionConfig = { ...state.sessionConfig, participatingClinicianIds: kept };
+      record.sessionConfig = { ...record.sessionConfig, participatingClinicianIds: kept };
       // Fail closed: an empty allowlist is invalid, so the sessions step is no longer
       // acknowledged and completeSetup will refuse until it is re-confirmed.
       if (kept.length === 0) {
-        state.acknowledgedSteps = state.acknowledgedSteps.filter((s) => s !== "sessions");
+        record.acknowledgedSteps = record.acknowledgedSteps.filter((s) => s !== "sessions");
       }
       audit(
         state,
+        practiceId,
         at,
         "setup:sessions",
         `offering allowlist narrowed to ${kept.length} clinician(s) after a roster change`,
       );
     }
   }
-  audit(state, at, "setup:clinicians", `roster set to ${state.clinicians.length} clinician(s)`);
+  audit(state, practiceId, at, "setup:clinicians", `roster set to ${record.clinicians.length} clinician(s)`);
   return {};
 }
 
 export function saveSessionConfig(
+  practiceId: PracticeId,
   config: SessionConfig,
   at: string,
   byEmail: string,
@@ -279,21 +365,25 @@ export function saveSessionConfig(
   const errors = validateSessionConfig(config);
   if (Object.keys(errors).length > 0) return errors;
   const state = getConsole();
-  const denied = requireEditRules(state, byEmail);
+  const denied = requireEditRules(state, practiceId, byEmail);
   if (denied) return denied;
+  const record = practiceRecord(practiceId, state)!;
   if (config.participatingClinicianIds !== "all") {
-    const known = new Set(state.clinicians.map((c) => c.id as string));
+    // Checked against THIS practice's roster. Before W166 there was only one roster, so an id
+    // belonging to another practice was not a state the type system or the check could describe.
+    const known = new Set(record.clinicians.map((c) => c.id as string));
     if (!config.participatingClinicianIds.every((id) => known.has(id))) {
       return { participatingClinicianIds: "Unknown clinician selected." };
     }
   }
-  state.sessionConfig = {
+  record.sessionConfig = {
     ...config,
     fillableTypes: [...config.fillableTypes],
     schedulingWindow: { ...config.schedulingWindow },
   };
   audit(
     state,
+    practiceId,
     at,
     "setup:sessions",
     `types=${config.fillableTypes.join("/")}; protected=${Math.round(
@@ -317,43 +407,51 @@ export interface SetupReadiness {
  * practice. Validity alone would pass on seeded defaults, letting a practice
  * "complete" setup while never seeing the settings it is being credited with.
  */
-export function setupReadiness(state: ConsoleState = getConsole()): SetupReadiness {
-  const acknowledged = (step: string) => state.acknowledgedSteps.includes(step);
-  const practice = state.practice !== null;
-  const clinicians = state.clinicians.length > 0 && state.clinicians.some((c) => c.participating);
+export function setupReadiness(record: PracticeRecord | null): SetupReadiness {
+  if (!record) {
+    return { practice: false, clinicians: false, sessions: false, rules: false, complete: false };
+  }
+  const acknowledged = (step: string) => record.acknowledgedSteps.includes(step);
+  const clinicians = record.clinicians.length > 0 && record.clinicians.some((c) => c.participating);
   const sessions =
-    acknowledged("sessions") && Object.keys(validateSessionConfig(state.sessionConfig)).length === 0;
-  const rules = acknowledged("rules") && Object.keys(validateRules(state.rulesConfig)).length === 0;
+    acknowledged("sessions") && Object.keys(validateSessionConfig(record.sessionConfig)).length === 0;
+  const rules = acknowledged("rules") && Object.keys(validateRules(record.rulesConfig)).length === 0;
   return {
-    practice,
+    practice: true,
     clinicians,
     sessions,
     rules,
-    complete: state.setupCompletedAt !== null,
+    complete: record.setupCompletedAt !== null,
   };
 }
 
 /** Record that the practice explicitly saved a wizard step. Idempotent. */
-export function acknowledgeSetupStep(step: string, byEmail: string): FieldErrors {
+export function acknowledgeSetupStep(
+  practiceId: PracticeId,
+  step: string,
+  byEmail: string,
+): FieldErrors {
   const state = getConsole();
-  const denied = requireEditRules(state, byEmail);
+  const denied = requireEditRules(state, practiceId, byEmail);
   if (denied) return denied;
-  if (!state.acknowledgedSteps.includes(step)) state.acknowledgedSteps.push(step);
+  const record = practiceRecord(practiceId, state)!;
+  if (!record.acknowledgedSteps.includes(step)) record.acknowledgedSteps.push(step);
   return {};
 }
 
 /** Finish setup — refused while any prerequisite is unmet, so "ready" means ready. */
-export function completeSetup(at: string, byEmail: string): FieldErrors {
+export function completeSetup(practiceId: PracticeId, at: string, byEmail: string): FieldErrors {
   const state = getConsole();
-  const denied = requireEditRules(state, byEmail);
+  const denied = requireEditRules(state, practiceId, byEmail);
   if (denied) return denied;
+  const record = practiceRecord(practiceId, state)!;
   // Keyed by the unmet prerequisite, so the wizard can name what is missing.
-  const readiness = setupReadiness(state);
+  const readiness = setupReadiness(record);
   if (!readiness.clinicians) return { clinicians: "Add at least one participating clinician first." };
   if (!readiness.sessions) return { fillableTypes: "Session settings are incomplete." };
   if (!readiness.rules) return { minDaysSinceLastVisit: "Eligibility rules are incomplete." };
-  if (state.setupCompletedAt !== null) return {}; // idempotent
-  state.setupCompletedAt = at;
-  audit(state, at, "setup:complete", "practice setup completed");
+  if (record.setupCompletedAt !== null) return {}; // idempotent
+  record.setupCompletedAt = at;
+  audit(state, practiceId, at, "setup:complete", "practice setup completed");
   return {};
 }

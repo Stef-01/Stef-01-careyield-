@@ -22,7 +22,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function DemoPage() {
   assertDemoEnabled();
-  const live = getConsole().practice !== null;
+  const live = getConsole().practices.length > 0;
   const rail = getStore();
 
   return (

@@ -31,7 +31,7 @@ import { effectiveExpiry, reattestationDue } from "@/credentials/attestation";
 import { logFor, ownCredentials } from "@/credentials/ledger";
 import { replayVerification } from "@/credentials/verification";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell, primaryButtonClass } from "../ui";
 import { withdrawOwnCredential } from "./actions";
 
@@ -63,26 +63,25 @@ export default async function CredentialsPage({
 }: {
   searchParams: Promise<{ error?: string; saved?: string }>;
 }) {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const console_ = getConsole();
-  if (!console_.practice) redirect("/console/onboarding");
-  if (!authorize(console_.memberships, email, console_.practice.id, "view_dashboard").allowed) {
+  if (!authorize(console_.memberships, email, record.practice.id, "view_dashboard").allowed) {
     redirect("/console");
   }
   const { error, saved } = await searchParams;
 
   // W81's rule, unchanged: unlinked means unlinked. Showing "probably you" on a page about
   // someone's qualifications is the one failure this lookup exists to avoid.
-  const identity = clinicianForEmail(console_.clinicians, email);
+  const identity = clinicianForEmail(record.clinicians, email);
   const today = new Date().toISOString().slice(0, 10);
 
   const mine = identity.linked
-    ? ownCredentials(console_.practice.id, identity.clinician.id, today)
+    ? ownCredentials(record.practice.id, identity.clinician.id, today)
     : [];
   // Notices are computed over the practice log and then narrowed to this clinician — the
   // urgency rules live in W112 and are not restated here.
   const dueForMe = identity.linked
-    ? reattestationDue(replayVerification(logFor(console_.practice.id), today)).filter(
+    ? reattestationDue(replayVerification(logFor(record.practice.id), today)).filter(
         (item) => item.subjectClinicianId === identity.clinician.id,
       )
     : [];

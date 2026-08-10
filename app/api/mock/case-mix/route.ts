@@ -13,7 +13,7 @@ export async function GET() {
   assertMockRoutesEnabled();
   return NextResponse.json({
     interests: Object.values(getInterestState().byKey),
-    clinicians: getConsole().clinicians,
+    clinicians: (getConsole().practices[0]?.clinicians ?? []),
   });
 }
 
@@ -28,20 +28,23 @@ export async function POST(request: NextRequest) {
 
   const email = request.nextUrl.searchParams.get("linkEmail");
   const state = getConsole();
+  // W166: a mock route acts for the seeded practice — the first one, deterministically.
+  const record = state.practices[0];
+  if (!record) return NextResponse.json({ clinicians: [] });
 
   // Seed a roster entry if there is none. The e2e is testing the case-mix surface, not the
   // W41 wizard, so it should not have to drive the wizard to get a clinician to exist.
-  if (state.clinicians.length === 0) {
-    state.nextClinicianSeq += 1;
-    state.clinicians.push({
-      id: `clin-${state.nextClinicianSeq}` as ClinicianId,
+  if (record!.clinicians.length === 0) {
+    record!.nextClinicianSeq += 1;
+    record!.clinicians.push({
+      id: `clin-${record!.nextClinicianSeq}` as ClinicianId,
       displayName: "Dr Amara Lee",
       participating: true,
       email: null,
     });
   }
-  const clinician = state.clinicians[0];
+  const clinician = record!.clinicians[0];
   if (clinician) clinician.email = email;
 
-  return NextResponse.json({ clinicians: state.clinicians });
+  return NextResponse.json({ clinicians: record!.clinicians });
 }

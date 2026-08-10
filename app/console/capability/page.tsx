@@ -15,7 +15,7 @@ import { getConsole } from "@/console/store";
 import { ownProfile, panelView } from "@/capability/graph";
 import type { ClinicianId } from "@/domain/types";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -46,10 +46,9 @@ export default async function CapabilityPage({
 }: {
   searchParams: Promise<{ as?: string }>;
 }) {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const state = getConsole();
-  if (!state.practice) redirect("/console/onboarding");
-  if (!authorize(state.memberships, email, state.practice.id, "view_dashboard").allowed) {
+  if (!authorize(state.memberships, email, record.practice.id, "view_dashboard").allowed) {
     redirect("/console");
   }
 
@@ -57,10 +56,10 @@ export default async function CapabilityPage({
   const today = new Date().toISOString().slice(0, 10);
   // Synthetic-phase stand-in for "which clinician am I": the first roster entry, or the one
   // named in the query. Real identity binding arrives with G1/G2 credentials.
-  const me = (params.as ?? state.clinicians[0]?.id ?? "clin-1") as ClinicianId;
+  const me = (params.as ?? record.clinicians[0]?.id ?? "clin-1") as ClinicianId;
 
-  const mine = ownProfile(state.practice.id, me, today);
-  const panel = panelView(state.practice.id, today);
+  const mine = ownProfile(record.practice.id, me, today);
+  const panel = panelView(record.practice.id, today);
 
   return (
     <ConsoleShell email={email}>

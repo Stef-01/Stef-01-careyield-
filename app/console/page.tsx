@@ -1,18 +1,17 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { openComplaintCount } from "@/complaints/store";
-import { getConsole } from "@/console/store";
-import { requireSession } from "./guard";
+import { getConsole, practicesFor } from "@/console/store";
+import { requirePractice } from "./guard";
 import { ConsoleShell } from "./ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function ConsoleHome() {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const state = getConsole();
-  if (!state.practice) redirect("/console/onboarding");
 
-  const rules = state.rulesConfig;
+  const rules = record.rulesConfig;
   const settings: Array<[string, string]> = [
     ["Minimum days since last visit", `${rules.minDaysSinceLastVisit} days`],
     ["Existing-booking block window", `${rules.futureBookingBlockDays} days`],
@@ -24,11 +23,15 @@ export default async function ConsoleHome() {
   const openComplaints = openComplaintCount();
 
   return (
-    <ConsoleShell email={email}>
+    <ConsoleShell
+      email={email}
+      practices={practicesFor(email).map((r) => ({ id: r.practice.id as string, name: r.practice.name }))}
+      activeId={record.practice.id as string}
+    >
       <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">{state.practice.name}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{record.practice.name}</h1>
         <span className="text-sm text-stone-500">
-          {state.practice.timezone} · holdout {Math.round(state.practice.holdoutRate * 100)}%
+          {record.practice.timezone} · holdout {Math.round(record.practice.holdoutRate * 100)}%
         </span>
       </div>
 
@@ -96,14 +99,14 @@ export default async function ConsoleHome() {
           href="/console/setup/practice"
           className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
         >
-          {state.setupCompletedAt ? "Setup" : "Finish setup"}
+          {record.setupCompletedAt ? "Setup" : "Finish setup"}
         </Link>
       </div>
 
       <section className="mt-8 rounded-xl border border-stone-200 bg-white p-6">
         <div className="mb-4 flex items-baseline justify-between">
           <h2 className="font-medium text-stone-900">Eligibility rules</h2>
-          <span className="text-xs text-stone-500">version {state.rulesVersion}</span>
+          <span className="text-xs text-stone-500">version {record.rulesVersion}</span>
         </div>
         <dl className="divide-y divide-stone-100">
           {settings.map(([term, value]) => (

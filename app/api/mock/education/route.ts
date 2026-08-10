@@ -111,16 +111,18 @@ export async function POST(request: NextRequest) {
   assertMockRoutesEnabled();
   resetEducation();
   const console_ = getConsole();
+  // W166: a mock route acts for the seeded practice — the first one, deterministically.
+  const record = console_.practices[0];
   const email = request.nextUrl.searchParams.get("linkEmail");
 
-  if (console_.clinicians.length < 2) {
-    console_.clinicians.length = 0;
-    console_.clinicians.push(
+  if (record!.clinicians.length < 2) {
+    record!.clinicians.length = 0;
+    record!.clinicians.push(
       { id: "clin-1" as ClinicianId, displayName: "Dr Demo One", participating: true, email: null },
       { id: "clin-2" as ClinicianId, displayName: "Dr Demo Two", participating: true, email: null },
     );
   }
-  const mine = console_.clinicians[0];
+  const mine = record!.clinicians[0];
   if (mine && email) mine.email = email;
 
   if (request.nextUrl.searchParams.get("empty") === "1") {
@@ -129,7 +131,7 @@ export async function POST(request: NextRequest) {
 
   // Register B is switched off for this practice, so its material is out of scope — a statement
   // about the PRACTICE, which the page names rather than hides (W145).
-  const practiceId = console_.practice?.id;
+  const practiceId = record!.practice.id;
   if (practiceId) setRegisterEnabled(practiceId, "placeholder_register_b" as ConditionCode, false);
 
   // Sign off the sources a1/a2 cite, before the items that cite them. item-b1's ref is
@@ -165,10 +167,10 @@ export async function POST(request: NextRequest) {
     const entries = [own, correctable];
     if (correction.ok) entries.push(correction.entry);
     // A colleague's entry, which must never reach the signed-in clinician's record.
-    const other = console_.clinicians[1];
+    const other = record!.clinicians[1];
     if (other) entries.push(cpd("cpd-colleague", other.id, "2026-03-03", "item-a1"));
     addCpdEntries(entries);
   }
 
-  return NextResponse.json({ library: getLibrary(), clinicians: console_.clinicians });
+  return NextResponse.json({ library: getLibrary(), clinicians: record!.clinicians });
 }

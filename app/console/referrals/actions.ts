@@ -5,7 +5,7 @@ import { getConsole } from "@/console/store";
 import { acceptanceStatus } from "@/referrals/acceptance";
 import { actsFor, addAcceptanceActs, sentTo } from "@/referrals/store";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 
 /**
  * Answer a referral addressed to this practice.
@@ -17,10 +17,9 @@ import { requireSession } from "../guard";
  * same answer so the error cannot confirm another practice holds a referral by that id.
  */
 export async function answerReferral(formData: FormData): Promise<void> {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const console_ = getConsole();
-  if (!console_.practice) redirect("/console/onboarding");
-  const practiceId = console_.practice.id;
+  const practiceId = record.practice.id;
   if (!authorize(console_.memberships, email, practiceId, "view_dashboard").allowed) {
     redirect("/console/referrals?error=denied");
   }

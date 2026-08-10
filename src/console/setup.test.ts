@@ -4,6 +4,7 @@ import {
   completeSetup,
   getConsole,
   onboardPractice,
+  practiceRecord,
   resetConsole,
   saveClinicians,
   saveSessionConfig,
@@ -14,6 +15,7 @@ import {
 import { DEFAULT_SESSION_CONFIG, validateSessionConfig } from "@/session/config";
 import type { AppointmentType } from "@/domain/types";
 import { DEFAULT_CONFIG } from "@/engine/eligibility";
+import type { PracticeId } from "@/domain/types";
 import { isSetupStep, nextStep, SETUP_STEPS, stepIndex } from "@/console/setup-steps";
 
 const NOW = "2026-08-09T04:30:00Z";
@@ -26,9 +28,14 @@ const ROSTER = [
   { displayName: "Dr Sam Okafor", participating: false },
 ];
 
+// W166: the practice under test. Ids are generated now, so no literal can stand in for it.
+let PRACTICE_ID: PracticeId;
+const record = () => practiceRecord(PRACTICE_ID)!;
+
 beforeEach(() => {
   resetConsole();
   onboardPractice(PRACTICE, NOW, OWNER);
+  PRACTICE_ID = getConsole().practices[0]!.practice.id;
 });
 
 describe("W41 step definitions", () => {
@@ -48,8 +55,8 @@ describe("W41 step definitions", () => {
 
 describe("W41 clinician roster", () => {
   it("saves a roster and assigns stable ids", () => {
-    expect(saveClinicians(ROSTER, NOW, OWNER)).toEqual({});
-    const { clinicians } = getConsole();
+    expect(saveClinicians(PRACTICE_ID, ROSTER, NOW, OWNER)).toEqual({});
+    const { clinicians } = record();
     expect(clinicians.map((c) => c.id)).toEqual(["clin-1", "clin-2"]);
     expect(clinicians[0]).toMatchObject({ displayName: "Dr Amara Lee", participating: true });
   });
@@ -57,10 +64,10 @@ describe("W41 clinician roster", () => {
   it("requires at least one participating clinician", () => {
     const errors = validateClinicians([{ displayName: "Dr Solo", participating: false }]);
     expect(errors.clinicians).toMatch(/participating/i);
-    expect(saveClinicians([{ displayName: "Dr Solo", participating: false }], NOW, OWNER)).toHaveProperty(
+    expect(saveClinicians(PRACTICE_ID, [{ displayName: "Dr Solo", participating: false }], NOW, OWNER)).toHaveProperty(
       "clinicians",
     );
-    expect(getConsole().clinicians).toHaveLength(0);
+    expect(record().clinicians).toHaveLength(0);
   });
 
   it("rejects an empty roster, short names and duplicates", () => {
@@ -75,40 +82,40 @@ describe("W41 clinician roster", () => {
   });
 
   it("refuses a caller without the grant", () => {
-    expect(saveClinicians(ROSTER, NOW, OUTSIDER)).toHaveProperty("form");
-    expect(getConsole().clinicians).toHaveLength(0);
+    expect(saveClinicians(PRACTICE_ID, ROSTER, NOW, OUTSIDER)).toHaveProperty("form");
+    expect(record().clinicians).toHaveLength(0);
   });
 
   it("drops allowlisted clinicians that no longer exist", () => {
-    saveClinicians(ROSTER, NOW, OWNER);
-    saveSessionConfig(
+    saveClinicians(PRACTICE_ID, ROSTER, NOW, OWNER);
+    saveSessionConfig(PRACTICE_ID, 
       { ...DEFAULT_SESSION_CONFIG, participatingClinicianIds: ["clin-1", "clin-2"] },
       NOW,
       OWNER,
     );
     // Roster shrinks to one — the stale id must not survive in session config.
-    const first = getConsole().clinicians[0]!;
-    saveClinicians([{ id: first.id, displayName: first.displayName, participating: true }], NOW, OWNER);
-    expect(getConsole().sessionConfig.participatingClinicianIds).toEqual([first.id]);
+    const first = record().clinicians[0]!;
+    saveClinicians(PRACTICE_ID, [{ id: first.id, displayName: first.displayName, participating: true }], NOW, OWNER);
+    expect(record().sessionConfig.participatingClinicianIds).toEqual([first.id]);
   });
 
   it("W41 review fix: an emptied allowlist fails CLOSED, never widens to 'all'", () => {
     // Previously this collapsed to "all" — the most permissive value — turning a
     // deliberate narrowing into a grant-everyone on an unrelated staff edit.
-    saveClinicians(ROSTER, NOW, OWNER);
-    saveSessionConfig({ ...DEFAULT_SESSION_CONFIG, participatingClinicianIds: ["clin-2"] }, NOW, OWNER);
-    acknowledgeSetupStep("sessions", OWNER);
+    saveClinicians(PRACTICE_ID, ROSTER, NOW, OWNER);
+    saveSessionConfig(PRACTICE_ID, { ...DEFAULT_SESSION_CONFIG, participatingClinicianIds: ["clin-2"] }, NOW, OWNER);
+    acknowledgeSetupStep(PRACTICE_ID, "sessions", OWNER);
 
-    saveClinicians([{ displayName: "Dr New Person", participating: true }], NOW, OWNER);
+    saveClinicians(PRACTICE_ID, [{ displayName: "Dr New Person", participating: true }], NOW, OWNER);
 
-    const state = getConsole();
+    const state = record();
     expect(state.sessionConfig.participatingClinicianIds).toEqual([]);
     // Empty is invalid, so the step loses its acknowledgement and setup cannot certify.
     expect(state.acknowledgedSteps).not.toContain("sessions");
-    expect(setupReadiness().sessions).toBe(false);
-    expect(completeSetup(NOW, OWNER)).toHaveProperty("fillableTypes");
+    expect(setupReadiness(record()).sessions).toBe(false);
+    expect(completeSetup(PRACTICE_ID, NOW, OWNER)).toHaveProperty("fillableTypes");
     // And the narrowing is on the record, not silent.
-    expect(state.auditEvents.some((e) => e.detail.includes("allowlist narrowed"))).toBe(true);
+    expect(getConsole().auditEvents.some((e) => e.detail.includes("allowlist narrowed"))).toBe(true);
   });
 
   it("W41 review fix: ids survive an edit, so the allowlist keeps naming the same person", () => {
@@ -119,17 +126,17 @@ describe("W41 clinician roster", () => {
       { displayName: "Dr Okafor", participating: true },
       { displayName: "Dr Chen", participating: true },
     ];
-    saveClinicians(three, NOW, OWNER);
-    const saved = getConsole().clinicians;
+    saveClinicians(PRACTICE_ID, three, NOW, OWNER);
+    const saved = record().clinicians;
     const lee = saved.find((c) => c.displayName === "Dr Lee")!;
     const okafor = saved.find((c) => c.displayName === "Dr Okafor")!;
     const chen = saved.find((c) => c.displayName === "Dr Chen")!;
 
     // Offer only Dr Chen.
-    saveSessionConfig({ ...DEFAULT_SESSION_CONFIG, participatingClinicianIds: [chen.id] }, NOW, OWNER);
+    saveSessionConfig(PRACTICE_ID, { ...DEFAULT_SESSION_CONFIG, participatingClinicianIds: [chen.id] }, NOW, OWNER);
 
     // Remove Dr Lee — the FIRST row, the case that used to shift every id.
-    saveClinicians(
+    saveClinicians(PRACTICE_ID, 
       [
         { id: okafor.id, displayName: "Dr Okafor", participating: true },
         { id: chen.id, displayName: "Dr Chen", participating: true },
@@ -138,12 +145,12 @@ describe("W41 clinician roster", () => {
       OWNER,
     );
 
-    const after = getConsole();
+    const after = record();
     // Chen keeps her id, and the allowlist still means Chen — not whoever slid up.
     expect(after.clinicians.find((c) => c.displayName === "Dr Chen")!.id).toBe(chen.id);
     expect(after.sessionConfig.participatingClinicianIds).toEqual([chen.id]);
     // The retired id is never reissued to a new person.
-    saveClinicians(
+    saveClinicians(PRACTICE_ID, 
       [
         { id: okafor.id, displayName: "Dr Okafor", participating: true },
         { id: chen.id, displayName: "Dr Chen", participating: true },
@@ -152,7 +159,7 @@ describe("W41 clinician roster", () => {
       NOW,
       OWNER,
     );
-    const newcomer = getConsole().clinicians.find((c) => c.displayName === "Dr Newcomer")!;
+    const newcomer = record().clinicians.find((c) => c.displayName === "Dr Newcomer")!;
     expect(newcomer.id).not.toBe(lee.id);
     expect(newcomer.id).not.toBe(okafor.id);
     expect(newcomer.id).not.toBe(chen.id);
@@ -197,22 +204,22 @@ describe("W41 session config validation", () => {
   });
 
   it("persists a valid config and audits it", () => {
-    saveClinicians(ROSTER, NOW, OWNER);
+    saveClinicians(PRACTICE_ID, ROSTER, NOW, OWNER);
     const config = {
       ...DEFAULT_SESSION_CONFIG,
       fillableTypes: ["standard" as const],
       protectedCapacityFraction: 0.2,
       schedulingWindow: { startHour: 9, endHour: 17 },
     };
-    expect(saveSessionConfig(config, NOW, OWNER)).toEqual({});
-    expect(getConsole().sessionConfig).toMatchObject(config);
+    expect(saveSessionConfig(PRACTICE_ID, config, NOW, OWNER)).toEqual({});
+    expect(record().sessionConfig).toMatchObject(config);
     expect(getConsole().auditEvents.at(-1)?.subjectId).toBe("setup:sessions");
   });
 
   it("refuses an allowlist naming an unknown clinician", () => {
-    saveClinicians(ROSTER, NOW, OWNER);
+    saveClinicians(PRACTICE_ID, ROSTER, NOW, OWNER);
     expect(
-      saveSessionConfig(
+      saveSessionConfig(PRACTICE_ID, 
         { ...DEFAULT_SESSION_CONFIG, participatingClinicianIds: ["clin-99"] },
         NOW,
         OWNER,
@@ -222,73 +229,73 @@ describe("W41 session config validation", () => {
 
   it("stores a copy, not a reference the caller can mutate later", () => {
     const fillableTypes: AppointmentType[] = ["standard"];
-    saveSessionConfig({ ...DEFAULT_SESSION_CONFIG, fillableTypes }, NOW, OWNER);
+    saveSessionConfig(PRACTICE_ID, { ...DEFAULT_SESSION_CONFIG, fillableTypes }, NOW, OWNER);
     fillableTypes.push("telehealth");
-    expect(getConsole().sessionConfig.fillableTypes).toEqual(["standard"]);
+    expect(record().sessionConfig.fillableTypes).toEqual(["standard"]);
   });
 });
 
 describe("W41 readiness and completion", () => {
   it("a fresh practice is not ready until a roster exists", () => {
-    const before = setupReadiness();
+    const before = setupReadiness(record());
     expect(before).toMatchObject({ practice: true, clinicians: false, complete: false });
     // Keyed by the unmet prerequisite, not a generic form error.
-    expect(completeSetup(NOW, OWNER)).toHaveProperty("clinicians");
-    expect(getConsole().setupCompletedAt).toBeNull();
+    expect(completeSetup(PRACTICE_ID, NOW, OWNER)).toHaveProperty("clinicians");
+    expect(record().setupCompletedAt).toBeNull();
   });
 
   it("refuses completion when sessions and rules were never reviewed", () => {
     // The seeded defaults validate clean, so validity alone must not count as
     // configured — otherwise finishing setup attests to wide-open defaults
     // (all appointment types, 0% protected, 24h window) nobody ever saw.
-    saveClinicians(ROSTER, NOW, OWNER);
-    expect(setupReadiness()).toMatchObject({ clinicians: true, sessions: false, rules: false });
-    expect(completeSetup(NOW, OWNER)).toHaveProperty("fillableTypes");
-    expect(getConsole().setupCompletedAt).toBeNull();
+    saveClinicians(PRACTICE_ID, ROSTER, NOW, OWNER);
+    expect(setupReadiness(record())).toMatchObject({ clinicians: true, sessions: false, rules: false });
+    expect(completeSetup(PRACTICE_ID, NOW, OWNER)).toHaveProperty("fillableTypes");
+    expect(record().setupCompletedAt).toBeNull();
 
-    acknowledgeSetupStep("sessions", OWNER);
-    expect(completeSetup(NOW, OWNER)).toHaveProperty("minDaysSinceLastVisit");
+    acknowledgeSetupStep(PRACTICE_ID, "sessions", OWNER);
+    expect(completeSetup(PRACTICE_ID, NOW, OWNER)).toHaveProperty("minDaysSinceLastVisit");
 
-    acknowledgeSetupStep("rules", OWNER);
-    expect(completeSetup(NOW, OWNER)).toEqual({});
+    acknowledgeSetupStep(PRACTICE_ID, "rules", OWNER);
+    expect(completeSetup(PRACTICE_ID, NOW, OWNER)).toEqual({});
   });
 
   it("acknowledgement is idempotent and needs the grant", () => {
-    expect(acknowledgeSetupStep("sessions", OUTSIDER)).toHaveProperty("form");
-    expect(getConsole().acknowledgedSteps).toEqual([]);
-    acknowledgeSetupStep("sessions", OWNER);
-    acknowledgeSetupStep("sessions", OWNER);
-    expect(getConsole().acknowledgedSteps).toEqual(["sessions"]);
+    expect(acknowledgeSetupStep(PRACTICE_ID, "sessions", OUTSIDER)).toHaveProperty("form");
+    expect(record().acknowledgedSteps).toEqual([]);
+    acknowledgeSetupStep(PRACTICE_ID, "sessions", OWNER);
+    acknowledgeSetupStep(PRACTICE_ID, "sessions", OWNER);
+    expect(record().acknowledgedSteps).toEqual(["sessions"]);
   });
 
   it("completes once every prerequisite is met, and is idempotent", () => {
-    saveClinicians(ROSTER, NOW, OWNER);
-    updateRules({ ...DEFAULT_CONFIG, minDaysSinceLastVisit: 200 }, NOW, OWNER);
-    acknowledgeSetupStep("sessions", OWNER);
-    acknowledgeSetupStep("rules", OWNER);
-    expect(completeSetup(NOW, OWNER)).toEqual({});
-    const completedAt = getConsole().setupCompletedAt;
+    saveClinicians(PRACTICE_ID, ROSTER, NOW, OWNER);
+    updateRules(PRACTICE_ID, { ...DEFAULT_CONFIG, minDaysSinceLastVisit: 200 }, NOW, OWNER);
+    acknowledgeSetupStep(PRACTICE_ID, "sessions", OWNER);
+    acknowledgeSetupStep(PRACTICE_ID, "rules", OWNER);
+    expect(completeSetup(PRACTICE_ID, NOW, OWNER)).toEqual({});
+    const completedAt = record().setupCompletedAt;
     expect(completedAt).toBe(NOW);
-    expect(setupReadiness().complete).toBe(true);
+    expect(setupReadiness(record()).complete).toBe(true);
 
-    expect(completeSetup("2026-08-09T05:00:00Z", OWNER)).toEqual({});
-    expect(getConsole().setupCompletedAt).toBe(completedAt); // unchanged
+    expect(completeSetup(PRACTICE_ID, "2026-08-09T05:00:00Z", OWNER)).toEqual({});
+    expect(record().setupCompletedAt).toBe(completedAt); // unchanged
     expect(getConsole().auditEvents.filter((e) => e.subjectId === "setup:complete")).toHaveLength(1);
   });
 
   it("refuses completion from a caller without the grant", () => {
-    saveClinicians(ROSTER, NOW, OWNER);
-    acknowledgeSetupStep("sessions", OWNER);
-    acknowledgeSetupStep("rules", OWNER);
-    expect(completeSetup(NOW, OUTSIDER)).toHaveProperty("form");
-    expect(getConsole().setupCompletedAt).toBeNull();
+    saveClinicians(PRACTICE_ID, ROSTER, NOW, OWNER);
+    acknowledgeSetupStep(PRACTICE_ID, "sessions", OWNER);
+    acknowledgeSetupStep(PRACTICE_ID, "rules", OWNER);
+    expect(completeSetup(PRACTICE_ID, NOW, OUTSIDER)).toHaveProperty("form");
+    expect(record().setupCompletedAt).toBeNull();
   });
 
   it("readiness reports each prerequisite independently", () => {
-    saveClinicians(ROSTER, NOW, OWNER);
-    acknowledgeSetupStep("sessions", OWNER);
-    acknowledgeSetupStep("rules", OWNER);
-    const readiness = setupReadiness();
+    saveClinicians(PRACTICE_ID, ROSTER, NOW, OWNER);
+    acknowledgeSetupStep(PRACTICE_ID, "sessions", OWNER);
+    acknowledgeSetupStep(PRACTICE_ID, "rules", OWNER);
+    const readiness = setupReadiness(record());
     expect(readiness).toMatchObject({ practice: true, clinicians: true, sessions: true, rules: true });
   });
 });

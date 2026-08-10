@@ -86,18 +86,33 @@ describe("W26: onboarding is create-only (privilege-escalation fix)", () => {
   beforeEach(() => resetConsole());
   const VALID = { name: "Demo Family Practice", timezone: "Australia/Sydney", holdoutPercent: 10 };
 
-  it("a second onboarding attempt is refused and changes nothing", () => {
+  // W166 restated this test, because the plural model changed HOW the property holds without
+  // changing the property. W26 refused a second onboarding because there was one practice slot:
+  // re-running it OVERWROTE the practice and re-seated the caller as owner. Appending cannot do
+  // that, and a stranger creating their own practice is now an ordinary multi-site case, not an
+  // attack. So the assertion moves to what actually matters and was always the real point.
+  it("a second onboarding cannot touch the first practice or its ownership", () => {
     expect(onboardPractice(VALID, "2026-08-09T02:00:00Z", "owner@demo.example")).toEqual({});
-    const attempt = onboardPractice(
+    const first = getConsole().practices[0]!.practice.id;
+    onboardPractice(
       { ...VALID, name: "Hijacked Practice", holdoutPercent: 0 },
       "2026-08-09T02:01:00Z",
       "attacker@elsewhere.example",
     );
-    expect(attempt).toHaveProperty("form");
     const state = getConsole();
-    expect(state.practice?.name).toBe("Demo Family Practice");
-    expect(state.memberships).toEqual([
-      { practiceId: "prac-console", email: "owner@demo.example", role: "owner" },
+    // The original is untouched: same id, same name, same holdout.
+    expect(state.practices.find((r) => r.practice.id === first)!.practice).toMatchObject({
+      name: "Demo Family Practice",
+      holdoutRate: 0.1,
+    });
+    // And the attacker holds NOTHING over it — the escalation W26 was about.
+    expect(state.memberships.filter((m) => m.practiceId === first)).toEqual([
+      { practiceId: first, email: "owner@demo.example", role: "owner" },
     ]);
+    expect(
+      state.memberships.some(
+        (m) => m.email === "attacker@elsewhere.example" && m.practiceId === first,
+      ),
+    ).toBe(false);
   });
 });

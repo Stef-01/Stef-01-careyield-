@@ -10,16 +10,15 @@ import { resolveInStore, submitComplaint, triageInStore } from "@/complaints/sto
 import type { ComplaintChannel, ComplaintSeverity } from "@/complaints/workflow";
 import { getConsole } from "@/console/store";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 
 const CHANNELS: ComplaintChannel[] = ["phone", "email", "front_desk", "sms_reply"];
 const SEVERITIES: ComplaintSeverity[] = ["low", "serious", "urgent"];
 
 async function requireGrant(action: "view_dashboard" | "pause_sending"): Promise<string> {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const state = getConsole();
-  if (!state.practice) redirect("/console/onboarding");
-  const decision = authorize(state.memberships, email, state.practice.id, action);
+  const decision = authorize(state.memberships, email, record.practice.id, action);
   if (!decision.allowed) redirect("/console/complaints?error=denied");
   return email;
 }

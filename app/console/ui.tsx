@@ -1,15 +1,57 @@
 // W11: shared console primitives — one look for every console surface.
 
-import { signOut } from "./actions";
+import { signOut, switchPractice } from "./actions";
 import { DemoNavigator } from "../demo-navigator";
 import Link from "next/link";
 import { isMeherrStaff } from "@/tenancy/staff";
 
+/**
+ * W166: the practices this session may act for, and which one it is on.
+ *
+ * Rendered only when there is more than one — a switcher offering a single choice is furniture,
+ * and every practice with one site would carry it forever.
+ */
+export function PracticeSwitcher({
+  practices,
+  activeId,
+}: {
+  practices: ReadonlyArray<{ id: string; name: string }>;
+  activeId: string;
+}) {
+  if (practices.length < 2) return null;
+  return (
+    <form action={switchPractice} className="flex items-center gap-2" data-testid="practice-switcher">
+      <label htmlFor="practiceId" className="text-sm text-stone-500">
+        Practice
+      </label>
+      <select
+        id="practiceId"
+        name="practiceId"
+        defaultValue={activeId}
+        className="rounded border border-stone-300 bg-white px-2 py-1 text-sm"
+      >
+        {practices.map((p) => (
+          <option key={p.id} value={p.id}>
+            {p.name}
+          </option>
+        ))}
+      </select>
+      <button type="submit" className="text-sm text-stone-500 underline hover:text-stone-800">
+        Switch
+      </button>
+    </form>
+  );
+}
+
 export function ConsoleShell({
   email,
+  practices,
+  activeId,
   children,
 }: {
   email: string | null;
+  practices?: ReadonlyArray<{ id: string; name: string }>;
+  activeId?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -21,6 +63,10 @@ export function ConsoleShell({
             <span className="text-sm text-stone-500">practice console</span>
           </div>
           {email && (
+            <div className="flex items-center gap-3">
+              {practices && activeId && (
+                <PracticeSwitcher practices={practices} activeId={activeId} />
+              )}
             <form action={signOut} className="flex items-center gap-3">
               {/* W105: Meherr-internal, so it is not offered to practice accounts. The
                   route still gates itself — hiding a link is navigation, not access control. */}
@@ -32,6 +78,7 @@ export function ConsoleShell({
                 Sign out
               </button>
             </form>
+            </div>
           )}
         </div>
       </header>

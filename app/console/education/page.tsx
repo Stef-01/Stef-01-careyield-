@@ -35,7 +35,7 @@ import { cpdEntriesFor, getLibrary, getSignedOffSources, getTriggers } from "@/e
 import { describeTriggers, triggersFor } from "@/education/triggers";
 import { registersFor } from "@/registers/store";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -43,14 +43,13 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Education — Meherr" };
 
 export default async function EducationPage() {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const console_ = getConsole();
-  if (!console_.practice) redirect("/console/onboarding");
-  if (!authorize(console_.memberships, email, console_.practice.id, "view_dashboard").allowed) {
+  if (!authorize(console_.memberships, email, record.practice.id, "view_dashboard").allowed) {
     redirect("/console");
   }
 
-  const practiceConditionCodes = registersFor(console_.practice.id)
+  const practiceConditionCodes = registersFor(record.practice.id)
     .filter((row) => row.enabled)
     .map((row) => row.condition.code as string);
 
@@ -75,7 +74,7 @@ export default async function EducationPage() {
     }));
   const triggers = triggersFor([], practiceConditionCodes, getTriggers());
 
-  const identity = clinicianForEmail(console_.clinicians, email);
+  const identity = clinicianForEmail(record.clinicians, email);
   const trail = identity.linked
     ? trailFor(cpdEntriesFor(identity.clinician.id), identity.clinician.id)
     : null;

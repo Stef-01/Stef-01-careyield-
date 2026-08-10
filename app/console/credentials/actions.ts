@@ -5,7 +5,7 @@ import { clinicianForEmail } from "@/console/clinician-identity";
 import { getConsole } from "@/console/store";
 import { ownCredentials, recordEvent } from "@/credentials/ledger";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 
 /**
  * Withdraw one of your own credentials.
@@ -24,14 +24,13 @@ import { requireSession } from "../guard";
  *      action is concerned.
  */
 export async function withdrawOwnCredential(formData: FormData): Promise<void> {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const console_ = getConsole();
-  if (!console_.practice) redirect("/console/onboarding");
-  if (!authorize(console_.memberships, email, console_.practice.id, "view_dashboard").allowed) {
+  if (!authorize(console_.memberships, email, record.practice.id, "view_dashboard").allowed) {
     redirect("/console/credentials?error=denied");
   }
 
-  const identity = clinicianForEmail(console_.clinicians, email);
+  const identity = clinicianForEmail(record.clinicians, email);
   if (!identity.linked) redirect("/console/credentials?error=not_linked");
 
   const credentialId = formData.get("credentialId");
@@ -44,13 +43,13 @@ export async function withdrawOwnCredential(formData: FormData): Promise<void> {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const mine = ownCredentials(console_.practice.id, identity.clinician.id, today);
+  const mine = ownCredentials(record.practice.id, identity.clinician.id, today);
   const target = mine.find((c) => c.credentialId === credentialId);
   // Same answer for "belongs to a colleague" and "does not exist" — a distinct message would
   // confirm that another clinician holds a credential by that id (W109's rule).
   if (!target) redirect("/console/credentials?error=not_yours");
 
-  const result = recordEvent(console_.practice.id, {
+  const result = recordEvent(record.practice.id, {
     kind: "withdrawn",
     at: today,
     credentialId,

@@ -32,7 +32,7 @@ import {
 } from "@/pathways/approval";
 import { allVersions, getPathwayAttestations } from "@/pathways/registry";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -40,10 +40,9 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Clinical content sign-off — Meherr" };
 
 export default async function PathwaysPage() {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const console_ = getConsole();
-  if (!console_.practice) redirect("/console/onboarding");
-  if (!authorize(console_.memberships, email, console_.practice.id, "view_dashboard").allowed) {
+  if (!authorize(console_.memberships, email, record.practice.id, "view_dashboard").allowed) {
     redirect("/console");
   }
 

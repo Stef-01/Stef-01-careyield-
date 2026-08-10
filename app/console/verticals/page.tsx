@@ -27,7 +27,7 @@ import { CONTRADICTION_COPY } from "@/verticals/consistency";
 import { assessCompleteness } from "@/verticals/completeness";
 import { VERTICAL_REFUSAL_COPY, usableVertical } from "@/verticals/model";
 import { assembleEvidence, getVerticalSpecs, knownMembers } from "@/verticals/store";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -42,10 +42,9 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default async function VerticalsPage() {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const console_ = getConsole();
-  if (!console_.practice) redirect("/console/onboarding");
-  if (!authorize(console_.memberships, email, console_.practice.id, "view_dashboard").allowed) {
+  if (!authorize(console_.memberships, email, record.practice.id, "view_dashboard").allowed) {
     redirect("/console");
   }
 

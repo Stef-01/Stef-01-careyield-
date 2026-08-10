@@ -76,11 +76,11 @@ test("a practice completes self-serve setup in one timed sitting", async ({ page
 
   // The practice is genuinely configured, not just walked through.
   const state = await (await request.get("/api/mock/console")).json();
-  expect(state.setupCompletedAt).not.toBeNull();
-  expect(state.clinicians).toHaveLength(2);
-  expect(state.sessionConfig.protectedCapacityFraction).toBeCloseTo(0.2, 6);
-  expect(state.sessionConfig.schedulingWindow).toEqual({ startHour: 9, endHour: 17 });
-  expect(state.rulesConfig.minDaysSinceLastVisit).toBe(240);
+  expect(state.practices[0].setupCompletedAt).not.toBeNull();
+  expect(state.practices[0].clinicians).toHaveLength(2);
+  expect(state.practices[0].sessionConfig.protectedCapacityFraction).toBeCloseTo(0.2, 6);
+  expect(state.practices[0].sessionConfig.schedulingWindow).toEqual({ startHour: 9, endHour: 17 });
+  expect(state.practices[0].rulesConfig.minDaysSinceLastVisit).toBe(240);
 
   expect(steps).toBeLessThanOrEqual(MAX_STEPS);
   expect(Date.now() - started).toBeLessThan(CEILING_MS);
@@ -99,7 +99,7 @@ test("the wizard refuses to finish while a prerequisite is unmet", async ({ page
   await expect(page.getByTestId("setup-error")).toContainText(/at least one clinician/i);
 
   const state = await (await request.get("/api/mock/console")).json();
-  expect(state.setupCompletedAt).toBeNull();
+  expect(state.practices[0].setupCompletedAt).toBeNull();
 });
 
 test("invalid session settings are refused with the reason shown", async ({ page }) => {

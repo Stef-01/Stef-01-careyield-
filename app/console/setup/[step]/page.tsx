@@ -9,7 +9,7 @@ import { notFound, redirect } from "next/navigation";
 import { getConsole, setupReadiness } from "@/console/store";
 import { isSetupStep, SETUP_STEPS, stepIndex, type SetupStepSlug } from "@/console/setup-steps";
 import { APPOINTMENT_TYPES } from "@/session/config";
-import { requireSession } from "../../guard";
+import { requirePracticeOptional } from "../../guard";
 import { ConsoleShell, Field, inputClass, primaryButtonClass } from "../../ui";
 import {
   finishSetup,
@@ -88,7 +88,7 @@ export default async function SetupStepPage({
   params: Promise<{ step: string }>;
   searchParams: Promise<{ error?: string }>;
 }) {
-  const email = await requireSession();
+  const { email, record } = await requirePracticeOptional();
   const { step } = await params;
   if (!isSetupStep(step)) notFound();
   const { error } = await searchParams;
@@ -96,9 +96,12 @@ export default async function SetupStepPage({
   const definition = SETUP_STEPS[stepIndex(step)]!;
 
   // Every step after the first needs a practice to attach to.
-  if (step !== "practice" && !state.practice) redirect("/console/setup/practice");
+  if (step !== "practice" && !record) redirect("/console/setup/practice");
+  // Past that redirect every step but the first has a practice. Narrowed once here
+  // rather than with a non-null assertion at each of the twenty reads below.
 
-  const readiness = setupReadiness(state);
+
+  const readiness = setupReadiness(record);
 
   return (
     <ConsoleShell email={email}>
@@ -121,11 +124,11 @@ export default async function SetupStepPage({
         )}
 
         {step === "practice" &&
-          (state.practice ? (
+          (record ? (
             <section className="rounded-xl border border-stone-200 bg-white p-6">
               <p className="text-stone-700">
-                <span className="font-medium">{state.practice.name}</span> is set up —{" "}
-                {state.practice.timezone}, holdout {Math.round(state.practice.holdoutRate * 100)}%.
+                <span className="font-medium">{record!.practice.name}</span> is set up —{" "}
+                {record!.practice.timezone}, holdout {Math.round(record!.practice.holdoutRate * 100)}%.
               </p>
               <Link
                 href="/console/setup/clinicians"
@@ -160,7 +163,7 @@ export default async function SetupStepPage({
               Add each clinician, and tick the ones who want availability invitations sent for them.
             </p>
             {Array.from({ length: 6 }, (_, i) => {
-              const existing = state.clinicians[i];
+              const existing = record!.clinicians[i];
               return (
                 <div key={i} className="flex items-end gap-3">
                   <div className="flex-1">
@@ -204,7 +207,7 @@ export default async function SetupStepPage({
                     type="checkbox"
                     name="fillableTypes"
                     value={type}
-                    defaultChecked={state.sessionConfig.fillableTypes.includes(type)}
+                    defaultChecked={record!.sessionConfig.fillableTypes.includes(type)}
                     className="h-4 w-4 rounded border-stone-300"
                   />
                   {TYPE_LABELS[type] ?? type}
@@ -221,7 +224,7 @@ export default async function SetupStepPage({
                 type="number"
                 min={0}
                 max={100}
-                defaultValue={Math.round(state.sessionConfig.protectedCapacityFraction * 100)}
+                defaultValue={Math.round(record!.sessionConfig.protectedCapacityFraction * 100)}
                 className={inputClass}
               />
             </Field>
@@ -233,7 +236,7 @@ export default async function SetupStepPage({
                   type="number"
                   min={0}
                   max={24}
-                  defaultValue={state.sessionConfig.schedulingWindow.startHour}
+                  defaultValue={record!.sessionConfig.schedulingWindow.startHour}
                   className={inputClass}
                 />
               </Field>
@@ -243,18 +246,18 @@ export default async function SetupStepPage({
                   type="number"
                   min={0}
                   max={24}
-                  defaultValue={state.sessionConfig.schedulingWindow.endHour}
+                  defaultValue={record!.sessionConfig.schedulingWindow.endHour}
                   className={inputClass}
                 />
               </Field>
             </div>
 
-            {state.clinicians.length > 0 && (
+            {record!.clinicians.length > 0 && (
               <fieldset className="flex flex-col gap-2">
                 <legend className="text-sm font-medium text-stone-700">
                   Offer sessions for (leave all unticked for every participating clinician)
                 </legend>
-                {state.clinicians
+                {record!.clinicians
                   .filter((c) => c.participating)
                   .map((c) => (
                     <label key={c.id} className="flex items-center gap-2 text-sm text-stone-700">
@@ -263,8 +266,8 @@ export default async function SetupStepPage({
                         name="participatingClinicianIds"
                         value={c.id}
                         defaultChecked={
-                          state.sessionConfig.participatingClinicianIds !== "all" &&
-                          state.sessionConfig.participatingClinicianIds.includes(c.id)
+                          record!.sessionConfig.participatingClinicianIds !== "all" &&
+                          record!.sessionConfig.participatingClinicianIds.includes(c.id)
                         }
                         className="h-4 w-4 rounded border-stone-300"
                       />
@@ -289,7 +292,7 @@ export default async function SetupStepPage({
                 required
                 min={0}
                 max={3650}
-                defaultValue={state.rulesConfig.minDaysSinceLastVisit}
+                defaultValue={record!.rulesConfig.minDaysSinceLastVisit}
                 className={inputClass}
               />
             </Field>
@@ -300,7 +303,7 @@ export default async function SetupStepPage({
                 required
                 min={0}
                 max={365}
-                defaultValue={state.rulesConfig.futureBookingBlockDays}
+                defaultValue={record!.rulesConfig.futureBookingBlockDays}
                 className={inputClass}
               />
             </Field>
@@ -311,7 +314,7 @@ export default async function SetupStepPage({
                 required
                 min={0}
                 max={12}
-                defaultValue={state.rulesConfig.maxInvitesPerQuarter}
+                defaultValue={record!.rulesConfig.maxInvitesPerQuarter}
                 className={inputClass}
               />
             </Field>
@@ -319,7 +322,7 @@ export default async function SetupStepPage({
               <input
                 name="usualClinicianOnly"
                 type="checkbox"
-                defaultChecked={state.rulesConfig.usualClinicianOnly}
+                defaultChecked={record!.rulesConfig.usualClinicianOnly}
                 className="h-4 w-4 rounded border-stone-300"
               />
               <span className="text-sm text-stone-700">Only invite patients of the clinician with availability</span>
@@ -328,7 +331,7 @@ export default async function SetupStepPage({
               <input
                 name="chronicCareOnly"
                 type="checkbox"
-                defaultChecked={state.rulesConfig.chronicCareOnly}
+                defaultChecked={record!.rulesConfig.chronicCareOnly}
                 className="h-4 w-4 rounded border-stone-300"
               />
               <span className="text-sm text-stone-700">Only invite patients flagged for ongoing care</span>
@@ -346,27 +349,27 @@ export default async function SetupStepPage({
               <dl className="divide-y divide-stone-100">
                 {(
                   [
-                    ["Practice", state.practice?.name ?? "—", readiness.practice],
+                    ["Practice", record!.practice?.name ?? "—", readiness.practice],
                     [
                       "Participating clinicians",
-                      String(state.clinicians.filter((c) => c.participating).length),
+                      String(record!.clinicians.filter((c) => c.participating).length),
                       readiness.clinicians,
                     ],
                     [
                       "Appointment types filled",
-                      state.sessionConfig.fillableTypes.map((t) => TYPE_LABELS[t] ?? t).join(", ") || "—",
+                      record!.sessionConfig.fillableTypes.map((t) => TYPE_LABELS[t] ?? t).join(", ") || "—",
                       readiness.sessions,
                     ],
                     [
                       "Offering window",
-                      `${state.sessionConfig.schedulingWindow.startHour}:00–${state.sessionConfig.schedulingWindow.endHour}:00, ` +
-                        `${Math.round(state.sessionConfig.protectedCapacityFraction * 100)}% protected`,
+                      `${record!.sessionConfig.schedulingWindow.startHour}:00–${record!.sessionConfig.schedulingWindow.endHour}:00, ` +
+                        `${Math.round(record!.sessionConfig.protectedCapacityFraction * 100)}% protected`,
                       readiness.sessions,
                     ],
                     [
                       "Eligibility",
-                      `${state.rulesConfig.minDaysSinceLastVisit} days since last visit, ` +
-                        `max ${state.rulesConfig.maxInvitesPerQuarter}/quarter`,
+                      `${record!.rulesConfig.minDaysSinceLastVisit} days since last visit, ` +
+                        `max ${record!.rulesConfig.maxInvitesPerQuarter}/quarter`,
                       readiness.rules,
                     ],
                   ] as Array<[string, string, boolean]>
@@ -381,7 +384,7 @@ export default async function SetupStepPage({
               </dl>
             </section>
 
-            {state.setupCompletedAt ? (
+            {record!.setupCompletedAt ? (
               <p data-testid="setup-complete" className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
                 Setup complete. Your practice is ready.
               </p>

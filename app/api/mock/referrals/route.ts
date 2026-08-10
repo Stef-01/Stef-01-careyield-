@@ -24,7 +24,7 @@ const THIRD = "prac-third" as PracticeId;
 
 export async function GET() {
   assertMockRoutesEnabled();
-  const practiceId = getConsole().practice?.id;
+  const practiceId = getConsole().practices[0]?.practice.id;
   return NextResponse.json({
     sent: practiceId ? sentBy(practiceId) : [],
     received: practiceId ? sentTo(practiceId) : [],
@@ -38,7 +38,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   assertMockRoutesEnabled();
   resetReferralRail();
-  const practiceId = getConsole().practice?.id;
+  const practiceId = getConsole().practices[0]?.practice.id;
   if (!practiceId) return NextResponse.json({ sent: [], received: [] });
   if (request.nextUrl.searchParams.get("empty") === "1") {
     return NextResponse.json({ sent: sentBy(practiceId), received: sentTo(practiceId) });

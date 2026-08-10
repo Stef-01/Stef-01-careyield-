@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { getComplaints } from "@/complaints/store";
 import { getConsole } from "@/console/store";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell, inputClass, primaryButtonClass } from "../ui";
 import { intake, resolve, triage } from "./actions";
 
@@ -23,12 +23,11 @@ export default async function ComplaintsPage({
 }: {
   searchParams: Promise<{ received?: string; error?: string }>;
 }) {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   // W51: the list is operator-entered, patient-linked data — reading it takes
   // membership, not merely a session.
   const state = getConsole();
-  if (!state.practice) redirect("/console/onboarding");
-  if (!authorize(state.memberships, email, state.practice.id, "view_dashboard").allowed) {
+  if (!authorize(state.memberships, email, record.practice.id, "view_dashboard").allowed) {
     redirect("/console");
   }
   const params = await searchParams;

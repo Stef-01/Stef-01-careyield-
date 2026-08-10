@@ -33,7 +33,7 @@ import { RETURN_OUTCOME_COPY } from "@/referrals/return-report";
 import { actsFor, eventsFor, returnFor, sentBy, sentTo } from "@/referrals/store";
 import { describeOutstanding, trackReferral } from "@/referrals/tracking";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell, primaryButtonClass } from "../ui";
 import { answerReferral } from "./actions";
 
@@ -68,15 +68,14 @@ export default async function ReferralsPage({
 }: {
   searchParams: Promise<{ error?: string; saved?: string }>;
 }) {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const console_ = getConsole();
-  if (!console_.practice) redirect("/console/onboarding");
-  if (!authorize(console_.memberships, email, console_.practice.id, "view_dashboard").allowed) {
+  if (!authorize(console_.memberships, email, record.practice.id, "view_dashboard").allowed) {
     redirect("/console");
   }
   const { error, saved } = await searchParams;
 
-  const practiceId = console_.practice.id;
+  const practiceId = record.practice.id;
   const acts = actsFor(practiceId);
   const events = eventsFor(practiceId);
   const leakage = detectLeakage(events, practiceId);

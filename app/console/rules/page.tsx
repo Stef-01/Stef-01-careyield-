@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getConsole } from "@/console/store";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { saveRules } from "../actions";
 import { ConsoleShell, ErrorNote, Field, inputClass, primaryButtonClass } from "../ui";
 
@@ -11,11 +11,10 @@ export default async function RulesPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const state = getConsole();
-  if (!state.practice) redirect("/console/onboarding");
   const { error } = await searchParams;
-  const rules = state.rulesConfig;
+  const rules = record.rulesConfig;
 
   return (
     <ConsoleShell email={email}>

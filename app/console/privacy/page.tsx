@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getConsole } from "@/console/store";
 import { getPrivacy, exportForPatient } from "@/privacy/store";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell, inputClass, primaryButtonClass } from "../ui";
 import { applyRetention, erasePatient, exportPatient } from "./actions";
 
@@ -16,15 +16,14 @@ export default async function PrivacyPage({
 }: {
   searchParams: Promise<{ export?: string; deleted?: string; error?: string; retention?: string }>;
 }) {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const params = await searchParams;
   const privacy = getPrivacy();
   // W39 review finding: the ?export= render is itself a data disclosure — it takes the
   // same stewardship grant as the action that links here, not just a session.
   const console_ = getConsole();
   const mayExport =
-    console_.practice !== null &&
-    authorize(console_.memberships, email, console_.practice.id, "edit_rules").allowed;
+    authorize(console_.memberships, email, record.practice.id, "edit_rules").allowed;
   const exported =
     params.export && mayExport ? exportForPatient(params.export, new Date().toISOString()) : null;
 

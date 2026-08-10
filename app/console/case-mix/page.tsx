@@ -11,7 +11,7 @@ import { getInterestState } from "@/capability/store";
 import { clinicianForEmail } from "@/console/clinician-identity";
 import { getConsole } from "@/console/store";
 import { getRegisters } from "@/registers/store";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
 import { stateInterest } from "./actions";
 
@@ -33,12 +33,11 @@ export default async function CaseMixPage({
 }: {
   searchParams: Promise<{ error?: string; saved?: string }>;
 }) {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const console_ = getConsole();
-  if (!console_.practice) redirect("/console/onboarding");
   const { error, saved } = await searchParams;
 
-  const identity = clinicianForEmail(console_.clinicians, email);
+  const identity = clinicianForEmail(record.clinicians, email);
   const registers = getRegisters().conditions.filter((c) => c.active);
   const state = getInterestState();
 
@@ -78,7 +77,7 @@ export default async function CaseMixPage({
             {registers.map((condition) => {
               const current = interestIn(
                 state,
-                console_.practice!.id,
+                record.practice.id,
                 identity.clinician.id,
                 condition.code,
               );

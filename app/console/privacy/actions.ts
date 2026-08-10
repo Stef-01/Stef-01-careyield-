@@ -8,13 +8,12 @@ import { redirect } from "next/navigation";
 import { getConsole } from "@/console/store";
 import { deletePatientEverywhere, runRetention } from "@/privacy/store";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 
 async function requirePrivacyGrant(): Promise<void> {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const state = getConsole();
-  if (!state.practice) redirect("/console/onboarding");
-  const decision = authorize(state.memberships, email, state.practice.id, "edit_rules");
+  const decision = authorize(state.memberships, email, record.practice.id, "edit_rules");
   if (!decision.allowed) redirect("/console/privacy?error=denied");
 }
 

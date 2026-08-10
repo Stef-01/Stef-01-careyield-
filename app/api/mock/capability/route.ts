@@ -22,8 +22,8 @@ const TODAY = "2026-08-10";
 
 export async function GET() {
   assertMockRoutesEnabled();
-  const practiceId = getConsole().practice?.id;
-  const me = getConsole().clinicians[0]?.id ?? ("clin-1" as ClinicianId);
+  const practiceId = getConsole().practices[0]?.practice.id;
+  const me = (getConsole().practices[0]?.clinicians ?? [])[0]?.id ?? ("clin-1" as ClinicianId);
   return NextResponse.json({
     state: getCapability(),
     panel: practiceId ? panelView(practiceId, TODAY) : [],
@@ -35,10 +35,12 @@ export async function POST() {
   assertMockRoutesEnabled();
   resetCapability();
   const console_ = getConsole();
-  const practiceId = console_.practice?.id as PracticeId | undefined;
+  // W166: a mock route acts for the seeded practice — the first one, deterministically.
+  const record = console_.practices[0];
+  const practiceId = record!.practice.id as PracticeId | undefined;
   // Onboarding does not create a roster, so fall back to the same id the page falls back
   // to. Keeps the e2e exercising the real accessors rather than a special-cased path.
-  const me = (console_.clinicians[0]?.id ?? "clin-1") as ClinicianId;
+  const me = (record!.clinicians[0]?.id ?? "clin-1") as ClinicianId;
   if (practiceId) {
     stateInterest({
       practiceId, clinicianId: me, conditionCode: COND, strength: 4,

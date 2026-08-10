@@ -21,6 +21,10 @@ const MEMBERS: Membership[] = [
   { practiceId: B, email: "owner@b.example", role: "owner" },
 ];
 
+// W166: ids are generated, so the practice under test is looked up rather than named.
+const rec = () => getConsole().practices[0]!;
+const pid = () => rec().practice.id;
+
 describe("W18 multi-tenancy — cross-tenant access is impossible", () => {
   it("every member of practice A is denied every action at practice B, whatever their role", () => {
     for (const member of MEMBERS.filter((m) => m.practiceId === A)) {
@@ -85,26 +89,26 @@ describe("W18 console enforcement", () => {
   it("onboarding seats the signer as owner", () => {
     onboardPractice(VALID, NOW, "owner@demo.example");
     expect(getConsole().memberships).toEqual([
-      { practiceId: "prac-console", email: "owner@demo.example", role: "owner" },
+      { practiceId: getConsole().practices[0]!.practice.id, email: "owner@demo.example", role: "owner" },
     ]);
   });
 
   it("a non-member cannot change rules; the owner can", () => {
     onboardPractice(VALID, NOW, "owner@demo.example");
-    const denied = updateRules(
+    const denied = updateRules(pid(), 
       { ...DEFAULT_CONFIG, minDaysSinceLastVisit: 240 },
       NOW,
       "outsider@elsewhere.example",
     );
     expect(denied).toHaveProperty("form");
-    expect(getConsole().rulesVersion).toBe(1);
-    const allowed = updateRules(
+    expect(rec().rulesVersion).toBe(1);
+    const allowed = updateRules(pid(), 
       { ...DEFAULT_CONFIG, minDaysSinceLastVisit: 240 },
       NOW,
       "owner@demo.example",
     );
     expect(allowed).toEqual({});
-    expect(getConsole().rulesVersion).toBe(2);
+    expect(rec().rulesVersion).toBe(2);
   });
 
   it("a clinician member is refused the rules grant", () => {
@@ -114,8 +118,8 @@ describe("W18 console enforcement", () => {
       email: "gp@demo.example",
       role: "clinician",
     });
-    const denied = updateRules({ ...DEFAULT_CONFIG, chronicCareOnly: true }, NOW, "gp@demo.example");
+    const denied = updateRules(pid(), { ...DEFAULT_CONFIG, chronicCareOnly: true }, NOW, "gp@demo.example");
     expect(denied).toHaveProperty("form");
-    expect(getConsole().rulesVersion).toBe(1);
+    expect(rec().rulesVersion).toBe(1);
   });
 });

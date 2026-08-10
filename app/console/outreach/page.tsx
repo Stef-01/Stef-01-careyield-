@@ -26,7 +26,7 @@ import {
 } from "@/referrals/outreach";
 import { syntheticReferrals } from "@/synthetic/referrals";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -37,10 +37,9 @@ export const metadata = { title: "Outreach — Meherr" };
 const SESSION_WINDOW = "after 5pm this week";
 
 export default async function OutreachPage() {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const state = getConsole();
-  if (!state.practice) redirect("/console/onboarding");
-  const practiceId = state.practice.id;
+  const practiceId = record.practice.id;
   if (!authorize(state.memberships, email, practiceId, "view_dashboard").allowed) {
     redirect("/console");
   }
@@ -55,7 +54,7 @@ export default async function OutreachPage() {
     practiceId,
     patientId,
     firstName: "there",
-    usualClinicianDisplayName: state.clinicians[0]?.displayName ?? "your GP",
+    usualClinicianDisplayName: record.clinicians[0]?.displayName ?? "your GP",
     bookingUrl: `https://book.example/${practiceId}/session`,
     preferences: DEFAULT_PREFERENCES,
     invitesInWindow: 0,
@@ -63,7 +62,7 @@ export default async function OutreachPage() {
 
   const plan = planOutreach({
     practiceId,
-    practiceName: state.practice.name,
+    practiceName: record.practice.name,
     sessionWindow: SESSION_WINDOW,
     leakage: detectLeakage(synthetic.events, practiceId),
     barriers: synthetic.barriers,
@@ -71,7 +70,7 @@ export default async function OutreachPage() {
     recipients,
     now,
     offerExpiresAt: new Date(now.getTime() + 7 * 86_400_000),
-    maxInvitesInWindow: state.rulesConfig.maxInvitesPerQuarter,
+    maxInvitesInWindow: record.rulesConfig.maxInvitesPerQuarter,
   });
 
   const counts = withheldCounts(plan);

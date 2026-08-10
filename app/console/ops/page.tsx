@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getConsole } from "@/console/store";
 import { getOps, queueView } from "@/ops/store";
 import { canSend, isPracticePaused } from "@/ops/switches";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
 import { toggleKillSwitch, togglePracticePause } from "./actions";
 
@@ -16,12 +16,11 @@ export default async function OpsPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const console_ = getConsole();
-  if (!console_.practice) redirect("/console/onboarding");
   const { error } = await searchParams;
 
-  const practiceId = console_.practice.id;
+  const practiceId = record.practice.id;
   const ops = getOps();
   const queue = queueView();
   const killed = ops.switches.killSwitch;

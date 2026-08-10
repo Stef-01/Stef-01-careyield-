@@ -70,7 +70,7 @@ function applyOptOutToRail(patientId: string, at: string): OptOutOutcome {
     {
       // W51: the console practice owns this event; the first invitation in the rail
       // is not necessarily (and in a multi-practice rail, is not) the right one.
-      practiceId: (getConsole().practice?.id ??
+      practiceId: (getConsole().practices[0]?.practice.id ??
         rail.state.invitations[0]?.practiceId ??
         "prac-demo") as AuditEvent["practiceId"],
       kind: "patient_opted_out",

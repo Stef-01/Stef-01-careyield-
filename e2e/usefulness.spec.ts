@@ -73,19 +73,29 @@ test("marking a visit worthwhile with no action is refused", async ({ page, requ
 
 test("a signed-in non-member cannot record an outcome (W51)", async ({ page, request }) => {
   // The clinician onboards the practice; a different signed-in email is not a member.
+  //
+  // W166 changed HOW this refusal reads, not whether it holds. Before, there was one practice
+  // and a stranger landed on its page and was told their role could not record outcomes. Now a
+  // stranger belongs to NO practice, so there is no practice whose page could refuse them — they
+  // are sent to onboarding instead. That is a more accurate answer to what is actually wrong,
+  // and the invariant the test exists for is unchanged: no outcome is recorded.
   await signInAsMember(page);
   await page.getByRole("button", { name: "Sign out" }).click();
   await page.waitForURL(/\/console\/signin$/);
   await page.getByLabel("Work email").fill("stranger@elsewhere.example");
   await page.getByRole("button", { name: "Sign in" }).click();
-  await page.waitForURL(/\/console$/);
+  await page.waitForURL(/\/console(\/onboarding)?$/);
 
+  // The PAGE still renders — it shows the synthetic audit queue, which belongs to no practice —
+  // so the refusal is where it always was: in the action, which is the independently-invocable
+  // endpoint (W13). What changed is the wording of the refusal, not its existence.
   await page.goto("/console/usefulness");
   const firstCard = page.locator("form").filter({ has: page.getByRole("button", { name: "Save" }) }).first();
   await firstCard.getByText("Medication reviewed").click();
   await firstCard.getByRole("button", { name: "Save" }).click();
 
-  await expect(page.getByText(/Your role cannot record visit outcomes/)).toBeVisible();
+  await expect(page).toHaveURL(/\/console\/onboarding$/);
+  // The invariant this test exists for, checked at the store rather than on screen.
   const after = await (await request.get("/api/mock/usefulness")).json();
   expect(after.outcomes).toHaveLength(0);
 });

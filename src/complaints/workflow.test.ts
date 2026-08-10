@@ -135,7 +135,7 @@ describe("W51 complaint opt-out is durable and honestly reported", () => {
       { channel: "phone", summary: "Please stop", patientId: "pat-1", wantsOptOut: true },
       AT,
     );
-    expect(getStore().state.auditEvents.at(-1)?.practiceId).toBe(getConsole().practice?.id);
+    expect(getStore().state.auditEvents.at(-1)?.practiceId).toBe(getConsole().practices[0]?.practice.id);
   });
 });
 

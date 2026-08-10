@@ -10,7 +10,7 @@ import { getConsole } from "@/console/store";
 import { toViewIntervals } from "@/registers/provenance";
 import { registersFor } from "@/registers/store";
 import { authorize } from "@/tenancy/tenancy";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
 import { toggleRegister } from "./actions";
 
@@ -28,12 +28,11 @@ export default async function RegistersPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  const email = await requireSession();
+  const { email, record } = await requirePractice();
   const console_ = getConsole();
-  if (!console_.practice) redirect("/console/onboarding");
   const { error } = await searchParams;
 
-  const practiceId = console_.practice.id;
+  const practiceId = record.practice.id;
   const registers = registersFor(practiceId);
   // Injected once per render so every relative review age on the page agrees.
   const now = new Date();
