@@ -86,5 +86,20 @@ export async function POST(request: NextRequest) {
   });
   if (returned.ok) addReturnReports([returned.report]);
 
+  // W173: opt-in extra referral recorded as NOT PROCEEDING, so the outcome dashboard can be
+  // scanned with all three of W170's verdicts populated. Behind a flag rather than added to the
+  // default seed: the referral console's e2e pins the two lists it renders, and widening a
+  // shared fixture to suit one page is how the other page's assertions quietly go vacuous.
+  if (request.nextUrl.searchParams.get("cancelled") === "1") {
+    addReferralDocuments([make("ref-sent-cancelled", practiceId, OTHER, "pat-4")]);
+    addAcceptanceActs([
+      { kind: "sent", referralId: "ref-sent-cancelled", at: "2026-02-01", by: "clin-demo", fromPracticeId: practiceId, toPracticeId: OTHER, patientId: "pat-4" as PatientId },
+    ]);
+    addReferralEvents([
+      { practiceId, patientId: "pat-4" as PatientId, referralId: "ref-sent-cancelled", kind: "referral_written", at: "2026-02-01" },
+      { practiceId, patientId: "pat-4" as PatientId, referralId: "ref-sent-cancelled", kind: "referral_cancelled", at: "2026-02-04" },
+    ]);
+  }
+
   return NextResponse.json({ sent: sentBy(practiceId), received: sentTo(practiceId) });
 }

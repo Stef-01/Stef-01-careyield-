@@ -95,6 +95,7 @@ unmapped surfaces" and been wrong within a day; that claim is now checked rather
 /console/onboarding — Practice console
 /console/ops — Complaint/opt-out workflow
 /console/outreach — Outreach console
+/console/outcomes — Weekly/pilot reports
 /console/privacy — Privacy page
 /console/registers — Register console
 /console/results — Weekly/pilot reports
