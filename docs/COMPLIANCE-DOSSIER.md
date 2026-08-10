@@ -93,3 +93,14 @@ remaining Privacy Act tranche-2 reforms. Each review appends a dated line here.
   first surface that would hold contact details for people who are **not** patients of a
   subscribing practice, which changes the privacy analysis (collection notice, retention, erasure)
   rather than merely extending it. Synthetic-only today, so the exposure is theoretical.
+- 2026-08-10 — **Recurring false positive worth the compliance owner's attention, not a
+  unilateral fix.** The W23 `no-ratings` rule (`/\breviews?\b/`) has now blocked correct copy
+  three times: "medication review" (W45), the analytics withheld-explainer (W65), and "reviews
+  due by the practice's schedule" (W100). In a healthcare product "review" overwhelmingly means
+  a *clinical* review, not a customer rating. Each time the copy was reworded and the linter
+  left alone, which is the right power balance and the W45 precedent — but three hits is
+  evidence the rule is miscalibrated rather than that the copy keeps being wrong. A tighter
+  pattern (e.g. requiring a rating context: customer/patient/online/Google reviews, star
+  ratings, `n/5`) would keep the protection and stop taxing correct sentences. **Not changed
+  here**: loosening a compliance rule is a decision for whoever owns the compliance posture,
+  and doing it inside an unrelated unit is exactly how such rules erode.

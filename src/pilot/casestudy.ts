@@ -19,6 +19,35 @@ export interface CaseStudyContext {
   identifyingStrings: string[];
   /** True until founder gate G4 — stamps the synthetic-data provenance on the study. */
   syntheticData: boolean;
+  /** W100: Year-2 register work, when the pilot ran any. Omitted entirely when it did not. */
+  registers?: RegisterCaseStudyInput;
+}
+
+/**
+ * W100: what a Year-2 case study may say about register-driven contact.
+ *
+ * Note what is ABSENT: there is no condition name, and no field to put one in. Two reasons,
+ * and the second is the stronger one.
+ *
+ * The W23 linter bans condition vocabulary in publishable copy, and W45 established the
+ * power balance — the copy changes, the linter does not. But de-identification is the real
+ * argument: "a 10-GP metropolitan practice" is not identifying, and "a 10-GP metropolitan
+ * practice running a diabetes register" narrows it considerably. A case study that names
+ * both the practice shape and the register is a smaller haystack than one that names either.
+ *
+ * So registers are described by what they DID, never by what they were about.
+ */
+export interface RegisterCaseStudyInput {
+  /** How many registers were active. Not which. */
+  registerCount: number;
+  /** Patients on any register at the start of the window. */
+  membersAtStart: number;
+  /** Open care gaps at the start — a scheduling figure, not a clinical one (W58). */
+  gapsAtStart: number;
+  /** Gap-closure rate in the messaged arm, 0..1. */
+  inviteClosureRate: number;
+  /** Gap-closure rate in the holdout arm, 0..1. Null when the register had no holdout. */
+  holdoutClosureRate: number | null;
 }
 
 export class CaseStudyComplianceError extends Error {}
@@ -92,7 +121,7 @@ a reasonable use of the appointment. The most common outcomes were routine
 follow-up, medicines management, and preventive care — ordinary general practice,
 delivered to patients who had drifted off the books.
 
-## Limitations
+${renderRegisterSection(context.registers)}## Limitations
 
 Point estimates from a single practice over ${report.weeksSimulated} weeks; no confidence
 intervals are implied. Attendance figures are counts of appointments, not health
@@ -101,6 +130,37 @@ outcomes — this document makes no claims about anyone's health.
 
   assertPublishable(text, context.identifyingStrings);
   return text;
+}
+
+/**
+ * The register section, or nothing at all.
+ *
+ * Reports the DIFFERENCE between arms, never the messaged arm's rate on its own — the same
+ * rule W64 holds for the analytics it comes from, because a closure rate without a comparison
+ * is just "patients attended appointments", which happens without any of this.
+ */
+function renderRegisterSection(input: CaseStudyContext["registers"]): string {
+  if (!input) return "";
+  const pctOf = (n: number) => `${(n * 100).toFixed(1)}%`;
+  const difference =
+    input.holdoutClosureRate === null
+      ? null
+      : (input.inviteClosureRate - input.holdoutClosureRate) * 100;
+
+  return `## Register-driven contact
+
+The practice ran ${input.registerCount} condition register${input.registerCount === 1 ? "" : "s"} during the period,
+covering ${input.membersAtStart.toLocaleString("en-AU")} patients with ${input.gapsAtStart.toLocaleString("en-AU")} appointments
+due by the practice's own schedule at the start of the window. Registers narrowed WHO received an
+availability message; the message itself was unchanged, and carried no mention of any register.
+
+${
+  difference === null
+    ? `This register had no comparison group, so no effect on appointment completion is claimed. The practice can see the rate; it cannot yet know what caused it.`
+    : `Appointments were completed for ${pctOf(input.inviteClosureRate)} of the messaged group against ${pctOf(input.holdoutClosureRate ?? 0)} of the comparison group — a difference of ${difference.toFixed(1)} percentage points. The messaged rate alone is not the result; without the comparison group it would mean only that patients attended appointments, which happens anyway.`
+}
+
+`;
 }
 
 function capitalise(s: string): string {
