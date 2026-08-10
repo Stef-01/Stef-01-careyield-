@@ -13,6 +13,7 @@
 // rather than merely looking untidy.
 
 import type { GuidelineInterval } from "@/domain/types";
+import { wholeMonthsBetween } from "./caregap";
 
 export interface ProvenanceView {
   /** Who published it — shown verbatim, never paraphrased. */
@@ -43,21 +44,28 @@ export function describeAge(reviewedOn: string, now: Date): string {
   const then = new Date(`${reviewedOn}T00:00:00Z`);
   if (Number.isNaN(then.getTime())) return "review date unreadable";
 
-  const days = daysBetween(then, now);
+  // Compare date to date, not a UTC midnight to a wall clock. CareYield is an Australian
+  // product (AEST = UTC+10), so a source retrieved "today" local time is a future instant in
+  // UTC for the first ten hours of every day — which rendered "reviewed in the future" on the
+  // one page whose job is making provenance credible.
+  const days = daysBetween(then, new Date(`${now.toISOString().slice(0, 10)}T00:00:00Z`));
   if (days < 0) return "reviewed in the future";
   if (days === 0) return "today";
   if (days === 1) return "yesterday";
   if (days < 30) return `${days} days ago`;
 
-  const months = Math.floor(days / 30);
+  // Calendar months, with years derived FROM them, so the two can never disagree. The
+  // previous mix of a 30-day month and a 365-day year made a source appear to get FRESHER
+  // as it aged — 719 days read "23 months ago", 720 days read "1 year ago" — and any
+  // fixed-length year makes an exact two-year-old source read as one year old.
+  const months = wholeMonthsBetween(reviewedOn, now.toISOString().slice(0, 10));
   if (months < 24) return months === 1 ? "1 month ago" : `${months} months ago`;
-  const years = Math.floor(days / 365);
+  const years = Math.floor(months / 12);
   return years === 1 ? "1 year ago" : `${years} years ago`;
 }
 
 export function cadenceLabel(intervalMonths: number): string {
   if (intervalMonths === 1) return "every month";
-  if (intervalMonths === 12) return "every 12 months";
   return `every ${intervalMonths} months`;
 }
 

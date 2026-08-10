@@ -12,7 +12,7 @@
 // because W56's real values are blocked on the G5 ruling. A cadence of 12 fixture-months is
 // not a claim that any condition should be reviewed annually.
 
-import { runSim, type SimConfig, type SimResult } from "@/sim/harness";
+import { checkInvariants, runSim, type SimConfig, type SimResult } from "@/sim/harness";
 import { DEFAULT_REGISTER_SIM, type RegisterSimConfig } from "./sim-registers";
 
 export interface ArmSummary {
@@ -42,6 +42,8 @@ export interface RegisterComparison {
     incrementalPer1000: number | null;
   };
   invariantsHeld: boolean;
+  /** Every invariant violation found, by arm. Empty in both when invariantsHeld. */
+  violations: { off: string[]; on: string[] };
 }
 
 function summarise(result: SimResult): ArmSummary {
@@ -70,6 +72,11 @@ export function runRegisterComparison(
   const offS = summarise(off);
   const onS = summarise(on);
 
+  // Actually check, rather than assert. A report that prints "invariants held" without
+  // running the check is worse than one that prints nothing: it launders an unverified
+  // claim through an artefact a reader is meant to trust.
+  const violations = { off: checkInvariants(off), on: checkInvariants(on) };
+
   return {
     weeks: base.weeks,
     seed: base.seed,
@@ -85,9 +92,8 @@ export function runRegisterComparison(
           ? null
           : onS.incrementalPer1000 - offS.incrementalPer1000,
     },
-    // Both arms replay clean: the spine verified each run, so neither arm silently
-    // diverged from its own event log.
-    invariantsHeld: true,
+    invariantsHeld: violations.off.length === 0 && violations.on.length === 0,
+    violations,
   };
 }
 
@@ -147,7 +153,9 @@ export function renderComparisonReport(c: RegisterComparison): string {
     `${c.off.invitationsSent} — ${c.off.invitationsSent === 0 ? "n/a" : `${Math.round((c.on.invitationsSent / c.off.invitationsSent) * 100)}%`} of the unnarrowed volume. Read its incrementality figure`,
     `with that in mind; a point estimate on a small arm is a wide interval reported as a number.`,
     ``,
-    `Invariants: ${c.invariantsHeld ? "held in both arms" : "FAILED"} — each run replays from its own event spine.`,
+    c.invariantsHeld
+      ? `Invariants: held in both arms — checked with the same checkInvariants() the fleet run uses.`
+      : `Invariants: **FAILED** — off: ${c.violations.off.join("; ") || "none"} | on: ${c.violations.on.join("; ") || "none"}`,
     ``,
   ].join("\n");
 }

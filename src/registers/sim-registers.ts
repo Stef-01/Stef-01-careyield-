@@ -17,7 +17,7 @@
 //     MECHANISM — what changes when a register narrows and reorders sending — not about any
 //     real condition's cadence. The report says so in as many words.
 
-import type { ConditionCode, Patient, PatientId } from "@/domain/types";
+import type { ConditionCode, Patient } from "@/domain/types";
 import { detectCareGaps, type CareGap } from "./caregap";
 import { narrowToCareGaps } from "./eligibility";
 import { loadIntervals, type IntervalCatalogue } from "./intervals";
@@ -121,18 +121,10 @@ export function buildRegisterLayer(
   return {
     memberIds: new Set(memberships.map((m) => m.patientId as string)),
     gaps,
+    // buildRegisterLayer runs once per week but these closures run per clinician-session,
+    // and both helpers rebuild a Set over the whole gap list on entry. Closing over the
+    // gaps once keeps that to one build per week instead of a few hundred per run.
     narrow: (eligible: Patient[]) => (config.requireCareGap ? narrowToCareGaps(eligible, gaps) : eligible),
     rank: (eligible: Patient[]) => rankGapAware(eligible, gaps),
   };
-}
-
-/** Patient ids on the register — used by the comparison to report register reach. */
-export function registerMemberIds(
-  patients: readonly Patient[],
-  config: RegisterSimConfig,
-  seed: number,
-): Set<PatientId> {
-  return new Set(
-    patients.filter((p) => flagged(p.id as string, seed, config.flaggedShare)).map((p) => p.id),
-  );
 }

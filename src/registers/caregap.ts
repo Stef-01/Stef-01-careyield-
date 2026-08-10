@@ -17,7 +17,13 @@
 // `detectCareGaps` returns nothing, which is the correct behaviour for a condition whose
 // interval has not been signed off: no interval, no cadence, no gap.
 
-import type { ConditionCode, GuidelineInterval, PatientId, RegisterMembership } from "@/domain/types";
+import type {
+  ConditionCode,
+  GuidelineInterval,
+  PatientId,
+  PracticeId,
+  RegisterMembership,
+} from "@/domain/types";
 import { lookupInterval, type IntervalCatalogue } from "./intervals";
 
 /**
@@ -28,6 +34,13 @@ import { lookupInterval, type IntervalCatalogue } from "./intervals";
  */
 export interface CareGap {
   readonly notAClinicalRecommendation: true;
+  /**
+   * Carried from the membership. Without it every downstream consumer keys on patientId
+   * alone, and a gap list spanning two practices would let one practice's gaps narrow and
+   * reorder another's invitation pool — the isolation W60's store and W72's attribution
+   * both hold, abandoned at the type level.
+   */
+  practiceId: PracticeId;
   patientId: PatientId;
   conditionCode: ConditionCode;
   /** The interval this gap was measured against — always a cited one (W56 loader). */
@@ -84,6 +97,7 @@ export function detectCareGaps(
     if (input.lastRelevantVisit === null) {
       gaps.push({
         notAClinicalRecommendation: true,
+        practiceId: membership.practiceId,
         patientId: membership.patientId,
         conditionCode: membership.conditionCode,
         intervalId: interval.id,
@@ -103,6 +117,7 @@ export function detectCareGaps(
 
     gaps.push({
       notAClinicalRecommendation: true,
+      practiceId: membership.practiceId,
       patientId: membership.patientId,
       conditionCode: membership.conditionCode,
       intervalId: interval.id,
@@ -127,9 +142,25 @@ export function detectCareGaps(
 
 /** Gap count per condition — what W60's console carries and W59's eligibility reads. */
 export function gapCountsByCondition(gaps: readonly CareGap[]): Record<string, number> {
-  const counts: Record<string, number> = {};
+  // Null-prototype: condition codes come from a PMS feed, and a code of "__proto__" against
+  // a plain object literal resolves to Object.prototype (non-nullish), so `?? 0` never fires,
+  // `+ 1` yields a string, and the assignment is a silent no-op — the register would report
+  // zero gaps for that condition with no error anywhere.
+  const counts: Record<string, number> = Object.create(null);
   for (const gap of gaps) {
-    counts[gap.conditionCode as string] = (counts[gap.conditionCode as string] ?? 0) + 1;
+    const code = gap.conditionCode as string;
+    counts[code] = (counts[code] ?? 0) + 1;
   }
   return counts;
+}
+
+/**
+ * Gaps belonging to one practice. Callers that hold gaps from more than one tenant must
+ * scope before narrowing or ranking; this is the seam that makes that possible at all.
+ */
+export function scopeGapsToPractice(
+  gaps: readonly CareGap[],
+  practiceId: PracticeId,
+): CareGap[] {
+  return gaps.filter((g) => g.practiceId === practiceId);
 }

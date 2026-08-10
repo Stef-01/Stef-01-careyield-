@@ -30,6 +30,7 @@ function patient(id: string, over: Partial<Patient> = {}): Patient {
 function gap(patientId: string): CareGap {
   return {
     notAClinicalRecommendation: true,
+    practiceId: PRACTICE,
     patientId: patientId as PatientId,
     conditionCode: "placeholder_register_a" as ConditionCode,
     intervalId: "iv-a" as CareGap["intervalId"],

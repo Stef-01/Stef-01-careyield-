@@ -7,7 +7,7 @@
 // silently stop being exhaustive.
 
 import { describe, expect, it } from "vitest";
-import type { ConditionCode, PatientId } from "@/domain/types";
+import type { ConditionCode, PatientId, PracticeId } from "@/domain/types";
 import type { EligibilityResult, ExclusionReason } from "@/engine/eligibility";
 import type { CareGap } from "./caregap";
 import {
@@ -17,6 +17,7 @@ import {
   type CareGapFilterConfig,
 } from "./eligibility";
 
+const PRACTICE = "prac-1" as PracticeId;
 const PAT = { id: "pat-1" as PatientId };
 
 /** Every reason W4 can refuse for. Kept in sync with the union by the check below. */
@@ -37,6 +38,7 @@ const ALL_EXCLUSIONS: ExclusionReason[] = [
 function gap(patientId = "pat-1"): CareGap {
   return {
     notAClinicalRecommendation: true,
+    practiceId: PRACTICE,
     patientId: patientId as PatientId,
     conditionCode: "placeholder_register_a" as ConditionCode,
     intervalId: "iv-a" as CareGap["intervalId"],
