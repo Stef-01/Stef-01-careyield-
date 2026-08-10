@@ -61,9 +61,15 @@ report generates from sim via `src/pilot/report.ts`).
 
 ## 6. Success criteria (pre-registered — decided before week 1, not after week 12)
 
-Primary: **incremental attended appointments per 1,000 eligible patients** (invite arm minus
-holdout arm) — target agreed with the practice at signing; the modelling floor from the venture
-brief is ~4 incremental attended visits/week practice-wide at breakeven.
+Primary: **incremental attended appointments per 1,000 patients in the messaged group** (invite
+arm minus holdout arm) — target agreed with the practice at signing; the modelling floor from the
+venture brief is ~4 incremental attended visits/week practice-wide at breakeven.
+
+The denominator is every patient assigned to the arm (`docs/ATTRIBUTION.md`: "rates are per
+1,000 arm patients"), not the smaller set who passed the eligibility rules in a given week —
+intention-to-treat holds the denominator fixed so the rate cannot be inflated by narrowing
+eligibility mid-pilot. Read against the eligible subset the figure is several times larger;
+CareYield reports the conservative one.
 
 Secondary: conversion ≥15% of invitations → booking; ≥60% of generated bookings with the
 patient's usual GP; opt-outs <1%/week; clinician-judged-reasonable ≥80%; zero upheld

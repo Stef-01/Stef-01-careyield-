@@ -69,7 +69,7 @@ function ProgressRail({ current }: { current: SetupStepSlug }) {
                 ? "border-stone-800 bg-stone-900 text-white"
                 : state === "done"
                   ? "border-stone-300 text-stone-700"
-                  : "border-stone-200 text-stone-400")
+                  : "border-stone-200 text-stone-500")
             }
           >
             {i + 1}. {step.title}
@@ -164,6 +164,8 @@ export default async function SetupStepPage({
               return (
                 <div key={i} className="flex items-end gap-3">
                   <div className="flex-1">
+                    {/* Carries the saved id so edits keep clinician identity stable. */}
+                    <input type="hidden" name="clinicianId" value={existing?.id ?? ""} />
                     <Field label={`Clinician ${i + 1}`}>
                       <input
                         name="clinicianName"

@@ -27,7 +27,7 @@ export default async function ConsoleHome() {
     <ConsoleShell email={email}>
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{state.practice.name}</h1>
-        <span className="text-sm text-stone-400">
+        <span className="text-sm text-stone-500">
           {state.practice.timezone} · holdout {Math.round(state.practice.holdoutRate * 100)}%
         </span>
       </div>
@@ -44,6 +44,12 @@ export default async function ConsoleHome() {
       )}
 
       <div className="mt-4 flex gap-4">
+        <Link
+          href="/console/results"
+          className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
+        >
+          Your results
+        </Link>
         <Link
           href="/console/dashboard"
           className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
@@ -91,7 +97,7 @@ export default async function ConsoleHome() {
       <section className="mt-8 rounded-xl border border-stone-200 bg-white p-6">
         <div className="mb-4 flex items-baseline justify-between">
           <h2 className="font-medium text-stone-900">Eligibility rules</h2>
-          <span className="text-xs text-stone-400">version {state.rulesVersion}</span>
+          <span className="text-xs text-stone-500">version {state.rulesVersion}</span>
         </div>
         <dl className="divide-y divide-stone-100">
           {settings.map(([term, value]) => (

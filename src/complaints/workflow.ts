@@ -17,6 +17,13 @@ export interface ComplaintRecord extends Complaint {
   /** Patient identifier when the complainant could be linked; enables opt-out. */
   patientId: string | null;
   optOutApplied: boolean;
+  /**
+   * W51: did the identifier the opt-out was applied under match any record the
+   * practice actually holds? A typo suppresses a phantom while the real patient
+   * keeps receiving messages, so the mismatch is surfaced, never assumed away.
+   * `null` when no opt-out was requested.
+   */
+  optOutMatchedPatient: boolean | null;
   timeline: Array<{ at: string; event: string; byEmail: string | null }>;
   resolution: string | null;
 }
@@ -53,6 +60,7 @@ export function intakeComplaint(input: IntakeInput, id: string, at: string): Com
     severity: null,
     patientId: input.patientId?.trim() || null,
     optOutApplied: false, // the store flips this after the terminal opt-out is applied
+    optOutMatchedPatient: null,
     timeline: [{ at, event: `received via ${input.channel}`, byEmail: null }],
     resolution: null,
   };

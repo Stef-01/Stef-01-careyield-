@@ -66,12 +66,12 @@ export default function DemoPage() {
                       Open booking link
                     </a>
                   ) : (
-                    <span className="text-stone-400">link closed</span>
+                    <span className="text-stone-500">link closed</span>
                   )}
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-xs text-stone-400">
+            <p className="mt-4 text-xs text-stone-500">
               Console tabs for the walkthrough: <a className="underline" href="/console">practice</a> ·{" "}
               <a className="underline" href="/console/dashboard">incrementality</a> ·{" "}
               <a className="underline" href="/console/usefulness">usefulness</a> ·{" "}

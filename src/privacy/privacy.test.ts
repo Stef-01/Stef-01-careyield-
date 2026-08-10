@@ -107,6 +107,7 @@ describe("W33 delete", () => {
       appointments: 1,
       auditEvents: 2,
       outcomes: 1,
+      complaints: 0, // this dataset carries none — the store composes the real count
     });
     expect(result.deletion.ref).toBe(patientRef("pat-1"));
     expect(result.deletion.ref).not.toContain("pat-1");

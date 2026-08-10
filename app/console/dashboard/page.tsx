@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 function StatTile({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-5">
-      <div className="text-xs font-medium uppercase tracking-wide text-stone-400">{label}</div>
+      <div className="text-xs font-medium uppercase tracking-wide text-stone-500">{label}</div>
       <div className="mt-1 text-3xl font-semibold text-stone-900">{value}</div>
       {detail && <div className="mt-1 text-xs text-stone-500">{detail}</div>}
     </div>
@@ -29,7 +29,7 @@ export default async function DashboardPage() {
     <ConsoleShell email={email}>
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Incrementality</h1>
-        <span className="text-sm text-stone-400">
+        <span className="text-sm text-stone-500">
           {data.weeks} simulated weeks · {data.patientCount.toLocaleString()} synthetic patients
         </span>
       </div>
@@ -65,14 +65,14 @@ export default async function DashboardPage() {
       <section className="mt-8 rounded-xl border border-stone-200 bg-white p-6">
         <div className="mb-4 flex items-baseline justify-between">
           <h2 className="font-medium text-stone-900">Weekly table</h2>
-          <span className="text-xs text-stone-400">
+          <span className="text-xs text-stone-500">
             opt-outs {data.optOutRatePct.toFixed(1)}% of {data.totals.invitationsSent.toLocaleString()} sent
           </span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm tabular-nums">
             <thead>
-              <tr className="border-b border-stone-200 text-left text-xs uppercase tracking-wide text-stone-400">
+              <tr className="border-b border-stone-200 text-left text-xs uppercase tracking-wide text-stone-500">
                 <th className="py-2 pr-4 font-medium">Week</th>
                 <th className="py-2 pr-4 font-medium">Invite / 1,000</th>
                 <th className="py-2 pr-4 font-medium">Holdout / 1,000</th>
@@ -93,7 +93,7 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      <p className="mt-6 text-xs text-stone-400">
+      <p className="mt-6 text-xs text-stone-500">
         Attribution definitions: docs/ATTRIBUTION.md {attr.version} — intention-to-treat; no claim
         without a holdout arm. <Link href="/console" className="underline">Back to console</Link>
       </p>

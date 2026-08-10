@@ -108,6 +108,71 @@ export interface AuditEvent {
   detail: string;
 }
 
+// ---------------------------------------------------------------------------
+// W55: care-gap registers. Schema only — no clinical content lives here.
+// ---------------------------------------------------------------------------
+
+/** Stable identifier for a condition (e.g. the code W56 cites its intervals against). */
+export type ConditionCode = string & { readonly __brand: "ConditionCode" };
+export type GuidelineIntervalId = string & { readonly __brand: "GuidelineIntervalId" };
+
+export interface Condition {
+  code: ConditionCode;
+  displayName: string;
+  /** Plain-English, practice-facing. Never a clinical definition of the condition. */
+  description: string;
+  active: boolean;
+}
+
+/**
+ * Where a guideline interval came from. Every field is required, so an interval
+ * cannot exist in the type system without a citable source — the TS twin of the
+ * NOT NULL source columns in 0004_registers.sql.
+ */
+export interface IntervalProvenance {
+  /** Human-readable citation, e.g. the guideline title and its issuing body. */
+  citation: string;
+  url: string;
+  /** ISO date the cited source was published. */
+  publishedOn: string;
+  /** ISO date the source was read when the row was written. */
+  retrievedOn: string;
+}
+
+/**
+ * A guideline-recommended interval between reviews.
+ *
+ * This is a SCHEDULING input, not a clinical recommendation: it says how often a
+ * guideline expects a review, never what should happen at one. W58 types the
+ * "not a clinical recommendation" boundary where gaps are computed.
+ */
+export interface GuidelineInterval {
+  id: GuidelineIntervalId;
+  conditionCode: ConditionCode;
+  name: string;
+  intervalMonths: number;
+  provenance: IntervalProvenance;
+}
+
+/**
+ * How a patient came to be on a register.
+ *
+ * There is deliberately no inferential member of this union — nothing for "inferred
+ * from symptoms" or "predicted". Symptom-based membership is unrepresentable, which
+ * is the G7/TGA boundary held at the type level as well as by a CHECK constraint.
+ */
+export type RegisterMembershipSource = "pms_condition_flag" | "practice_confirmed";
+
+export interface RegisterMembership {
+  practiceId: PracticeId;
+  patientId: PatientId;
+  conditionCode: ConditionCode;
+  source: RegisterMembershipSource;
+  addedAt: string; // ISO datetime
+  /** Set when the patient leaves the register; history is kept, not deleted. */
+  removedAt: string | null;
+}
+
 /** Registry mirrored by SQL tables — the W2 consistency test keys off this. */
 export const DOMAIN_TABLES = [
   "practices",
@@ -118,6 +183,28 @@ export const DOMAIN_TABLES = [
   "outcome_records",
   "audit_events",
   "memberships", // W18 multi-tenancy
+  "conditions", // W55 reference
+  "guideline_intervals", // W55 reference
+  "register_membership", // W55 practice-scoped
 ] as const;
 
 export type DomainTable = (typeof DOMAIN_TABLES)[number];
+
+/**
+ * National clinical guidance, identical for every practice, so NOT practice-scoped:
+ * readable by any staff identity, writable by none (rows change by migration).
+ *
+ * This is the only sanctioned exception to the 0003 rule that every table is scoped
+ * by membership. It is listed explicitly, and the schema-consistency test holds both
+ * halves — reference tables stay read-only, and everything else stays scoped — so the
+ * exception cannot spread to practice data by accident.
+ */
+export const REFERENCE_TABLES = ["conditions", "guideline_intervals"] as const;
+
+export type ReferenceTable = (typeof REFERENCE_TABLES)[number];
+
+/** Every domain table that holds one practice's data and must be membership-scoped. */
+export const PRACTICE_SCOPED_TABLES = DOMAIN_TABLES.filter(
+  (table): table is Exclude<DomainTable, ReferenceTable> =>
+    !(REFERENCE_TABLES as readonly string[]).includes(table),
+);

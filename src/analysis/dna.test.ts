@@ -54,6 +54,11 @@ describe("W44 DNA analysis", () => {
     expect(c.verdict).toBe("generated_worse");
   });
 
+  // 30s budget: building the 12k-patient sim takes ~5s on a cold cache, right on
+  // Vitest's 5s default, so this flakes intermittently on an unchanged tree
+  // (observed at 5499ms). It is a contract test, not a perf budget — state the real
+  // budget rather than dodge it by hoisting runSim to module scope, where the same
+  // work would just become unbounded collect time. Same 30s precedent as W27.
   it("produces a definite, well-formed comparison from the full sim", () => {
     // Contract test only: the verdict itself is a property of the sim's DNA calibration, not of
     // this module. (Observed on current defaults: generated_worse — the synthetic DNA model for
@@ -66,5 +71,5 @@ describe("W44 DNA analysis", () => {
       expect(arm.rate).toBeGreaterThanOrEqual(0);
       expect(arm.rate).toBeLessThanOrEqual(1);
     }
-  });
+  }, 30_000);
 });

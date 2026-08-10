@@ -8,6 +8,12 @@ import { confirmBooking } from "../actions";
 
 export const dynamic = "force-dynamic";
 
+// W49 follow-up: pin a route-level <title>. The confirm action revalidates this
+// route, and during that swap the inherited layout title can be momentarily absent —
+// axe caught it as a document-title violation (WCAG 2.4.2). A patient-facing page
+// reached from an SMS deserves its own title regardless.
+export const metadata = { title: "Your appointment — CareYield" };
+
 function Panel({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-4 px-6">
@@ -48,7 +54,7 @@ export default async function BookingPage({ params }: { params: Promise<{ token:
           {store.clinicianName} at {store.practiceName}
           {appointment ? ` — ${new Date(appointment.startsAt).toLocaleString("en-AU")}` : ""}.
         </p>
-        <p className="text-sm text-stone-400">
+        <p className="text-sm text-stone-500">
           {isTelehealth
             ? "The practice will call you at this time. If you can no longer attend, please contact the practice."
             : "If you can no longer attend, please contact the practice."}
@@ -99,7 +105,7 @@ export default async function BookingPage({ params }: { params: Promise<{ token:
           Confirm booking
         </button>
       </form>
-      <p className="text-sm text-stone-400">
+      <p className="text-sm text-stone-500">
         No action is needed if this time doesn't suit you.
       </p>
     </Panel>

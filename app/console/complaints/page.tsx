@@ -2,7 +2,10 @@
 // complaints are the practice notification: they banner here and on the console
 // home, and the W16 guardrail treats any open complaint as critical.
 
+import { redirect } from "next/navigation";
 import { getComplaints } from "@/complaints/store";
+import { getConsole } from "@/console/store";
+import { authorize } from "@/tenancy/tenancy";
 import { requireSession } from "../guard";
 import { ConsoleShell, inputClass, primaryButtonClass } from "../ui";
 import { intake, resolve, triage } from "./actions";
@@ -21,6 +24,13 @@ export default async function ComplaintsPage({
   searchParams: Promise<{ received?: string; error?: string }>;
 }) {
   const email = await requireSession();
+  // W51: the list is operator-entered, patient-linked data — reading it takes
+  // membership, not merely a session.
+  const state = getConsole();
+  if (!state.practice) redirect("/console/onboarding");
+  if (!authorize(state.memberships, email, state.practice.id, "view_dashboard").allowed) {
+    redirect("/console");
+  }
   const params = await searchParams;
   const { complaints } = getComplaints();
   const open = complaints.filter((c) => c.status === "open");
@@ -30,7 +40,7 @@ export default async function ComplaintsPage({
     <ConsoleShell email={email}>
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Complaints</h1>
-        <span className="text-sm text-stone-400" data-testid="open-count">
+        <span className="text-sm text-stone-500" data-testid="open-count">
           {open.length} open
         </span>
       </div>
@@ -98,8 +108,13 @@ export default async function ComplaintsPage({
                         opt-out applied
                       </span>
                     )}
+                    {c.optOutApplied && c.optOutMatchedPatient === false && (
+                      <span className="ml-2 rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-900">
+                        identifier matched no record — check it
+                      </span>
+                    )}
                   </span>
-                  <span className="text-xs text-stone-400">
+                  <span className="text-xs text-stone-500">
                     {c.channel} · {c.at.slice(0, 16).replace("T", " ")}
                   </span>
                 </div>
@@ -144,7 +159,7 @@ export default async function ComplaintsPage({
             {resolved.map((c) => (
               <li key={c.id} className="py-2.5">
                 <span className="text-stone-700">{c.summary}</span>{" "}
-                <span className="text-stone-400">— {c.resolution}</span>
+                <span className="text-stone-500">— {c.resolution}</span>
               </li>
             ))}
           </ul>

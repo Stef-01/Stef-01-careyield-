@@ -16,3 +16,6 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      # W53: dependency advisories (moderate+). Accepted risks live in
+      # src/security/audit-allowlist.ts and expire on their reviewBy date.
+      - run: pnpm audit:gate

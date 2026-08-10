@@ -9,3 +9,7 @@ test-results/
 playwright-report/
 # test-regenerated binary artifact (zip timestamps make it non-deterministic)
 reports/weekly-w8.docx
+reports/load-w48.md
+# test-regenerated binary artifacts (zip timestamps make them non-deterministic — W20 precedent)
+reports/careyield-one-pager.docx
+reports/careyield-sales-deck.pptx

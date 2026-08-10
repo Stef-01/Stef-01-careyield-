@@ -6,8 +6,10 @@ ledger: `BUILD-STATE.md`).
 
 1. **One unit per firing.** Follow the claim protocol in `BUILD-STATE.md` exactly — claim-push
    first, build second. Overlapping sessions are normal; the ledger is the lock.
-2. **Verify gate is hard.** `pnpm typecheck && pnpm test && pnpm build` plus the unit's stated
-   verification. Green commits only; WIP goes behind flags with continuation notes.
+2. **Verify gate is hard.** `pnpm verify` (typecheck · test · build · audit:gate) plus the unit's
+   stated verification. Green commits only; WIP goes behind flags with continuation notes.
+   `audit:gate` (W53) fails on any moderate+ dependency advisory that is not accepted in
+   `src/security/audit-allowlist.ts` with a rationale and a review date.
 3. **Karpathy laws**: think before coding · simplicity first · surgical changes · goal-driven
    execution. No features beyond the unit. No speculative abstractions.
 4. **Founder gates (plan §4) are absolute.** No real patient data, no live SMS, no production

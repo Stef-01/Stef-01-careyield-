@@ -6,6 +6,8 @@ import { resetComplaints } from "@/complaints/store";
 import { getConsole, resetConsole } from "@/console/store";
 import { resetPrivacy } from "@/privacy/store";
 import { assertMockRoutesEnabled } from "@/lib/mock-guard";
+import { resetRateLimits } from "@/lib/rate-limit";
+import { resetRegisters } from "@/registers/store";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +19,13 @@ export async function GET() {
 export async function POST() {
   assertMockRoutesEnabled();
   resetPrivacy(); // W33 state rides along with the console reset in e2e
+  // The W37 sign-in limiter is per-identifier per minute, and the e2e suite signs in
+  // as the same manager dozens of times inside that window. Without this the suite
+  // trips its own rate limit and fails in whichever spec happens to cross the
+  // threshold — a wandering flake, not a product defect. Clearing it here keeps the
+  // limiter's production behaviour untouched.
+  resetRateLimits();
   resetComplaints(); // W43 likewise
+  resetRegisters(); // W60 likewise
   return NextResponse.json(resetConsole());
 }

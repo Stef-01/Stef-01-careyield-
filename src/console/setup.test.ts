@@ -87,15 +87,75 @@ describe("W41 clinician roster", () => {
       OWNER,
     );
     // Roster shrinks to one — the stale id must not survive in session config.
-    saveClinicians([ROSTER[0]!], NOW, OWNER);
-    expect(getConsole().sessionConfig.participatingClinicianIds).toEqual(["clin-1"]);
+    const first = getConsole().clinicians[0]!;
+    saveClinicians([{ id: first.id, displayName: first.displayName, participating: true }], NOW, OWNER);
+    expect(getConsole().sessionConfig.participatingClinicianIds).toEqual([first.id]);
   });
 
-  it("falls back to 'all' when the allowlist empties out", () => {
+  it("W41 review fix: an emptied allowlist fails CLOSED, never widens to 'all'", () => {
+    // Previously this collapsed to "all" — the most permissive value — turning a
+    // deliberate narrowing into a grant-everyone on an unrelated staff edit.
     saveClinicians(ROSTER, NOW, OWNER);
     saveSessionConfig({ ...DEFAULT_SESSION_CONFIG, participatingClinicianIds: ["clin-2"] }, NOW, OWNER);
+    acknowledgeSetupStep("sessions", OWNER);
+
     saveClinicians([{ displayName: "Dr New Person", participating: true }], NOW, OWNER);
-    expect(getConsole().sessionConfig.participatingClinicianIds).toBe("all");
+
+    const state = getConsole();
+    expect(state.sessionConfig.participatingClinicianIds).toEqual([]);
+    // Empty is invalid, so the step loses its acknowledgement and setup cannot certify.
+    expect(state.acknowledgedSteps).not.toContain("sessions");
+    expect(setupReadiness().sessions).toBe(false);
+    expect(completeSetup(NOW, OWNER)).toHaveProperty("fillableTypes");
+    // And the narrowing is on the record, not silent.
+    expect(state.auditEvents.some((e) => e.detail.includes("allowlist narrowed"))).toBe(true);
+  });
+
+  it("W41 review fix: ids survive an edit, so the allowlist keeps naming the same person", () => {
+    // Clearing a non-last row used to shift every id below it, silently re-pointing
+    // the allowlist at a different clinician.
+    const three = [
+      { displayName: "Dr Lee", participating: true },
+      { displayName: "Dr Okafor", participating: true },
+      { displayName: "Dr Chen", participating: true },
+    ];
+    saveClinicians(three, NOW, OWNER);
+    const saved = getConsole().clinicians;
+    const lee = saved.find((c) => c.displayName === "Dr Lee")!;
+    const okafor = saved.find((c) => c.displayName === "Dr Okafor")!;
+    const chen = saved.find((c) => c.displayName === "Dr Chen")!;
+
+    // Offer only Dr Chen.
+    saveSessionConfig({ ...DEFAULT_SESSION_CONFIG, participatingClinicianIds: [chen.id] }, NOW, OWNER);
+
+    // Remove Dr Lee — the FIRST row, the case that used to shift every id.
+    saveClinicians(
+      [
+        { id: okafor.id, displayName: "Dr Okafor", participating: true },
+        { id: chen.id, displayName: "Dr Chen", participating: true },
+      ],
+      NOW,
+      OWNER,
+    );
+
+    const after = getConsole();
+    // Chen keeps her id, and the allowlist still means Chen — not whoever slid up.
+    expect(after.clinicians.find((c) => c.displayName === "Dr Chen")!.id).toBe(chen.id);
+    expect(after.sessionConfig.participatingClinicianIds).toEqual([chen.id]);
+    // The retired id is never reissued to a new person.
+    saveClinicians(
+      [
+        { id: okafor.id, displayName: "Dr Okafor", participating: true },
+        { id: chen.id, displayName: "Dr Chen", participating: true },
+        { displayName: "Dr Newcomer", participating: true },
+      ],
+      NOW,
+      OWNER,
+    );
+    const newcomer = getConsole().clinicians.find((c) => c.displayName === "Dr Newcomer")!;
+    expect(newcomer.id).not.toBe(lee.id);
+    expect(newcomer.id).not.toBe(okafor.id);
+    expect(newcomer.id).not.toBe(chen.id);
   });
 });
 

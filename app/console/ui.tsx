@@ -15,7 +15,7 @@ export function ConsoleShell({
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
           <div className="flex items-baseline gap-3">
             <span className="text-lg font-semibold tracking-tight">CareYield</span>
-            <span className="text-sm text-stone-400">practice console</span>
+            <span className="text-sm text-stone-500">practice console</span>
           </div>
           {email && (
             <form action={signOut} className="flex items-center gap-3">
@@ -45,7 +45,7 @@ export function Field({
     <label className="flex flex-col gap-1.5">
       <span className="text-sm font-medium text-stone-700">{label}</span>
       {children}
-      {hint && <span className="text-xs text-stone-400">{hint}</span>}
+      {hint && <span className="text-xs text-stone-500">{hint}</span>}
     </label>
   );
 }

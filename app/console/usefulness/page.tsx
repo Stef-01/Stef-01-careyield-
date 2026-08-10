@@ -17,6 +17,7 @@ const ERROR_COPY: Record<string, string> = {
   reasonable_requires_action: "To mark a visit worthwhile, record at least one thing that happened.",
   unknown_visit: "That visit is no longer in the queue.",
   already_recorded: "That visit was already audited.",
+  denied: "Your role cannot record visit outcomes.",
 };
 
 export default async function UsefulnessPage({
@@ -68,7 +69,7 @@ export default async function UsefulnessPage({
               <input type="hidden" name="appointmentId" value={visit.appointmentId} />
               <div className="mb-4 flex items-baseline justify-between">
                 <span className="font-medium text-stone-900">{visit.patientLabel}</span>
-                <span className="text-xs text-stone-400">
+                <span className="text-xs text-stone-500">
                   {new Date(visit.attendedAt).toLocaleString("en-AU")}
                 </span>
               </div>
