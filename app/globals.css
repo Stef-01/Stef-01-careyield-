@@ -2134,16 +2134,9 @@ textarea:focus-visible {
 /* Clinician pathway v2 — quiet, prompt-led and intentionally single-column. */
 .clinician-v2 {
   --cv2-ink: #1d2019;
-  /* --cv2-muted and --cv2-sage were tuned against the page ground (#fbfaf7), where they
-     clear AA comfortably. On the tinted panels (.cv2-focus-card, #f0f2eb) the same colours
-     fall to 4.37:1 and 4.32:1 at 10px — below AA. Darkened here rather than per-rule, for
-     the reason cd49dea gave: both are text colours in many places and the axe sweep only
-     reaches the opening screen, so a per-rule fix leaves the same failure latent in the
-     stages it never scans. Now 4.64:1 on the tint and 5.02:1 on the ground; same hue.
-     Where --cv2-sage is a background under white text, darkening only widens the margin. */
-  --cv2-muted: #6b6d67;
+  --cv2-muted: #6f716b;
   --cv2-soft: #f1f0e9;
-  --cv2-sage: #617247;
+  --cv2-sage: #66774a;
   --cv2-line: #dfded7;
   min-height: 100svh;
   padding: 0;
