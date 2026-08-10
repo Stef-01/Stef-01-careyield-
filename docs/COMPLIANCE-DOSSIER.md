@@ -44,6 +44,57 @@ surface without a row here does not ship. Regulatory basis: the venture research
 | G5 authoring workspace | W69 (`src/registers/authoring.ts`) | **G5** | The gate itself, in code. Unapproved content is unusable — enforced by the type system, not a runtime check: `ApprovedContent` is branded so only `usableContent()` can produce one. Three stages, because a specialist ("is this correct?") and the founder ("do we accept shipping it?") answer different questions. Reviewed-but-unsigned content is still unusable; the author cannot review their own work; any amendment clears both attestations. Ships with zero content signed off |
 | Register console (`app/console/registers`) | W60 (`src/registers/*`) | 2, 3 | enable/disable is keyed by practice id, so one practice cannot change what another sees (isolation unit-tested); scheduling-only copy asserted in e2e ("needs", "at risk", "requires", "should be seen" all banned); register membership is non-inferential by construction — the W55 CHECK constraint and union type admit no symptom-derived source (G7) |
 
+| Capability console (`app/console/capability`) | W83 (`src/capability/graph.ts`) | 2, 3 | Two deliberately different views of one graph: a clinician sees their own record in full (a capability record you cannot inspect is one you cannot correct — APP 13 in spirit), the practice sees presence-and-freshness only, never raw visit counts, so a capability graph cannot become a productivity board. Copy states what the practice KNOWS, never what a clinician is good at; "verified by an external body" is provenance, "expert in" would be a s 133 claim. Holds personal information about CLINICIANS, including the derived case mix of W80 — the first records in the tree generated *about* a person rather than collected from them |
+| Case-mix console (`app/console/case-mix`) | W80 (`src/capability/case-mix.ts`) | 2, 3 | Derived from attended visits only, and derived is labelled as derived. The no-inference guarantee is an absence: no function exists that turns a clinician attribute into a competence claim, and a test asserts the export list. Practice-scoped and session-gated |
+| Outreach console (`app/console/outreach`) | W95 (`src/referrals/outreach.ts`) | 1, 2, 3 | The nudge IS the ordinary availability invitation, byte for byte — `planOutreach` calls W6's `renderCompliant`, and a test asserts byte-identity with `renderAvailabilityInvitation`, so a leakage nudge can never be held to a weaker standard than any other message. The referral is why the practice is looking and never what the patient is told: the specialty cannot reach the message because the planner is handed `LeakageSummary`, which does not carry one. Recipients are named (sending needs a recipient) in referral-record order, with the page stating the order carries no priority — naming is unavoidable, ranking by need is the G7 line. Synthetic referral data only; no send path is wired |
+| Community interest export (`app/api/interest/export`) | founder commit 3317340 (`src/interest/store.ts`) | 2 | **MAPPED WITH AN OPEN AUTHORIZATION GAP — see the 2026-08-10 W102 entry.** Streams the whole community interest register as CSV (name, email, audience) behind `verifySession` alone: no practice scoping, no role check, and the register itself carries no practice id. Any signed-in console user at any practice can download every signup. Synthetic-only today (G2), so the exposure is theoretical — but the correct control cannot currently be expressed, because the product has no Meherr-staff role |
+| Mock introspection routes (`app/api/mock/*`) | W44 (`src/lib/mock-guard.ts`) | 2 | Eight routes that reset and read shared state, and disclose signed booking tokens. `assertMockRoutesEnabled()` 404s them outside a non-production build unless `CAREYIELD_ENABLE_MOCK_ROUTES=1` is set explicitly; a real deployment sets neither. Synthetic-phase only, removed when real persistence lands |
+
+## Surface census (machine-checked)
+
+Every route the application serves, and the row above that governs it. **This block is a test,
+not a list** — `src/compliance/surfaces.test.ts` walks `app/` and fails on any difference in
+either direction: a route with no line here is unmapped, and a line here with no route is a
+stale row describing something that has moved or gone. The document has twice claimed "zero
+unmapped surfaces" and been wrong within a day; that claim is now checked rather than made.
+
+```surface-census
+/ — Community landing
+/api/interest/export — Community interest export
+/api/mock/capability — Mock introspection routes
+/api/mock/case-mix — Mock introspection routes
+/api/mock/console — Mock introspection routes
+/api/mock/ops — Mock introspection routes
+/api/mock/preferences — Mock introspection routes
+/api/mock/registers — Mock introspection routes
+/api/mock/state — Mock introspection routes
+/api/mock/usefulness — Mock introspection routes
+/book/[token] — Booking page; Patient contact preferences
+/clinicians — Clinician walkthrough
+/console — Practice console
+/console/capability — Capability console
+/console/case-mix — Case-mix console
+/console/complaints — Complaint/opt-out workflow
+/console/dashboard — Practice console
+/console/interest — Community interest register
+/console/onboarding — Practice console
+/console/ops — Complaint/opt-out workflow
+/console/outreach — Outreach console
+/console/privacy — Privacy page
+/console/registers — Register console
+/console/results — Weekly/pilot reports
+/console/roi — Weekly/pilot reports
+/console/rules — Practice console
+/console/setup/[step] — Practice console
+/console/signin — Practice console
+/console/usefulness — Weekly/pilot reports
+/demo — Demo presenter page
+/finder — Clinician finder demo
+/practices — B2B landing
+/privacy — Privacy page
+/privacy/automated-decisions — Privacy page
+```
+
 ## Standing prohibitions (structural, not policy)
 
 - No patient-facing clinical language: linter blocks "overdue", urgency, deterioration,
@@ -60,6 +111,67 @@ surface without a row here does not ship. Regulatory basis: the venture research
 Quarterly, or immediately on: any new user-facing surface; any change to message templates or
 linter rules; TGA CDSS guidance updates (carve-outs expected to narrow); commencement of the
 remaining Privacy Act tranche-2 reforms. Each review appends a dated line here.
+
+- 2026-08-10 — **W102: Y2 review. Zero unmapped surfaces, and this time it is a test.** 34 routes
+  served, 34 census lines, checked by `src/compliance/surfaces.test.ts` in both directions. The
+  document had claimed completeness twice and been wrong within a day both times, corrected each
+  time by whoever happened to look; that is the control failing, not working. Five surfaces were
+  in fact unmapped when this review started — `/console/capability`, `/console/case-mix`,
+  `/console/outreach`, `/api/interest/export` and the eight `/api/mock/*` routes — and they now
+  carry rows. Stale lines fail the same test, which is the failure nobody catches: a row
+  describing controls over something that has moved reads as coverage.
+- 2026-08-10 — **W102 finding 1 (fixed here): the published ADM statement had become untrue.**
+  `/privacy/automated-decisions` said *"No inference from clinical notes, test results, or
+  diagnoses — we do not process them."* W57 reads recorded condition flags and W92–W95 read
+  referral records, so Meherr processes recorded diagnoses and referrals. The no-inference
+  boundary held — nothing is derived from symptoms — but "we do not process them" is a claim
+  about processing, and a privacy statement that is wrong about what data you handle is the
+  document a regulator reads first. Rewritten, with a "what information is used" section that
+  names the health information actually read.
+- 2026-08-10 — **W102 finding 2 (fixed here): five Year-2 automated decisions were undisclosed.**
+  The statement described eligibility, ordering and send mechanics — the Year-1 system. It said
+  nothing about register membership (W55/W57), scheduled-review timing (W58), the continuity cap
+  (W85), the decisions *not* to contact (W71/W74/W94/W95), or **in-panel routing (W84), which can
+  put a different GP's name on the offer than the patient's usual one** — the automated decision
+  in this product most likely to count as significantly affecting someone, and the one most
+  conspicuously missing. All now stated, along with the guarantee that no message reveals why a
+  patient was selected (W66/W95).
+- 2026-08-10 — **W102 finding 3 (NOT fixed — needs a product decision, filed as PRIV-1):
+  `/api/interest/export` is authorised by "is anyone signed in".** It streams the whole community
+  interest register as CSV — name, email, audience — behind `verifySession` alone. There is no
+  practice scoping and no role check, and `src/interest/store.ts` carries no practice id at all,
+  so any console user at any practice can download every signup. The register is a Meherr-run
+  community program rather than practice data, so the *correct* control is "Meherr staff only" —
+  and the product has no such role, meaning the right answer cannot currently be expressed. That
+  makes it a product decision (add a staff role, or move the register out of the practice
+  console), not something to patch inside a compliance review. Synthetic-only today under G2, so
+  the exposure is theoretical; it stops being theoretical the day a real signup is stored, which
+  is why it is filed rather than merely noted.
+- 2026-08-10 — **W102 finding 4 (NOT fixed — filed as PRIV-2): APP 12 access and APP 11 retention
+  do not know about Year-2 record classes.** `exportPatientData` returns invitations,
+  appointments, audit events and outcomes; `RetentionConfig` prunes the last three. Neither names
+  register membership (W55, `0004_registers.sql`), referral or barrier records (W92–W95), or
+  clinician capability records (W79, `0005_capability.sql`) — and the capability records include
+  the *derived* case mix of W80, information generated about a person rather than collected from
+  them, which is precisely the kind an access request exists to surface. Today an access request
+  would return an incomplete answer and a retention run would leave those rows untouched.
+  Currently harmless only because those stores are in-memory and synthetic: the migrations exist,
+  so the gap opens the moment ingest writes to them. **The trigger condition is the first store
+  that persists any of these classes; export, delete and retention must grow in the same unit.**
+- 2026-08-10 — **W102 note: the plan says ADM transparency is "now in force". It is not.** APP 1.7
+  commences 10 December 2026 — four months out. Nothing here depends on the difference (the
+  statement has been published since W33 and is now accurate), but a compliance document that
+  overstates a commencement date teaches its readers to discount it, and the same four months are
+  the window in which findings 3 and 4 should be closed rather than carried.
+
+- 2026-08-10 — **W102 finding 5 (fixed here): the accessibility sweep had already drifted.**
+  `e2e/a11y.spec.ts` enumerates its console surfaces by hand, and `/console/outreach` was missing
+  — one day after W101 declared zero violations "across every surface". Added, and it passes.
+  Worth recording as a pattern rather than a one-off: this is the third enumerated-coverage list
+  in the tree to fall behind the routes it covers, after the surface map itself (twice). The
+  census block above is now derived-and-checked; the axe list still is not, and will drift again.
+  A future unit should have it read `discoverSurfaces()` — not done here, because changing how
+  another unit's gate decides what to test is that unit's call, not a compliance review's.
 
 - 2026-08-09 — v1 established (W50). All eight surfaces mapped; zero unmapped surfaces in `app/`.
 - 2026-08-10 — **Four surfaces landed outside the loop** in founder commit 603219f (voice

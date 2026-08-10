@@ -64,6 +64,7 @@ test("console surfaces pass WCAG A/AA", async ({ page }) => {
     "/console/capability", // W83
     "/console/interest",
     "/console/case-mix", // W81
+    "/console/outreach", // W95 — landed after the W101 sweep was claimed
     "/console/setup/practice",
   ];
   for (const path of surfaces) {
