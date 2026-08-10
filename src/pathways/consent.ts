@@ -164,8 +164,30 @@ export function consentFor(
 
   // Latest decision wins, and a withdrawal is reported as itself rather than as an absence:
   // the patient did something, and the record should say so.
+  //
+  // W129 finding, and it was a bad one. This used to take the last record after sorting by
+  // `decidedAt` and check ITS `withdrawnAt`. But `withdrawConsent` returns a NEW record with
+  // the SAME `decidedAt` — which is the documented way to use it — so a set holding both the
+  // original and the withdrawn copy resolved by ARRAY ORDER, and a withdrawn consent read as
+  // `given` whenever the copies happened to be stored the other way round.
+  //
+  // The rule now is stated over the whole set rather than over one row: A WITHDRAWAL
+  // SUPPRESSES EVERY DECISION MADE AT OR BEFORE IT. That is order-independent, it needs no
+  // deduplication, and re-consent still works because a fresh decision dated AFTER the
+  // withdrawal is not suppressed. A re-consent dated the SAME DAY as a withdrawal reads as
+  // withdrawn — day-granularity dates cannot order two events within a day, and refusing to
+  // guess is the safe direction for consent.
+  const lastWithdrawal = forVersion
+    .map((record) => record.withdrawnAt)
+    .filter((at): at is string => at !== null)
+    .sort()
+    .at(-1);
+
   const latest = [...forVersion].sort((a, b) => a.decidedAt.localeCompare(b.decidedAt)).at(-1)!;
-  if (latest.withdrawnAt !== null) return { status: "withdrawn", record: latest };
+  if (lastWithdrawal !== undefined && latest.decidedAt <= lastWithdrawal) {
+    const withdrawnRecord = forVersion.find((r) => r.withdrawnAt === lastWithdrawal) ?? latest;
+    return { status: "withdrawn", record: withdrawnRecord };
+  }
   return latest.decision === "given"
     ? { status: "given", record: latest }
     : { status: "refused", record: latest };

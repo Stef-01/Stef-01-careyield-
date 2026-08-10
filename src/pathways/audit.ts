@@ -71,7 +71,17 @@ export function appendAudit(log: PathwayAuditLog, event: PathwayAuditEvent): Aud
   return { ok: true, log: Object.freeze([...log, entry]) as PathwayAuditLog };
 }
 
-export type VersionState = "drafted" | "published" | "withdrawn";
+/**
+ * Mirrors W118's `PathwayVersionState` (with `draft` spelled `drafted`, since the trail records
+ * the ACT rather than the state).
+ *
+ * W129 finding: `superseded` was missing, so a version replaced by a newer publication still
+ * read as `published` here. An audit trail that disagrees with the system it audits is worse
+ * than no audit trail — somebody reconciling an incident would take "in force" from the trail
+ * while the pathway model said otherwise. It is DERIVED in replay rather than added as an event
+ * kind, so nobody has to remember to record it.
+ */
+export type VersionState = "drafted" | "published" | "superseded" | "withdrawn";
 
 export interface AttestationState {
   kind: PathwayAttestationKind;
@@ -148,6 +158,14 @@ export function replayAudit(log: PathwayAuditLog): ReplayedAudit {
         version.draftedAt = entry.at;
         break;
       case "version_published":
+        // Publishing supersedes whichever version of the SAME pathway was in force. W118's
+        // `pathwayAt` asserts at most one is published at any instant; deriving it here keeps
+        // this trail agreeing with that rather than quietly diverging.
+        for (const other of byVersion.values()) {
+          if (other.pathwayId === entry.pathwayId && other !== version && other.state === "published") {
+            other.state = "superseded";
+          }
+        }
         version.state = "published";
         version.publishedBy = entry.by;
         version.publishedAt = entry.at;

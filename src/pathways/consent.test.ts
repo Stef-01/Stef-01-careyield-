@@ -189,6 +189,41 @@ describe("W125 withdrawal", () => {
   });
 });
 
+describe("W129 a withdrawal cannot be lost to array order", () => {
+  // The finding: `withdrawConsent` returns a NEW record with the SAME decidedAt, which is the
+  // documented way to use it — so a set holding both copies used to resolve by array order,
+  // and a withdrawn consent read as `given` whenever they were stored the other way round.
+  const original = record({ decidedAt: "2026-06-01" });
+  const withdrawn = withdrawConsent(original, "2026-07-01");
+
+  it.each([
+    ["withdrawn last", [original, withdrawn]],
+    ["withdrawn first", [withdrawn, original]],
+  ])("reads as withdrawn with the copies %s", (_label, records) => {
+    expect(lookup(records as ConsentRecord[]).status).toBe("withdrawn");
+  });
+
+  it("suppresses an earlier decision as well as the withdrawn one", () => {
+    // The rule is stated over the whole set: a withdrawal suppresses every decision made at or
+    // before it. Anything narrower leaves an older `given` to be picked up by a later reader.
+    const earlier = record({ decidedAt: "2026-05-01" });
+    expect(lookup([earlier, original, withdrawn]).status).toBe("withdrawn");
+  });
+
+  it("a re-consent dated AFTER the withdrawal still restores it", () => {
+    const fresh = record({ decidedAt: "2026-08-01" });
+    expect(lookup([original, withdrawn, fresh]).status).toBe("given");
+    expect(lookup([fresh, withdrawn, original]).status).toBe("given");
+  });
+
+  it("a re-consent dated the SAME DAY as the withdrawal reads as withdrawn", () => {
+    // Day-granularity dates cannot order two events within a day, and refusing to guess is the
+    // safe direction for consent. Stated so the behaviour is a decision, not an accident.
+    const sameDay = record({ decidedAt: "2026-07-01" });
+    expect(lookup([original, withdrawn, sameDay]).status).toBe("withdrawn");
+  });
+});
+
 describe("W125 the gate throws rather than returning a boolean", () => {
   it("returns the record when consent was given", () => {
     expect(assertConsented(lookup([FIXTURES.given])).decidedAt).toBe("2026-06-01");

@@ -135,6 +135,51 @@ describe("W126 replay reproduces every state transition", () => {
     ]);
   });
 
+  it("supersedes the version in force when a newer one is published (W129)", () => {
+    // The finding: `superseded` was missing from this trail's state model, so a replaced
+    // version still read as `published` and the trail disagreed with W118's own model.
+    const log = build(
+      EVENTS[0]!,
+      { ...base, kind: "version_published", at: "2026-01-05", by: "author@x.example" },
+      { pathwayId: P, versionHash: "hash-v2", kind: "version_drafted", at: "2026-02-01", by: "author@x.example", ordinal: 2 },
+      { pathwayId: P, versionHash: "hash-v2", kind: "version_published", at: "2026-02-02", by: "author@x.example" },
+    );
+    const replayed = replayAudit(log);
+    expect(replayed.versions.map((v) => [v.versionHash, v.state])).toEqual([
+      ["hash-v1", "superseded"],
+      ["hash-v2", "published"],
+    ]);
+    // At most one version of a pathway is in force at any instant — W118's own invariant.
+    expect(replayed.versions.filter((v) => v.state === "published")).toHaveLength(1);
+  });
+
+  it("does not supersede a DIFFERENT pathway's version", () => {
+    const log = build(
+      EVENTS[0]!,
+      { ...base, kind: "version_published", at: "2026-01-05", by: "author@x.example" },
+      { pathwayId: "path-2", versionHash: "hash-other", kind: "version_drafted", at: "2026-02-01", by: "author@x.example", ordinal: 1 },
+      { pathwayId: "path-2", versionHash: "hash-other", kind: "version_published", at: "2026-02-02", by: "author@x.example" },
+    );
+    expect(replayAudit(log).versions.map((v) => v.state)).toEqual(["published", "published"]);
+  });
+
+  it("a withdrawal after supersession does not resurrect the older version", () => {
+    const log = build(
+      EVENTS[0]!,
+      { ...base, kind: "version_published", at: "2026-01-05", by: "author@x.example" },
+      { pathwayId: P, versionHash: "hash-v2", kind: "version_drafted", at: "2026-02-01", by: "author@x.example", ordinal: 2 },
+      { pathwayId: P, versionHash: "hash-v2", kind: "version_published", at: "2026-02-02", by: "author@x.example" },
+      { pathwayId: P, versionHash: "hash-v2", kind: "version_withdrawn", at: "2026-03-01", by: "founder@x.example", reason: "Placeholder." },
+    );
+    const replayed = replayAudit(log);
+    // Withdrawing the current version leaves NOTHING in force — bringing the old one back is
+    // a fresh publication, not an automatic fallback.
+    expect(replayed.versions.map((v) => [v.versionHash, v.state])).toEqual([
+      ["hash-v1", "superseded"],
+      ["hash-v2", "withdrawn"],
+    ]);
+  });
+
   it("records a version it never saw drafted rather than ignoring it", () => {
     // An audit trail that silently dropped an orphan event would hide exactly the anomaly an
     // auditor is looking for.
