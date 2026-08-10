@@ -83,7 +83,8 @@ export interface WeeklyExtra {
   weekStartIso: string;
   messagedPer100: number;
   comparisonPer100: number;
-  extraAppointments: number;
+  /** Null when the week has no holdout arm — no comparison, so no figure. */
+  extraAppointments: number | null;
 }
 
 export function weeklyExtras(data: DashboardData): WeeklyExtra[] {
@@ -94,7 +95,12 @@ export function weeklyExtras(data: DashboardData): WeeklyExtra[] {
     messagedPer100: per100(point.invitePer1000),
     comparisonPer100: per100(point.holdoutPer1000),
     // Per-1,000 difference scaled back to whole appointments across the messaged arm.
-    extraAppointments: Math.round((point.incrementalPer1000 * messaged) / 1000),
+    // Null propagates rather than becoming 0: a week with no comparison group has no
+    // "extra appointments" figure, and printing 0 would assert one.
+    extraAppointments:
+      point.incrementalPer1000 === null
+        ? null
+        : Math.round((point.incrementalPer1000 * messaged) / 1000),
   }));
 }
 

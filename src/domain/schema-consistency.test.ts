@@ -130,3 +130,84 @@ describe("W55 register schema", () => {
     expect(sql).not.toMatch(/insert into conditions/i);
   });
 });
+
+describe("W79 capability graph", () => {
+  const CAPABILITY_TABLES = [
+    "clinician_interest",
+    "clinician_experience",
+    "clinician_competence",
+  ] as const;
+
+  it("interest, experience and competence are three tables, not one with a type column", () => {
+    // A single table with a `kind` column is exactly how the three get conflated: one
+    // write path, one shape, and nothing stopping a self-report being relabelled.
+    for (const table of CAPABILITY_TABLES) {
+      expect(tableBody(table)).toBeTruthy();
+    }
+  });
+
+  it("each table admits exactly one provenance, and the three are disjoint", () => {
+    const sources = CAPABILITY_TABLES.map((table) => {
+      const line = tableBody(table)
+        .split("\n")
+        .find((l) => l.includes("source text not null"));
+      expect(line, `${table} must pin its source`).toBeDefined();
+      const match = line!.match(/source = '([a-z_]+)'/);
+      expect(match, `${table} must admit exactly one source value`).not.toBeNull();
+      return match![1];
+    });
+
+    expect(new Set(sources).size).toBe(3);
+    expect(sources.sort()).toEqual([
+      "clinician_self_reported",
+      "derived_case_mix",
+      "external_verification",
+    ]);
+  });
+
+  it("experience has no free-text column a self-report could hide in", () => {
+    // Experience is derived (W80). Any prose field here would be a self-report wearing a
+    // derived label, so the table carries counts, a window and a timestamp and nothing else.
+    const body = tableBody("clinician_experience");
+    const textColumns = body
+      .split("\n")
+      .filter((l) => /^\s+\w+ text\b/.test(l))
+      .map((l) => l.trim().split(" ")[0]);
+
+    expect(textColumns).toEqual(["condition_code", "source"]);
+  });
+
+  it("a count cannot float free of the window it was measured over", () => {
+    const body = tableBody("clinician_experience");
+    for (const column of ["window_from date not null", "window_to date not null"]) {
+      expect(body).toContain(column);
+    }
+    expect(body).toContain("window_to >= window_from");
+  });
+
+  it("competence cannot exist without naming who verified it", () => {
+    // The whole control: no anonymous verification, so nothing can be self-asserted as
+    // "verified" without a verifier on the record.
+    const body = tableBody("clinician_competence");
+    expect(body).toMatch(/attested_by text not null/);
+    expect(body).toMatch(/verified_on date not null/);
+    expect(body).toContain("length(trim(attested_by)) > 0");
+  });
+
+  it("interest is a bounded preference, not an unbounded score", () => {
+    expect(tableBody("clinician_interest")).toContain("strength between 1 and 5");
+  });
+
+  it("every capability table is practice-scoped", () => {
+    for (const table of CAPABILITY_TABLES) {
+      expect(tableBody(table)).toContain("practice_id");
+      expect(PRACTICE_SCOPED_TABLES).toContain(table);
+    }
+  });
+
+  it("ships no capability data — the graph is populated by W80/W81, not by migration", () => {
+    for (const table of CAPABILITY_TABLES) {
+      expect(sql).not.toMatch(new RegExp(`insert into ${table}`, "i"));
+    }
+  });
+});

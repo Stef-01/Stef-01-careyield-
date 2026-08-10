@@ -23,5 +23,13 @@ export async function GET() {
     ]),
   );
 
-  return NextResponse.json({ preferences: store.contactPreferences, plans });
+  // Keys are practiceId::patientId (W78 tenancy fix); the e2e reads by patient, so also
+  // expose a patient-keyed view rather than making the test parse the composite key.
+  const byPatient = Object.fromEntries(
+    Object.entries(store.contactPreferences).map(([key, prefs]) => [key.split("::")[1] ?? key, prefs]),
+  );
+  const plansByPatient = Object.fromEntries(
+    Object.entries(plans).map(([key, plan]) => [key.split("::")[1] ?? key, plan]),
+  );
+  return NextResponse.json({ preferences: byPatient, plans: plansByPatient, keyed: store.contactPreferences });
 }

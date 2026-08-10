@@ -21,7 +21,15 @@ export interface RailStore {
   state: RailState;
   practiceName: string;
   clinicianName: string;
-  /** W74: contact preferences the patient set for themselves, keyed by patient id. */
+  /**
+   * W74: contact preferences the patient set for themselves.
+   *
+   * Keyed by `practiceId::patientId`, not by patient id alone. W65's hardening found the
+   * unscoped version of this bug twice (W71 recalls, W64 closures): a patient id that
+   * collided across practices let one practice's data act on another's. Here the damage
+   * would be quieter and worse — one practice's patient could impose their quiet hours on
+   * a different practice's patient, or reveal that they had set any.
+   */
   contactPreferences: Record<string, ContactPreferences>;
 }
 
@@ -90,19 +98,27 @@ export function sessionAppointmentType(store: RailStore, invitation: { clinician
  * W74: record what a patient said about being contacted. Refuses an invalid window
  * rather than storing something that would silence them or open a 24-hour one.
  */
+function preferenceKey(practiceId: string, patientId: string): string {
+  return `${practiceId}::${patientId}`;
+}
+
 export function saveContactPreferences(
+  practiceId: string,
   patientId: string,
   prefs: ContactPreferences,
 ): { ok: boolean; errors: string[] } {
   const validation = validatePreferences(prefs);
   if (!validation.ok) return { ok: false, errors: validation.errors };
-  getStore().contactPreferences[patientId] = prefs;
+  getStore().contactPreferences[preferenceKey(practiceId, patientId)] = prefs;
   return { ok: true, errors: [] };
 }
 
 /** What we may do for this patient — their own answer, or the conservative default. */
-export function contactPreferencesFor(patientId: string): ContactPreferences {
-  return getStore().contactPreferences[patientId] ?? DEFAULT_PREFERENCES;
+export function contactPreferencesFor(
+  practiceId: string,
+  patientId: string,
+): ContactPreferences {
+  return getStore().contactPreferences[preferenceKey(practiceId, patientId)] ?? DEFAULT_PREFERENCES;
 }
 
 /** Book against the shared store, committing the new state on success or refusal. */

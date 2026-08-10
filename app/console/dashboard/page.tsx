@@ -37,8 +37,8 @@ export default async function DashboardPage() {
       <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatTile
           label="Incremental attended / 1,000"
-          value={(attr.incrementalPer1000 ?? 0).toFixed(1)}
-          detail="North star — invite-arm rate above holdout"
+          value={attr.incrementalPer1000 === null ? "—" : attr.incrementalPer1000.toFixed(1)}
+          detail={attr.incrementalPer1000 === null ? "No holdout arm — no claim" : "North star — invite-arm rate above holdout"}
         />
         <StatTile
           label="Incremental attended"
@@ -85,7 +85,7 @@ export default async function DashboardPage() {
                   <td className="py-1.5 pr-4">W{p.week}</td>
                   <td className="py-1.5 pr-4">{p.invitePer1000.toFixed(1)}</td>
                   <td className="py-1.5 pr-4">{p.holdoutPer1000.toFixed(1)}</td>
-                  <td className="py-1.5">{p.incrementalPer1000.toFixed(1)}</td>
+                  <td className="py-1.5">{p.incrementalPer1000 === null ? "—" : p.incrementalPer1000.toFixed(1)}</td>
                 </tr>
               ))}
             </tbody>

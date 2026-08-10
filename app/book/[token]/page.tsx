@@ -170,7 +170,7 @@ export default async function BookingPage({
         </p>
         <ContactPreferenceForm
           token={token}
-          prefs={contactPreferencesFor(invitation.patientId)}
+          prefs={contactPreferencesFor(invitation.practiceId, invitation.patientId)}
           saved={prefs === "saved"}
           invalid={prefs === "invalid"}
         />

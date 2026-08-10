@@ -118,3 +118,21 @@ describe("W5 invitation pool builder", () => {
     expect(expireOnFill(withOneBooked, 3)).toEqual(withOneBooked);
   });
 });
+
+describe("W51 audit fix: batchSize refuses a rate it cannot size a batch from", () => {
+  // A non-positive rate made `needed` negative and Math.min then handed slice() a value
+  // that invited nearly the whole eligible panel — the safety ceiling inverted into a mass
+  // send. Sending nothing is the safe answer to a misconfiguration.
+  it.each([0, -0.25, Number.NaN, Number.POSITIVE_INFINITY])("returns 0 for a rate of %s", (rate) => {
+    expect(batchSize(10, { expectedResponseRate: rate as number, maxInvitesPerSession: 40 })).toBe(0);
+  });
+
+  it("never exceeds the ceiling, and a negative ceiling sends nothing", () => {
+    expect(batchSize(1000, { expectedResponseRate: 0.25, maxInvitesPerSession: 40 })).toBe(40);
+    expect(batchSize(10, { expectedResponseRate: 0.25, maxInvitesPerSession: -5 })).toBe(0);
+  });
+
+  it("still sizes a normal batch", () => {
+    expect(batchSize(4, { expectedResponseRate: 0.25, maxInvitesPerSession: 40 })).toBe(16);
+  });
+});

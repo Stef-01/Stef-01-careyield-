@@ -12,7 +12,11 @@ export interface WeeklyPoint {
   weekStartIso: string;
   invitePer1000: number;
   holdoutPer1000: number;
-  incrementalPer1000: number;
+  /**
+   * Null when the week has no holdout arm. ATTRIBUTION.md: no holdout means no claim —
+   * "not zero, not an estimate" — so the absence has to survive all the way to the render.
+   */
+  incrementalPer1000: number | null;
 }
 
 export interface DashboardData {
@@ -40,7 +44,11 @@ export function buildDashboardData(result: SimResult): DashboardData {
       weekStartIso: isoDaysFrom(config.todayIso, w * 7 + 1),
       invitePer1000: attr.inviteArm.attendedPer1000,
       holdoutPer1000: attr.holdoutArm.attendedPer1000,
-      incrementalPer1000: attr.incrementalPer1000 ?? 0,
+      // NOT `?? 0`. ATTRIBUTION.md is explicit: with no holdout arm there is no claim —
+      // "not zero, not an estimate". Coercing null to 0 printed a measured result of
+      // exactly no effect where the honest answer is that nothing was measured.
+      // (W51 audit, low — but it is the one law this product is built around.)
+      incrementalPer1000: attr.incrementalPer1000,
     });
   }
   return {

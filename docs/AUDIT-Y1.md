@@ -51,6 +51,17 @@ Recorded because a future reader will re-raise them:
 - **"Positional invitation ids collide when a session is re-pooled or a slot re-freed."** Refuted — no path mints a colliding id for a different patient.
 - **"Complaint opt-out re-implements `handleStop` instead of calling the single declared STOP path."** Refuted as stated; the durability half of the concern was real and is fixed above (#2).
 
+## Medium/low findings since actioned (2026-08-10)
+
+Three of the recorded findings were fixed once the register work reopened the files they
+live in. They are struck from the list below.
+
+| Where | Finding | Fix |
+|---|---|---|
+| `src/sim/dashboard-data.ts` | The weekly dashboard coerced a null (no-holdout) incremental to `0`, contradicting the attribution law that no holdout means **no claim — "not zero, not an estimate"**. It printed a measured result of exactly no effect where nothing had been measured. | `null` now survives all the way to the render, which required widening the type through `results.ts`, `weekly.ts` and the chart tooltip. All four render "—" and the dashboard tile says "No holdout arm — no claim". Of the 32 recorded findings this was filed lowest, and it was the one that broke the single law the product is built around. |
+| `src/engine/pool.ts` | `batchSize` returned a negative number for a non-positive `expectedResponseRate`, and `Math.min` then handed `slice()` a value that invited nearly the whole eligible panel — the safety ceiling inverted into a mass send. | Refuses: a rate that cannot size a batch is a misconfiguration, and sending nothing is the safe answer. A negative ceiling also sends nothing. Pinned across 0, negative, NaN and Infinity. |
+| `src/registers/*` (W65) | Eleven Q5 findings including three tenancy leaks, a membership duplication bug and an unverified "invariants held" claim. | See `docs/HARDENING-Q5.md`. |
+
 ## Medium/low findings not actioned
 
 32 further findings were raised at medium/low and left in place. They are recorded here
