@@ -5,13 +5,13 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
-  BookOpen,
   Check,
   Clock,
   Target,
   TrendUp,
 } from "@phosphor-icons/react";
 import { useState } from "react";
+import { DemoNavigator } from "../demo-navigator";
 
 type Stage = "goal" | "feed" | "briefing" | "practice";
 
@@ -22,21 +22,19 @@ const stages: Array<{ id: Stage; label: string }> = [
   { id: "practice", label: "Practice" },
 ];
 
-const focusAreas = ["Women’s metabolic & reproductive health"];
-
 const cases = [
-  { label: "New PCOS assessment", detail: "Cycles · metabolic screen", time: "8:40 am" },
-  { label: "PCOS follow-up", detail: "COCP suitability · mood check", time: "10:20 am" },
-  { label: "Metformin review", detail: "Titration · GI tolerance", time: "1:10 pm" },
-  { label: "Longer PCOS consult", detail: "Symptoms · shared plan", time: "3:40 pm" },
+  { label: "New PCOS assessment", detail: "Cycles · metabolic screen", time: "8:40" },
+  { label: "PCOS follow-up", detail: "COCP suitability · mood check", time: "10:20" },
+  { label: "Metformin review", detail: "Titration · GI tolerance", time: "1:10" },
+  { label: "Longer PCOS consult", detail: "Symptoms · shared plan", time: "3:40" },
 ];
 
 const resources = [
   {
     id: "guideline",
     eyebrow: "Current PCOS / PMOS guideline",
-    title: "PCOS metabolic management",
-    detail: "2023 International Evidence-based Guideline",
+    title: "Metabolic management",
+    detail: "The relevant section from the 2023 International Evidence-based Guideline.",
     duration: "3 min",
     href: "https://www.monash.edu/__data/assets/pdf_file/0003/3379521/Evidence-Based-Guidelines-2023.pdf",
   },
@@ -44,7 +42,7 @@ const resources = [
     id: "diagnosis",
     eyebrow: "Diagnostic refresher",
     title: "Rotterdam criteria + the AMH update",
-    detail: "A two-minute pattern check before clinic",
+    detail: "A two-minute pattern check before your first consult.",
     duration: "2 min",
     href: "https://www.monash.edu/medicine/mchri/pcos/guideline",
   },
@@ -52,7 +50,7 @@ const resources = [
     id: "cocp",
     eyebrow: "Safety checklist",
     title: "COCP contraindications",
-    detail: "Check against WHO medical eligibility criteria",
+    detail: "A focused check against WHO medical eligibility criteria.",
     duration: "2 min",
     href: "https://www.who.int/publications/i/item/9789240115583",
   },
@@ -60,15 +58,15 @@ const resources = [
     id: "metformin",
     eyebrow: "Treatment guide",
     title: "Metformin: start, titrate, review",
-    detail: "Tolerance, dose progression and follow-up prompts",
+    detail: "Tolerance, dose progression and follow-up prompts.",
     duration: "2 min",
     href: "https://www.monash.edu/__data/assets/pdf_file/0003/3379521/Evidence-Based-Guidelines-2023.pdf",
   },
   {
     id: "paper",
-    eyebrow: "Latest evidence",
+    eyebrow: "Recent evidence",
     title: "COMET-PCOS randomised trial",
-    detail: "COCP and metformin for metabolic outcomes · 2025",
+    detail: "COCP and metformin for metabolic outcomes, published in 2025.",
     duration: "4 min",
     href: "https://pubmed.ncbi.nlm.nih.gov/41359669/",
   },
@@ -76,224 +74,250 @@ const resources = [
 
 export function ClinicianWalkthrough() {
   const [stage, setStage] = useState<Stage>("goal");
-  const [focus, setFocus] = useState(focusAreas[0]!);
   const [target, setTarget] = useState(30);
-  const [reviewed, setReviewed] = useState<string[]>(["guideline"]);
+  const [resourceIndex, setResourceIndex] = useState(0);
+  const [reviewed, setReviewed] = useState<string[]>([]);
 
   const stageIndex = stages.findIndex((item) => item.id === stage);
+  const resource = resources[resourceIndex]!;
+
+  function goToStage(next: Stage) {
+    setStage(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   function move(direction: 1 | -1) {
     const next = Math.min(stages.length - 1, Math.max(0, stageIndex + direction));
-    setStage(stages[next]!.id);
-    window.scrollTo(0, 0);
+    goToStage(stages[next]!.id);
   }
 
-  function toggleReviewed(id: string) {
-    setReviewed((current) => current.includes(id)
-      ? current.filter((item) => item !== id)
-      : [...current, id]);
+  function reviewResource() {
+    setReviewed((current) => current.includes(resource.id) ? current : [...current, resource.id]);
+
+    if (resourceIndex === resources.length - 1) {
+      goToStage("practice");
+      return;
+    }
+
+    setResourceIndex((current) => current + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function restart() {
     setStage("goal");
-    setFocus(focusAreas[0]!);
     setTarget(30);
-    setReviewed(["guideline"]);
-    window.scrollTo(0, 0);
+    setResourceIndex(0);
+    setReviewed([]);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
-    <main className="clinician-app">
-      <section className="clinician-shell">
-        <header className="clinician-header">
-          <div>
-            <span className="wordmark">CareYield</span>
-            <span className="clinician-product-name">Clinician</span>
+    <main className="clinician-app clinician-v2">
+      <div className="cv2-shell">
+        <header className="cv2-header">
+          <div className="cv2-brand">
+            <DemoNavigator />
+            <span>for clinicians</span>
           </div>
-          <Link href="/" className="quiet-link">Patient view</Link>
+          <Link href="/" className="cv2-exit">
+            Patient view <ArrowUpRight size={15} weight="bold" aria-hidden="true" />
+          </Link>
         </header>
 
-        <nav className="walkthrough-progress" aria-label="Clinician walkthrough progress">
-          {stages.map((item, index) => (
-            <button
-              key={item.id}
-              type="button"
-              className={index <= stageIndex ? "is-reached" : ""}
-              aria-current={item.id === stage ? "step" : undefined}
-              onClick={() => setStage(item.id)}
-            >
-              <span>{index + 1}</span>
-              {item.label}
-            </button>
-          ))}
+        <nav className="cv2-progress" aria-label="Clinician pathway progress">
+          <span>{stageIndex + 1} of {stages.length}</span>
+          <div>
+            {stages.map((item, index) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`${index < stageIndex ? "is-complete " : ""}${item.id === stage ? "is-current" : ""}`}
+                aria-label={`Step ${index + 1}: ${item.label}`}
+                aria-current={item.id === stage ? "step" : undefined}
+                onClick={() => goToStage(item.id)}
+              />
+            ))}
+          </div>
         </nav>
 
         {stage === "goal" && (
-          <div className="clinician-stage goal-stage">
-            <div className="clinician-stage-heading">
-              <p className="eyebrow">Shape your practice</p>
-              <h1>Build the clinical work you want to get better at.</h1>
-              <p>Set a direction. CareYield concentrates appropriate cases and prepares learning around the work arriving next.</p>
+          <section className="cv2-stage cv2-goal">
+            <div className="cv2-intro">
+              <p className="cv2-eyebrow">Choose your direction</p>
+              <h1>What kind of GP do you want to become?</h1>
+              <p>Choose a focus. We’ll shape your case mix and learning around it.</p>
             </div>
 
-            <div className="direction-panel">
-              <div className="direction-label">
-                <span>Clinical direction</span>
-                <Target size={20} weight="light" aria-hidden="true" />
-              </div>
-              <div className="focus-options" aria-label="Clinical focus">
-                {focusAreas.map((area) => (
-                  <button
-                    key={area}
-                    type="button"
-                    className={focus === area ? "selected" : ""}
-                    aria-pressed={focus === area}
-                    onClick={() => setFocus(area)}
-                  >
-                    <span>{area}</span>
-                    {focus === area && <Check size={18} weight="bold" aria-hidden="true" />}
-                  </button>
-                ))}
-              </div>
+            <button className="cv2-focus-card" type="button" aria-pressed="true">
+              <span className="cv2-icon"><Target size={21} weight="bold" aria-hidden="true" /></span>
+              <span>
+                <small>Your focus</small>
+                <strong>Women’s metabolic &amp; reproductive health</strong>
+                <em>PCOS · reproductive care · metabolic health</em>
+              </span>
+              <span className="cv2-selected"><Check size={15} weight="bold" aria-hidden="true" /></span>
+            </button>
 
-              <div className="target-control">
-                <div>
-                  <label htmlFor="focus-target">Target practice mix</label>
-                  <strong>{target}%</strong>
-                </div>
-                <input
-                  id="focus-target"
-                  type="range"
-                  min="10"
-                  max="50"
-                  step="5"
-                  value={target}
-                  onChange={(event) => setTarget(Number(event.target.value))}
-                />
-                <div className="range-labels" aria-hidden="true"><span>10%</span><span>50%</span></div>
+            <div className="cv2-mix-card">
+              <div>
+                <span>How much of your clinical week?</span>
+                <strong>{target}%</strong>
               </div>
+              <input
+                id="focus-target"
+                aria-label="Target practice mix"
+                type="range"
+                min="10"
+                max="50"
+                step="5"
+                value={target}
+                onChange={(event) => setTarget(Number(event.target.value))}
+              />
+              <div className="cv2-range-labels" aria-hidden="true"><span>10%</span><span>50%</span></div>
             </div>
 
-            <div className="clinician-stage-action">
-              <button className="primary-button" type="button" onClick={() => move(1)}>
-                Create my pathway <ArrowRight size={18} weight="bold" aria-hidden="true" />
+            <div className="cv2-action">
+              <button type="button" onClick={() => move(1)}>
+                Build my pathway <ArrowRight size={18} weight="bold" aria-hidden="true" />
               </button>
-              <p>Demo pathway only. It does not determine scope or credentialing.</p>
+              <p>Demo pathway only. Scope and credentialing remain practice-led.</p>
             </div>
-          </div>
+          </section>
         )}
 
         {stage === "feed" && (
-          <div className="clinician-stage feed-stage">
-            <button className="stage-back" type="button" onClick={() => move(-1)}><ArrowLeft size={18} /> Direction</button>
-            <div className="clinician-stage-heading">
-              <p className="eyebrow">Your pathway is active</p>
-              <h1>{target}% of your work is moving toward {focus.toLowerCase()}.</h1>
+          <section className="cv2-stage cv2-feed">
+            <button className="cv2-back" type="button" onClick={() => move(-1)}>
+              <ArrowLeft size={17} weight="bold" aria-hidden="true" /> Direction
+            </button>
+            <div className="cv2-intro">
+              <p className="cv2-eyebrow">Your pathway is live</p>
+              <h1>Tomorrow already looks different.</h1>
+              <p>Your case mix is moving toward the work you chose.</p>
             </div>
 
-            <div className="feed-summary">
-              <div><span>This week</span><strong>9 matched cases</strong></div>
-              <div><span>Tomorrow</span><strong>4 PCOS appointments</strong></div>
+            <div className="cv2-case-hero">
+              <div className="cv2-case-hero-top">
+                <span>Tomorrow · Fitzroy</span>
+                <Clock size={20} weight="bold" aria-hidden="true" />
+              </div>
+              <div className="cv2-case-number"><strong>4</strong><span>PCOS<br />appointments</span></div>
+              <p>{target}% target mix · 9 matched cases this week</p>
             </div>
 
-            <section className="tomorrow-panel">
-              <div className="panel-heading">
-                <div><p className="eyebrow">Tomorrow · Fitzroy clinic</p><h2>Your concentrated case mix</h2></div>
-                <Clock size={22} weight="light" aria-hidden="true" />
-              </div>
-              <div className="case-list">
-                {cases.map((item) => (
-                  <div key={item.time} className="case-row">
-                    <time>{item.time}</time>
-                    <div><strong>{item.label}</strong><span>{item.detail}</span></div>
-                  </div>
-                ))}
-              </div>
-            </section>
+            <div className="cv2-case-list" aria-label="Tomorrow’s concentrated case mix">
+              {cases.map((item) => (
+                <article key={item.time}>
+                  <time>{item.time}</time>
+                  <div><strong>{item.label}</strong><span>{item.detail}</span></div>
+                  <Check size={16} weight="bold" aria-hidden="true" />
+                </article>
+              ))}
+            </div>
 
-            <div className="clinician-stage-action inline-action">
-              <button className="primary-button" type="button" onClick={() => move(1)}>
-                Open tomorrow’s briefing <ArrowRight size={18} weight="bold" aria-hidden="true" />
+            <div className="cv2-action">
+              <button type="button" onClick={() => move(1)}>
+                Prepare for tomorrow <ArrowRight size={18} weight="bold" aria-hidden="true" />
               </button>
-              <p>Case summaries are synthetic and contain no identifying details.</p>
+              <p>Synthetic cases. No identifying patient details.</p>
             </div>
-          </div>
+          </section>
         )}
 
         {stage === "briefing" && (
-          <div className="clinician-stage briefing-stage">
-            <button className="stage-back" type="button" onClick={() => move(-1)}><ArrowLeft size={18} /> Case mix</button>
-            <div className="clinician-stage-heading briefing-heading">
-              <p className="eyebrow">Tomorrow · 4 PCOS cases</p>
-              <h1>Your case-specific learning stream.</h1>
-              <p>Five small prompts, sequenced around the decisions likely to arise tomorrow.</p>
+          <section className="cv2-stage cv2-briefing">
+            <button className="cv2-back" type="button" onClick={() => move(-1)}>
+              <ArrowLeft size={17} weight="bold" aria-hidden="true" /> Case mix
+            </button>
+            <div className="cv2-intro">
+              <p className="cv2-eyebrow">13 minutes for tomorrow</p>
+              <h1>Learn for the cases in front of you.</h1>
+              <p>One useful prompt at a time. Nothing generic.</p>
             </div>
 
-            <div className="resource-list">
-              {resources.map((resource) => {
-                const isReviewed = reviewed.includes(resource.id);
-                return (
-                  <article key={resource.id} className={`resource-row${isReviewed ? " is-reviewed" : ""}`}>
-                    <button type="button" onClick={() => toggleReviewed(resource.id)} aria-pressed={isReviewed} aria-label={`${isReviewed ? "Mark unread" : "Mark reviewed"}: ${resource.title}`}>
-                      <span className="resource-check">{isReviewed && <Check size={15} weight="bold" aria-hidden="true" />}</span>
-                    </button>
-                    <div>
-                      <span className="resource-eyebrow">{resource.eyebrow}</span>
-                      <strong>{resource.title}</strong>
-                      <small>{resource.detail}</small>
-                    </div>
-                    <div className="resource-meta">
-                      <span>{resource.duration}</span>
-                      <a href={resource.href} target="_blank" rel="noreferrer" aria-label={`Open source for ${resource.title}`}>
-                        <ArrowUpRight size={18} weight="light" aria-hidden="true" />
-                      </a>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+            <article className="cv2-learning-card" key={resource.id}>
+              <div className="cv2-learning-meta">
+                <span>{resourceIndex + 1} of {resources.length}</span>
+                <span>{resource.duration}</span>
+              </div>
+              <div className="cv2-learning-body">
+                <p>{resource.eyebrow}</p>
+                <h2>{resource.title}</h2>
+                <span>{resource.detail}</span>
+                <a href={resource.href} target="_blank" rel="noreferrer">
+                  Open source <ArrowUpRight size={16} weight="bold" aria-hidden="true" />
+                </a>
+              </div>
+              <button type="button" onClick={reviewResource}>
+                {resourceIndex === resources.length - 1 ? "Finish briefing" : "Mark ready"}
+                <ArrowRight size={18} weight="bold" aria-hidden="true" />
+              </button>
+            </article>
 
-            <div className="briefing-footer">
-              <span><BookOpen size={18} weight="light" aria-hidden="true" /> {reviewed.length} of {resources.length} reviewed</span>
-              <button type="button" onClick={() => move(1)}>See the longer arc <ArrowRight size={17} weight="bold" aria-hidden="true" /></button>
+            <div className="cv2-resource-progress">
+              <div>
+                {resources.map((item, index) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`${reviewed.includes(item.id) ? "is-reviewed " : ""}${index === resourceIndex ? "is-current" : ""}`}
+                    aria-label={`Open briefing item ${index + 1}: ${item.title}`}
+                    onClick={() => setResourceIndex(index)}
+                  >
+                    {reviewed.includes(item.id) && <Check size={11} weight="bold" aria-hidden="true" />}
+                  </button>
+                ))}
+              </div>
+              <span>{reviewed.length} ready</span>
             </div>
-          </div>
+          </section>
         )}
 
         {stage === "practice" && (
-          <div className="clinician-stage practice-stage">
-            <button className="stage-back" type="button" onClick={() => move(-1)}><ArrowLeft size={18} /> Briefing</button>
-            <div className="clinician-stage-heading">
-              <p className="eyebrow">The practice flywheel</p>
-              <h1>Concentrated cases turn learning into repeated practice.</h1>
-              <p>Each week pairs relevant exposure with small, deliberate learning moments tied to the work in front of you.</p>
+          <section className="cv2-stage cv2-practice">
+            <button className="cv2-back" type="button" onClick={() => move(-1)}>
+              <ArrowLeft size={17} weight="bold" aria-hidden="true" /> Briefing
+            </button>
+            <div className="cv2-intro">
+              <p className="cv2-eyebrow">The longer arc</p>
+              <h1>This is how focus compounds.</h1>
+              <p>Relevant cases and deliberate learning, repeated over time.</p>
             </div>
 
-            <div className="practice-metrics">
-              <div><span>Focused cases</span><strong>184</strong></div>
-              <div><span>Briefings reviewed</span><strong>46</strong></div>
-              <div><span>Current focus mix</span><strong>31%</strong></div>
+            <div className="cv2-practice-hero">
+              <div><span>Focused cases</span><strong>184</strong><small>across 18 months</small></div>
+              <TrendUp size={28} weight="bold" aria-hidden="true" />
+              <div className="cv2-practice-mini">
+                <span><strong>46</strong> briefings</span>
+                <span><strong>31%</strong> focus mix</span>
+              </div>
             </div>
 
-            <div className="practice-loop">
-              <div><span>1</span><div><strong>Choose a direction</strong><p>Make the desired clinical mix explicit.</p></div></div>
-              <div><span>2</span><div><strong>Concentrate appropriate cases</strong><p>See enough similar presentations to recognise patterns.</p></div></div>
-              <div><span>3</span><div><strong>Learn against tomorrow’s work</strong><p>Review only what is relevant to the decisions ahead.</p></div></div>
-              <div><span>4</span><div><strong>Repeat, reflect, refine</strong><p>Case volume and deliberate learning compound together.</p></div></div>
+            <div className="cv2-loop">
+              {[
+                ["Choose", "Make the clinical direction explicit."],
+                ["Concentrate", "See enough similar cases to recognise patterns."],
+                ["Learn", "Review only what tomorrow’s work makes useful."],
+                ["Repeat", "Let exposure and reflection compound."],
+              ].map(([title, detail], index) => (
+                <div key={title}>
+                  <span>{index + 1}</span>
+                  <div><strong>{title}</strong><p>{detail}</p></div>
+                </div>
+              ))}
             </div>
 
-            <div className="skin-cancer-note">
-              <TrendUp size={24} weight="light" aria-hidden="true" />
-              <p>The operating idea mirrors focused skin-cancer general practice: concentrated exposure, repeat pattern recognition and deliberate learning.</p>
+            <div className="cv2-note">
+              <p>Focused skin-cancer GPs improved through the same operating idea: concentrated exposure, pattern recognition and deliberate learning.</p>
             </div>
 
-            <div className="clinician-stage-action inline-action">
-              <button className="primary-button" type="button" onClick={restart}>Restart walkthrough</button>
-              <p>Exposure and learning activity are not a credential or competence score.</p>
+            <div className="cv2-action">
+              <button type="button" onClick={restart}>Restart pathway</button>
+              <p>Exposure and learning activity are not a competence score.</p>
             </div>
-          </div>
+          </section>
         )}
-      </section>
+      </div>
     </main>
   );
 }

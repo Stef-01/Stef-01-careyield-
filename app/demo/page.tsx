@@ -6,6 +6,7 @@
 import { getStore } from "@/booking/store";
 import { signBookingToken } from "@/booking/token";
 import { getConsole } from "@/console/store";
+import { DemoNavigator } from "../demo-navigator";
 import { assertDemoEnabled } from "@/lib/demo-guard";
 import { launchDemo } from "./actions";
 
@@ -27,6 +28,9 @@ export default function DemoPage() {
   return (
     <div className="min-h-screen bg-stone-50">
       <main className="mx-auto max-w-3xl px-6 py-16">
+        <div className="mb-10">
+          <DemoNavigator />
+        </div>
         <h1 className="text-3xl font-semibold tracking-tight">CareYield demo</h1>
         <p className="mt-3 max-w-xl text-stone-500">
           A scripted synthetic practice: {rail.practiceName}, {rail.clinicianName}, one open

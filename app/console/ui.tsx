@@ -1,6 +1,7 @@
 // W11: shared console primitives — one look for every console surface.
 
 import { signOut } from "./actions";
+import { DemoNavigator } from "../demo-navigator";
 
 export function ConsoleShell({
   email,
@@ -14,7 +15,7 @@ export function ConsoleShell({
       <header className="border-b border-stone-200 bg-white">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
           <div className="flex items-baseline gap-3">
-            <span className="text-lg font-semibold tracking-tight">CareYield</span>
+            <DemoNavigator />
             <span className="text-sm text-stone-500">practice console</span>
           </div>
           {email && (

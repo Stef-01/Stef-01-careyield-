@@ -91,6 +91,53 @@ A separate crop was not needed: both halves of the combined comparison are nativ
 - The briefing progress control updates from 1/5 to 2/5 when a resource is reviewed, all five source links are exposed semantically, direct stage navigation works, and the browser console reports no warnings or errors.
 - Current guideline, prescribing-safety and recent-evidence cards are visually distinguished without implying credentialing or measured competence; case details are explicitly synthetic.
 
+### Pass 8 — passed (clinician minimalism overhaul)
+
+- Before/after evidence at 1440 × 1000: `qa/32-clinician-desktop.png` and `qa/37-clinician-v2-desktop.png` were inspected together at the same viewport.
+- Final mobile evidence: `qa/33-clinician-v2-goal-mobile.png`, `qa/34-clinician-v2-feed-mobile.png`, `qa/35-clinician-v2-briefing-mobile.png`, and `qa/36-clinician-v2-practice-mobile.png`.
+- The labelled four-tab dashboard navigation became a quiet segmented progress rail; the bordered desktop app window became a focused 680 px product column; and each stage now leads with one prompt and one primary action.
+- The five-row briefing was replaced by one learning card at a time, with five 32 px progress targets, explicit reviewed state, source access and a single **Mark ready** action.
+- [P2] The case-mix action originally sat below the 390 × 844 fold because four case rows correctly remained available.
+- Fix: on mobile only, the action now rests in a compact sticky footer while the case list scrolls underneath. The current case count, first appointments and next action remain visible together.
+- [P2 accessibility] Minimal progress segments initially had a 4 px interaction box.
+- Fix: the visual line remains 4 px, while each segment now has a 24 px hit area; learning-item targets increased to 32 px, back/exit controls retain 44 px height, and the main action remains 58 px.
+- All four stages were exercised at 390 × 844, with no horizontal overflow and no browser console warnings or errors. The 1440 × 1000 direction screen keeps the same hierarchy rather than expanding into a dashboard.
+
+### Pass 9 — passed (patient minimalism overhaul)
+
+- Before/after match evidence at 390 × 844: `qa/25-practical-match.png` and `qa/40-patient-v2-match-mobile.png` were inspected together at the same viewport.
+- Final mobile evidence: `qa/38-patient-v2-welcome-mobile.png`, `qa/39-patient-v2-review-mobile.png`, `qa/40-patient-v2-match-mobile.png`, `qa/41-patient-v2-profile-mobile.png`, `qa/42-patient-v2-booking-mobile.png`, `qa/43-patient-v2-confirmed-mobile.png`, and `qa/44-patient-v2-all-mobile.png`.
+- Final desktop evidence: `qa/45-patient-v2-welcome-desktop.png` and `qa/46-patient-v2-match-desktop.png` at 1440 × 1000.
+- The opening screen now behaves as one quiet prompt with two pill actions. The review screen turns five competing chips into four ruled priorities, and the primary match replaces three repeated fit chips with one human fit sentence plus the two practical details needed to act.
+- The match and profile portraits now sit within softly rounded margins rather than touching the viewport edges. Editorial names, restrained sage context, thin rules, and one black primary action create a consistent Hinge-level rhythm without borrowing dating mechanics or ratings.
+- Desktop retains the same focused 520 px product column instead of becoming a dashboard. The patient journey was exercised from typed request through tailored results, all eight matches, profile, time selection, and confirmation with no horizontal overflow or console errors.
+
+### Pass 10 — passed (patient motion overhaul)
+
+- Layout comparison at 390 × 844: `qa/40-patient-v2-match-mobile.png` and `qa/48-motion-match-mobile.png` were inspected together in the same input. The settled Motion state preserves the selected portrait crop, typography, spacing, practical details, and above-the-fold primary action exactly.
+- Motion evidence: `qa/47-motion-loading-mobile.png`, `qa/48-motion-match-mobile.png`, `qa/49-motion-all-mobile.png`, `qa/50-motion-booking-mobile.png`, `qa/51-motion-confirmed-mobile.png`, and `qa/52-motion-match-desktop.png`.
+- Screen transitions now use quiet opacity, blur and short directional movement; profile transitions intentionally remain opacity-only so the fixed appointment action stays anchored during page scroll.
+- The 4.25-second matching state advances through three single-line status messages rather than adding simultaneous progress UI. The waveform breathes continuously, then the first match enters with a spring transition.
+- Clinician changes now respond to horizontal drag velocity or distance and animate the portrait/details as one unit. Priorities, the all-matches list, appointment times and confirmation state use restrained sequencing; primary controls use tactile press feedback.
+- Reduced-motion preferences are respected through Motion's user preference configuration and opacity-only fallbacks. The full patient journey and clinician changes were exercised at 390 × 844, the desktop match was exercised at 1440 × 1000, the profile footer stayed fixed before and after a 500 px scroll, and browser diagnostics contained no warnings or errors.
+
+### Pass 11 — passed (ten qualitative women’s-health archetypes)
+
+- Before/after welcome evidence at 390 × 844: `qa/38-patient-v2-welcome-mobile.png` and `qa/53-archetypes-first-mobile.png` were inspected together. The new selector occupies previously empty space, preserves the original hierarchy and keeps both primary actions in their exact positions.
+- Additional evidence: `qa/54-archetypes-tenth-mobile.png`, `qa/55-archetype-review-mobile.png`, `qa/56-archetype-match-mobile.png`, and `qa/57-archetypes-desktop.png`.
+- The welcome screen now cycles through ten lived-situation demos centred on PCOS/PMOS, gestational diabetes and post-birth physical or emotional recovery. Each story includes qualitative matching language about fear, shame, family dynamics, executive function, consent or the pressure to “bounce back,” rather than reducing the patient to a diagnosis.
+- Language-fit journeys cover Tamil, Malayalam, Hindi, Punjabi, Spanish, Arabic and Vietnamese. A disability-rights journey explicitly requests wheelchair access, consent, autonomy and a Vietnamese-speaking clinician.
+- Existing clinician profiles were reframed around women’s health while preserving the earlier cardiac, kidney, dialysis and ADHD expertise. The ranking engine now treats clinical focus, spoken language, psychological safety, disability rights and weight-respectful care as distinct match signals.
+- All ten archetypes were cycled at 390 × 844 with no page overflow, and each generated its intended first match in automated coverage. A complete sustainable-PCOS journey was exercised through review, the 4.25-second matching state and Dr Sofia Alvarez as the first result. The desktop selector was also verified at 1440 × 1000.
+
+### Pass 12 — passed (cross-demo navigation)
+
+- Evidence: `qa/58-demo-nav-patient-mobile.png`, `qa/59-demo-nav-clinician-mobile.png`, `qa/60-demo-nav-operations-mobile.png`, and `qa/61-demo-nav-patient-desktop.png`.
+- The CareYield wordmark is now the consistent demo-navigation trigger across the patient finder, clinician pathway, practice story, operations demo and practice console. This adds no persistent bar or competing screen element; the existing hierarchy remains unchanged while the menu is closed.
+- The open menu shows four numbered stops, current location, concise descriptions and one explicit next stop. Selecting the current stop performs a full section restart, which lets a presenter recover from any deep patient or clinician state without hunting for local back controls.
+- The complete sequence was exercised from patient finder → clinician pathway → practice story → operations demo → patient finder. Active-state and next-stop labels updated correctly on every route, and the patient section successfully restarted from its typed-request state.
+- The 320 px menu fits at 390 × 844 and 1440 × 1000 with no horizontal overflow. It closes on outside click, Escape or route selection, retains visible focus treatment, and browser diagnostics contained no warnings or errors.
+
 ## Primary interactions tested
 
 1. Start and finish the simulated 20-second voice description.
@@ -105,6 +152,11 @@ A separate crop was not needed: both halves of the combined comparison are nativ
 10. Set a 30% women’s metabolic/reproductive-health direction and open the generated PCOS case mix.
 11. Open tomorrow’s five-part learning briefing, mark a resource reviewed, and verify progress updates.
 12. Open the practice flywheel, navigate directly between stages, and verify the clinician route at 390 × 844 and 1440 × 1000.
+13. Progress through the redesigned single-card briefing, use its item navigator, and finish into the long-term practice screen.
+14. Progress through the redesigned patient flow from the opening prompt to confirmation, including the all-matches list and all three appointment-time states, at 390 × 844 and 1440 × 1000.
+15. Exercise animated screen transitions, all three matching-status messages, previous/next clinician motion, staggered roster and appointment choices, fixed profile CTA during scroll, and confirmation motion with reduced-motion configuration enabled.
+16. Cycle through all ten qualitative women’s-health archetypes, verify their language/access copy, and confirm each request ranks its intended first clinician.
+17. Open the wordmark demo map on patient, clinician, practice and operations routes; follow the complete next-stop loop and restart a deep patient state from the active menu item.
 
 ## Implementation checklist
 
@@ -117,6 +169,11 @@ A separate crop was not needed: both halves of the combined comparison are nativ
 - [x] South Indian PCOS request, review priorities, ranked results and profile rationale complete.
 - [x] Billing, travel time and practical access tags complete.
 - [x] Clinician direction, concentrated PCOS case mix, case-specific briefing and practice flywheel complete.
+- [x] Clinician pathway minimalism overhaul complete across phone and desktop.
+- [x] Patient pathway minimalism overhaul complete across request, review, match, roster, profile, booking and confirmation states.
+- [x] Motion overhaul complete with accessible screen, loading, card, list, booking and confirmation transitions.
+- [x] Ten PCOS, gestational-diabetes and post-birth archetypes complete with language, psychological-safety and disability-rights matching signals.
+- [x] Cross-demo navigation and section restart controls complete across patient, clinician, practice and operations surfaces.
 - [x] Typecheck, unit tests, production build, and browser QA complete.
 
 final result: passed

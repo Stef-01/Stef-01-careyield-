@@ -96,7 +96,7 @@ test("patient booking states pass WCAG A/AA", async ({ page, request }) => {
 test("public pages pass WCAG A/AA", async ({ page }) => {
   // "/" is now the patient-facing care finder; the B2B landing moved to /practices and
   // is still a public page, so it keeps its coverage under its new URL.
-  for (const path of ["/", "/practices", "/privacy", "/privacy/automated-decisions", "/demo"]) {
+  for (const path of ["/", "/clinicians", "/practices", "/privacy", "/privacy/automated-decisions", "/demo"]) {
     await page.goto(path);
     await expectNoViolations(page, path);
   }

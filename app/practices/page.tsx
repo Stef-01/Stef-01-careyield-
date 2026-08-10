@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DemoNavigator } from "../demo-navigator";
 import { LANDING_COPY as C } from "@/compliance/landing-copy";
 
 export default function PracticesPage() {
@@ -6,7 +7,7 @@ export default function PracticesPage() {
     <div className="min-h-screen bg-white text-stone-900">
       <header className="border-b border-stone-100">
         <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-lg font-semibold tracking-tight">CareYield</Link>
+          <DemoNavigator />
           <div className="flex items-center gap-6 text-sm text-stone-600">
             <a href="#how" className="hidden hover:text-stone-900 sm:inline">{C.nav.product}</a>
             <a href="#measurement" className="hidden hover:text-stone-900 sm:inline">{C.nav.measurement}</a>
