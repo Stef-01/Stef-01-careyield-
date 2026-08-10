@@ -27,7 +27,7 @@ export interface RoiAssumptions {
   /** Practice billing per attended GP visit, AUD (W20 default). */
   revenuePerAttendedVisit: number;
   /** Meherr subscription, AUD/month (pricing assumption — finalised W47). */
-  careYieldMonthlyFee: number;
+  meherrMonthlyFee: number;
 }
 
 export const BRIEF_ASSUMPTIONS: RoiAssumptions = {
@@ -38,7 +38,7 @@ export const BRIEF_ASSUMPTIONS: RoiAssumptions = {
   dnaRate: 0.05,
   incrementalShare: 0.6,
   revenuePerAttendedVisit: 80,
-  careYieldMonthlyFee: 990,
+  meherrMonthlyFee: 990,
 };
 
 export interface RoiResult {
@@ -49,7 +49,7 @@ export interface RoiResult {
   incrementalRevenuePerWeek: number;
   annualIncrementalVisits: number;
   annualIncrementalRevenue: number;
-  annualCareYieldCost: number;
+  annualMeherrCost: number;
   netAnnualBenefit: number;
   /** Incremental revenue ÷ Meherr cost; 0 when cost is 0 (guarded). */
   roiMultiple: number;
@@ -66,9 +66,9 @@ export function computeRoi(a: RoiAssumptions): RoiResult {
   const incrementalRevenuePerWeek = incrementalAttendedPerWeek * a.revenuePerAttendedVisit;
   const annualIncrementalVisits = incrementalAttendedPerWeek * WEEKS_PER_YEAR;
   const annualIncrementalRevenue = incrementalRevenuePerWeek * WEEKS_PER_YEAR;
-  const annualCareYieldCost = a.careYieldMonthlyFee * MONTHS_PER_YEAR;
-  const netAnnualBenefit = annualIncrementalRevenue - annualCareYieldCost;
-  const roiMultiple = annualCareYieldCost === 0 ? 0 : annualIncrementalRevenue / annualCareYieldCost;
+  const annualMeherrCost = a.meherrMonthlyFee * MONTHS_PER_YEAR;
+  const netAnnualBenefit = annualIncrementalRevenue - annualMeherrCost;
+  const roiMultiple = annualMeherrCost === 0 ? 0 : annualIncrementalRevenue / annualMeherrCost;
   return {
     openSlotsPerWeek,
     generatedBookingsPerWeek,
@@ -77,7 +77,7 @@ export function computeRoi(a: RoiAssumptions): RoiResult {
     incrementalRevenuePerWeek,
     annualIncrementalVisits,
     annualIncrementalRevenue,
-    annualCareYieldCost,
+    annualMeherrCost,
     netAnnualBenefit,
     roiMultiple,
   };

@@ -13,7 +13,7 @@ describe("computeRoi", () => {
     expect(r.incrementalRevenuePerWeek).toBeCloseTo(1094.4, 6);
     expect(r.annualIncrementalVisits).toBeCloseTo(711.36, 6);
     expect(r.annualIncrementalRevenue).toBeCloseTo(56908.8, 4);
-    expect(r.annualCareYieldCost).toBe(11880);
+    expect(r.annualMeherrCost).toBe(11880);
     expect(r.netAnnualBenefit).toBeCloseTo(45028.8, 4);
     expect(r.roiMultiple).toBeCloseTo(4.79, 2);
   });
@@ -32,15 +32,15 @@ describe("computeRoi", () => {
   });
 
   it("guards divide-by-zero when Meherr cost is zero", () => {
-    const free: RoiAssumptions = { ...BRIEF_ASSUMPTIONS, careYieldMonthlyFee: 0 };
+    const free: RoiAssumptions = { ...BRIEF_ASSUMPTIONS, meherrMonthlyFee: 0 };
     const r = computeRoi(free);
-    expect(r.annualCareYieldCost).toBe(0);
+    expect(r.annualMeherrCost).toBe(0);
     expect(r.roiMultiple).toBe(0);
     expect(r.netAnnualBenefit).toBe(r.annualIncrementalRevenue);
   });
 
   it("net benefit turns negative when the fee outweighs incremental revenue", () => {
-    const r = computeRoi({ ...BRIEF_ASSUMPTIONS, careYieldMonthlyFee: 100_000 });
+    const r = computeRoi({ ...BRIEF_ASSUMPTIONS, meherrMonthlyFee: 100_000 });
     expect(r.netAnnualBenefit).toBeLessThan(0);
     expect(r.roiMultiple).toBeLessThan(1);
   });

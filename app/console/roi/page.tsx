@@ -20,7 +20,7 @@ const aud = (n: number) =>
 export default async function RoiPage({
   searchParams,
 }: {
-  searchParams: Promise<{ gpCount?: string; revenuePerAttendedVisit?: string; careYieldMonthlyFee?: string }>;
+  searchParams: Promise<{ gpCount?: string; revenuePerAttendedVisit?: string; meherrMonthlyFee?: string }>;
 }) {
   const email = await requireSession();
   const sp = await searchParams;
@@ -31,7 +31,7 @@ export default async function RoiPage({
       sp.revenuePerAttendedVisit,
       BRIEF_ASSUMPTIONS.revenuePerAttendedVisit,
     ),
-    careYieldMonthlyFee: positiveNumber(sp.careYieldMonthlyFee, BRIEF_ASSUMPTIONS.careYieldMonthlyFee),
+    meherrMonthlyFee: positiveNumber(sp.meherrMonthlyFee, BRIEF_ASSUMPTIONS.meherrMonthlyFee),
   };
   const r = computeRoi(assumptions);
 
@@ -46,7 +46,7 @@ export default async function RoiPage({
     ["Attended (after DNA) / week", r.attendedPerWeek.toFixed(1)],
     ["Incremental attended / week", r.incrementalAttendedPerWeek.toFixed(1)],
     ["Incremental revenue / year", aud(r.annualIncrementalRevenue)],
-    ["Meherr cost / year", aud(r.annualCareYieldCost)],
+    ["Meherr cost / year", aud(r.annualMeherrCost)],
   ];
 
   return (
@@ -84,10 +84,10 @@ export default async function RoiPage({
         </Field>
         <Field label="Meherr fee (AUD/month)">
           <input
-            name="careYieldMonthlyFee"
+            name="meherrMonthlyFee"
             type="number"
             min={0}
-            defaultValue={assumptions.careYieldMonthlyFee}
+            defaultValue={assumptions.meherrMonthlyFee}
             className={inputClass}
           />
         </Field>
