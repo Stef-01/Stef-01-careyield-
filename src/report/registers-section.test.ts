@@ -29,6 +29,7 @@ const closure: RegisterAnalytics = {
     },
   ],
   ambiguousClosures: 4,
+    ambiguousGapClosures: 4,
 };
 
 function armCount(patients: number, attended: number) {
@@ -137,7 +138,7 @@ describe("W76 register section — golden", () => {
 
   it("handles a practice with no registers without pretending there is data", () => {
     const output = renderRegisterSection({
-      closure: { conditions: [], ambiguousClosures: 0 },
+      closure: { conditions: [], ambiguousClosures: 0, ambiguousGapClosures: 0 },
       attribution: { window: attribution.window, conditions: [], overlapCount: 0 },
     });
     expect(output).toContain("No registers are active.");
