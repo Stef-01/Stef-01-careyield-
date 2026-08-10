@@ -211,7 +211,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W115 | available | — | — | — | [P] Credential provenance report for the practice. Verify: golden report; states its own coverage; ranks no clinician |
 | W116 | available | — | — | — | Q9 hardening (code-review + security-review + the W103 scoping sweep). Verify: zero criticals |
 | W117 | available | — | — | — | Q9 gate dossier — the G6 position on credential visibility, decided BEFORE Q11 routes on it. Verify: dossier complete; founder actions named |
-| W118 | available | — | — | — | Pathway as versioned data: inclusion/exclusion/escalation criteria. Verify: a published version is immutable, edits create a new version, replay reproduces any version. **G5** |
+| W118 | claimed | builder-B | 2026-08-10T10:10Z | — | Pathway as versioned data: inclusion/exclusion/escalation criteria. Verify: a published version is immutable, edits create a new version, replay reproduces any version. **G5** |
 | W119 | available | — | — | — | [P] Pathway authoring workspace, extending W69's three-stage gate. Verify: unapproved pathway unusable BY TYPE, not by check; ships with zero signed. **G5** |
 | W120 | available | — | — | — | Criteria evaluation over RECORDED facts only. Verify: export-list test — no function takes symptoms and returns a pathway (G7) |
 | W121 | available | — | — | — | Escalation rules as data, shipping EMPTY (W68 posture). Verify: a test pins the shipped rule set at zero. **G5** |
