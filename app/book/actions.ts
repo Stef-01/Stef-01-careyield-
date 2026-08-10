@@ -37,7 +37,9 @@ export async function saveContactPreference(formData: FormData): Promise<void> {
     days: weekdaysOnly ? [1, 2, 3, 4, 5] : [0, 1, 2, 3, 4, 5, 6],
   };
 
-  const result = saveContactPreferences(invitation.patientId, prefs);
+  // Scoped by the invitation's own practice, so a colliding patient id in another
+  // practice can never be written through this token.
+  const result = saveContactPreferences(invitation.practiceId, invitation.patientId, prefs);
   // Only ever an error KEY in the URL, never a message built from input (W41).
   redirect(`/book/${token}${result.ok ? "?prefs=saved" : "?prefs=invalid"}`);
 }

@@ -109,6 +109,7 @@ export function evaluateConditionGuardrails(
 export function conditionMetricsFrom(
   invitations: readonly {
     id: string;
+    practiceId?: string;
     patientId: string;
     status: string;
     generatedDna?: boolean;
@@ -116,6 +117,12 @@ export function conditionMetricsFrom(
   }[],
   registerOf: (invitationId: string) => string | null,
   openComplaintsByCondition: Readonly<Record<string, number>> = {},
+  /**
+   * Required to scope, mirroring closuresFromAppointments. Omit only for single-tenant
+   * data. W65 found the unscoped form of this bug twice and W78 found a third, so the
+   * filter is offered here before a fleet-wide caller exists rather than after.
+   */
+  practiceId?: string,
 ): ConditionGuardrailMetrics[] {
   const byCondition = new Map<string, ConditionGuardrailMetrics>();
   // Opt-outs are counted as DISTINCT PATIENTS, not invitations. A STOP closes every
@@ -142,6 +149,13 @@ export function conditionMetricsFrom(
   };
 
   for (const invitation of invitations) {
+    if (
+      practiceId !== undefined &&
+      invitation.practiceId !== undefined &&
+      invitation.practiceId !== practiceId
+    ) {
+      continue;
+    }
     const code = registerOf(invitation.id);
     if (code === null) continue;
     const m = bucket(code);

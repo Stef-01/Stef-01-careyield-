@@ -209,3 +209,24 @@ describe("W70 in the simulation", () => {
     expect(report.criticalConditions.length).toBeGreaterThan(0);
   }, 30_000);
 });
+
+describe("W78 tenancy", () => {
+  it("ignores another practice's invitations when a practice is named", () => {
+    const invitations = [
+      { id: "i1", practiceId: "prac-a", patientId: "shared", status: "opted_out" },
+      { id: "i2", practiceId: "prac-b", patientId: "shared", status: "opted_out" },
+    ];
+    const scoped = conditionMetricsFrom(invitations, () => "cond_a", {}, "prac-a");
+
+    expect(scoped[0]!.invitationsSent).toBe(1);
+    expect(scoped[0]!.optedOut).toBe(1);
+  });
+
+  it("counts everything when no practice is named (single-tenant data)", () => {
+    const invitations = [
+      { id: "i1", practiceId: "prac-a", patientId: "p1", status: "sent" },
+      { id: "i2", practiceId: "prac-b", patientId: "p2", status: "sent" },
+    ];
+    expect(conditionMetricsFrom(invitations, () => "cond_a")[0]!.invitationsSent).toBe(2);
+  });
+});
