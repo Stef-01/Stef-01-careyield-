@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { numberField } from "@/lib/form-numbers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, signSession } from "@/console/session";
 import { rateLimit } from "@/lib/rate-limit";
@@ -36,12 +37,9 @@ export async function onboard(formData: FormData): Promise<void> {
     {
       name: String(formData.get("name") ?? ""),
       timezone: String(formData.get("timezone") ?? ""),
-      // Missing/blank must fail validation, not coerce to 0 and silently
-      // disable the holdout arm (Number(null) === 0).
-      holdoutPercent:
-        formData.get("holdoutPercent") === null || formData.get("holdoutPercent") === ""
-          ? Number.NaN
-          : Number(formData.get("holdoutPercent")),
+      // Missing/blank must fail validation, not coerce to 0 and silently disable the
+      // holdout arm. Same hazard as every other numeric field — see numberField.
+      holdoutPercent: numberField(formData, "holdoutPercent"),
     },
     new Date().toISOString(),
     email,
@@ -53,9 +51,9 @@ export async function onboard(formData: FormData): Promise<void> {
 export async function saveRules(formData: FormData): Promise<void> {
   const email = await requireSession();
   const config: EligibilityConfig = {
-    minDaysSinceLastVisit: Number(formData.get("minDaysSinceLastVisit")),
-    futureBookingBlockDays: Number(formData.get("futureBookingBlockDays")),
-    maxInvitesPerQuarter: Number(formData.get("maxInvitesPerQuarter")),
+    minDaysSinceLastVisit: numberField(formData, "minDaysSinceLastVisit"),
+    futureBookingBlockDays: numberField(formData, "futureBookingBlockDays"),
+    maxInvitesPerQuarter: numberField(formData, "maxInvitesPerQuarter"),
     usualClinicianOnly: formData.get("usualClinicianOnly") === "on",
     chronicCareOnly: formData.get("chronicCareOnly") === "on",
   };

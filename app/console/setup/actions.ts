@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { numberField } from "@/lib/form-numbers";
 import {
   acknowledgeSetupStep,
   completeSetup,
@@ -71,10 +72,10 @@ export async function saveStepSessions(formData: FormData): Promise<void> {
   const config: SessionConfig = {
     fillableTypes: chosen.filter((t) => APPOINTMENT_TYPES.includes(t)),
     participatingClinicianIds: allowlist.length > 0 ? allowlist : "all",
-    protectedCapacityFraction: Number(formData.get("protectedCapacityPercent")) / 100,
+    protectedCapacityFraction: numberField(formData, "protectedCapacityPercent") / 100,
     schedulingWindow: {
-      startHour: Number(formData.get("startHour")),
-      endHour: Number(formData.get("endHour")),
+      startHour: numberField(formData, "startHour"),
+      endHour: numberField(formData, "endHour"),
     },
   };
   const errors = saveSessionConfig(config, new Date().toISOString(), email);
@@ -87,9 +88,9 @@ export async function saveStepSessions(formData: FormData): Promise<void> {
 export async function saveStepRules(formData: FormData): Promise<void> {
   const email = await requireSession();
   const config: EligibilityConfig = {
-    minDaysSinceLastVisit: Number(formData.get("minDaysSinceLastVisit")),
-    futureBookingBlockDays: Number(formData.get("futureBookingBlockDays")),
-    maxInvitesPerQuarter: Number(formData.get("maxInvitesPerQuarter")),
+    minDaysSinceLastVisit: numberField(formData, "minDaysSinceLastVisit"),
+    futureBookingBlockDays: numberField(formData, "futureBookingBlockDays"),
+    maxInvitesPerQuarter: numberField(formData, "maxInvitesPerQuarter"),
     usualClinicianOnly: formData.get("usualClinicianOnly") === "on",
     chronicCareOnly: formData.get("chronicCareOnly") === "on",
   };
