@@ -67,6 +67,18 @@ export function appendAll(log: EventLog, events: SpineEvent[]): EventLog {
  * note; use verifyLogAgainst when an anchor is available.
  */
 export function verifyLog(log: EventLog): boolean {
+  return verifySequence(log);
+}
+
+/**
+ * The contiguity check, over anything that carries a sequence number.
+ *
+ * W126 needed this for the pathway audit trail. Generalising it rather than letting that unit
+ * copy four lines is the point: an integrity check that exists twice is one that can be fixed
+ * once, and the copy then quietly guarantees less than the original. Same reasoning as W114
+ * reaching the real linter rules instead of duplicating the patterns.
+ */
+export function verifySequence(log: readonly { readonly seq: number }[]): boolean {
   return log.every((entry, i) => entry.seq === i);
 }
 
@@ -93,6 +105,14 @@ export type LogVerdict =
  * the sequence numbers say.
  */
 export function verifyLogAgainst(log: EventLog, anchor: LogAnchor): LogVerdict {
+  return verifySequenceAgainst(log, anchor);
+}
+
+/** `verifyLogAgainst`, over anything that carries a sequence number. See `verifySequence`. */
+export function verifySequenceAgainst(
+  log: readonly { readonly seq: number }[],
+  anchor: LogAnchor,
+): LogVerdict {
   const firstBad = log.findIndex((entry, i) => entry.seq !== i);
   if (firstBad !== -1) return { ok: false, reason: "not_contiguous", at: firstBad };
   if (log.length < anchor.length) return { ok: false, reason: "truncated", at: log.length };
