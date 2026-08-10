@@ -137,7 +137,7 @@ Not defects — decisions this loop must not make, or work already scheduled.
 | 2 | **G5 values.** W56's intervals, SUP-1/SUP-2 still blocked; nine registries ship empty and the product is correspondingly empty | Founder |
 | 3 | **G6 position.** W133 blocked; also gates W117 (subject access to evidence scans) | Founder |
 | 4 | **Credential visibility across a practice boundary** (Q9 dossier action 1). W131/W137 are built to the safe intersection pending an A-or-B ruling | Founder |
-| 5 | **W152's `RenderableItem` is not what W151's console renders.** The provenance guarantee is real inside W152 and unrealised at the only surface showing material; wiring it is a trade-off, not an edit (see the W151 ledger row) | W154 |
+| 5 | ~~**W152's `RenderableItem` is not what W151's console renders.**~~ **CLOSED by W154 (`bce55e6`) while this audit was being written** — filed from the W151 close-out, confirmed critical by Q12 hardening, and fixed there. Recorded rather than deleted because a finding that was raised, routed and closed is evidence the ledger works | Closed |
 | 6 | **The console still cannot represent two practices** (Y2 finding B2, still open). Console-side scoping remains untestable end-to-end | Y4 |
 | 7 | **`MEHERR_STAFF` ships empty**, so `/console/interest`'s populated branch is unreachable and W153's display sink is not asserted end-to-end | Founder |
 
