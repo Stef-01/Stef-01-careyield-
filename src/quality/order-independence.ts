@@ -111,11 +111,53 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    module: "src/pathways/audit.ts",
+    folds: 1,
+    disposition: {
+      kind: "rationale",
+      why: "Takes the final element of an append-only trail that REFUSES an event dated before the last one (`out_of_order`). The last element is the latest by construction, so there is no tie to break — the ordering is enforced at write time rather than recovered at read time.",
+    },
+  },
+  {
+    // W168: found by widening the detector past `.reduce(`. This one WAS defective — a same-day
+    // given/refused pair resolved by array order — and is fixed in the same unit.
+    module: "src/pathways/consent.ts",
+    folds: 2,
+    disposition: {
+      kind: "tie_break_test",
+      test: "src/pathways/consent.test.ts :: W168: two decisions on one day do not resolve by array order",
+    },
+  },
+  {
+    module: "src/pathways/versioning.ts",
+    folds: 1,
+    disposition: {
+      kind: "rationale",
+      why: "Takes the final element of a list where replay guarantees at most one version in force at an instant. The index is belt-and-braces rather than a selection, and W128's mutation check already proved the surrounding rule is tested rather than compensated for.",
+    },
+  },
+  {
     module: "src/pms/ingest.ts",
     folds: 1,
     disposition: {
       kind: "rationale",
       why: "Folds to the maximum capturedAt VALUE, not to the record holding it. Two records sharing the maximum produce the same string either way round.",
+    },
+  },
+  {
+    module: "src/referrals/store.ts",
+    folds: 1,
+    disposition: {
+      kind: "tie_break_test",
+      test: "src/referrals/store.test.ts :: W142 two return reports filed on the same date are AMBIGUOUS, not resolved by position",
+    },
+  },
+  {
+    module: "src/security/audit-gate.ts",
+    folds: 1,
+    disposition: {
+      kind: "rationale",
+      why: "Takes the final element of a review list written by hand in `audit-allowlist.ts`, in the order the reviews happened. Not a query result and not an ingest — the order is the author's, which is the one case where position IS the fact.",
     },
   },
   {
@@ -168,7 +210,28 @@ export const FOLD_SITES: readonly FoldSite[] = [
   },
 ];
 
-const FOLD_RE = /\.reduce\(/g;
+// W168 widened this. It matched `.reduce(` only, and W167's ledger row concluded from that
+// "there are no sort-then-take-first sites". There were five: `.at(-1)` and `[xs.length - 1]`
+// fold a collection to one answer just as much as a reduce does, and one of them — consent — was
+// order-dependent and is fixed in this unit. A detector that cannot see a whole family of folds
+// reports zero for that family, and zero reads as clean.
+//
+// The patterns are assembled from fragments so this module does not match ITSELF, which is
+// W153's trick for the same problem: the alternative is excluding the file by name, and an
+// excluded file is a place to hide something.
+const FOLD_RE = new RegExp(
+  [
+    ["\\.redu", "ce\\("].join(""),
+    ["\\.a", "t\\(-1\\)"].join(""),
+    ["\\[\\s*[\\w.]+\\.len", "gth - 1\\s*\\]"].join(""),
+  ].join("|"),
+  "g",
+);
+
+/** Line and block comments removed, so prose about a fold is not counted as one. */
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+}
 
 /** Modules under `root` that fold a collection, with how many folds each contains. */
 export function discoverFoldSites(root: string): Array<{ module: string; folds: number }> {
@@ -183,7 +246,11 @@ export function discoverFoldSites(root: string): Array<{ module: string; folds: 
       }
       // Tests are excluded: a fold in a test is the test's own arithmetic, not a product answer.
       if (!entry.endsWith(".ts") || entry.includes(".test.")) continue;
-      const source = readFileSync(full, "utf8");
+      // W168: comments are stripped first. A fold NAMED IN PROSE is not a fold, and this
+      // module's own header naming the patterns was enough to make it match itself. Counting
+      // comment mentions also inflates a declared count, which then has to be "corrected" by
+      // somebody who has not read the code — the failure mode a register exists to prevent.
+      const source = stripComments(readFileSync(full, "utf8"));
       const count = (source.match(FOLD_RE) ?? []).length;
       if (count > 0) found.push({ module: full.slice(root.length + 1), folds: count });
     }

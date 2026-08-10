@@ -183,7 +183,21 @@ export function consentFor(
     .sort()
     .at(-1);
 
-  const latest = [...forVersion].sort((a, b) => a.decidedAt.localeCompare(b.decidedAt)).at(-1)!;
+  // W168. The withdrawal rule above is stated over the whole set for a reason this line used to
+  // ignore: day-granularity dates cannot order two events within a day. Sorting by `decidedAt`
+  // and taking the last one therefore resolved a SAME-DAY given/refused pair by array order —
+  // consent decided by however the caller's store happened to return rows.
+  //
+  // The fix applies the sentence already written a dozen lines up: refusing to guess is the safe
+  // direction for consent. Where the latest day's decisions DISAGREE, the refusal is the answer;
+  // where they agree, there is nothing to guess about. No sort remains, so there is no comparator
+  // and no position for a tie to be resolved by.
+  const latestDay = forVersion.reduce(
+    (max, r) => (r.decidedAt > max ? r.decidedAt : max),
+    forVersion[0]!.decidedAt,
+  );
+  const onLatestDay = forVersion.filter((r) => r.decidedAt === latestDay);
+  const latest = onLatestDay.find((r) => r.decision !== "given") ?? onLatestDay[0]!;
   if (lastWithdrawal !== undefined && latest.decidedAt <= lastWithdrawal) {
     const withdrawnRecord = forVersion.find((r) => r.withdrawnAt === lastWithdrawal) ?? latest;
     return { status: "withdrawn", record: withdrawnRecord };

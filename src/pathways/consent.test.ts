@@ -282,3 +282,35 @@ describe("W125 what a record must carry", () => {
     expect(kept.statement).toBe("Placeholder wording as read aloud.");
   });
 });
+
+describe("W168: two decisions on one day do not resolve by array order", () => {
+  // W129 stated the WITHDRAWAL rule over the whole set precisely because day-granularity dates
+  // cannot order two events within a day, and this module says so in its own comment: "refusing
+  // to guess is the safe direction for consent". Two lines later `latest` guessed anyway — a
+  // plain sort by decidedAt with no tie-break, so a same-day given/refused pair resolved to
+  // whichever the caller happened to list last. Same shape as the Y3-1 audit finding, in the
+  // module that decides whether a patient agreed.
+  const given = record({ decision: "given", decidedAt: "2026-06-10" });
+  const refused = record({ decision: "refused", decidedAt: "2026-06-10" });
+
+  it("reads as NOT consented whichever order the pair arrives in", () => {
+    for (const order of [[given, refused], [refused, given]]) {
+      const status = consentFor(order, "pat-1", "prac-a", "path-1", HASH_A);
+      expect(status.status, `order ${order.map((r) => r.decision).join(",")}`).not.toBe("given");
+    }
+  });
+
+  it("still reads as consented when the day's decisions agree", () => {
+    // The fix must not turn every same-day pair into a refusal — only a contradictory one.
+    const second = record({ decision: "given", decidedAt: "2026-06-10", recordedBy: "clin-2" });
+    for (const order of [[given, second], [second, given]]) {
+      expect(consentFor(order, "pat-1", "prac-a", "path-1", HASH_A).status).toBe("given");
+    }
+  });
+
+  it("still lets a later day override an earlier one", () => {
+    const later = record({ decision: "given", decidedAt: "2026-06-11" });
+    expect(consentFor([refused, later], "pat-1", "prac-a", "path-1", HASH_A).status).toBe("given");
+    expect(consentFor([later, refused], "pat-1", "prac-a", "path-1", HASH_A).status).toBe("given");
+  });
+});
