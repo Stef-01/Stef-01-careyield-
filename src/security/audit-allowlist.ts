@@ -41,6 +41,24 @@ export const AUDIT_ALLOWLIST: readonly AllowlistEntry[] = [
           "nothing.",
         extendedTo: "2026-11-09",
       },
+      {
+        on: "2026-08-11",
+        by: "W165",
+        finding:
+          "Second scheduled review. Nothing has changed in the advisory: patched range still " +
+          "<0.0.0, recommendation still None, last updated 2026-08-07 — the same data W107 saw. " +
+          "What this review added was to ask whether the DEPENDENCY can go rather than the " +
+          "acceptance be renewed forever. It cannot, and the reason is worth recording so " +
+          "November is not re-litigated from scratch: there is no patched image-size to " +
+          "override to (every version <=2.0.2 is affected and none is newer), and removing " +
+          "pptxgenjs would delete W46's control rather than just a dependency — it exists " +
+          "solely so a test can regenerate the sales deck from traceable figures instead of the " +
+          "deck being a hand-made artefact nobody can check. Reachability re-confirmed against " +
+          "a tree that has grown from 16 to 20 console surfaces since W107, and the scanner " +
+          "that proves it was itself repaired in this unit. NOT EXTENDED: three months out, the " +
+          "November date is still the forcing function.",
+        extendedTo: "2026-11-09",
+      },
     ],
   },
   {
@@ -59,6 +77,15 @@ export const AUDIT_ALLOWLIST: readonly AllowlistEntry[] = [
           "Reviewed with GHSA-w3rx-r6r6-pgpr; same package, same path, same conclusion. Still " +
           "no patched release. Reachability now enforced by test rather than argued. Not " +
           "extended.",
+        extendedTo: "2026-11-09",
+      },
+      {
+        on: "2026-08-11",
+        by: "W165",
+        finding:
+          "Reviewed with GHSA-w3rx-r6r6-pgpr, as before: same package, same path, same " +
+          "conclusion, and the same finding that neither an override nor removal is available. " +
+          "Not extended.",
         extendedTo: "2026-11-09",
       },
     ],

@@ -51,6 +51,27 @@ describe("W107 request-serving paths reach no build-time-only package", () => {
   });
 });
 
+describe("W165 the scanner reads code, not prose", () => {
+  it("every reported package is specifier-shaped", () => {
+    // The bug this replaced produced entries like "], string> = {\n  referring_practice: " —
+    // a doc comment ending in the word "from" started a match that ran into the next string
+    // literal. Nonsense in the list was the visible harm; the real one is that `exec` advances
+    // past the whole match, so a genuine import inside that span is never seen. A control whose
+    // job is to prove something is UNREACHABLE must not be able to miss an import.
+    const { packages } = reach();
+    for (const name of packages) {
+      expect(name, `"${name}" is not a module specifier`).toMatch(/^(?:@[^/\s]+\/)?[^/\s{}()<>=,;"']+$/);
+      expect(name).not.toContain("\n");
+    }
+  });
+
+  it("reports the packages the app genuinely uses, and no others", () => {
+    // Pinned exactly. A new runtime dependency is a real change and should be seen in a diff,
+    // not absorbed silently — and if this ever shrinks, the walk has stopped walking.
+    expect(reach().packages).toEqual(["@phosphor-icons/react", "motion", "next", "react"]);
+  });
+});
+
 describe("W107 the check would notice", () => {
   it("reports the packages it did find, so a failure is diagnosable", () => {
     const { packages } = reach();

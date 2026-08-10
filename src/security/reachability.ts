@@ -24,16 +24,48 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
-const IMPORT_RE = /(?:^|\n)\s*(?:import|export)\s[^;]*?from\s*["']([^"']+)["']/g;
+// W165: two fixes to a scanner that was reading prose as code.
+//
+// `[^;=]`, not `[^;]`: the original spanned statements, so `export const X: Record<A, string> =
+// {` plus a later `from "..."` matched as one "import". No genuine import contains `=` (this
+// tree uses no `import x = require(...)`), while every accidental cross-statement match does.
+//
+// And comments are STRIPPED before scanning. This tree is heavily commented and the word "from"
+// is ordinary English — a doc comment ending "...delete it from" was enough to start a match
+// that ran into the next string literal. Both bugs produce the same two harms: a nonsense entry
+// in the package set, and — the one that matters — a CONSUMED region, since `exec` advances
+// past the whole match, so a real import sitting inside it is never seen. A control whose job
+// is to prove something is unreachable must not be able to miss an import.
+const IMPORT_RE = /(?:^|\n)\s*(?:import|export)\s[^;=]*?from\s*["']([^"']+)["']/g;
+
+/** A real module specifier: no whitespace, no braces. Junk cannot survive this. */
+const SPECIFIER_RE = /^[^\s{}()<>=,;"']+$/;
+
+/**
+ * Remove comments so prose cannot be mistaken for code.
+ *
+ * Replaces each comment with an equal number of newlines rather than deleting it, so nothing
+ * downstream depends on offsets shifting.
+ */
+function stripComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
+    .replace(/(^|[^:])\/\/[^\n]*/g, (_m, lead: string) => lead);
+}
 const BARE_IMPORT_RE = /(?:^|\n)\s*import\s*["']([^"']+)["']/g;
 const CANDIDATE_EXTS = [".ts", ".tsx", "/index.ts", "/index.tsx"];
 
-function specifiersIn(source: string): string[] {
+function specifiersIn(rawSource: string): string[] {
+  const source = stripComments(rawSource);
   const found: string[] = [];
   for (const re of [IMPORT_RE, BARE_IMPORT_RE]) {
     re.lastIndex = 0;
     let match: RegExpExecArray | null;
-    while ((match = re.exec(source)) !== null) if (match[1]) found.push(match[1]);
+    while ((match = re.exec(source)) !== null) {
+      const specifier = match[1];
+      // Anything that is not specifier-shaped is a scanner artefact, not a dependency.
+      if (specifier && SPECIFIER_RE.test(specifier)) found.push(specifier);
+    }
   }
   return found;
 }
