@@ -21,7 +21,9 @@ const DIABETES = "cond_diabetes" as ConditionCode;
 const CKD = "cond_ckd" as ConditionCode;
 const WINDOW = { fromIso: "2026-01-01", toIso: "2026-06-30" };
 
-function appt(over: Partial<Appointment> & { id: string; patientId: string }): Appointment {
+function appt(
+  over: Omit<Partial<Appointment>, "id" | "patientId"> & { id: string; patientId: string },
+): Appointment {
   return {
     practiceId: PRACTICE,
     clinicianId: DR_LEE,
