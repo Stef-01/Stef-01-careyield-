@@ -157,7 +157,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W61 | done | builder-A | 2026-08-10T07:10Z | 6c45bef | src/registers/ranking.ts + 12 tests. Ranking decides who is contacted FIRST; eligibility decides who is contacted AT ALL — and the signature enforces the split: rankGapAware takes an already-eligible list and returns a PERMUTATION of it, so it cannot add or drop a patient and a gap can never become a reason to contact someone the rules exclude (W59's asymmetry, held for ordering). Implemented by PARTITIONING and applying W5's rankCandidates to each side, deliberately not by adding a comparator term: W5 stays the single definition of the base order, so if W5's rule changes this inherits it instead of drifting. Consequence pinned by test: with no gaps the output is byte-identical to W5's, so a practice with registers off sees ZERO behaviour change; when everyone has a gap it collapses back to W5's order too. W5 properties carried over and all still hold: permutation, never adds (incl. a gap for a patient outside the set), never drops (ranking is not a filter), deterministic, no input mutation, empty panel. Verify: pnpm verify green, 571 tests / 62 files |
 >>>>>>> 5758d2d (W61: gap-aware ranking that stays a permutation)
 | W63 | claimed | builder-A | 2026-08-10T07:40Z | — | 26-week sim, registers on vs off, comparative report |
-| W64 | available | — | — | — | [P] W63 |
+| W64 | claimed | builder-B | 2026-08-10T05:19Z | — | [P] W63 |
 | W65 | available | — | — | — | W53–W64 |
 | W66 | available | — | — | — | W65 |
 | W67 | available | — | — | — | W66 |
