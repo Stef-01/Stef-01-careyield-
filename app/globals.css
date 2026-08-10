@@ -5,11 +5,17 @@
 :root {
   --ink: #191a17;
   --muted: #6e706a;
-  --faint: #a3a49f;
+  /* Darkened from #a3a49f (2.4:1 on --paper) — failed WCAG AA at 11px. Now 5.1:1. */
+  --faint: #6b6c67;
   --paper: #fbfaf7;
   --stone: #eeece5;
   --line: #dfddd6;
-  --sage: #728356;
+  /* Darkened from #728356 (3.94:1 on --paper) — failed WCAG AA as body text. Now 4.7:1.
+     Fixed at the token rather than per-rule: --sage is a text colour in nine places and
+     axe only reaches the finder's opening screen, so the same failure was latent in the
+     listening/match/profile stages it never scans. Same hue, same posture as W49's
+     stone-400 → stone-500 sweep. */
+  --sage: #66774a;
   --sage-soft: #eef1e8;
 }
 

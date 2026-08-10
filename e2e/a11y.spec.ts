@@ -6,6 +6,15 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+// Scan the settled page, not a frame of its entrance animation. The care finder's
+// `.screen` fades opacity 0→1 over 260ms; caught mid-fade, axe measures the composited
+// colour (e.g. --muted #6e706a reads as #73756f, 4.46:1) and reports a contrast
+// violation against tokens that pass at rest (4.7:1 and 5.1:1). That made the suite
+// pass in isolation and fail under load — a measurement artefact, not a defect.
+// prefers-reduced-motion is the app's own escape hatch (globals.css collapses every
+// animation to 0.01ms), so this scans a state the product actually ships, and it is
+// the state a reduced-motion user sees. It does not relax the zero-violation bar.
+
 interface MockState {
   invitations: Array<{ id: string; status: string; token: string }>;
 }
@@ -17,6 +26,7 @@ async function expectNoViolations(page: Page, label: string) {
   // page that has one pinned (W49 follow-up). This is the same requirement with a
   // retry, so a genuinely title-less page still fails, and fails more legibly.
   await expect(page, `${label} must have a document title`).toHaveTitle(/.+/);
+  await page.emulateMedia({ reducedMotion: "reduce" });
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();
@@ -84,7 +94,9 @@ test("patient booking states pass WCAG A/AA", async ({ page, request }) => {
 });
 
 test("public pages pass WCAG A/AA", async ({ page }) => {
-  for (const path of ["/", "/privacy", "/privacy/automated-decisions", "/demo"]) {
+  // "/" is now the patient-facing care finder; the B2B landing moved to /practices and
+  // is still a public page, so it keeps its coverage under its new URL.
+  for (const path of ["/", "/practices", "/privacy", "/privacy/automated-decisions", "/demo"]) {
     await page.goto(path);
     await expectNoViolations(page, path);
   }
