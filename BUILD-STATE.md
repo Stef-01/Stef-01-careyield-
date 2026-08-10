@@ -187,7 +187,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W94 | available | — | — | — | [P] W92 |
 | W95 | available | — | — | — | W93 |
 | W96 | available | — | — | — | [P] W93 |
-| W97 | available | — | — | — | W91 |
+| W97 | claimed | builder-A | 2026-08-10T14:05Z | — | multisite |
 | W98 | available | — | — | — | [P] W97 |
 | W99 | available | — | — | — | W97 |
 | W100 | available | — | — | — | [P] W96 |
