@@ -169,9 +169,12 @@ describe("W95 which stages earn a nudge", () => {
       reason: "service_side_gap",
     },
     {
+      // W136 changed this from `stage_not_actionable`, and the change is the unit: a completed
+      // chain is a GOOD OUTCOME, and filing it under the same reason as a stuck one meant a
+      // practice reading the withheld counts could not tell success from a gap.
       kinds: ["referral_written", "completion_recorded"],
       sent: false,
-      reason: "stage_not_actionable",
+      reason: "loop_closed_by_return",
     },
     {
       kinds: ["referral_written", "referral_cancelled"],

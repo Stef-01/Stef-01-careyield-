@@ -59,6 +59,13 @@ const ACTIONABLE: ReadonlySet<LeakageStage> = new Set([
 
 /** Refusals this module decides. W74's three are unioned in below, not restated. */
 type OutreachRefusal =
+  /**
+   * W136: a return report closed this chain. Checked FIRST and given its own reason, because
+   * a completed referral otherwise fell out as `stage_not_actionable` — true, and misleading:
+   * it filed a GOOD OUTCOME under the same reason as a chain that is stuck in a way the patient
+   * cannot fix. A practice reading the withheld counts could not tell success from a gap.
+   */
+  | "loop_closed_by_return"
   | "stage_not_actionable"
   | "service_side_gap"
   | "barrier_already_recorded"
@@ -97,6 +104,16 @@ export interface OutreachInput {
   recipients: readonly NudgeRecipient[];
   /** Referrals already nudged once. One nudge per referral, ever. */
   nudgedReferralIds?: readonly string[];
+  /**
+   * W136: referrals a return report has closed (W132).
+   *
+   * Supplied directly rather than read only from the derived stage, and the difference matters:
+   * `completed` is derived from a `completion_recorded` event, so a return report that has been
+   * written but whose event has not been folded in yet would leave the chain looking open — and
+   * the patient would be chased about something that is finished. Closure is checked against
+   * both, so whichever arrives first stops the nudge.
+   */
+  closedReferralIds?: readonly string[];
   now: Date;
   offerExpiresAt: Date;
   maxInvitesInWindow: number;
@@ -163,6 +180,7 @@ export function planOutreach(input: OutreachInput): OutreachPlan {
       .map((r) => r.patientId),
   );
   const nudged = new Set(input.nudgedReferralIds ?? []);
+  const closed = new Set(input.closedReferralIds ?? []);
 
   const send: PlannedNudge[] = [];
   const withheld: WithheldNudge[] = [];
@@ -178,6 +196,13 @@ export function planOutreach(input: OutreachInput): OutreachPlan {
     const hold = (reason: NudgeRefusal) =>
       withheld.push({ referralId: timeline.referralId, patientId: timeline.patientId, reason });
 
+    // W136: checked before everything, so the reason a practice sees IS the completion. A
+    // closed loop is not a leak, not a gap and not an unactionable stage — it is the outcome
+    // the whole rail exists to produce, and it should read that way in the counts.
+    if (closed.has(timeline.referralId) || timeline.stage === "completed") {
+      hold("loop_closed_by_return");
+      continue;
+    }
     // Checked before the general stage test: this stage IS leaked, and the practice's next
     // step is a different one, so it earns its own reason rather than "not actionable".
     if (timeline.stage === "attended_no_completion") {
@@ -236,6 +261,8 @@ export function planOutreach(input: OutreachInput): OutreachPlan {
  * the whole value of separating the reasons is that they need different responses.
  */
 export const NUDGE_REFUSAL_COPY: Record<NudgeRefusal, string> = {
+  loop_closed_by_return:
+    "A return report came back, so this referral is finished. Nothing is outstanding and the patient is not being chased.",
   stage_not_actionable:
     "Nothing to send — this referral is completed, was withdrawn, or has no record to act on.",
   service_side_gap:
@@ -259,6 +286,7 @@ export const NUDGE_REFUSAL_COPY: Record<NudgeRefusal, string> = {
 };
 
 const REFUSAL_ZEROES: Record<NudgeRefusal, number> = {
+  loop_closed_by_return: 0,
   stage_not_actionable: 0,
   service_side_gap: 0,
   barrier_already_recorded: 0,
