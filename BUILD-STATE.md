@@ -204,7 +204,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W108 | claimed | builder-A | 2026-08-10T16:10Z | — | credential record model; provenance required by the type |
 | W109 | available | — | — | — | Evidence vault: documents attached to a credential. Verify: isolation tests; no route serves an evidence document without authorization; nothing public (G6) |
 | W110 | available | — | — | — | [P] Verification workflow: submitted → checked → verified → expired, recording who checked. Verify: replay; self-verification refused (W69 rule) |
-| W111 | available | — | — | — | Ahpra register check adapter — read-only, recorded never inferred. Verify: live-host refusal in the constructor (G1/G3 shape); fixtures only; instantiated nowhere outside tests |
+| W111 | claimed | builder-B | 2026-08-10T09:50Z | — | Ahpra register check adapter — read-only, recorded never inferred. Verify: live-host refusal in the constructor (G1/G3 shape); fixtures only; instantiated nowhere outside tests |
 | W112 | available | — | — | — | Expiry + re-attestation: W88's VOID-not-stale rule applied to credentials. Verify: an expired credential is ABSENT, never weak evidence; no-stated-expiry does not mean never expires |
 | W113 | available | — | — | — | [P] Credential console — a clinician sees and corrects their own record. Verify: e2e + axe zero violations |
 | W114 | available | — | — | — | Scope statements: what a credential permits, as data. Verify: W23/W6 linters reach every scope label; "specialist" cannot appear next to a niche scope (s 133) |
