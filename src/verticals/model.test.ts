@@ -31,7 +31,17 @@ import { loadIntervals } from "@/registers/intervals";
  * this, because the brands are only mintable by W69/W119/W152's own gates. A test that could not
  * fabricate them could not exercise this module at all.
  */
-const pathway = (versionHash: string) => ({ version: { versionHash } }) as unknown as UsablePathway;
+// W159 exposed that this fixture was under-specified: an UsablePathway always carries criteria,
+// and the original stub omitted them, so it stood in for a shape that cannot exist. Empty
+// criteria are the honest minimum — the consistency checks then genuinely find nothing.
+const pathway = (versionHash: string, pathwayId = versionHash) =>
+  ({
+    version: {
+      versionHash,
+      pathwayId,
+      criteria: { inclusion: [], exclusion: [], escalation: [] },
+    },
+  }) as unknown as UsablePathway;
 const content = (id: string) => ({ record: { id } }) as unknown as ApprovedContent;
 const item = (itemId: string) => ({ item: { itemId } }) as unknown as RenderableItem;
 

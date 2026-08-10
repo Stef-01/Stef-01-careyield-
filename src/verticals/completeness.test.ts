@@ -16,7 +16,16 @@ import { loadIntervals } from "@/registers/intervals";
 
 // Branded values are cast here for the reason W157's tests give: production code cannot mint
 // them, so a test that could not fabricate them could not exercise this module at all.
-const pathway = (versionHash: string) => ({ version: { versionHash } }) as unknown as UsablePathway;
+// W159 needs the criteria an UsablePathway always carries; the original stub omitted them and so
+// stood in for a shape that cannot exist.
+const pathway = (versionHash: string, pathwayId = versionHash) =>
+  ({
+    version: {
+      versionHash,
+      pathwayId,
+      criteria: { inclusion: [], exclusion: [], escalation: [] },
+    },
+  }) as unknown as UsablePathway;
 const content = (id: string) => ({ record: { id } }) as unknown as ApprovedContent;
 const item = (itemId: string) => ({ item: { itemId } }) as unknown as RenderableItem;
 

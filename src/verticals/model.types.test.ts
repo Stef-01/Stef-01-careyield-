@@ -88,7 +88,13 @@ describe("W157 the vertical brand cannot be bypassed", () => {
   it("the only legitimate source is usableVertical()", () => {
     // The positive control. Without it, the assertions above could be passing because the
     // surface rejects everything.
-    const pathway = { version: { versionHash: "hash-a" } } as unknown as UsablePathway;
+    const pathway = {
+      version: {
+        versionHash: "hash-a",
+        pathwayId: "p-a",
+        criteria: { inclusion: [], exclusion: [], escalation: [] },
+      },
+    } as unknown as UsablePathway;
     const result = usableVertical(
       { verticalId: "v1", name: "Example", members: [{ kind: "pathway", ref: "hash-a" }] },
       { pathways: [pathway], content: [], educationItems: [], intervals: loadIntervals([]) },

@@ -39,6 +39,12 @@
 // and unilaterally reshaping it from here would be this unit deciding that unit's design.
 
 import { createHash } from "node:crypto";
+import {
+  blockingContradictions,
+  contradictionsIn,
+  reviewContradictions,
+  type Contradiction,
+} from "./consistency";
 import type { ApprovedContent } from "@/registers/authoring";
 import type { IntervalCatalogue } from "@/registers/intervals";
 import type { RenderableItem } from "@/education/provenance";
@@ -96,6 +102,12 @@ export interface UsableVertical {
   content: ApprovedContent[];
   educationItems: RenderableItem[];
   intervals: IntervalCatalogue["intervals"][number][];
+  /**
+   * W159 findings that need a human but do not block: one member takes a patient on for a fact
+   * another escalates on. Carried WITH the vertical rather than recomputed by whoever remembers,
+   * and `review` by construction — a blocking finding would have refused above.
+   */
+  contradictions: Contradiction[];
 }
 
 export type VerticalRefusal =
@@ -103,6 +115,15 @@ export type VerticalRefusal =
   | "member_not_usable"
   /** No members at all. "Every member is usable" would be vacuously true. */
   | "no_members"
+  /**
+   * W159: members that cannot be reconciled — two versions of one pathway, two cadences for one
+   * condition, a pathway that excludes everyone it includes.
+   *
+   * This reason exists so the detection is WIRED INTO the resolver rather than offered to it.
+   * Y3-1's corollary: filing a conflict and then returning usable anyway is worse than not
+   * detecting it, because the conflict record makes the system look careful.
+   */
+  | "members_contradict"
   /** The same ref twice: a bundle that cannot say how many of something it contains. */
   | "duplicate_member"
   | "unnamed";
@@ -121,7 +142,12 @@ export interface UnusableMember {
 
 export type VerticalResult =
   | { usable: true; vertical: UsableVertical }
-  | { usable: false; reasons: VerticalRefusal[]; unusable: UnusableMember[] };
+  | {
+      usable: false;
+      reasons: VerticalRefusal[];
+      unusable: UnusableMember[];
+      contradictions: Contradiction[];
+    };
 
 /**
  * The bundle's identity, from its membership.
@@ -181,7 +207,9 @@ export function usableVertical(spec: VerticalSpec, evidence: VerticalEvidence): 
   }
   if (unusable.length > 0) reasons.push("member_not_usable");
 
-  if (reasons.length > 0) return { usable: false, reasons, unusable };
+  // Members must exist before they can be compared, so contradictions are checked only once
+  // every member resolved. A vertical missing a member has a different problem first.
+  if (reasons.length > 0) return { usable: false, reasons, unusable, contradictions: [] };
 
   const wanted = (kind: VerticalMemberKind) =>
     new Set(spec.members.filter((m) => m.kind === kind).map((m) => m.ref));
@@ -190,16 +218,27 @@ export function usableVertical(spec: VerticalSpec, evidence: VerticalEvidence): 
   const itemRefs = wanted("education_item");
   const intervalRefs = wanted("interval");
 
+  const members = {
+    pathways: evidence.pathways.filter((p) => pathwayRefs.has(p.version.versionHash)),
+    intervals: evidence.intervals.intervals.filter((i) => intervalRefs.has(i.id as string)),
+  };
+  const contradictions = contradictionsIn(members);
+  const blocking = blockingContradictions(contradictions);
+  if (blocking.length > 0) {
+    return { usable: false, reasons: ["members_contradict"], unusable: [], contradictions };
+  }
+
   return {
     usable: true,
     vertical: {
       verticalId: spec.verticalId,
       name: spec.name,
       verticalHash: verticalHash(spec.members),
-      pathways: evidence.pathways.filter((p) => pathwayRefs.has(p.version.versionHash)),
+      pathways: members.pathways,
       content: evidence.content.filter((c) => contentRefs.has(c.record.id)),
       educationItems: evidence.educationItems.filter((i) => itemRefs.has(i.item.itemId)),
-      intervals: evidence.intervals.intervals.filter((i) => intervalRefs.has(i.id as string)),
+      intervals: members.intervals,
+      contradictions: reviewContradictions(contradictions),
     } as UsableVertical,
   };
 }
@@ -212,4 +251,6 @@ export const VERTICAL_REFUSAL_COPY: Record<VerticalRefusal, string> = {
   duplicate_member:
     "The same member is listed twice, so the vertical cannot say how much of anything it contains.",
   unnamed: "A vertical needs an identifier and a name before anything can refer to it.",
+  members_contradict:
+    "Members of this vertical contradict each other in a way that has no answer — two versions of one pathway, two monitoring cadences for one condition, or a pathway that excludes everyone it includes. Each is listed; the bundle cannot be used until one side of each is removed.",
 };
