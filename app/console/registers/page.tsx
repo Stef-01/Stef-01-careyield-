@@ -7,6 +7,7 @@
 
 import { redirect } from "next/navigation";
 import { getConsole } from "@/console/store";
+import { toViewIntervals } from "@/registers/provenance";
 import { registersFor } from "@/registers/store";
 import { authorize } from "@/tenancy/tenancy";
 import { requireSession } from "../guard";
@@ -34,6 +35,8 @@ export default async function RegistersPage({
 
   const practiceId = console_.practice.id;
   const registers = registersFor(practiceId);
+  // Injected once per render so every relative review age on the page agrees.
+  const now = new Date();
   const canEdit = authorize(console_.memberships, email, practiceId, "edit_rules").allowed;
 
   return (
@@ -98,17 +101,50 @@ export default async function RegistersPage({
                   </div>
                 </dl>
 
-                <ul className="mt-4 flex flex-col gap-2 border-t border-stone-100 pt-4">
-                  {intervals.map((interval) => (
-                    <li key={interval.id} className="text-sm text-stone-600">
-                      <span className="text-stone-800">{interval.name}</span> — every{" "}
-                      {interval.intervalMonths} months.{" "}
-                      <span className="text-stone-500">
-                        Source: {interval.provenance.citation} (reviewed{" "}
-                        {interval.provenance.retrievedOn}).
-                      </span>
-                    </li>
-                  ))}
+                {/* W62: intervals reach the page only as ViewIntervals, which cannot be
+                    constructed without a complete provenance line — so an interval row
+                    without a visible source is not expressible here. */}
+                <ul className="mt-4 flex flex-col gap-3 border-t border-stone-100 pt-4">
+                  {(() => {
+                    const { shown, withheld } = toViewIntervals(intervals, now);
+                    return (
+                      <>
+                        {shown.map((interval) => (
+                          <li
+                            key={interval.id}
+                            data-testid="interval-row"
+                            className="text-sm text-stone-600"
+                          >
+                            <span className="text-stone-800">{interval.name}</span> —{" "}
+                            {interval.cadence}.
+                            <span
+                              data-testid="interval-provenance"
+                              className="mt-0.5 block text-stone-500"
+                            >
+                              Source:{" "}
+                              <a
+                                href={interval.provenance.url}
+                                className="underline hover:text-stone-800"
+                                rel="noreferrer noopener"
+                                target="_blank"
+                              >
+                                {interval.provenance.citation}
+                              </a>{" "}
+                              · last reviewed {interval.provenance.reviewedOn} (
+                              {interval.provenance.reviewedAgo})
+                            </span>
+                          </li>
+                        ))}
+                        {withheld > 0 && (
+                          <li data-testid="interval-withheld" className="text-sm text-stone-600">
+                            {withheld} {withheld === 1 ? "interval is" : "intervals are"} hidden
+                            because the source could not be shown. Nothing is scheduled from a
+                            source this practice cannot see.
+                          </li>
+                        )}
+                      </>
+                    );
+                  })()}
                 </ul>
 
                 {canEdit && (
