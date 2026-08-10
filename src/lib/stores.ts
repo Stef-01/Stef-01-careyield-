@@ -18,6 +18,7 @@ import { resetInterestState } from "@/capability/store";
 import { resetComplaints } from "@/complaints/store";
 import { resetConsole } from "@/console/store";
 import { resetEducation } from "@/education/store";
+import { resetVerticals } from "@/verticals/store";
 import { resetLedger } from "@/credentials/ledger";
 import { resetVault } from "@/credentials/vault";
 import { resetRateLimits } from "@/lib/rate-limit";
@@ -36,6 +37,7 @@ export const STORE_RESETTERS: Record<string, () => unknown> = {
   resetComplaints,
   resetConsole,
   resetEducation,
+  resetVerticals,
   resetLedger,
   resetVault,
   resetRateLimits,

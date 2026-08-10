@@ -55,6 +55,7 @@ test.beforeEach(async ({ page, request }) => {
   // W151: linked, so the education page is scanned with a POPULATED reading record rather than
   // with the unlinked refusal, which renders one paragraph and no list.
   await request.post("/api/mock/education?linkEmail=manager@demo.practice.example");
+  await request.post("/api/mock/verticals"); // W164: scanned POPULATED, not on its zero state
 });
 
 test("console surfaces pass WCAG A/AA", async ({ page }) => {
@@ -78,6 +79,7 @@ test("console surfaces pass WCAG A/AA", async ({ page }) => {
     "/console/pathways", // W127
     "/console/referrals", // W137
     "/console/education", // W151
+    "/console/verticals", // W164
     "/console/setup/practice",
   ];
   for (const path of surfaces) {
