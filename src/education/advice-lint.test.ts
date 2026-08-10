@@ -20,6 +20,7 @@ import { EDUCATION_CONSOLE_COPY } from "./console-copy";
 import { curate, describeCuration, CURATION_REJECTION_COPY } from "./curation";
 import { describeTriggers, triggersFor } from "./triggers";
 import { CPD_REJECTION_COPY, recordCpdEntry, renderCpdExport, trailFor } from "./cpd";
+import { PROVENANCE_REFUSAL_COPY } from "./provenance";
 import type { RecordedFact } from "@/pathways/evaluation";
 
 const DIR = path.resolve(__dirname);
@@ -103,6 +104,14 @@ describe("W150 the linter reaches every education surface", () => {
     // The console's prose lives in src/education/ precisely so this loop can reach it. Copy
     // written straight into the page's JSX would be copy no linter sees.
     for (const copy of Object.values(EDUCATION_CONSOLE_COPY)) {
+      expect(lintEducationCopy(copy), copy).toEqual([]);
+    }
+  });
+
+  it("passes every refusal W152's provenance gate can render", () => {
+    // Declared late: W152 landed with a *_COPY export and a `renderable` export and was not in
+    // the list, which is exactly the omission the tree check exists to catch. It caught it.
+    for (const copy of Object.values(PROVENANCE_REFUSAL_COPY)) {
       expect(lintEducationCopy(copy), copy).toEqual([]);
     }
   });
