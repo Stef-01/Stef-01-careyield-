@@ -28,7 +28,7 @@ surface without a row here does not ship. Regulatory basis: the venture research
 | Booking page (`app/book`) | `src/booking/*` | 2, 3 | tokenised links (no identity in URL); no clinical content rendered; offer-expiry honesty (no scarcity theatre) |
 | Practice console (`app/console`) | `src/console/*`, `src/tenancy/*` | 2 | role-based access, practice isolation (W18 RLS + tests); config changes audit-logged to the event spine |
 | Weekly/pilot reports | `src/report/*`, `src/pilot/report.ts` | 4 | naive counts labelled contrast-only (`docs/ATTRIBUTION.md` "never counts"); revenue figures labelled estimation-only (`src/mbs/items.ts` header) |
-| Privacy page (`app/privacy`) | W33 | 2 | retention config + delete/export flows; ADM transparency statement (Dec 2026 requirement) shipped ahead of force date |
+| Privacy page (`app/privacy`) | W33, W138 (`src/compliance/party-to-care.ts`) | 2, 3 | retention config + delete/export flows; ADM transparency statement (Dec 2026 requirement) shipped ahead of force date; **W138: carries the canonical responsibility statement**, rendered from the single constant rather than paraphrased, so the claim cannot drift across surfaces (W23 `LANDING_COPY` pattern) |
 | Community landing (`app/page.tsx`) | founder commits 3317340, cfa2f1d | 2, 3 | Plain-language PMOS awareness copy and the interest form share this route. The form collects name, email and audience only; the privacy link and synthetic-demo separation remain visible. It does not diagnose, rank clinicians or make a treatment claim. The community interest register row below governs storage and retention limits |
 | B2B landing (`app/practices`) | W23 (`src/compliance/landing.ts`) | 3 | Copy lives in the lint-gated `LANDING_COPY` bundle and moved here intact when the finder took `/`; the W23 linter and the a11y sweep both follow it to this URL. This row replaces the stale `app/page.tsx` row — W23's B2B-only guarantee describes `/practices`, and no longer describes `/` |
 | Clinician walkthrough (`app/clinicians`) | founder commits 603219f, e083d7a | 2, 3, **G5** | **MAPPED AS PROTOTYPE — G5 question open and escalated.** Clinician-facing, not patient-facing, and carries disclaimers ("demo pathway only — does not determine scope or credentialing"; synthetic case summaries). Every clinical claim links to a primary source and nothing computes a recommendation, which is the lower-risk side of the CDSS line. But the CONTENT is real clinical guidance, which is what G5 governs, and W56's guideline intervals are blocked for exactly that reason — the two cannot both be right, and the founder has been asked to rule on them together. Joined the W49 a11y sweep at W65. Renders condition-specific clinical content ("New PCOS assessment", "Metformin review", "COCP suitability") — the first surface in the tree carrying named conditions and drug classes, which is the territory G5 gates |
@@ -114,6 +114,12 @@ unmapped surfaces" and been wrong within a day; that claim is now checked rather
 - No symptom-based patient triage — matching keys on clinician attributes only (TGA boundary,
   founder gate G7).
 - No per-referral money in any direction (`docs/PRICING.md`).
+- **Meherr is never a party to clinical care, on any surface (W138).** Enforced by
+  `lintPartyToCare`, swept over the rendered text of every page route in `e2e/party-to-care.spec.ts`
+  — the route list derived from the census above, so a new page is covered the day it lands. The
+  rule looks for *Meherr as the subject of a care verb*, not for clinical words: "your GP will
+  review the results" passes and "we will review your results" does not, because a linter that
+  taxes correct sentences gets switched off and then protects nothing.
 
 ## Review cadence
 
@@ -194,6 +200,18 @@ remaining Privacy Act tranche-2 reforms. Each review appends a dated line here.
   accessibility needs a pass at the moment the founder grants the first staff account.
   **Still open:** PRIV-2 (APP 12/APP 11 coverage of Y2 record classes, scheduled W106) and
   PRIV-3 (console single-practice identity, W103 finding B2).
+
+- 2026-08-10 — **W138: the responsibility posture is now checkable.** W89 drew this line for
+  specialists and W134 drew it between practices; neither covered whether the PRODUCT reads as a
+  participant in care, which fails by wording rather than by architecture. Three reasons it is
+  worth a linter rather than a style note: a patient who believes Meherr is involved will wait on
+  us for something we will never do (and not chase their practice, which is the harm); holding
+  ourselves out as providing or directing care makes us a different regulated thing, one sentence
+  at a time; and it misdescribes who is accountable, since the practice is the treating entity and
+  the sender of every message. The statement is written once and rendered, never paraphrased. The
+  sweep found **zero violations across every existing surface** — so this is a ratchet on current
+  behaviour, not a fix. Proven non-vacuous by injecting "Our doctors will review your results"
+  into a live page and watching the sweep catch it.
 
 - 2026-08-09 — v1 established (W50). All eight surfaces mapped; zero unmapped surfaces in `app/`.
 - 2026-08-10 — **Four surfaces landed outside the loop** in founder commit 603219f (voice

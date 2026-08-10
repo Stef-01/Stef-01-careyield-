@@ -2,6 +2,7 @@
 // pilot. No clinical claims, no patient-facing marketing (compliance law #6).
 
 import Link from "next/link";
+import { RESPONSIBILITY_STATEMENT } from "@/compliance/party-to-care";
 
 export const metadata = { title: "Privacy policy (draft) — Meherr" };
 
@@ -57,6 +58,14 @@ export default function PrivacyPolicyPage() {
           <p className="mt-3 text-sm leading-6">
             Community interest details are kept while the program is being developed or until the
             person asks for them to be removed.
+          </p>
+        </section>
+        <section>
+          <h2 className="text-lg font-medium text-stone-900">Who is responsible for your care</h2>
+          {/* W138: rendered from the canonical statement, never paraphrased — a claim restated
+              in four places is four claims, and they drift. */}
+          <p className="mt-2 text-sm leading-6" data-testid="responsibility-statement">
+            {RESPONSIBILITY_STATEMENT}
           </p>
         </section>
         <section>
