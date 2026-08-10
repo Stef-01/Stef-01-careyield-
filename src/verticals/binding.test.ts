@@ -16,6 +16,7 @@ import type { PracticeId } from "@/domain/types";
 import type { ApprovedContent } from "@/registers/authoring";
 import type { UsablePathway } from "@/pathways/approval";
 import { loadIntervals } from "@/registers/intervals";
+import { foldIsOrderIndependent } from "@/quality/order-independence";
 
 const PRACTICE = "prac-1" as PracticeId;
 const OTHER = "prac-2" as PracticeId;
@@ -177,6 +178,29 @@ describe("W160 accepting is an act with a name on it", () => {
     const bindings = boundToV1();
     expect(currentBinding(bindings, OTHER, VERTICAL)).toBeNull();
     expect(resolveBinding(bindings, [V1], ALL, OTHER, VERTICAL).state).toBe("not_bound");
+  });
+});
+
+describe("W167 two acceptances at the same instant resolve the same way", () => {
+  it("the answer does not depend on the order the store returned the rows", () => {
+    // W167's register names this fold. Without the tie-break the practice's answer to "which
+    // version am I on" would depend on row order — the silent version drift this whole module
+    // exists to prevent, arriving by a different door.
+    const at = "2026-03-01T00:00:00Z";
+    const tied: VerticalBinding[] = [V1, V_INDEPENDENT].map((spec) => ({
+      practiceId: PRACTICE,
+      verticalId: VERTICAL,
+      versionHash: verticalHash(spec.members),
+      acceptedBy: "manager@demo.practice.example",
+      acceptedAt: at,
+      replacedAt: null,
+    }));
+
+    const result = foldIsOrderIndependent(
+      (rows) => currentBinding(rows as VerticalBinding[], PRACTICE, VERTICAL)?.versionHash ?? null,
+      tied,
+    );
+    expect(result.stable, `forward ${result.forward} vs reversed ${result.reversed}`).toBe(true);
   });
 });
 

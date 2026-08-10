@@ -18,6 +18,8 @@ import {
   versionHash,
 } from "./versioning";
 
+import { foldIsOrderIndependent } from "@/quality/order-independence";
+
 const PATHWAY = "pathway-placeholder-a";
 const AUTHOR = "author@example.test";
 const REVIEWER = "specialist@example.test";
@@ -197,6 +199,27 @@ describe("W119 the gate cannot be skipped by forgetting to read it", () => {
     const cleared = usablePathways([signed, unsigned], [REVIEW, SIGN_OFF]);
     expect(cleared).toHaveLength(1);
     expect(cleared[0]?.version.versionHash).toBe(signed.versionHash);
+  });
+});
+
+describe("W167 two attestations at the same instant name the same attester", () => {
+  it("the audit record does not change with row order", () => {
+    // W167's register names this fold. Two specialists recording a review at the same instant
+    // used to resolve to whichever the store listed first, so the document whose job is to say
+    // WHO LOOKED would name a different person on a refresh.
+    const at = "2026-03-03T00:00:00Z";
+    const tied: PathwayAttestation[] = [
+      attest({ byEmail: "zoe@example.test", at }),
+      attest({ byEmail: "ada@example.test", at }),
+    ];
+
+    const result = foldIsOrderIndependent((rows) => {
+      const outcome = usablePathway(publishedVersion(), [...rows, SIGN_OFF]);
+      return outcome.usable ? outcome.pathway.reviewedBy : outcome.reason;
+    }, tied);
+
+    expect(result.stable, `forward ${result.forward} vs reversed ${result.reversed}`).toBe(true);
+    expect(result.forward).toBe("ada@example.test");
   });
 });
 

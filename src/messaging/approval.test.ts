@@ -17,6 +17,8 @@ import {
   type TemplateApproval,
 } from "./approval";
 
+import { foldIsOrderIndependent } from "@/quality/order-independence";
+
 const A = "prac-a" as PracticeId;
 const B = "prac-b" as PracticeId;
 const TPL = "availability-invitation";
@@ -25,6 +27,32 @@ const AT = "2026-08-10T09:00:00Z";
 
 const approved = (text = TEXT, practiceId = A): TemplateApproval[] =>
   approveTemplate([], { practiceId, templateId: TPL, text, byEmail: "owner@x", at: AT });
+
+describe("W167 two withdrawals at the same instant pick the same one", () => {
+  it("the reported withdrawal does not change with row order", () => {
+    // W167's register names this fold. `evaluateSendable` reports "the most recent withdrawal,
+    // which is the one a manager will be asking about" — and with two recorded at the same
+    // instant it used to report whichever the store listed first, so a manager asking who
+    // withdrew this would get a different answer on a refresh.
+    const at = "2026-08-11T00:00:00Z";
+    const tied: TemplateApproval[] = ["zoe@x", "ada@x"].map((byEmail) => ({
+      practiceId: A,
+      templateId: TPL,
+      contentHash: templateHash(TEXT),
+      approvedByEmail: byEmail,
+      approvedAt: AT,
+      withdrawnAt: at,
+      approvedText: TEXT,
+    }));
+
+    const result = foldIsOrderIndependent(
+      (rows) => evaluateSendable(rows as TemplateApproval[], A, TPL, TEXT).approval?.approvedByEmail ?? null,
+      tied,
+    );
+    expect(result.stable, `forward ${result.forward} vs reversed ${result.reversed}`).toBe(true);
+    expect(result.forward).toBe("ada@x");
+  });
+});
 
 describe("W67 nothing sends without an approval", () => {
   it("refuses with no approval on record", () => {

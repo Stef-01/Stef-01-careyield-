@@ -80,7 +80,14 @@ export function currentBinding(
   if (live.length === 0) return null;
   // Latest acceptance wins if more than one is somehow live; a practice cannot be on two
   // versions of one vertical at once, and picking the newest is the only defensible tie-break.
-  return live.reduce((a, b) => (a.acceptedAt >= b.acceptedAt ? a : b));
+  //
+  // W167: and when two acceptances share an instant, the version hash breaks the tie. Without
+  // it the practice's answer to "which version am I on" would depend on store order — the same
+  // silent-version-drift this whole module exists to prevent, arriving by a different door.
+  return live.reduce((a, b) => {
+    if (a.acceptedAt === b.acceptedAt) return a.versionHash <= b.versionHash ? a : b;
+    return a.acceptedAt > b.acceptedAt ? a : b;
+  });
 }
 
 /**

@@ -114,7 +114,17 @@ function live(
   if (unrevoked.length > 0) {
     // The earliest live one, so the recorded date is when the check actually happened rather
     // than whichever row was appended last.
-    return { found: unrevoked.reduce((a, b) => (a.at <= b.at ? a : b)), revoked: false };
+    //
+    // W167: tie-broken on the attester. Two attestations at the same instant used to resolve to
+    // whichever the store listed first, so the audit record would name a different reviewer
+    // depending on row order — a small thing that is exactly wrong in the one document whose
+    // job is to say who looked.
+    return {
+      found: unrevoked.reduce((a, b) =>
+        a.at === b.at ? (a.byEmail <= b.byEmail ? a : b) : a.at < b.at ? a : b,
+      ),
+      revoked: false,
+    };
   }
   return { found: null, revoked: matching.length > 0 };
 }

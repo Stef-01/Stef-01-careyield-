@@ -76,7 +76,15 @@ export function evaluateSendable(
   if (live) return { sendable: true, reason: null, approval: live };
   if (matching.length > 0) {
     // Report the most recent withdrawal, which is the one a manager will be asking about.
-    const latest = matching.reduce((a, b) => ((a.withdrawnAt ?? "") >= (b.withdrawnAt ?? "") ? a : b));
+    // W167: tie-broken on the approver, so two withdrawals recorded at the same instant report
+    // the same one whichever order the store returns them in. A manager asking "who withdrew
+    // this" must not get a different name on a refresh.
+    const latest = matching.reduce((a, b) => {
+      const at = a.withdrawnAt ?? "";
+      const bt = b.withdrawnAt ?? "";
+      if (at === bt) return a.approvedByEmail <= b.approvedByEmail ? a : b;
+      return at > bt ? a : b;
+    });
     return { sendable: false, reason: "approval_withdrawn", approval: latest };
   }
 
