@@ -53,6 +53,7 @@ Next.js (App Router) + TypeScript strict + Tailwind · Supabase (Postgres + RLS 
 - **G5** — clinical pathway content sign-off (specialist reviewers engaged; Y3-4)
 - **G6** — network/directory public launch (Ahpra advertising review of all profile copy; Y4)
 - **G7** — any feature that could constitute TGA-regulated CDSS (default: keep matching keyed to clinician attributes, never symptom-based patient triage)
+- **G8** — **PROPOSED at W104, awaiting founder ratification.** Third-party model processing: no patient-derived content, identified or not, is sent to any third-party model API until the founder has signed off the vendor, the data-flow and the retention terms. Proposed because Y3 Q12 is the first time anything would leave this tree to a third party, and no existing gate covers it — G2 governs holding real patient data, G5 governs clinical content, G7 governs CDSS, and none of them says whether de-identified case context may be transmitted to a model vendor at all. W146 and W147 are written to be buildable behind it; **the loop must not decide this itself.**
 
 ## 5. Year 1 weekly ledger (W1–W52)
 
@@ -218,6 +219,98 @@ first enters the product. Two W51 process findings are units in their own right 
 - **W103** Y2 full-system audit (W51 method: whole tree, not a diff) → verify: audit report + green suite.
 - **W104** Y3 expansion: derive Q9–Q12 (Scope Yield foundations) into §5c + BUILD-STATE → verify:
   52 new units appended with verify gates; founder gates inherited intact.
+
+## 5c. Year 3 weekly ledger (W105–W156) — Scope Yield foundations
+
+Expanded by W104 on 2026-08-10 per the §6 rule, from the Y3 themes in §6. Same contract:
+each unit is **build → verify**, `[P]` = parallel-safe. Founder gates are inherited, never
+expanded away.
+
+**What Year 2 leaves on the table, and where it lands here.** Three things are derived from
+what was actually built rather than from the theme, because a just-in-time plan that ignores
+its own audit findings is not just-in-time:
+
+1. **G5 stops being deferrable in Q10.** W56's guideline intervals and W69's authoring
+   workspace have been blocked since Q5, and Q10's pathway engine is the same question at ten
+   times the scale. The engine is buildable without the ruling — mechanism ships empty, the
+   W68/W69 pattern — but Q10 delivers an empty product without it, so the ruling is scheduled
+   as a dependency, not a hope.
+2. **The first live quarter will be integration, not features.** W28/W29/W36's send path is
+   still unwired, so W74's contact preferences and W95's outreach plans are captured and inert
+   (W103 observation 4). Q9 opens with the deferred privacy work rather than new surface, and
+   nothing in Y3 assumes a send path exists until G3 opens.
+3. **Two dated failures fall inside Q9** and are units, not surprises: the audit allowlist
+   expires 2026-11-09 (W107) and APP 1.7 commences 2026-12-10, which is the deadline for
+   W105/W106.
+
+**Proposed new gate, for founder ratification — G8: third-party model processing.** Q12 sends
+content to the Claude API, which is the first time anything leaves this tree to a third party.
+Existing gates do not cover it: G2 governs holding real patient data, G5 governs clinical
+content, G7 governs CDSS, and none of them says whether de-identified case context may be
+transmitted to a model vendor at all. Proposed wording: *no patient-derived content, identified
+or not, is sent to any third-party model API until the founder has signed off the vendor, the
+data-flow and the retention terms.* W144, W146 and W147 are written to be buildable behind it;
+**the loop must not decide this itself.**
+
+### Q9 — Credential registry + evidence vault (W105–W117)
+- **W105** Close PRIV-1: access control for the community interest register — a Meherr-staff role, or move the register out of the practice console → verify: a practice user can neither read nor export it; e2e. **Deadline 2026-12-10 (APP 1.7).**
+- **W106** Close PRIV-2: APP 12 export and APP 11 retention cover every Y2 record class (register membership, referrals, barriers, capability) → verify: an access request returns them all, retention prunes them, and the test enumerates the record classes so a NEW class fails the suite until it is handled. **Deadline 2026-12-10.**
+- **W107** [P] Dependency allowlist review ahead of the 2026-11-09 expiry → verify: `audit:gate` green with no acceptance past its review date, and no acceptance extended without a fresh rationale.
+- **W108** Credential record model: issuer, scope, evidence, verified-by, expiry — provenance required by the type (W79 pattern) → verify: no credential is representable without a verifier and a date.
+- **W109** Evidence vault: documents attached to a credential → verify: isolation tests; no route serves an evidence document without authorization; nothing public (G6).
+- **W110** [P] Verification workflow: submitted → checked → verified → expired, recording who checked → verify: replay; self-verification refused (the W69 rule).
+- **W111** Ahpra register check adapter: read-only lookup, recorded never inferred → verify: live-host refusal in the constructor (G1/G3 shape); fixtures only; instantiated nowhere outside tests.
+- **W112** Expiry and re-attestation: W88's void-not-stale rule applied to credentials → verify: an expired credential is ABSENT, never weak evidence; no-stated-expiry does not mean never expires.
+- **W113** [P] Credential console: a clinician sees and can correct their own record → verify: e2e + axe zero violations.
+- **W114** Scope statements: what a credential permits, as data → verify: the W23/W6 linters reach every scope label; "specialist" cannot appear next to a niche scope (s 133).
+- **W115** [P] Credential provenance report for the practice → verify: golden report; states its own coverage; ranks no clinician.
+- **W116** Q9 hardening (code-review + security-review + the W103 scoping sweep) → verify: zero criticals.
+- **W117** Q9 gate dossier: the G6 position on credential visibility, decided before Q11 routes on it → verify: dossier complete; founder actions named.
+
+### Q10 — Pathway definition engine (W118–W130) — **G5 load-bearing throughout**
+- **W118** Pathway as versioned data: inclusion, exclusion and escalation criteria → verify: a published version is immutable; edits create a new version; replay reproduces any version.
+- **W119** [P] Pathway authoring workspace, extending W69's three-stage gate to pathways → verify: unapproved pathway unusable by TYPE, not by check; ships with zero pathways signed.
+- **W120** Criteria evaluation: evaluate a pathway against RECORDED facts only → verify: export-list test — no function takes symptoms and returns a pathway (G7).
+- **W121** Escalation rules as data, shipping empty (W68 posture) → verify: a test pins the shipped rule set at zero.
+- **W122** [P] Pathway diffing: what changed between two versions, in clinician-readable form → verify: golden diff; no change is renderable without its author and date.
+- **W123** Pathway–capability binding: which clinicians a pathway may be offered under → verify: in-panel only; a foreign practice's capability record is absent (W91/W103).
+- **W124** [P] Pathway simulation over synthetic cohorts → verify: determinism; the report asserts no clinical verdict, only distribution.
+- **W125** Consent and record-of-decision: what the patient agreed to, recorded never inferred → verify: fixtures; no default consent.
+- **W126** [P] Pathway audit trail on the W10 event spine → verify: replay reproduces every state transition.
+- **W127** Content sign-off dashboard: which pathways are signed, by whom, when → verify: e2e; zero signed at ship, and the dashboard says so rather than rendering empty.
+- **W128** Pathway withdrawal: retiring a published version → verify: withdrawal is immediate and terminal for that version; re-publication is a fresh act (W67 shape).
+- **W129** Q10 hardening → verify: zero criticals.
+- **W130** [P] Y3 gate dossier refresh, G5 now load-bearing → verify: dossier complete; the G5 ruling's consequences traced through every blocked row.
+
+### Q11 — GP-to-GP referral rails (W131–W143)
+- **W131** Structured referral document model → verify: schema fixtures; no free-text clinical field that bypasses the content gate.
+- **W132** Return report model: what comes back, structured → verify: a recorded return closes W93's `attended_no_completion` stage on replay.
+- **W133** [P] Referral routing to an extended-scope GP, in-network only → verify: never crosses G6; W82's capability floor honoured; foreign records absent.
+- **W134** Acceptance protocol: a receiving GP must ACCEPT before becoming a party to the patient's care — the W89 hook-3 line, in code → verify: no patient-linked obligation exists without a recorded acceptance.
+- **W135** [P] Referral status tracking wired to W93's state machine → verify: replay; no inference from silence.
+- **W136** Loop closure: a completed return report stops W95 outreach for that chain → verify: the outreach plan withholds with a reason, and the reason is the completion.
+- **W137** [P] Referral console for both sides → verify: e2e + axe zero violations + cross-practice isolation.
+- **W138** Responsibility and indemnity posture, as code and copy → verify: no surface implies Meherr is a party to clinical care (W89).
+- **W139** [P] Referral compliance linter → verify: no clinical claim in any referral-adjacent patient-facing copy; W6's rules applied, not re-implemented.
+- **W140** Cross-practice referral isolation → verify: the W103 scoping sweep run as this unit's gate, with every hit triaged in writing.
+- **W141** [P] Referral analytics for the practice: process, never people → verify: golden report; no patient ranking, coverage stated (W96 shape).
+- **W142** Q11 hardening → verify: zero criticals.
+- **W143** [P] Q11 gate dossier: the G6/G7 position on GP-to-GP routing → verify: dossier complete.
+
+### Q12 — Education engine v1 (W144–W156) — **behind proposed gate G8**
+- **W144** Education engine boundary document, written BEFORE any code (W89 pattern) → verify: doc review; the G5/G7/G8 lines argued rather than asserted, and the incremental path to a regulated clinical service named so a later unit cannot arrive there by extension.
+- **W145** Curation over generation: the engine SELECTS from signed-off content and never writes clinical text → verify: export-list test — no generation entry point exists.
+- **W146** [P] De-identification gate on anything leaving the tree → verify: fail-closed; no patient identifier can reach an API, asserted at the boundary rather than by convention. **Blocked on G8.**
+- **W147** Claude API adapter behind the gate → verify: constructor refuses live endpoints until G8 opens (G1/G3 shape); instantiated nowhere outside tests. **Blocked on G8.**
+- **W148** Case-trigger rules as data, over recorded facts only → verify: no symptom inference (G7); rules shipped empty.
+- **W149** [P] CPD trail: what a GP read and when, exportable → verify: fixtures; the record belongs to the clinician and is correctable by them.
+- **W150** Pre-consult pathway updates: informs the GP, never recommends → verify: a copy linter bans recommendation language on every education surface.
+- **W151** [P] Education console → verify: e2e + axe zero violations.
+- **W152** Provenance on every item: traceable to signed-off source → verify: an item with no source is unrenderable BY TYPE (W69 branding pattern).
+- **W153** [P] Prompt-injection posture for ingested clinical content → verify: security-review; content read from a PMS or a document cannot alter system behaviour.
+- **W154** Q12 hardening → verify: zero criticals.
+- **W155** Y3 full-system audit (W51 method: whole tree, not a diff) → verify: audit report + green suite.
+- **W156** Y4 expansion: derive Q13–Q16 into §5d + BUILD-STATE → verify: 52 new units appended with verify gates; founder gates inherited intact.
 
 ## 6. Years 2–5 — quarterly themes + expansion rule
 
