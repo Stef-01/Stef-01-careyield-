@@ -83,6 +83,12 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
     rationale: "W94 records barriers as data attached to a referral, which is itself derived — and barriers are never inferred, so there is no independent store.",
   },
   {
+    module: "src/credentials/vault.ts",
+    what: "Evidence documents behind a clinician's credential",
+    handling: "no_patient_identity",
+    rationale: "W109 holds credentialing documents about CLINICIANS — a certificate scan, its subject and its uploader — and has no patient field to scrub. Note what this classification does NOT say: these are personal documents about identifiable people, and the clinician's own access and erasure rights are a separate obligation this registry does not cover, because the registry's question is patient identity. W112/W113 own that.",
+  },
+  {
     module: "src/capability/graph.ts",
     what: "Clinician interest, experience, competence",
     handling: "no_patient_identity",

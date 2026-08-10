@@ -10,7 +10,9 @@ export type TenancyAction =
   | "edit_rules"
   | "manage_members"
   | "record_usefulness"
-  | "pause_sending";
+  | "pause_sending"
+  /** W109: open the evidence vault. Credentialing roles only — see `openVault`. */
+  | "read_credential_evidence";
 
 export interface Membership {
   practiceId: string;
@@ -20,8 +22,15 @@ export interface Membership {
 
 /** Grants per role. Owner ⊇ manager ⊇ clinician by construction — asserted in tests. */
 const GRANTS: Record<Role, readonly TenancyAction[]> = {
-  owner: ["view_dashboard", "edit_rules", "manage_members", "record_usefulness", "pause_sending"],
-  manager: ["view_dashboard", "edit_rules", "record_usefulness", "pause_sending"],
+  owner: [
+    "view_dashboard",
+    "edit_rules",
+    "manage_members",
+    "record_usefulness",
+    "pause_sending",
+    "read_credential_evidence",
+  ],
+  manager: ["view_dashboard", "edit_rules", "record_usefulness", "pause_sending", "read_credential_evidence"],
   clinician: ["view_dashboard", "record_usefulness"],
 };
 
