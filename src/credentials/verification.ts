@@ -40,6 +40,13 @@ export type VerificationEvent =
       credentialId: string;
       subjectClinicianId: string;
       submittedBy: string;
+      /**
+       * W112 re-attestation: the credential this renews. A renewal is a NEW credential that
+       * names its predecessor rather than a re-opening of it — the old verification really
+       * did happen, and rewriting its dates would erase any gap between the two, which is
+       * precisely what an auditor asks about.
+       */
+      supersedes?: string;
     }
   /** Someone examined the evidence — the documents, the register lookup, or both. */
   | {
@@ -191,6 +198,8 @@ export interface CredentialLifecycle {
   singleHandled: boolean;
   /** Why it ended, for the terminal states. */
   endedReason: string | null;
+  /** W112: the credential this one renews, if it is a re-attestation. */
+  supersedes: string | null;
 }
 
 export interface ReplayedVerification {
@@ -222,6 +231,7 @@ export function replayVerification(log: VerificationLog, asOf: string): Replayed
         expiresOn: null,
         singleHandled: false,
         endedReason: null,
+        supersedes: entry.supersedes ?? null,
       });
       continue;
     }
