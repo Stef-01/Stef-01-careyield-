@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Appointment, AppointmentId, Invitation, PatientId } from "@/domain/types";
+import type { Appointment, AppointmentId, Invitation, InvitationId, PatientId } from "@/domain/types";
 import { bookInvitation, type RailState } from "@/booking/rail";
 import { DEFAULT_CONFIG, eligibleForClinician } from "@/engine/eligibility";
 import { assignHoldout } from "@/engine/holdout";
@@ -14,6 +14,8 @@ import {
   verifyLog,
   type EventLog,
   type SpineEvent,
+  anchorOf,
+  verifyLogAgainst,
 } from "./spine";
 
 const TODAY = "2026-08-08";
@@ -179,5 +181,42 @@ describe("W10 event spine", () => {
       invitationId: "inv-ghost" as Invitation["id"],
     });
     expect(() => replay(log)).toThrow("unknown invitation");
+  });
+});
+
+describe("W51 audit fix: what verifyLog can and cannot prove", () => {
+  const built = () =>
+    appendAll(EMPTY_LOG, [
+      { kind: "invitation_sent", at: AT, invitationId: "inv-1" as InvitationId },
+      { kind: "invitation_sent", at: AT, invitationId: "inv-2" as InvitationId },
+      { kind: "invitation_sent", at: AT, invitationId: "inv-3" as InvitationId },
+    ]);
+
+  it("bare verifyLog cannot see a truncated tail — and that is a property, not a bug", () => {
+    // Dropping the last entries leaves 0..n-k-1 contiguous. A self-describing log cannot
+    // prove it is complete: the evidence of what was removed goes with it.
+    const truncated = built().slice(0, 2) as typeof EMPTY_LOG;
+    expect(verifyLog(truncated)).toBe(true);
+  });
+
+  it("an anchor makes truncation visible", () => {
+    const log = built();
+    const anchor = anchorOf(log);
+    const truncated = log.slice(0, 2) as typeof EMPTY_LOG;
+    expect(verifyLogAgainst(log, anchor)).toEqual({ ok: true });
+    expect(verifyLogAgainst(truncated, anchor)).toEqual({ ok: false, reason: "truncated", at: 2 });
+  });
+
+  it("a log that has grown past its anchor is fine — logs are append-only", () => {
+    const anchor = anchorOf(built());
+    const grown = append(built(), { kind: "invitation_sent", at: AT, invitationId: "inv-4" as InvitationId });
+    expect(verifyLogAgainst(grown, anchor)).toEqual({ ok: true });
+  });
+
+  it("interior deletion is still caught, with the position", () => {
+    const log = built();
+    const gapped = [log[0]!, log[2]!] as typeof EMPTY_LOG;
+    expect(verifyLog(gapped)).toBe(false);
+    expect(verifyLogAgainst(gapped, anchorOf(log))).toMatchObject({ ok: false, reason: "not_contiguous", at: 1 });
   });
 });
