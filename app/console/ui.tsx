@@ -3,6 +3,7 @@
 import { signOut } from "./actions";
 import { DemoNavigator } from "../demo-navigator";
 import Link from "next/link";
+import { isMeherrStaff } from "@/tenancy/staff";
 
 export function ConsoleShell({
   email,
@@ -21,7 +22,11 @@ export function ConsoleShell({
           </div>
           {email && (
             <form action={signOut} className="flex items-center gap-3">
-              <Link href="/console/interest" className="text-sm text-stone-500 underline hover:text-stone-800">Interest</Link>
+              {/* W105: Meherr-internal, so it is not offered to practice accounts. The
+                  route still gates itself — hiding a link is navigation, not access control. */}
+              {isMeherrStaff(email) && (
+                <Link href="/console/interest" className="text-sm text-stone-500 underline hover:text-stone-800">Interest</Link>
+              )}
               <span className="text-sm text-stone-500">{email}</span>
               <button type="submit" className="text-sm text-stone-500 underline hover:text-stone-800">
                 Sign out

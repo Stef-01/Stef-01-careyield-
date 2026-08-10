@@ -1,12 +1,38 @@
+// W105: the community interest register, behind the Meherr-staff gate.
+//
+// The signup list is NOT FETCHED AT ALL for a non-staff visitor. Rendering it conditionally
+// would be enough for the human eye and not enough for the wire: in a server component the
+// data would still be assembled, and anything that reaches the RSC payload has left the
+// server. The gate therefore sits above the read, not around the markup.
+
 import { ConsoleShell } from "../ui";
 import { requireSession } from "../guard";
 import { listInterestSignups } from "@/interest/store";
+import { isMeherrStaff, STAFF_REFUSAL_COPY } from "@/tenancy/staff";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Community interest — Meherr" };
 
 export default async function CommunityInterestPage() {
   const email = await requireSession();
+
+  if (!isMeherrStaff(email)) {
+    return (
+      <ConsoleShell email={email}>
+        <div>
+          <p className="text-sm font-medium text-stone-500">Demand evidence</p>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight">Community interest</h1>
+        </div>
+        <p
+          data-testid="interest-refused"
+          className="mt-8 rounded-xl border border-stone-300 bg-white p-6 text-sm leading-6 text-stone-700"
+        >
+          {STAFF_REFUSAL_COPY}
+        </p>
+      </ConsoleShell>
+    );
+  }
+
   const signups = listInterestSignups();
 
   return (
