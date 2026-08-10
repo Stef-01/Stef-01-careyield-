@@ -179,7 +179,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W86 | available | — | — | — | [P] W84 |
 | W87 | available | — | — | — | W84, W85 |
 | W88 | available | — | — | — | [P] W80 |
-| W89 | available | — | — | — | W79 |
+| W89 | claimed | builder-A | 2026-08-10T12:15Z | — | specialist-supervision hooks, DESIGN ONLY (G5-gated) |
 | W90 | available | — | — | — | [P] W78 |
 | W91 | available | — | — | — | W79–W90 |
 | W92 | available | — | — | — | W91 |
