@@ -52,8 +52,18 @@ export interface MembershipInputs {
   enabledConditions: readonly ConditionCode[];
 }
 
-function key(patientId: string, conditionCode: string): string {
-  return `${patientId}::${conditionCode}`;
+/**
+ * W103: the key includes the PRACTICE.
+ *
+ * It did not, and `RegisterMembership` carries a practiceId, so `existing` spanning two
+ * practices — which is what a store query naturally returns — collided on any shared patient
+ * id. The consequence was not a stale read but a WRITE: practice A's derivation, not
+ * containing practice B's patient, closed B's open row with a `removedAt`, quietly removing a
+ * patient from a register belonging to a practice A cannot see. Fifth instance of the class
+ * W91 documented, and the first that mutates another practice's data rather than reading it.
+ */
+function key(practiceId: string, patientId: string, conditionCode: string): string {
+  return `${practiceId}::${patientId}::${conditionCode}`;
 }
 
 /**
@@ -75,7 +85,7 @@ export function deriveMemberships(inputs: MembershipInputs, atIso: string): Regi
   ) => {
     if (!known.has(patientId as string)) return; // never invent a patient
     if (!enabled.has(conditionCode as string)) return;
-    const k = key(patientId as string, conditionCode as string);
+    const k = key(inputs.practiceId as string, patientId as string, conditionCode as string);
     if (rows.has(k)) return; // first source wins; pms_condition_flag is applied first
     rows.set(k, {
       practiceId: inputs.practiceId,
@@ -95,8 +105,8 @@ export function deriveMemberships(inputs: MembershipInputs, atIso: string): Regi
   }
 
   return [...rows.values()].sort((a, b) =>
-    key(a.patientId as string, a.conditionCode as string).localeCompare(
-      key(b.patientId as string, b.conditionCode as string),
+    key(a.practiceId as string, a.patientId as string, a.conditionCode as string).localeCompare(
+      key(b.practiceId as string, b.patientId as string, b.conditionCode as string),
     ),
   );
 }
@@ -110,11 +120,24 @@ export function reconcileMemberships(
   existing: readonly RegisterMembership[],
   derived: readonly RegisterMembership[],
   atIso: string,
+  practiceId: PracticeId,
 ): RegisterMembership[] {
+  // W103: the practice is an EXPLICIT parameter, not read off `derived[0]` the way W71 reads
+  // it off the gaps. Deriving it would fail in exactly the dangerous case: `derived` is empty
+  // precisely when this function's job is to CLOSE rows, so an inferred scope would be
+  // unknown at the only moment it matters.
+  const mine = (m: RegisterMembership) => m.practiceId === practiceId;
+
   const derivedByKey = new Map(
-    derived.map((m) => [key(m.patientId as string, m.conditionCode as string), m]),
+    derived
+      .filter(mine)
+      .map((m) => [key(m.practiceId as string, m.patientId as string, m.conditionCode as string), m]),
   );
-  const out: RegisterMembership[] = [];
+  // Rows belonging to other practices are passed through UNCHANGED rather than dropped.
+  // Dropping would be the W91 "a foreign record is absent" posture applied where it does real
+  // damage: the natural call is `store = reconcile(store, ...)`, so "absent" would mean
+  // deleted. Not this call's business is not the same as not there.
+  const out: RegisterMembership[] = existing.filter((m) => !mine(m));
   const carried = new Set<string>();
 
   // Two passes. The first decides, per key, whether an OPEN row already exists — because a
@@ -122,11 +145,13 @@ export function reconcileMemberships(
   // once per closed row is how you end up with N live memberships for one patient. (That is
   // not hypothetical: a close/rejoin/close/rejoin cycle produced two open rows.)
   const hasOpen = new Set(
-    existing.filter((r) => r.removedAt === null).map((r) => key(r.patientId as string, r.conditionCode as string)),
+    existing
+      .filter((r) => mine(r) && r.removedAt === null)
+      .map((r) => key(r.practiceId as string, r.patientId as string, r.conditionCode as string)),
   );
 
-  for (const row of existing) {
-    const k = key(row.patientId as string, row.conditionCode as string);
+  for (const row of existing.filter(mine)) {
+    const k = key(row.practiceId as string, row.patientId as string, row.conditionCode as string);
     const stillDerived = derivedByKey.get(k);
     if (stillDerived && row.removedAt === null) {
       carried.add(k);
@@ -152,9 +177,14 @@ export function reconcileMemberships(
 /** Members currently on a register — the count W60's console carries and W58 reads. */
 export function currentMembers(
   memberships: readonly RegisterMembership[],
+  practiceId: PracticeId,
   conditionCode: ConditionCode,
 ): RegisterMembership[] {
-  return memberships.filter((m) => m.conditionCode === conditionCode && m.removedAt === null);
+  // W103: scoped rather than trusted. The signature previously offered no way to scope at
+  // all, so it could not be called correctly — a footgun waiting for its first caller.
+  return memberships.filter(
+    (m) => m.practiceId === practiceId && m.conditionCode === conditionCode && m.removedAt === null,
+  );
 }
 
 export type MembershipReason =
