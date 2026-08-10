@@ -29,6 +29,9 @@ export const EDUCATION_CONSOLE_COPY = {
     "There is no material in the library. Meherr ships with none of its own: every item has to trace back to content that cleared sign-off, and nothing has cleared it. That is the state of the product rather than a page that failed to load.",
 
   /** W148's emptiness, stated where a reader would otherwise assume a broken feature. */
+  /** W154: material whose cited source is not signed off is not shown — and says so. */
+  librarySourceWithheld:
+    "Some material is not shown because the content it cites is not currently signed off. It may have been withdrawn, or the reference may be wrong. Nothing is hidden silently — each item is named below, and the ordering figures further down count material before this check.",
   triggersNone:
     "No teaching triggers ship with Meherr. Deciding that something written on a record is a moment to put material in front of a clinician is a clinical judgement about that condition, and nobody has made it. The library above does not depend on that — it is offered in full either way.",
 

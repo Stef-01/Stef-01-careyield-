@@ -11,22 +11,45 @@
 import type { EducationItem } from "./curation";
 import type { CpdEntry } from "./cpd";
 import type { CaseTrigger } from "./triggers";
+import { type SignedOffSource, sourcesFromContent } from "./provenance";
+import type { ApprovedContent } from "@/registers/authoring";
 
 interface EducationState {
   items: EducationItem[];
   triggers: CaseTrigger[];
   cpd: CpdEntry[];
+  /**
+   * W154: the signed-off sources the library may cite. Held as `SignedOffSource`, and the only
+   * way to put one here is `addSignedOffContent`, which takes `ApprovedContent` — so the store
+   * cannot be handed a source that never cleared G5.
+   */
+  sources: SignedOffSource[];
 }
 
 const globalStore = globalThis as { __meherrEducation?: EducationState };
 
 function state(): EducationState {
-  globalStore.__meherrEducation ??= { items: [], triggers: [], cpd: [] };
+  globalStore.__meherrEducation ??= { items: [], triggers: [], cpd: [], sources: [] };
   return globalStore.__meherrEducation;
 }
 
 export function resetEducation(): void {
-  globalStore.__meherrEducation = { items: [], triggers: [], cpd: [] };
+  globalStore.__meherrEducation = { items: [], triggers: [], cpd: [], sources: [] };
+}
+
+/**
+ * Record content that has cleared G5, so material may cite it.
+ *
+ * Takes `ApprovedContent` rather than a ref string: the parameter type is the whole guarantee
+ * (W152). There is deliberately no overload accepting a bare source.
+ */
+export function addSignedOffContent(approved: readonly ApprovedContent[]): void {
+  state().sources.push(...sourcesFromContent(approved));
+}
+
+/** The catalogue a surface checks material against. Empty until something is signed off. */
+export function getSignedOffSources(): readonly SignedOffSource[] {
+  return state().sources;
 }
 
 export function getLibrary(): readonly EducationItem[] {

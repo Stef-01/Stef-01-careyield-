@@ -139,3 +139,40 @@ test("the page makes no clinical claim and gives no instruction", async ({ page,
     expect(body, `page copy contains "${banned}"`).not.toContain(banned);
   }
 });
+
+test("W154: material citing content that is not signed off is withheld, and named", async ({
+  page,
+  request,
+}) => {
+  // W151 rendered the curated list directly, so W152's provenance gate — the guarantee that
+  // everything on this page traces to signed-off content — was never applied to the only
+  // surface that renders material. The seed's refs pointed at nothing and were displayed as
+  // though they were provenance, which is precisely the "looks sourced" failure.
+  await request.post(`/api/mock/education?linkEmail=${EMAIL}&unbacked=1`);
+  await page.goto("/console/education");
+
+  // The backed items still show...
+  await expect(page.getByTestId("item-item-a1")).toBeVisible();
+  await expect(page.getByTestId("item-item-a2")).toBeVisible();
+  // ...and the unbacked one does not.
+  await expect(page.getByTestId("item-item-a3")).toHaveCount(0);
+
+  // Withheld, not vanished: named, with why.
+  const withheld = page.getByTestId("library-withheld");
+  await expect(withheld).toBeVisible();
+  await expect(page.getByTestId("withheld-item-a3")).toContainText("not currently signed off");
+
+  // And the page no longer claims everything is shown, which would contradict the panel above.
+  await expect(page.getByTestId("library-all-shown")).toHaveCount(0);
+});
+
+test("W154: with nothing withheld the page still says nothing was held back", async ({
+  page,
+  request,
+}) => {
+  // Guard against the fix over-firing: the honest claim must survive when it is true.
+  await request.post(`/api/mock/education?linkEmail=${EMAIL}`);
+  await page.goto("/console/education");
+  await expect(page.getByTestId("library-withheld")).toHaveCount(0);
+  await expect(page.getByTestId("library-all-shown")).toContainText("does not shorten this list");
+});

@@ -10,7 +10,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getConsole } from "@/console/store";
 import { recordCpdEntry, type CpdEntry } from "@/education/cpd";
 import type { EducationItem } from "@/education/curation";
-import { addCpdEntries, addLibraryItems, getLibrary, resetEducation } from "@/education/store";
+import {
+  addCpdEntries,
+  addLibraryItems,
+  addSignedOffContent,
+  getLibrary,
+  resetEducation,
+} from "@/education/store";
+import { draft, review, signOff, submitForReview, usableContent } from "@/registers/authoring";
 import { assertMockRoutesEnabled } from "@/lib/mock-guard";
 import { setRegisterEnabled } from "@/registers/store";
 import type { ClinicianId, ConditionCode } from "@/domain/types";
@@ -36,7 +43,10 @@ const ITEMS: EducationItem[] = [
     itemId: "item-b1",
     conditionCode: "placeholder_register_b",
     title: "Placeholder material B1 — fixture only.",
-    sourceRef: "signed-off-source-b1",
+    // W154: deliberately cites content that was never signed off, so the page is exercised on
+    // the case that matters — material which LOOKS sourced. The seed would otherwise only ever
+    // show the happy path.
+    sourceRef: "never-signed-off",
     relevantFactCodes: [],
   },
 ];
@@ -53,6 +63,43 @@ function cpd(entryId: string, clinicianId: string, at: string, itemId: string): 
   );
   if (!result.ok) throw new Error(result.errors.join(", "));
   return result.entry;
+}
+
+/**
+ * W154: synthetic content driven through W69's REAL sign-off workflow.
+ *
+ * The seed used to give items refs like "signed-off-source-a1" — strings pointing at nothing,
+ * which the console then rendered as though they were provenance. That is the exact failure
+ * W152 exists to prevent, so the mock now has to actually sign something off: `usableContent`
+ * is the only way to obtain the branded value `addSignedOffContent` requires, and it returns
+ * null for anything unsigned.
+ */
+function seedSignedOffSources(ids: readonly string[]): void {
+  const approved = ids.map((id) => {
+    let record = draft(
+      {
+        id,
+        conditionCode: "placeholder_register_a" as ConditionCode,
+        kind: "condition_description",
+        body: `Placeholder signed-off body for ${id} — fixture only.`,
+      },
+      "author@demo.practice.example",
+      "2026-03-01T00:00:00Z",
+    );
+    for (const step of [
+      () => submitForReview(record, "author@demo.practice.example", "2026-03-02T00:00:00Z"),
+      () => review(record, "specialist@demo.practice.example", "2026-03-03T00:00:00Z"),
+      () => signOff(record, "founder@demo.practice.example", "2026-03-04T00:00:00Z"),
+    ]) {
+      const result = step();
+      if (!result.ok) throw new Error(`education seed could not sign off ${id}: ${result.error}`);
+      record = result.record;
+    }
+    const usable = usableContent(record);
+    if (!usable) throw new Error(`education seed produced no usable content for ${id}`);
+    return usable;
+  });
+  addSignedOffContent(approved);
 }
 
 export async function GET() {
@@ -85,7 +132,24 @@ export async function POST(request: NextRequest) {
   const practiceId = console_.practice?.id;
   if (practiceId) setRegisterEnabled(practiceId, "placeholder_register_b" as ConditionCode, false);
 
+  // Sign off the sources a1/a2 cite, before the items that cite them. item-b1's ref is
+  // deliberately left unbacked.
+  seedSignedOffSources(["signed-off-source-a1", "signed-off-source-a2"]);
   addLibraryItems(ITEMS);
+
+  // W154: an IN-SCOPE item whose source was never signed off, so the console's provenance
+  // withholding is exercised. Opt-in, so the existing seed keeps its happy-path shape.
+  if (request.nextUrl.searchParams.get("unbacked") === "1") {
+    addLibraryItems([
+      {
+        itemId: "item-a3",
+        conditionCode: "placeholder_register_a",
+        title: "Placeholder material A3 — cites content that is not signed off.",
+        sourceRef: "withdrawn-or-wrong",
+        relevantFactCodes: [],
+      },
+    ]);
+  }
 
   if (mine) {
     const own = cpd("cpd-1", mine.id, "2026-03-01", "item-a1");

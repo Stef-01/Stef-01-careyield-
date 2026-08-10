@@ -30,7 +30,8 @@ import { getConsole } from "@/console/store";
 import { trailFor } from "@/education/cpd";
 import { EDUCATION_CONSOLE_COPY as COPY } from "@/education/console-copy";
 import { curate, describeCuration } from "@/education/curation";
-import { cpdEntriesFor, getLibrary, getTriggers } from "@/education/store";
+import { PROVENANCE_REFUSAL_COPY, renderable } from "@/education/provenance";
+import { cpdEntriesFor, getLibrary, getSignedOffSources, getTriggers } from "@/education/store";
 import { describeTriggers, triggersFor } from "@/education/triggers";
 import { registersFor } from "@/registers/store";
 import { authorize } from "@/tenancy/tenancy";
@@ -56,6 +57,22 @@ export default async function EducationPage() {
   // No patient is in view on a library page, so no recorded facts are supplied — and W145 says
   // so in its own ordering basis rather than implying an order it did not use.
   const curation = curate(getLibrary(), { practiceConditionCodes, recordedFactCodes: [] });
+
+  // W154: the curated order is then put through W152's provenance gate, which W151 shipped
+  // without. Curation decides ORDER; this decides whether material may be shown at all, and the
+  // two are separate questions — an item citing content nobody has signed off is not
+  // low-priority, it is unshowable. Withholding here is not the suppression W145 forbids: that
+  // rule protects against hiding material on a PATIENT-level judgement, and this is a content
+  // governance fact, reported in full below rather than made to disappear.
+  const sources = getSignedOffSources();
+  const gated = curation.ordered.map((ranked) => ({ ranked, check: renderable(ranked.item, sources) }));
+  const shown = gated.filter((g) => g.check.renderable);
+  const withheld = gated
+    .filter((g) => !g.check.renderable)
+    .map((g) => ({
+      itemId: g.ranked.item.itemId,
+      reason: g.check.renderable ? "" : PROVENANCE_REFUSAL_COPY[g.check.reason],
+    }));
   const triggers = triggersFor([], practiceConditionCodes, getTriggers());
 
   const identity = clinicianForEmail(console_.clinicians, email);
@@ -77,7 +94,7 @@ export default async function EducationPage() {
             Material for this practice&rsquo;s registers
           </h2>
 
-          {curation.ordered.length === 0 ? (
+          {shown.length === 0 ? (
             <p
               data-testid="library-empty"
               className="rounded-lg border border-dashed border-stone-300 px-4 py-6 text-stone-600"
@@ -86,7 +103,7 @@ export default async function EducationPage() {
             </p>
           ) : (
             <ul data-testid="library-list" className="flex flex-col gap-3">
-              {curation.ordered.map((ranked) => (
+              {shown.map(({ ranked }) => (
                 <li
                   key={ranked.item.itemId}
                   data-testid={`item-${ranked.item.itemId}`}
@@ -114,14 +131,35 @@ export default async function EducationPage() {
             </ul>
           )}
 
+          {withheld.length > 0 && (
+            <div
+              data-testid="library-withheld"
+              className="rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-700"
+            >
+              <p>{COPY.librarySourceWithheld}</p>
+              <ul className="mt-2 flex flex-col gap-1">
+                {withheld.map((w) => (
+                  <li key={w.itemId} data-testid={`withheld-${w.itemId}`}>
+                    <span className="font-medium">{w.itemId}</span> — {w.reason}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div data-testid="library-basis" className="flex flex-col gap-1 text-sm text-stone-600">
             {describeCuration(curation).map((line) => (
               <p key={line}>{line}</p>
             ))}
           </div>
-          <p data-testid="library-all-shown" className="text-sm text-stone-500">
-            {COPY.libraryAllShown}
-          </p>
+          {/* W154: only claimed when it is true. "Every item is above, in full" alongside a
+              list of what was held back would be the page contradicting itself, and the
+              withheld panel already carries the honest version. */}
+          {withheld.length === 0 && (
+            <p data-testid="library-all-shown" className="text-sm text-stone-500">
+              {COPY.libraryAllShown}
+            </p>
+          )}
         </section>
 
         <section aria-labelledby="triggers-heading" className="flex flex-col gap-3">
