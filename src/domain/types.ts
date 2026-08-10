@@ -173,6 +173,65 @@ export interface RegisterMembership {
   removedAt: string | null;
 }
 
+// ---------------------------------------------------------------------------
+// W79: capability graph. Three DISTINCT things about a clinician, never conflated.
+// ---------------------------------------------------------------------------
+
+/**
+ * The provenance vocabularies are disjoint BY CONSTRUCTION, mirroring the single-valued
+ * CHECK on each table in 0005_capability.sql. Because each interface pins its own literal,
+ * a self-reported record cannot be assigned where a derived one is expected: conflating the
+ * three fails to typecheck rather than merely being discouraged.
+ */
+export type InterestSource = "clinician_self_reported";
+export type ExperienceSource = "derived_case_mix";
+export type CompetenceSource = "external_verification";
+
+/** What a clinician says they want more of. A preference, never a capability. */
+export interface ClinicianInterest {
+  practiceId: PracticeId;
+  clinicianId: ClinicianId;
+  conditionCode: ConditionCode;
+  /** 1 (would take some) .. 5 (would take much more). */
+  strength: number;
+  source: InterestSource;
+  statedAt: string;
+}
+
+/**
+ * What a clinician has actually seen. Derived (W80) and never typed in — note there is no
+ * free-text field here, because anything hand-written would be a self-report wearing a
+ * derived label.
+ */
+export interface ClinicianExperience {
+  practiceId: PracticeId;
+  clinicianId: ClinicianId;
+  conditionCode: ConditionCode;
+  attendedVisits: number;
+  /** The window the count covers, so a number never floats free of its period. */
+  windowFrom: string;
+  windowTo: string;
+  source: ExperienceSource;
+  computedAt: string;
+}
+
+/**
+ * What someone external has verified. `attestedBy` and `verifiedOn` are required, so a
+ * competence record cannot exist without naming who checked it — there is no path to
+ * "verified" that does not record a verifier.
+ */
+export interface ClinicianCompetence {
+  practiceId: PracticeId;
+  clinicianId: ClinicianId;
+  conditionCode: ConditionCode;
+  credential: string;
+  attestedBy: string;
+  verifiedOn: string;
+  /** Null means no stated expiry, not "never expires" — W82 decides how to treat that. */
+  expiresOn: string | null;
+  source: CompetenceSource;
+}
+
 /** Registry mirrored by SQL tables — the W2 consistency test keys off this. */
 export const DOMAIN_TABLES = [
   "practices",
@@ -186,6 +245,9 @@ export const DOMAIN_TABLES = [
   "conditions", // W55 reference
   "guideline_intervals", // W55 reference
   "register_membership", // W55 practice-scoped
+  "clinician_interest", // W79 capability graph
+  "clinician_experience", // W79
+  "clinician_competence", // W79
 ] as const;
 
 export type DomainTable = (typeof DOMAIN_TABLES)[number];
