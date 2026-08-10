@@ -17,12 +17,12 @@ export type CareArchetype = {
 export const careArchetypes: CareArchetype[] = [
   {
     id: "south-indian-pcos",
-    title: "PCOS + South Indian context",
+    title: "PMOS (formerly PCOS) + South Indian context",
     eyebrow: "Culture and emotional safety",
-    example: "A woman GP with PCOS experience who speaks Tamil or Malayalam and understands family pressure.",
+    example: "A woman GP with PMOS experience who speaks Tamil or Malayalam and understands family pressure.",
     request:
-      "I’m a young South Indian woman navigating PCOS and a difficult time with my mental health. I want a woman GP who speaks Tamil or Malayalam, understands family pressure and gives me time without judgement.",
-    headline: "PCOS, language and emotional safety.",
+      "I’m a young South Indian woman navigating PMOS and a difficult time with my mental health. I want a woman GP who speaks Tamil or Malayalam, understands family pressure and gives me time without judgement.",
+    headline: "PMOS, language and emotional safety.",
     expectedFirstMatch: "priya-nair",
     requirements: {
       careAreas: ["pcos", "perinatal-mental-health"],
@@ -32,12 +32,12 @@ export const careArchetypes: CareArchetype[] = [
   },
   {
     id: "hindi-punjabi-pcos",
-    title: "PCOS + Hindi family context",
+    title: "PMOS (formerly PCOS) + Hindi family context",
     eyebrow: "Family dynamics and mood",
-    example: "A calm woman GP who speaks Hindi or Punjabi and understands the emotional side of PCOS.",
+    example: "A calm woman GP who speaks Hindi or Punjabi and understands the emotional side of PMOS.",
     request:
-      "I want a calm woman GP for PCOS who speaks Hindi or Punjabi. I’m anxious about symptoms and family expectations, and I need someone collaborative who will explain choices slowly.",
-    headline: "PCOS care that includes family and mood.",
+      "I want a calm woman GP for PMOS who speaks Hindi or Punjabi. I’m anxious about symptoms and family expectations, and I need someone collaborative who will explain choices slowly.",
+    headline: "PMOS care that includes family and mood.",
     expectedFirstMatch: "nisha-kapoor",
     requirements: {
       careAreas: ["pcos", "perinatal-mental-health"],
@@ -147,12 +147,12 @@ export const careArchetypes: CareArchetype[] = [
   },
   {
     id: "pcos-metabolic-reset",
-    title: "PCOS + sustainable health goals",
+    title: "PMOS (formerly PCOS) + sustainable health goals",
     eyebrow: "Metabolic care without shame",
-    example: "A GP who understands PCOS and can help me build sustainable health habits without reducing me to my weight.",
+    example: "A GP who understands PMOS and can help me build sustainable health habits without reducing me to my weight.",
     request:
-      "I want to feel stronger and healthier while managing PCOS. I need a woman GP with metabolic-health experience who will talk about sleep, food, movement and mental wellbeing without shame or extreme targets.",
-    headline: "PCOS and sustainable health, without shame.",
+      "I want to feel stronger and healthier while managing PMOS. I need a woman GP with metabolic-health experience who will talk about sleep, food, movement and mental wellbeing without shame or extreme targets.",
+    headline: "PMOS and sustainable health, without shame.",
     expectedFirstMatch: "sofia-alvarez",
     requirements: {
       careAreas: ["pcos", "metabolic"],
@@ -214,12 +214,12 @@ export const careArchetypes: CareArchetype[] = [
   },
   {
     id: "pcos-adhd",
-    title: "PCOS care that works with ADHD",
+    title: "PMOS (formerly PCOS) care that works with ADHD",
     eyebrow: "Hormonal health and executive function",
-    example: "A GP experienced in both PCOS and ADHD who gives me clear, realistic steps instead of an overwhelming plan.",
+    example: "A GP experienced in both PMOS and ADHD who gives me clear, realistic steps instead of an overwhelming plan.",
     request:
-      "I have PCOS and ADHD and feel overwhelmed by complicated health plans. I want a GP experienced in both who understands executive-function barriers, gives me a few clear steps at a time and checks what is genuinely realistic for me.",
-    headline: "PCOS care that works with your brain.",
+      "I have PMOS and ADHD and feel overwhelmed by complicated health plans. I want a GP experienced in both who understands executive-function barriers, gives me a few clear steps at a time and checks what is genuinely realistic for me.",
+    headline: "PMOS care that works with your brain.",
     expectedFirstMatch: "grace-chen",
     requirements: {
       careAreas: ["pcos", "adhd"],

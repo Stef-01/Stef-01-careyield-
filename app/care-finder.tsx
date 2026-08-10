@@ -132,8 +132,8 @@ function getRequestHeadline(value: string, fallback: string) {
   if (hasTraumaContext) return "Trauma-sensitive care, with you in control.";
   if (hasGestationalDiabetes) return "Gestational diabetes with whole-person support.";
   if (hasPostBirth) return "Post-birth health, strength and emotional care.";
-  if (hasPcos && hasCulturalContext) return "PCOS, language and emotional safety.";
-  if (hasPcos) return "PCOS care without shame or assumptions.";
+  if (hasPcos && hasCulturalContext) return "PMOS, language and emotional safety.";
+  if (hasPcos) return "PMOS care without shame or assumptions.";
   return fallback;
 }
 
@@ -141,7 +141,7 @@ function getRequestPriorities(value: string) {
   const words = value.toLowerCase();
   const priorities = [
     { label: "Gestational diabetes", terms: ["gestational diabetes", "pregnancy diabetes"] },
-    { label: "PCOS expertise", terms: ["pcos", "pmos", "polycystic"] },
+    { label: "PMOS (formerly PCOS) expertise", terms: ["pcos", "pmos", "polycystic"] },
     { label: "Post-birth recovery", terms: ["post-birth", "post birth", "postpartum", "after birth", "giving birth"] },
     { label: "Complex mental-health shared care", terms: ["ptsd", "bipolar", "psychiatrist", "psychiatric"] },
     { label: "Maternal depression", terms: ["maternal depression", "postnatal depression", "depression after birth", "persistently low"] },
@@ -163,6 +163,15 @@ function getRequestPriorities(value: string) {
 
 function Wordmark() {
   return <DemoNavigator />;
+}
+
+function FinderContext() {
+  return (
+    <aside className="finder-context">
+      <p>Part of a community program helping South Asian women in Blacktown and neighbouring suburbs recognise PMOS (formerly PCOS) earlier.</p>
+      <strong>Early demo: all clinician profiles and availability are synthetic.</strong>
+    </aside>
+  );
 }
 
 function WaveformMark({ active = false }: { active?: boolean }) {
@@ -288,6 +297,8 @@ export function CareFinder() {
               <Link href="/clinicians" className="quiet-link">Clinician view</Link>
             </header>
 
+            <FinderContext />
+
             <div className="voice-core">
               <div className="voice-prompt">
                 <h1>Who would you feel comfortable seeing?</h1>
@@ -328,7 +339,7 @@ export function CareFinder() {
               <button className="text-action" type="button" onClick={() => setStage("type")}>Type instead</button>
             </div>
 
-            <footer className="micro-footer">Demo profiles and availability are synthetic.</footer>
+            <footer className="micro-footer">Community program prototype · Blacktown area</footer>
           </MotionScreen>
         )}
 
@@ -374,6 +385,7 @@ export function CareFinder() {
             </header>
 
             <div className="type-content">
+              <FinderContext />
               <p className="eyebrow">In your own words</p>
               <h1>Who would you feel comfortable seeing?</h1>
               <label className="sr-only" htmlFor="doctor-request">Describe the GP you want to see</label>
@@ -381,7 +393,7 @@ export function CareFinder() {
                 id="doctor-request"
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
-                placeholder="For example: A woman GP with PCOS experience who understands South Indian family dynamics."
+                placeholder="For example: A woman GP with PMOS or PCOS experience who understands South Indian family dynamics."
                 autoFocus
               />
             </div>

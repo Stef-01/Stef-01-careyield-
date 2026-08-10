@@ -24,7 +24,7 @@ const stages: Array<{ id: Stage; label: string }> = [
 ];
 
 const womenHealthConditions = [
-  { id: "pcos", label: "PCOS", detail: "Demo anchor", locked: true },
+  { id: "pcos", label: "PMOS (formerly PCOS)", detail: "Demo anchor", locked: true },
   { id: "gestational-diabetes", label: "Gestational diabetes", detail: "Pregnancy and follow-up" },
   { id: "endometriosis", label: "Endometriosis & pelvic pain", detail: "Recognition and continuity" },
   { id: "perinatal-mental-health", label: "Perinatal mental health", detail: "Depression, anxiety and shared care" },
@@ -35,16 +35,16 @@ const womenHealthConditions = [
 const comingFocusAreas = ["Metabolic health", "Renal health", "Cardiac health", "Mental health", "Skin cancer"];
 
 const cases = [
-  { label: "New PCOS assessment", detail: "Cycles · metabolic screen", time: "8:40" },
-  { label: "PCOS follow-up", detail: "COCP suitability · mood check", time: "10:20" },
+  { label: "New PMOS assessment", detail: "Cycles · metabolic screen", time: "8:40" },
+  { label: "PMOS follow-up", detail: "COCP suitability · mood check", time: "10:20" },
   { label: "Metformin review", detail: "Titration · GI tolerance", time: "1:10" },
-  { label: "Longer PCOS consult", detail: "Symptoms · shared plan", time: "3:40" },
+  { label: "Longer PMOS consult", detail: "Symptoms · shared plan", time: "3:40" },
 ];
 
 const resources = [
   {
     id: "guideline",
-    eyebrow: "Current PCOS / PMOS guideline",
+    eyebrow: "Current PMOS guideline (formerly PCOS)",
     title: "Metabolic management",
     detail: "The relevant section from the 2023 International Evidence-based Guideline.",
     duration: "3 min",
@@ -142,7 +142,7 @@ export function ClinicianWalkthrough() {
             <DemoNavigator />
             <span>for clinicians</span>
           </div>
-          <Link href="/" className="cv2-exit">
+          <Link href="/finder" className="cv2-exit">
             Patient view <ArrowUpRight size={15} weight="bold" aria-hidden="true" />
           </Link>
         </header>
@@ -244,12 +244,12 @@ export function ClinicianWalkthrough() {
                 aria-label="Target practice mix"
                 type="range"
                 min="10"
-                max="50"
+                max="100"
                 step="5"
                 value={target}
                 onChange={(event) => setTarget(Number(event.target.value))}
               />
-              <div className="cv2-range-labels" aria-hidden="true"><span>10%</span><span>50%</span></div>
+              <div className="cv2-range-labels" aria-hidden="true"><span>10%</span><span>100%</span></div>
             </div>
 
             <div className="cv2-action">
@@ -274,10 +274,10 @@ export function ClinicianWalkthrough() {
 
             <div className="cv2-case-hero">
               <div className="cv2-case-hero-top">
-                <span>Tomorrow · Fitzroy</span>
+                <span>Tomorrow · Blacktown</span>
                 <Clock size={20} weight="bold" aria-hidden="true" />
               </div>
-              <div className="cv2-case-number"><strong>4</strong><span>PCOS<br />appointments</span></div>
+              <div className="cv2-case-number"><strong>4</strong><span>PMOS<br />appointments</span></div>
               <p>{target}% target mix · 9 matched cases this week</p>
             </div>
 

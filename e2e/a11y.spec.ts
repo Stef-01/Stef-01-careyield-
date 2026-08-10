@@ -61,6 +61,7 @@ test("console surfaces pass WCAG A/AA", async ({ page }) => {
     "/console/privacy",
     "/console/complaints",
     "/console/registers", // W60
+    "/console/interest",
     "/console/setup/practice",
   ];
   for (const path of surfaces) {
@@ -94,11 +95,9 @@ test("patient booking states pass WCAG A/AA", async ({ page, request }) => {
 });
 
 test("public pages pass WCAG A/AA", async ({ page }) => {
-  // "/" is now the patient-facing care finder; the B2B landing moved to /practices and
-  // is still a public page, so it keeps its coverage under its new URL. /clinicians is
-  // the third public pathway and joins the sweep on the same rule W49 set: every public
-  // surface is scanned, and a new one is added when it lands, not when it breaks.
-  for (const path of ["/", "/practices", "/clinicians", "/privacy", "/privacy/automated-decisions", "/demo"]) {
+  // The public root is the community program; the synthetic finder lives separately.
+  // Every public surface remains on the same zero-violation rule.
+  for (const path of ["/", "/finder", "/practices", "/clinicians", "/privacy", "/privacy/automated-decisions", "/demo"]) {
     await page.goto(path);
     await expectNoViolations(page, path);
   }

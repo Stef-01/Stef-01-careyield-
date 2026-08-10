@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CareYield — find a GP who fits",
+  title: "CareYield — recognise PMOS earlier",
   description:
-    "Describe the kind of GP you want to see and explore tailored clinician profiles.",
+    "A Blacktown community program helping South Asian women recognise PMOS, formerly PCOS, earlier.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

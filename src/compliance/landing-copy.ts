@@ -60,21 +60,21 @@ export const LANDING_COPY = {
       "Practices extend reach by being genuinely useful",
     ],
     evidenceEyebrow: "Why concentrated capability matters",
-    evidenceHeading: "The current PCOS journey loses time, trust and information.",
+    evidenceHeading: "The current PMOS (formerly PCOS) journey loses time, trust and information.",
     evidenceBody:
       "The studies quantify delay and clinician-hopping; an individual pathway can vary. The opportunity is to make a relevant GP easier to find and help that GP keep getting better through repeated, supported work.",
     evidence: [
-      { value: "24%", label: "waited more than two years for PCOS to be recognised" },
+      { value: "24%", label: "waited more than two years for PMOS to be recognised" },
       { value: "39%", label: "saw three or more health professionals first" },
-      { value: "60%", label: "received no information when PCOS was identified" },
-      { value: "≈ half", label: "of cohort participants meeting PCOS criteria were not previously recognised by their early 30s" },
+      { value: "60%", label: "received no information when PMOS was identified" },
+      { value: "≈ half", label: "of cohort participants meeting PMOS/PCOS criteria were not previously recognised by their early 30s" },
     ],
     evidenceNote:
       "Australian studies: Family Practice 2014, n=210; Human Reproduction 2021, Adelaide cohort, n=974.",
     pathwayEyebrow: "The real capability gap",
     pathwayHeading: "Education exists. The practice pathway does not.",
     pathwayBody:
-      "RACGP’s Sexual and Reproductive Health interest group explicitly includes PCOS, and ACRRM lists a PCOS learning activity. " +
+      "RACGP’s Sexual and Reproductive Health interest group explicitly includes PMOS/PCOS, and ACRRM lists a related learning activity. " +
       "What is still missing is a clear practice-level route from a GP’s chosen focus to repeated cases, relevant learning and visible community contribution.",
     pathwayNote:
       "CareYield does not create a clinical credential. It makes a clinician-chosen focus and learning loop visible inside the practice.",

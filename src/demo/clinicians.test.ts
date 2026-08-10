@@ -9,6 +9,7 @@ describe("demo clinician matching", () => {
     ["someone who understands adult ADHD", "tom-bennett"],
     ["a calm woman GP", "nisha-kapoor"],
     ["a young South Indian woman seeking PCOS and mental health care", "priya-nair"],
+    ["a young South Indian woman seeking PMOS and mental health care", "priya-nair"],
   ])("ranks %s first", (request, expectedId) => {
     expect(rankClinicians(request)[0]!.id).toBe(expectedId);
   });
@@ -24,6 +25,27 @@ describe("demo clinician matching", () => {
   it("keeps the full synthetic roster available", () => {
     expect(clinicians).toHaveLength(15);
     expect(new Set(clinicians.map((clinician) => clinician.id)).size).toBe(15);
+  });
+
+  it("keeps every demo clinician in Blacktown or a neighbouring suburb", () => {
+    const blacktownArea = new Set([
+      "Blacktown",
+      "Doonside",
+      "Glenwood",
+      "Kings Langley",
+      "Lalor Park",
+      "Marayong",
+      "Mount Druitt",
+      "Prospect",
+      "Quakers Hill",
+      "Rooty Hill",
+      "Seven Hills",
+      "Toongabbie",
+      "Woodcroft",
+    ]);
+
+    expect(clinicians.every((clinician) => blacktownArea.has(clinician.suburb))).toBe(true);
+    expect(clinicians.filter((clinician) => clinician.suburb === "Blacktown")).toHaveLength(2);
   });
 
   it.each([

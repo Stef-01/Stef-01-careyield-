@@ -31,6 +31,12 @@ export default function PrivacyPolicyPage() {
             appointments. We do not collect or process clinical notes, diagnoses, or test
             results, and we never use patient information for advertising.
           </p>
+          <p className="mt-3 text-sm leading-6">
+            For the Blacktown-area community interest list, we collect the name, email address
+            and interest options a person chooses, with their consent. We use these details only
+            to contact them about community sessions and early product testing. We do not ask for
+            clinical records or a description of symptoms in this form.
+          </p>
         </section>
         <section>
           <h2 className="text-lg font-medium text-stone-900">Access, correction and deletion (APP 12 / APP 13)</h2>
@@ -47,6 +53,10 @@ export default function PrivacyPolicyPage() {
             Records are retained per practice-configured windows and pruned automatically when
             they age out. Opt-out and deletion records are kept — they are the evidence that a
             request was honoured.
+          </p>
+          <p className="mt-3 text-sm leading-6">
+            Community interest details are kept while the program is being developed or until the
+            person asks for them to be removed.
           </p>
         </section>
         <section>
