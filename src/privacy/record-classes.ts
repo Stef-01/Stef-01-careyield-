@@ -83,6 +83,12 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
     rationale: "W94 records barriers as data attached to a referral, which is itself derived — and barriers are never inferred, so there is no independent store.",
   },
   {
+    module: "src/pathways/registry.ts",
+    what: "Pathway catalogue and its sign-off attestations",
+    handling: "no_patient_identity",
+    rationale: "W127 holds clinical CONTENT and who reviewed it — versions, criteria, reviewer and signatory identities. There is no patient field on any event, so a patient erasure has nothing to scrub here. Deliberately not practice-scoped either: a pathway is a document, not practice data.",
+  },
+  {
     module: "src/credentials/ledger.ts",
     what: "Per-practice credential verification logs",
     handling: "no_patient_identity",

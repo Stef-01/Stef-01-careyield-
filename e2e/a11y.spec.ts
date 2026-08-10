@@ -50,6 +50,7 @@ test.beforeEach(async ({ page, request }) => {
   // renders one paragraph and no form — scanning that instead would pass while leaving the
   // list, the status chips and the withdraw forms untested.
   await request.post("/api/mock/credentials?linkEmail=manager@demo.practice.example");
+  await request.post("/api/mock/pathways");
 });
 
 test("console surfaces pass WCAG A/AA", async ({ page }) => {
@@ -70,6 +71,7 @@ test("console surfaces pass WCAG A/AA", async ({ page }) => {
     "/console/case-mix", // W81
     "/console/outreach", // W95 — landed after the W101 sweep was claimed
     "/console/credentials", // W113
+    "/console/pathways", // W127
     "/console/setup/practice",
   ];
   for (const path of surfaces) {
