@@ -23,7 +23,7 @@ $80 AUD average billing per attended visit, applied to
 incremental visits only.
 
 Counting every invitation-generated booking (287 visits)
-would claim $22,960 AUD — CareYield does not report that number as
+would claim $22,960 AUD — Meherr does not report that number as
 impact, because part of it is displaced organic attendance.
 
 ## Guardrails

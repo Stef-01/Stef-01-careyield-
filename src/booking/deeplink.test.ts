@@ -42,7 +42,7 @@ const settings = (
 ): PracticeLinkSettings => ({ enabled, config, fallback: INTERNAL });
 
 describe("W29 booking deep-link formats", () => {
-  it("internal provider emits the tokenised CareYield link", () => {
+  it("internal provider emits the tokenised Meherr link", () => {
     const link = buildBookingLink(settings(INTERNAL), CTX);
     expect(link.provider).toBe("internal");
     expect(link.url.startsWith("https://book.careyield.test/book/")).toBe(true);

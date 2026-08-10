@@ -3,7 +3,7 @@ import { requireSession } from "../guard";
 import { listInterestSignups } from "@/interest/store";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Community interest — CareYield" };
+export const metadata = { title: "Community interest — Meherr" };
 
 export default async function CommunityInterestPage() {
   const email = await requireSession();

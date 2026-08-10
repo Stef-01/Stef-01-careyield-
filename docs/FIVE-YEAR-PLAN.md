@@ -1,4 +1,4 @@
-# CareYield — Five-Year Vibecoded Build Plan (v1, 2026-08-08)
+# Meherr — Five-Year Vibecoded Build Plan (v1, 2026-08-08)
 
 > Canonical build plan. Executed by the `careyield-build-loop` (two offset hourly Claude Routines =
 > one firing every 30 minutes, each firing = one build session = one week-unit advanced).

@@ -48,7 +48,7 @@ export const FIGURES: readonly Figure[] = [
   },
   {
     id: "roi.multiple",
-    label: "Return on the CareYield subscription",
+    label: "Return on the Meherr subscription",
     value: roi.roiMultiple,
     display: "4.8×",
     source: {

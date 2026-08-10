@@ -1,4 +1,4 @@
-# CareYield Compliance Dossier (W50, v1 — living document)
+# Meherr Compliance Dossier (W50, v1 — living document)
 
 Every user-facing surface mapped to the four regimes that govern it, with the code that enforces
 the posture. Update this document in the same commit as any change to a mapped surface — a
@@ -16,7 +16,7 @@ surface without a row here does not ship. Regulatory basis: the venture research
 3. **Ahpra advertising guidelines / s 133 National Law** — no clinical claims, no urgency, no
    testimonials/ratings, no title inflation ("specialist"/"surgeon" never near a niche scope),
    accuracy of every credential statement. Platform is itself liable ("a person who advertises").
-4. **MBS integrity (PSR posture)** — CareYield generates attendance *opportunities*, never
+4. **MBS integrity (PSR posture)** — Meherr generates attendance *opportunities*, never
    billings; only clinically relevant services are billed, by the GP; incrementality + usefulness
    audit is the standing anti-low-value-care evidence.
 
@@ -30,7 +30,7 @@ surface without a row here does not ship. Regulatory basis: the venture research
 | Weekly/pilot reports | `src/report/*`, `src/pilot/report.ts` | 4 | naive counts labelled contrast-only (`docs/ATTRIBUTION.md` "never counts"); revenue figures labelled estimation-only (`src/mbs/items.ts` header) |
 | Privacy page (`app/privacy`) | W33 | 2 | retention config + delete/export flows; ADM transparency statement (Dec 2026 requirement) shipped ahead of force date |
 | Landing page (`app/page.tsx`) | W23 → **now renders `CareFinder`** | 3 | ⚠ **ROW STALE — see the 2026-08-10 review line.** W23's B2B-only guarantee no longer describes this route: the root page is now the patient-facing finder |
-| Voice care-finder (`app/page.tsx` → `app/care-finder.tsx`) | founder commit 603219f | 2, 3, **G6, G7** | **UNMAPPED / UNCLEARED — no CareYield control applies to it yet.** Patient-facing: free-text/voice description of a desired GP → matched named clinician with photo and appointment times. Three exposures: patient states a clinical need ("a GP who understands ADHD") and is matched on it (G7/TGA — matching must key on clinician attributes, not patient symptoms); named clinicians + photos in a patient-facing directory (G6 + Ahpra advertising: credential claims must be accurate and supportable, no testimonials); the eight portraits in `public/clinicians/` are not verified real practitioners |
+| Voice care-finder (`app/page.tsx` → `app/care-finder.tsx`) | founder commit 603219f | 2, 3, **G6, G7** | **UNMAPPED / UNCLEARED — no Meherr control applies to it yet.** Patient-facing: free-text/voice description of a desired GP → matched named clinician with photo and appointment times. Three exposures: patient states a clinical need ("a GP who understands ADHD") and is matched on it (G7/TGA — matching must key on clinician attributes, not patient symptoms); named clinicians + photos in a patient-facing directory (G6 + Ahpra advertising: credential claims must be accurate and supportable, no testimonials); the eight portraits in `public/clinicians/` are not verified real practitioners |
 | Clinician walkthrough (`app/clinicians`) | founder commit 603219f | 2, 3 | **UNMAPPED.** Renders condition-specific clinical content ("New PCOS assessment", "Metformin review", "COCP suitability") — the first surface in the tree carrying named conditions and drug classes, which is the territory G5 gates |
 | Practices page (`app/practices`) | founder commit 603219f | 3 | **UNMAPPED.** Assumed B2B; needs the W23 copy-lint applied |
 | Complaint/opt-out workflow | W43 (`src/ops`) | 1, 2, 3 | intake → triage → practice notification; Sev-1 pause-first rule (`docs/SUPPORT-RUNBOOK.md`); event-spine replay resolves "STOP not honoured" claims with evidence |
@@ -42,7 +42,7 @@ surface without a row here does not ship. Regulatory basis: the venture research
 
 - No patient-facing clinical language: linter blocks "overdue", urgency, deterioration,
   diagnosis, test-result bait, benefit claims, check-up prompting. Tests seed each violation.
-- No testimonials or star-ratings on any surface CareYield controls.
+- No testimonials or star-ratings on any surface Meherr controls.
 - No identifiable clinical data in model training (W33 posture; also contractual in the pilot
   agreement skeleton §6).
 - No symptom-based patient triage — matching keys on clinician attributes only (TGA boundary,
@@ -60,7 +60,7 @@ remaining Privacy Act tranche-2 reforms. Each review appends a dated line here.
   care-finder now served at `/`, clinician walkthrough, practices page). They arrived without
   dossier rows, so this document's prior claim of "zero unmapped surfaces in `app/`" was untrue
   until this entry; the rows above now describe what is actually deployed, and the W23 landing-page
-  row is marked stale rather than silently left wrong. **No CareYield control has been applied to
+  row is marked stale rather than silently left wrong. **No Meherr control has been applied to
   any of them** — no copy lint, no G6/G7 assessment, no G5 review of the condition/drug content.
   Awaiting the founder's ruling on whether these are design prototypes (in which case: mark
   prototype-only, keep them off any patient-reachable deployment, and the exposures below stay

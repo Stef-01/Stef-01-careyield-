@@ -36,17 +36,17 @@ export default async function RoiPage({
   const r = computeRoi(assumptions);
 
   const headline: Array<[string, string, string?]> = [
-    ["Net annual benefit", aud(r.netAnnualBenefit), "incremental revenue − CareYield cost"],
-    ["Return on cost", `${r.roiMultiple.toFixed(1)}×`, "incremental revenue ÷ CareYield cost"],
+    ["Net annual benefit", aud(r.netAnnualBenefit), "incremental revenue − Meherr cost"],
+    ["Return on cost", `${r.roiMultiple.toFixed(1)}×`, "incremental revenue ÷ Meherr cost"],
     ["Incremental visits / year", Math.round(r.annualIncrementalVisits).toLocaleString("en-AU")],
   ];
   const rows: Array<[string, string]> = [
     ["Unfilled slots per week", Math.round(r.openSlotsPerWeek).toLocaleString("en-AU")],
-    ["Bookings CareYield generates / week", r.generatedBookingsPerWeek.toFixed(1)],
+    ["Bookings Meherr generates / week", r.generatedBookingsPerWeek.toFixed(1)],
     ["Attended (after DNA) / week", r.attendedPerWeek.toFixed(1)],
     ["Incremental attended / week", r.incrementalAttendedPerWeek.toFixed(1)],
     ["Incremental revenue / year", aud(r.annualIncrementalRevenue)],
-    ["CareYield cost / year", aud(r.annualCareYieldCost)],
+    ["Meherr cost / year", aud(r.annualCareYieldCost)],
   ];
 
   return (
@@ -82,7 +82,7 @@ export default async function RoiPage({
             className={inputClass}
           />
         </Field>
-        <Field label="CareYield fee (AUD/month)">
+        <Field label="Meherr fee (AUD/month)">
           <input
             name="careYieldMonthlyFee"
             type="number"

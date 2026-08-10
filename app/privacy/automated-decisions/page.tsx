@@ -1,15 +1,15 @@
 // W33: ADM-transparency statement (Privacy Act amendments, in force December 2026):
-// a plain-English public page stating what CareYield automates, what it never
+// a plain-English public page stating what Meherr automates, what it never
 // automates, and the human controls — mirrored by the code (eligibility engine,
 // founder gates, ops kill-switch).
 
-export const metadata = { title: "Automated decisions — CareYield" };
+export const metadata = { title: "Automated decisions — Meherr" };
 
 export default function AutomatedDecisionsPage() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-16">
       <h1 className="text-3xl font-semibold tracking-tight">
-        How CareYield uses automated decision-making
+        How Meherr uses automated decision-making
       </h1>
       <p className="mt-4 text-sm leading-6 text-stone-500">
         This statement is published to meet the Privacy Act&apos;s automated-decision-making
@@ -59,7 +59,7 @@ export default function AutomatedDecisionsPage() {
             <li>Practice staff can pause all sending instantly with one switch.</li>
             <li>
               A patient can stop all messages by replying STOP, and can ask their practice to
-              access or delete the information CareYield holds.
+              access or delete the information Meherr holds.
             </li>
             <li>Every automated action is written to an audit log the practice can inspect.</li>
           </ul>

@@ -1,12 +1,12 @@
 // W21: practice-economics / ROI model. A transparent, deterministic calculation
 // from named assumptions to the numbers a practice manager cares about: how much
-// unused capacity exists, how much of it CareYield fills, how much of THAT is
+// unused capacity exists, how much of it Meherr fills, how much of THAT is
 // genuinely incremental (holdout-adjusted, not displaced organic attendance), and
 // the revenue and return that follow.
 //
 // The default assumptions are the ones already encoded across this build — slot
 // calibration (W3 synthetic generator), response/DNA rates (W12 sim), and
-// $/visit (W20 report) — so every surface tells one story. CareYield pricing is a
+// $/visit (W20 report) — so every surface tells one story. Meherr pricing is a
 // stated assumption here; it is finalised at W47 (pricing pack). Revenue is only
 // ever counted on INCREMENTAL visits, never the naive generated-booking count —
 // the same honesty rule the attribution (W9) and weekly report (W20) enforce.
@@ -18,7 +18,7 @@ export interface RoiAssumptions {
   slotsPerGpPerWeek: number;
   /** Share of upcoming capacity that sits unfilled — the wedge (W3 calibration). */
   openSlotRate: number;
-  /** Share of open slots CareYield converts to a booking (W12 response rate). */
+  /** Share of open slots Meherr converts to a booking (W12 response rate). */
   fillRate: number;
   /** Share of generated bookings that do not attend (W12 DNA rate). */
   dnaRate: number;
@@ -26,7 +26,7 @@ export interface RoiAssumptions {
   incrementalShare: number;
   /** Practice billing per attended GP visit, AUD (W20 default). */
   revenuePerAttendedVisit: number;
-  /** CareYield subscription, AUD/month (pricing assumption — finalised W47). */
+  /** Meherr subscription, AUD/month (pricing assumption — finalised W47). */
   careYieldMonthlyFee: number;
 }
 
@@ -51,7 +51,7 @@ export interface RoiResult {
   annualIncrementalRevenue: number;
   annualCareYieldCost: number;
   netAnnualBenefit: number;
-  /** Incremental revenue ÷ CareYield cost; 0 when cost is 0 (guarded). */
+  /** Incremental revenue ÷ Meherr cost; 0 when cost is 0 (guarded). */
   roiMultiple: number;
 }
 

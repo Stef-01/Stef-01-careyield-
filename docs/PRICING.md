@@ -1,4 +1,4 @@
-# CareYield Pricing (W47, v1 — internal)
+# Meherr Pricing (W47, v1 — internal)
 
 Flat platform fees only. **No percentage of clinical revenue, no per-referral payments, ever** —
 this is a compliance posture (fee-splitting/inducement rules; see the venture brief §6 and the

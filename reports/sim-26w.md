@@ -1,4 +1,4 @@
-# CareYield 26-week simulation report (W12)
+# Meherr 26-week simulation report (W12)
 
 Deterministic run — seed 20260808, 4000 synthetic patients,
 10 clinicians, 26 weeks from 2026-08-08.

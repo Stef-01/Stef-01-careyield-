@@ -16,7 +16,7 @@ import { toggleRegister } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Registers — CareYield" };
+export const metadata = { title: "Registers — Meherr" };
 
 const ERROR_COPY: Record<string, string> = {
   denied: "You do not have permission to change registers.",
@@ -46,7 +46,7 @@ export default async function RegistersPage({
           <h1 className="text-2xl font-semibold tracking-tight">Registers</h1>
           <p className="text-stone-600">
             A register is a group of patients your practice already manages for ongoing care.
-            CareYield uses it to decide who to offer an appointment to when a session has room
+            Meherr uses it to decide who to offer an appointment to when a session has room
             — never to decide anything about their care.
           </p>
         </div>

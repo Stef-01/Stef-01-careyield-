@@ -67,7 +67,7 @@ export function deriveMemberships(inputs: MembershipInputs, atIso: string): Regi
 
   // Practice confirmation is applied second so it can add a patient the PMS has not
   // flagged. It deliberately cannot REMOVE a PMS-flagged patient: unticking a box in
-  // CareYield must not silently contradict the clinical record in the PMS.
+  // Meherr must not silently contradict the clinical record in the PMS.
   const add = (
     patientId: PatientId,
     conditionCode: ConditionCode,

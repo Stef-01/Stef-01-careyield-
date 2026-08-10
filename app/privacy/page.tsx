@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 
-export const metadata = { title: "Privacy policy (draft) — CareYield" };
+export const metadata = { title: "Privacy policy (draft) — Meherr" };
 
 export default function PrivacyPolicyPage() {
   return (
@@ -16,9 +16,9 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-lg font-medium text-stone-900">Who we are</h2>
           <p className="mt-2 text-sm leading-6">
-            CareYield provides general practices with software that offers available
+            Meherr provides general practices with software that offers available
             appointment times to their existing patients, on the practice&apos;s instructions.
-            The practice remains the custodian of its patient records; CareYield processes
+            The practice remains the custodian of its patient records; Meherr processes
             the minimum information needed to deliver the service.
           </p>
         </section>
@@ -41,7 +41,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-lg font-medium text-stone-900">Access, correction and deletion (APP 12 / APP 13)</h2>
           <p className="mt-2 text-sm leading-6">
-            Patients may request access to the information CareYield holds, or its deletion,
+            Patients may request access to the information Meherr holds, or its deletion,
             through their practice. Deletion removes identifiable records and leaves a hashed
             deletion record as proof; a suppression entry ensures a deleted patient is never
             contacted again, even after a later data refresh.
@@ -62,7 +62,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-lg font-medium text-stone-900">Automated decision-making</h2>
           <p className="mt-2 text-sm leading-6">
-            CareYield uses automation in deciding which patients are offered available
+            Meherr uses automation in deciding which patients are offered available
             appointments. Our{" "}
             <Link href="/privacy/automated-decisions" className="underline">
               automated-decisions statement

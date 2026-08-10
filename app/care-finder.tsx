@@ -161,7 +161,7 @@ function getRequestPriorities(value: string) {
 }
 
 function Wordmark() {
-  return <Link href="/" className="wordmark finder-wordmark" aria-label="CareYield — back to main home">CareYield</Link>;
+  return <Link href="/" className="wordmark finder-wordmark" aria-label="Meherr — back to main home">Meherr</Link>;
 }
 
 function FinderContext() {

@@ -1,4 +1,4 @@
--- CareYield core schema (W2). Mirrors src/domain/types.ts (consistency-tested).
+-- Meherr core schema (W2). Mirrors src/domain/types.ts (consistency-tested).
 -- RLS: default deny — every table enabled, no permissive policies until the auth
 -- model lands (W11); service-role only until then.
 

@@ -13,7 +13,7 @@ export async function GET() {
   return new Response(interestSignupsCsv(), {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="careyield-community-interest.csv"',
+      "Content-Disposition": 'attachment; filename="meherr-community-interest.csv"',
       "Cache-Control": "no-store",
     },
   });

@@ -31,7 +31,7 @@ describe("computeRoi", () => {
     expect(full.annualIncrementalRevenue).toBeGreaterThan(computeRoi(BRIEF_ASSUMPTIONS).annualIncrementalRevenue);
   });
 
-  it("guards divide-by-zero when CareYield cost is zero", () => {
+  it("guards divide-by-zero when Meherr cost is zero", () => {
     const free: RoiAssumptions = { ...BRIEF_ASSUMPTIONS, careYieldMonthlyFee: 0 };
     const r = computeRoi(free);
     expect(r.annualCareYieldCost).toBe(0);

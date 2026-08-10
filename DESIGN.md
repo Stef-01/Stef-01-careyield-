@@ -1,4 +1,4 @@
-# CareYield — DESIGN.md
+# Meherr — DESIGN.md
 
 The visual system as it actually exists in `app/globals.css`, captured 2026-08-10 so units
 built by the loop extend one language instead of inventing a ninth. Register: **product**

@@ -145,7 +145,7 @@ ${aud(r.revenue.perVisitAssumptionAud)} average billing per attended visit, appl
 incremental visits only.
 
 Counting every invitation-generated booking (${r.cumulative.naiveGeneratedAttended} visits)
-would claim ${aud(r.revenue.naiveWouldClaimAud)} — CareYield does not report that number as
+would claim ${aud(r.revenue.naiveWouldClaimAud)} — Meherr does not report that number as
 impact, because part of it is displaced organic attendance.
 
 ## Guardrails
@@ -174,7 +174,7 @@ export async function renderWeeklyReportDocx(r: WeeklyReport): Promise<Buffer> {
     });
 
   const doc = new Document({
-    creator: "CareYield",
+    creator: "Meherr",
     title: `${r.practiceName} weekly report — week ${r.week}`,
     sections: [
       {
