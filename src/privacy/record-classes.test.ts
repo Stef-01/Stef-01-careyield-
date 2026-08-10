@@ -81,6 +81,7 @@ describe("W106 the classes W51 was about are still covered", () => {
       "src/complaints/store.ts",
       "src/interest/store.ts",
       "src/privacy/state.ts",
+      "src/referrals/store.ts",
     ]);
   });
 

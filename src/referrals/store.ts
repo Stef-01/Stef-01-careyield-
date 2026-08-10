@@ -1,0 +1,136 @@
+// W137: where referrals live for a running console.
+//
+// The rail's modules are all pure — W131 builds a document, W134 folds acts into a status,
+// W135 combines two machines. A console needs somewhere to read them from, and this is that
+// and nothing more.
+//
+// The one decision worth stating is the read model. A referral has TWO practices, and the
+// obvious mistake is a single `forPractice(id)` that returns everything touching it. That
+// would be correct and useless: the two sides have different jobs and different rights. The
+// referring practice is chasing an outcome; the receiving practice is deciding whether to take
+// somebody on. So there are two reads, and neither is a flag on the other — the same reasoning
+// W113 used to keep `ownCredentials` and `practiceCredentials` apart.
+//
+// Cross-practice isolation is by construction: both reads filter on the practice's own field
+// before anything else, so a third practice's referral is ABSENT rather than removed later.
+
+import type { PracticeId } from "@/domain/types";
+import type { AcceptanceAct } from "./acceptance";
+import type { ReferralDocument } from "./document";
+import type { ReferralEvent } from "./leakage";
+import type { ReturnReport } from "./return-report";
+
+interface RailState {
+  documents: ReferralDocument[];
+  acts: AcceptanceAct[];
+  events: ReferralEvent[];
+  returns: ReturnReport[];
+}
+
+const globalStore = globalThis as { __meherrReferralRail?: RailState };
+
+function state(): RailState {
+  globalStore.__meherrReferralRail ??= { documents: [], acts: [], events: [], returns: [] };
+  return globalStore.__meherrReferralRail;
+}
+
+export function resetReferralRail(): void {
+  globalStore.__meherrReferralRail = { documents: [], acts: [], events: [], returns: [] };
+}
+
+export function addReferralDocuments(documents: readonly ReferralDocument[]): void {
+  state().documents.push(...documents);
+}
+
+export function addAcceptanceActs(acts: readonly AcceptanceAct[]): void {
+  state().acts.push(...acts);
+}
+
+export function addReferralEvents(events: readonly ReferralEvent[]): void {
+  state().events.push(...events);
+}
+
+export function addReturnReports(reports: readonly ReturnReport[]): void {
+  state().returns.push(...reports);
+}
+
+export function allActs(): readonly AcceptanceAct[] {
+  return state().acts;
+}
+
+export function allEvents(): readonly ReferralEvent[] {
+  return state().events;
+}
+
+/**
+ * Referrals this practice SENT.
+ *
+ * Filters on `fromPracticeId` as the query, not afterwards — W123's rule, and the reason
+ * W91/W103 gave for preferring it: a later filter is a line somebody can delete, and the
+ * deletion looks like a simplification.
+ */
+export function sentBy(practiceId: PracticeId): ReferralDocument[] {
+  return state()
+    .documents.filter((document) => document.fromPracticeId === practiceId)
+    .sort((a, b) => a.referralId.localeCompare(b.referralId));
+}
+
+/** Referrals sent TO this practice. A separate read, because it answers a different job. */
+export function sentTo(practiceId: PracticeId): ReferralDocument[] {
+  return state()
+    .documents.filter((document) => document.toPracticeId === practiceId)
+    .sort((a, b) => a.referralId.localeCompare(b.referralId));
+}
+
+/**
+ * Remove a patient from every referral record on both sides.
+ *
+ * W137 declared this store as holding patient identity, and W106's registry test refuses that
+ * declaration unless erasure actually reaches it — which is W51's original finding working as
+ * intended rather than a formality.
+ *
+ * The referral ROWS are dropped rather than scrubbed, and that is the difference from the
+ * booking rail: an appointment loses its patient link so the slot history survives, but a
+ * referral with no patient is not a record of anything — it is a note that a practice once
+ * asked another practice about somebody. Its acceptance acts and chain events go with it,
+ * because a chain about a deleted referral is a dangling obligation nobody can act on.
+ *
+ * Returns what it removed, so the deletion record can say so rather than claiming completeness.
+ */
+export function scrubPatientFromReferrals(patientId: string): {
+  documents: number;
+  acts: number;
+  events: number;
+  returns: number;
+} {
+  const rail = state();
+  const mine = new Set(
+    rail.documents.filter((d) => d.patientId === patientId).map((d) => d.referralId),
+  );
+  for (const act of rail.acts) {
+    if (act.kind === "sent" && act.patientId === patientId) mine.add(act.referralId);
+  }
+  for (const event of rail.events) {
+    if (event.patientId === patientId) mine.add(event.referralId);
+  }
+  for (const report of rail.returns) {
+    if (report.patientId === patientId) mine.add(report.referralId);
+  }
+
+  const removed = {
+    documents: rail.documents.filter((d) => mine.has(d.referralId)).length,
+    acts: rail.acts.filter((a) => mine.has(a.referralId)).length,
+    events: rail.events.filter((e) => mine.has(e.referralId)).length,
+    returns: rail.returns.filter((r) => mine.has(r.referralId)).length,
+  };
+  rail.documents = rail.documents.filter((d) => !mine.has(d.referralId));
+  rail.acts = rail.acts.filter((a) => !mine.has(a.referralId));
+  rail.events = rail.events.filter((e) => !mine.has(e.referralId));
+  rail.returns = rail.returns.filter((r) => !mine.has(r.referralId));
+  return removed;
+}
+
+/** The return report for one referral, if one has come back. */
+export function returnFor(referralId: string): ReturnReport | null {
+  return state().returns.find((report) => report.referralId === referralId) ?? null;
+}

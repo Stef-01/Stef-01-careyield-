@@ -101,6 +101,8 @@ export interface DeletionRecord {
     outcomes: number;
     /** W43 complaint links scrubbed. Composed by the store — this dataset has none. */
     complaints: number;
+    /** W137 GP-to-GP referrals removed, on BOTH sides. Composed by the store, as above. */
+    referrals: number;
   };
 }
 
@@ -129,6 +131,7 @@ export function deletePatient(
     auditEvents: auditToRemove.size,
     outcomes: dataset.outcomes.filter((o) => appointmentIds.has(o.appointmentId as string)).length,
     complaints: 0, // filled by deletePatientEverywhere, which owns the complaints store
+    referrals: 0, // likewise — the GP-to-GP rail is another store, composed there (W137)
   };
   return {
     dataset: {

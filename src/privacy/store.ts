@@ -4,6 +4,7 @@
 
 import { getStore } from "@/booking/store";
 import { complaintsForPatient, scrubPatientFromComplaints } from "@/complaints/store";
+import { scrubPatientFromReferrals } from "@/referrals/store";
 import type { ComplaintRecord } from "@/complaints/workflow";
 import {
   applyRetention,
@@ -57,9 +58,14 @@ export function deletePatientEverywhere(patientId: string, nowIso: string): Dele
   // records, so the pure rail deletion is composed with a complaints scrub here —
   // otherwise a raw patientId survives an erasure the console reports as complete.
   const complaints = scrubPatientFromComplaints(patientId, nowIso);
+  // W137: the GP-to-GP rail holds patient-linked records on BOTH sides of a handover, so
+  // "everywhere" has to include the referrals another practice was sent. Composed here for the
+  // same reason complaints were: a store that erasure does not reach is a store the console
+  // reports as clean while a raw patientId survives in it.
+  const referrals = scrubPatientFromReferrals(patientId);
   const deletion: DeletionRecord = {
     ...result.deletion,
-    removed: { ...result.deletion.removed, complaints },
+    removed: { ...result.deletion.removed, complaints, referrals: referrals.documents },
   };
   const privacy = getPrivacy();
   privacy.deletions.push(deletion);

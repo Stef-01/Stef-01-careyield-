@@ -23,6 +23,7 @@ import { resetRateLimits } from "@/lib/rate-limit";
 import { resetOps } from "@/ops/store";
 import { resetPathwayRegistry } from "@/pathways/registry";
 import { resetPrivacy } from "@/privacy/state";
+import { resetReferralRail } from "@/referrals/store";
 import { resetRegisters } from "@/registers/store";
 
 /** Every store reset, by the name the source tree exports it under. */
@@ -39,6 +40,7 @@ export const STORE_RESETTERS: Record<string, () => unknown> = {
   resetOps,
   resetPathwayRegistry,
   resetPrivacy,
+  resetReferralRail,
   resetRegisters,
 };
 

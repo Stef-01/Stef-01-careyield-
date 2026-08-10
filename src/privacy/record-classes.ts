@@ -83,6 +83,12 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
     rationale: "W94 records barriers as data attached to a referral, which is itself derived — and barriers are never inferred, so there is no independent store.",
   },
   {
+    module: "src/referrals/store.ts",
+    what: "Referral documents, acceptance acts, chain events and return reports",
+    handling: "stored",
+    rationale: "W137 holds patient-linked referral records on both sides of a GP-to-GP handover. On erasure the patient link must be removed from documents, acts, events and return reports alike — a referral naming a patient is patient identity wherever it sits, and the receiving practice holding a copy does not change that.",
+  },
+  {
     module: "src/pathways/registry.ts",
     what: "Pathway catalogue and its sign-off attestations",
     handling: "no_patient_identity",
