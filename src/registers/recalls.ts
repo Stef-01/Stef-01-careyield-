@@ -79,6 +79,9 @@ export function reconcileWithRecalls(
   recalls: readonly PracticeRecall[],
   options: ReconcileOptions = {},
 ): RecallReconciliation {
+  // Derived from the gaps themselves: they all belong to one practice by construction
+  // (detectCareGaps copies it from the membership). Null only when there are no gaps.
+  const practiceId = gaps[0]?.practiceId ?? null;
   const flagged = options.patientsWithActiveRecall ?? new Set<PatientId>();
 
   // Index the open recalls once: unscoped by patient, scoped by patient+condition.
@@ -87,6 +90,10 @@ export function reconcileWithRecalls(
 
   for (const recall of recalls) {
     if (!isOpen(recall)) continue;
+    // Tenancy: PracticeRecall carries practiceId and it was never read, so a recall owned
+    // by one practice could suppress another's care gaps on a colliding patient id. Gaps
+    // now carry their practice (W58), so scope against it rather than trusting the caller.
+    if (practiceId !== null && recall.practiceId !== practiceId) continue;
     if (recall.conditionCode === null) {
       const existing = unscoped.get(recall.patientId);
       // Keep the earliest open recall, so the reported date is when the practice

@@ -19,7 +19,7 @@
 // visit belongs to (a PMS with a reason-for-visit, a practice-confirmed closure) should pass
 // scoped closures instead and the ambiguity disappears.
 
-import type { ConditionCode, PatientId } from "@/domain/types";
+import type { ConditionCode, PatientId, PracticeId } from "@/domain/types";
 import type { CareGap } from "./caregap";
 import type { WithheldReason } from "./attribution";
 
@@ -55,8 +55,17 @@ export interface ConditionClosure {
 
 export interface RegisterAnalytics {
   conditions: ConditionClosure[];
-  /** Closures resolved by an unscoped visit; see the module note on attribution. */
+  /**
+   * Unscoped closure EVENTS relied upon — comparable against the closure list, so a caller
+   * can read "how much of this rests on the unscoped assumption" as a fraction.
+   */
   ambiguousClosures: number;
+  /**
+   * GAPS closed by those events. Always >= ambiguousClosures, because one visit closes every
+   * open gap for that patient. Both are reported because they answer different questions and
+   * a single number called "ambiguous" was being read as each of them.
+   */
+  ambiguousGapClosures: number;
 }
 
 export interface AnalyticsOptions {
@@ -70,11 +79,22 @@ export interface AnalyticsOptions {
  * register a visit belongs to would invent precision the data does not have.
  */
 export function closuresFromAppointments(
-  appointments: readonly { patientId: PatientId | null; status: string; startsAt: string }[],
+  appointments: readonly {
+    practiceId: PracticeId;
+    patientId: PatientId | null;
+    status: string;
+    startsAt: string;
+  }[],
   window: { fromIso: string; toIso: string },
+  /** Required to scope, exactly as countAttribution scopes. Omit only for single-tenant data. */
+  practiceId?: PracticeId,
 ): GapClosureEvent[] {
   const events: GapClosureEvent[] = [];
   for (const a of appointments) {
+    // Tenancy: countAttribution discards other practices' appointments; this mirrors it.
+    // Without the filter an attended visit elsewhere, for a colliding patient id, inflated
+    // this arm's closure count.
+    if (practiceId !== undefined && a.practiceId !== practiceId) continue;
     if (a.status !== "attended" || a.patientId === null) continue;
     const date = a.startsAt.slice(0, 10);
     if (date < window.fromIso || date > window.toIso) continue;
@@ -107,7 +127,12 @@ export function gapClosureByCondition(
     holdout: { gaps: number; closed: number };
   }
   const byCondition = new Map<ConditionCode, Tally>();
-  let ambiguousClosures = 0;
+  // Counted as a set of CLOSURE EVENTS, not incremented per closed gap. One patient on three
+  // registers with a single unscoped visit is ONE ambiguous closure resolving three gaps; the
+  // old counter said 3, so a caller comparing it against closures.length to judge how much of
+  // the result rested on the unscoped assumption got a ratio above 1.
+  const ambiguousPatients = new Set<string>();
+  let ambiguousGapClosures = 0;
 
   for (const gap of gapsAtStart) {
     const tally =
@@ -120,7 +145,10 @@ export function gapClosureByCondition(
     const closedUnscoped = !closedScoped && unscoped.has(gap.patientId);
     if (closedScoped || closedUnscoped) {
       arm.closed += 1;
-      if (closedUnscoped) ambiguousClosures += 1;
+      if (closedUnscoped) {
+        ambiguousPatients.add(gap.patientId as string);
+        ambiguousGapClosures += 1;
+      }
     }
 
     byCondition.set(gap.conditionCode, tally);
@@ -158,5 +186,22 @@ export function gapClosureByCondition(
     });
   }
 
-  return { conditions, ambiguousClosures };
+  return { conditions, ambiguousClosures: ambiguousPatients.size, ambiguousGapClosures };
+}
+
+/**
+ * Why a closure figure was withheld, in this module's own units.
+ *
+ * attribution.ts's explainWithheld() counts PATIENTS against MIN_ARM_PATIENTS; this module
+ * withholds on GAPS against MIN_ARM_GAPS. Reusing the other explainer told a practice with
+ * 25 gaps per arm that it needed 30 patients — the wrong unit and the wrong number, on a
+ * surface whose whole job is being trusted.
+ */
+export function explainClosureWithheld(reason: WithheldReason, minArmGaps = MIN_ARM_GAPS): string {
+  switch (reason) {
+    case "no_holdout_arm":
+      return "No comparison group on this register yet, so there is nothing to measure against.";
+    case "cohort_too_small":
+      return `This register is too small to measure reliably — it needs at least ${minArmGaps} open care gaps in each group.`;
+  }
 }

@@ -15,6 +15,7 @@ import {
   TextRun,
   WidthType,
 } from "docx";
+import { renderRegisterSection, type RegisterSectionInput } from "./registers-section";
 import { evaluateGuardrails, metricsFromSim, DEFAULT_GUARDRAILS, type Complaint, type GuardrailAlert, type GuardrailConfig } from "@/guardrails/monitors";
 import { buildDashboardData } from "@/sim/dashboard-data";
 import type { SimResult } from "@/sim/harness";
@@ -107,7 +108,14 @@ export function buildWeeklyReport(result: SimResult, options: ReportOptions): We
 const fmt = (n: number | null, digits = 1) => (n === null ? "n/a" : n.toFixed(digits));
 const aud = (n: number | null) => (n === null ? "n/a" : `$${n.toLocaleString("en-AU")} AUD`);
 
-export function renderWeeklyReportMarkdown(r: WeeklyReport): string {
+/**
+ * W76: the register section is optional and appended, never interleaved — a practice with
+ * no registers gets byte-identical output to the v1 report, so the W20 golden stays valid.
+ */
+export function renderWeeklyReportMarkdown(
+  r: WeeklyReport,
+  registers?: RegisterSectionInput,
+): string {
   const alerts =
     r.alerts.length === 0
       ? "All guardrails clear: opt-out rate, generated-booking DNA, and complaints are all inside thresholds."
@@ -145,7 +153,7 @@ impact, because part of it is displaced organic attendance.
 ${alerts}
 
 Loop this period: ${r.loop.invitationsSent.toLocaleString("en-AU")} invitations sent, ${r.loop.booked} booked, ${r.loop.optedOut} opt-outs, ${r.loop.dnaGenerated} DNA on generated bookings.
-`;
+${registers ? `\n${renderRegisterSection(registers)}` : ""}`;
 }
 
 /** The same content as a .docx for the practice inbox. */

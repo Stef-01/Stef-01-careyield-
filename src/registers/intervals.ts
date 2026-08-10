@@ -134,8 +134,12 @@ export function lookupInterval(
 ): GuidelineInterval | null {
   const matches = catalogue.intervals.filter((i) => i.conditionCode === conditionCode);
   if (matches.length === 0) return null;
-  if (name === undefined) return matches[0] ?? null;
-  return matches.find((i) => i.name === name) ?? null;
+  if (name !== undefined) return matches.find((i) => i.name === name) ?? null;
+  // Ambiguity is refused, not resolved by row order. Returning matches[0] meant which cited
+  // source governed a patient's cadence depended on the order rows happened to load, so a
+  // data-only reordering would silently flip gap counts — the opposite of "traceable to a
+  // cited source". A condition with several cadences must be looked up BY NAME.
+  return matches.length === 1 ? (matches[0] ?? null) : null;
 }
 
 /** Every source cited by the catalogue — the audit view W90's gate dossier will want. */

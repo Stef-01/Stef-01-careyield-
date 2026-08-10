@@ -5,9 +5,11 @@
 // that quietly means something else.
 
 import { describe, expect, it } from "vitest";
-import type { ConditionCode, PatientId } from "@/domain/types";
+import type { ConditionCode, PatientId, PracticeId } from "@/domain/types";
+
 import type { CareGap } from "./caregap";
 import {
+  explainClosureWithheld,
   MIN_ARM_GAPS,
   type GapClosureEvent,
   type RegisterAnalytics,
@@ -15,12 +17,15 @@ import {
   gapClosureByCondition,
 } from "./analytics";
 
+const PRACTICE = "prac-1" as PracticeId;
+
 const DIABETES = "cond_diabetes" as ConditionCode;
 const CKD = "cond_ckd" as ConditionCode;
 
 function gap(patientId: string, conditionCode: ConditionCode): CareGap {
   return {
     notAClinicalRecommendation: true,
+    practiceId: PRACTICE,
     patientId: patientId as PatientId,
     conditionCode,
     intervalId: "i1" as CareGap["intervalId"],
@@ -84,6 +89,7 @@ describe("W64 gap closure — golden fixture", () => {
       },
     ],
     ambiguousClosures: 0,
+    ambiguousGapClosures: 0,
   };
 
   it("matches the golden output exactly", () => {
@@ -163,8 +169,10 @@ describe("W64 closure attribution", () => {
       new Set(),
     );
 
-    // One visit, two registers: it closes both, and both are flagged ambiguous.
-    expect(result.ambiguousClosures).toBe(2);
+    // One visit, two registers: it closes both gaps, and both are flagged as gap-closures —
+    // while the number of ambiguous EVENTS relied upon is still one (W65). ambiguous.
+    expect(result.ambiguousGapClosures).toBe(2);
+    expect(result.ambiguousClosures).toBe(1);
     for (const c of result.conditions) expect(c.invite.closed).toBe(1);
   });
 
@@ -186,10 +194,10 @@ describe("W64 closure attribution", () => {
   it("derives unscoped closures from attended appointments inside the window", () => {
     const events = closuresFromAppointments(
       [
-        { patientId: "p1" as PatientId, status: "attended", startsAt: "2026-03-01T09:00:00Z" },
-        { patientId: "p2" as PatientId, status: "dna", startsAt: "2026-03-01T09:00:00Z" },
-        { patientId: "p3" as PatientId, status: "attended", startsAt: "2026-12-01T09:00:00Z" },
-        { patientId: null, status: "attended", startsAt: "2026-03-01T09:00:00Z" },
+        { practiceId: PRACTICE, patientId: "p1" as PatientId, status: "attended", startsAt: "2026-03-01T09:00:00Z" },
+        { practiceId: PRACTICE, patientId: "p2" as PatientId, status: "dna", startsAt: "2026-03-01T09:00:00Z" },
+        { practiceId: PRACTICE, patientId: "p3" as PatientId, status: "attended", startsAt: "2026-12-01T09:00:00Z" },
+        { practiceId: PRACTICE, patientId: null, status: "attended", startsAt: "2026-03-01T09:00:00Z" },
       ],
       { fromIso: "2026-01-01", toIso: "2026-06-30" },
     );
@@ -199,8 +207,57 @@ describe("W64 closure attribution", () => {
     ]);
   });
 
+  it("discards another practice's attended visits (W65 tenancy fix)", () => {
+    // Without the filter, a colliding patient id at another practice inflated this
+    // register's closure count — the same leak countAttribution already guards against.
+    const events = closuresFromAppointments(
+      [
+        { practiceId: PRACTICE, patientId: "p1" as PatientId, status: "attended", startsAt: "2026-03-01T09:00:00Z" },
+        { practiceId: "other-practice" as PracticeId, patientId: "p1" as PatientId, status: "attended", startsAt: "2026-03-02T09:00:00Z" },
+      ],
+      { fromIso: "2026-01-01", toIso: "2026-06-30" },
+      PRACTICE,
+    );
+    expect(events).toHaveLength(1);
+    expect(events[0]?.at).toBe("2026-03-01");
+  });
+
   it("a gap with no closing visit is simply not closed", () => {
     const result = gapClosureByCondition([gap("p1", DIABETES)], [], new Set());
     expect(result.conditions[0]!.invite).toEqual({ gapsAtStart: 1, closed: 0, closureRate: 0 });
+  });
+});
+
+describe("W65 the withheld explainer speaks this module's units", () => {
+  it("counts gaps, not patients", () => {
+    const text = explainClosureWithheld("cohort_too_small");
+    expect(text).toContain(`${MIN_ARM_GAPS} open care gaps`);
+    expect(text).not.toContain("patients in each group");
+  });
+
+  it("still explains a missing holdout", () => {
+    expect(explainClosureWithheld("no_holdout_arm")).toMatch(/nothing to measure against/);
+  });
+});
+
+describe("W65 ambiguousClosures counts events, not gaps", () => {
+  it("one unscoped visit closing three registers is one ambiguous closure", () => {
+    const gaps = ["a", "b", "c"].map((code) => ({
+      notAClinicalRecommendation: true as const,
+      practiceId: PRACTICE,
+      patientId: "p1" as PatientId,
+      conditionCode: code as ConditionCode,
+      intervalId: `iv-${code}` as CareGap["intervalId"],
+      intervalMonths: 12,
+      lastRelevantVisit: "2020-01-01",
+      monthsSinceLastVisit: 60,
+      basis: "interval_elapsed" as const,
+    }));
+    const closures: GapClosureEvent[] = [{ patientId: "p1" as PatientId, conditionCode: null, at: "2026-03-01" }];
+    const out = gapClosureByCondition(gaps, closures, new Set());
+    // Three gaps closed, but only ONE unscoped event was relied upon.
+    expect(out.ambiguousClosures).toBe(1);
+    expect(out.ambiguousGapClosures).toBe(3);
+    expect(out.ambiguousClosures).toBeLessThanOrEqual(closures.length);
   });
 });

@@ -2,9 +2,10 @@
 // Copy discipline mirrors the W6 linter posture: availability language only —
 // no urgency, no clinical framing, no benefit claims.
 
-import { getStore, sessionAppointmentType } from "@/booking/store";
+import { contactPreferencesFor, getStore, sessionAppointmentType } from "@/booking/store";
 import { verifyBookingToken } from "@/booking/token";
-import { confirmBooking } from "../actions";
+import type { ContactPreferences } from "@/messaging/preferences";
+import { confirmBooking, saveContactPreference } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +24,116 @@ function Panel({ heading, children }: { heading: string; children: React.ReactNo
   );
 }
 
-export default async function BookingPage({ params }: { params: Promise<{ token: string }> }) {
+// W74: the patient sets when and how the practice may contact them. Deliberately offered
+// AFTER booking rather than as a gate before it — making someone answer a preferences form
+// to take an appointment would be a worse experience than the one it protects.
+function ContactPreferenceForm({
+  token,
+  prefs,
+  saved,
+  invalid,
+}: {
+  token: string;
+  prefs: ContactPreferences;
+  saved: boolean;
+  invalid: boolean;
+}) {
+  const hours = Array.from({ length: 25 }, (_, h) => h);
+
+  return (
+    <form
+      action={saveContactPreference}
+      data-testid="contact-preferences"
+      className="mt-2 flex flex-col gap-3 border-t border-stone-200 pt-5"
+    >
+      <input type="hidden" name="token" value={token} />
+      <h2 className="text-base font-medium text-stone-800">When can we contact you?</h2>
+      <p className="text-sm text-stone-500">
+        This only affects messages about appointment times. The practice can always reach you
+        about your care.
+      </p>
+
+      <label className="flex items-center gap-2 text-sm text-stone-700">
+        <input
+          type="checkbox"
+          name="contactable"
+          value="1"
+          defaultChecked={prefs.channel !== null}
+          data-testid="pref-contactable"
+        />
+        Send me a text when an appointment comes up
+      </label>
+
+      <div className="flex items-center gap-2 text-sm text-stone-700">
+        <label className="flex items-center gap-2">
+          Between
+          <select
+            name="earliestHour"
+            defaultValue={String(prefs.earliestHour)}
+            data-testid="pref-earliest"
+            className="rounded border border-stone-300 px-2 py-1"
+          >
+            {hours.slice(0, 24).map((h) => (
+              <option key={h} value={h}>{`${String(h).padStart(2, "0")}:00`}</option>
+            ))}
+          </select>
+        </label>
+        <label className="flex items-center gap-2">
+          and
+          <select
+            name="latestHour"
+            defaultValue={String(prefs.latestHour)}
+            data-testid="pref-latest"
+            className="rounded border border-stone-300 px-2 py-1"
+          >
+            {hours.slice(1).map((h) => (
+              <option key={h} value={h}>{`${String(h).padStart(2, "0")}:00`}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <label className="flex items-center gap-2 text-sm text-stone-700">
+        <input
+          type="checkbox"
+          name="weekdaysOnly"
+          value="1"
+          defaultChecked={!prefs.days.includes(0)}
+          data-testid="pref-weekdays"
+        />
+        Weekdays only
+      </label>
+
+      {saved && (
+        <p role="status" data-testid="pref-saved" className="text-sm text-stone-700">
+          Saved. We&rsquo;ll only text you in those hours.
+        </p>
+      )}
+      {invalid && (
+        <p role="alert" data-testid="pref-invalid" className="text-sm text-stone-700">
+          Please choose an end time later than the start time.
+        </p>
+      )}
+
+      <button
+        type="submit"
+        className="self-start rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium text-stone-800 hover:bg-stone-50"
+      >
+        Save contact times
+      </button>
+    </form>
+  );
+}
+
+export default async function BookingPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ token: string }>;
+  searchParams: Promise<{ prefs?: string }>;
+}) {
   const { token } = await params;
+  const { prefs } = await searchParams;
   const invitationId = verifyBookingToken(token);
   const store = getStore();
   const invitation = invitationId
@@ -59,6 +168,12 @@ export default async function BookingPage({ params }: { params: Promise<{ token:
             ? "The practice will call you at this time. If you can no longer attend, please contact the practice."
             : "If you can no longer attend, please contact the practice."}
         </p>
+        <ContactPreferenceForm
+          token={token}
+          prefs={contactPreferencesFor(invitation.patientId)}
+          saved={prefs === "saved"}
+          invalid={prefs === "invalid"}
+        />
       </Panel>
     );
   }

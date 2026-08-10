@@ -38,6 +38,9 @@ describe("W63 the 26-week comparison", () => {
       const result = runSim({ ...SHORT, registers });
       expect(verifyLog(result.log)).toBe(true);
     }
+    // Not a tautology: assert the check actually ran and found nothing, so a real
+    // violation would surface here rather than being asserted away.
+    expect(comparison.violations).toEqual({ off: [], on: [] });
     expect(comparison.invariantsHeld).toBe(true);
   });
 

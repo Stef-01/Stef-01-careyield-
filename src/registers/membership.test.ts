@@ -195,6 +195,18 @@ describe("W57 reconciliation keeps history", () => {
     expect(currentMembers(rejoined, DIABETES)).toHaveLength(1);
   });
 
+  it("repeated close/rejoin cycles never produce two live rows", () => {
+    // Regression: reopening once per CLOSED row gave a patient N live memberships after N
+    // cycles, which double-counted the register and emitted duplicate care gaps.
+    let rows = derived();
+    for (let cycle = 0; cycle < 3; cycle++) {
+      rows = reconcileMemberships(rows, [], T1); // basis disappears
+      rows = reconcileMemberships(rows, derived(), T1); // and comes back
+      expect(rows.filter((m) => m.removedAt === null)).toHaveLength(1);
+      expect(currentMembers(rows, DIABETES)).toHaveLength(1);
+    }
+  });
+
   it("closed history is left alone on later runs", () => {
     const closed = reconcileMemberships(derived(), [], T1);
     expect(reconcileMemberships(closed, [], "2026-10-10T06:00:00Z")).toEqual(closed);

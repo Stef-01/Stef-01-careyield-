@@ -76,7 +76,9 @@ describe("W58 fixtures: 12-month register", () => {
 
 describe("W58 fixtures: 3-month register", () => {
   it("the shorter cadence catches a visit the annual register would not", () => {
-    const input = [{ membership: member("pat-1", REG_B), lastRelevantVisit: "2026-02-10" }];
+    const input = [
+      { membership: member("pat-1", REG_B), lastRelevantVisit: "2026-02-10", intervalName: "Quarterly cadence" },
+    ];
     expect(detectCareGaps(CATALOGUE, input, TODAY)).toHaveLength(1);
     // The same date against the 12-month register is well inside cadence.
     expect(detectCareGaps(CATALOGUE, [{ membership: member("pat-1", REG_A), lastRelevantVisit: "2026-02-10" }], TODAY)).toEqual([]);
@@ -91,6 +93,12 @@ describe("W58 fixtures: 3-month register", () => {
 });
 
 describe("W58 refuses to manufacture a gap", () => {
+  it("refuses an ambiguous lookup rather than picking by row order (W65)", () => {
+    // REG_B has two signed-off cadences. Without a name there is no non-arbitrary answer,
+    // and picking matches[0] would mean a data-only reordering silently flipped gap counts.
+    expect(detectCareGaps(CATALOGUE, [{ membership: member("pat-1", REG_B), lastRelevantVisit: "2020-01-01" }], TODAY)).toEqual([]);
+  });
+
   it("a condition with no signed-off interval yields nothing", () => {
     const gaps = detectCareGaps(CATALOGUE, [{ membership: member("pat-1", "unlisted_condition" as ConditionCode), lastRelevantVisit: "2000-01-01" }], TODAY);
     expect(gaps).toEqual([]);
@@ -136,7 +144,7 @@ describe("W58 ordering is recency arithmetic, never clinical priority", () => {
       [
         { membership: member("pat-1", REG_A), lastRelevantVisit: null },
         { membership: member("pat-2", REG_A), lastRelevantVisit: "2020-01-01" },
-        { membership: member("pat-3", REG_B), lastRelevantVisit: "2020-01-01" },
+        { membership: member("pat-3", REG_B), lastRelevantVisit: "2020-01-01", intervalName: "Quarterly cadence" },
       ],
       TODAY,
     );

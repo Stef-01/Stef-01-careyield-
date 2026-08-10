@@ -112,10 +112,13 @@ export function attributionByCondition(
   const conditions: ConditionAttribution[] = [];
 
   // Sorted so a report's row order is stable across runs rather than map-insertion order.
+  // Copied once, not once per condition: the spread exists only to satisfy countAttribution's
+  // mutable Appointment[] parameter, which it never mutates.
+  const apptsOnce = [...appointments];
   for (const conditionCode of [...cohorts.keys()].sort()) {
     const ids = cohorts.get(conditionCode)!;
     const cohortPatients = patients.filter((p) => ids.has(p.id));
-    const cohort = countAttribution(practice, cohortPatients, [...appointments], window);
+    const cohort = countAttribution(practice, cohortPatients, apptsOnce, window);
 
     let withheld: WithheldReason | null = null;
     if (cohort.incrementalPer1000 === null || cohort.incrementalAttended === null) {

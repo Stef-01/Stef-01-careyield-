@@ -19,6 +19,7 @@ const CKD = "cond_b" as ConditionCode;
 function gap(patientId: string, conditionCode: ConditionCode = DIABETES): CareGap {
   return {
     notAClinicalRecommendation: true,
+    practiceId: PRACTICE,
     patientId: patientId as PatientId,
     conditionCode,
     intervalId: "i1" as CareGap["intervalId"],

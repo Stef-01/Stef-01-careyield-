@@ -117,22 +117,32 @@ export function reconcileMemberships(
   const out: RegisterMembership[] = [];
   const carried = new Set<string>();
 
+  // Two passes. The first decides, per key, whether an OPEN row already exists — because a
+  // patient who has closed and rejoined more than once has several closed rows, and reopening
+  // once per closed row is how you end up with N live memberships for one patient. (That is
+  // not hypothetical: a close/rejoin/close/rejoin cycle produced two open rows.)
+  const hasOpen = new Set(
+    existing.filter((r) => r.removedAt === null).map((r) => key(r.patientId as string, r.conditionCode as string)),
+  );
+
   for (const row of existing) {
     const k = key(row.patientId as string, row.conditionCode as string);
     const stillDerived = derivedByKey.get(k);
     if (stillDerived && row.removedAt === null) {
       carried.add(k);
       out.push(row); // unchanged, original addedAt preserved
-    } else if (stillDerived && row.removedAt !== null) {
-      // Rejoined: the closed row stays as history, a fresh row opens alongside it.
-      out.push(row);
-      out.push({ ...stillDerived, addedAt: atIso });
-      carried.add(k);
     } else if (row.removedAt === null) {
       out.push({ ...row, removedAt: atIso }); // basis gone — close, never delete
     } else {
-      out.push(row); // already closed history
+      out.push(row); // already closed history, left alone
     }
+  }
+
+  // Reopen at most ONE row per key, and only when nothing is already open for it.
+  for (const [k, row] of derivedByKey) {
+    if (carried.has(k) || !hasOpen.has(k)) continue;
+    out.push({ ...row, addedAt: atIso });
+    carried.add(k);
   }
 
   for (const [k, row] of derivedByKey) if (!carried.has(k)) out.push(row);
