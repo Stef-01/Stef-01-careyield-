@@ -30,7 +30,17 @@
 // container ignorant of the content is what lets the content stay gated while the machinery
 // ships.
 //
-// Withdrawal of a published version is W128 and deliberately absent here.
+// W128 added withdrawal. A version is taken out of force by an event like any other, and the
+// shape it forced is worth naming: publication is an EPISODE, not a fact. W67's withdrawal is
+// terminal for that approval RECORD and re-approving "opens a new record, the withdrawal stays
+// as history" — so here, withdrawal ends the current publication episode and publishing again
+// starts a new one. The version's content is still immutable and still hash-identified; what
+// has a lifecycle is its time in force, and a version can have several.
+//
+// That also removes an arbitrary special case: a version is republishable whenever it is not
+// currently in force, whether it left force by withdrawal or by supersession. Reverting to a
+// previous version is a real thing a practice needs, and forbidding it while permitting
+// re-publication after withdrawal would be a rule with no argument behind it.
 
 import { createHash } from "node:crypto";
 
@@ -55,7 +65,7 @@ export interface PathwayCriteria {
   escalation: readonly PathwayCriterion[];
 }
 
-export type PathwayEventKind = "version_drafted" | "version_published";
+export type PathwayEventKind = "version_drafted" | "version_published" | "version_withdrawn";
 
 export interface PathwayEvent {
   pathwayId: string;
@@ -66,10 +76,32 @@ export interface PathwayEvent {
   byEmail: string;
   /** Carried on `version_drafted` only — the content the hash is of. */
   criteria?: PathwayCriteria;
+  /**
+   * Required on `version_withdrawn`. Taking a clinical pathway out of force without saying
+   * why leaves the next person unable to tell a safety withdrawal from a tidy-up, and they
+   * have to know before deciding whether to publish it again.
+   */
+  reason?: string;
 }
 
-/** `published` is in force; `superseded` was in force and has been replaced. */
-export type PathwayVersionState = "draft" | "published" | "superseded";
+/**
+ * `published` is in force; `superseded` was in force and a newer version replaced it;
+ * `withdrawn` was in force and somebody took it out. The last two are distinguished because
+ * they mean different things to a reader: superseded is routine, withdrawn is a decision.
+ */
+export type PathwayVersionState = "draft" | "published" | "superseded" | "withdrawn";
+
+/** One stretch of time a version spent in force. A version can have more than one. */
+export interface PublicationEpisode {
+  publishedAt: string;
+  publishedBy: string;
+  /** Null while in force. */
+  endedAt: string | null;
+  endedBy: string | null;
+  endedReason: "superseded" | "withdrawn" | null;
+  /** Set only on withdrawal. */
+  withdrawnReason: string | null;
+}
 
 export interface PathwayVersion {
   pathwayId: string;
@@ -80,16 +112,25 @@ export interface PathwayVersion {
   state: PathwayVersionState;
   draftedAt: string;
   draftedBy: string;
+  /** The CURRENT (or most recent) episode's publication. Null if never published. */
   publishedAt: string | null;
   publishedBy: string | null;
-  /** When a later version took over. Null while in force or still a draft. */
+  /** When a later version took over. Null while in force, withdrawn, or still a draft. */
   supersededAt: string | null;
+  /** The most recent withdrawal, if any. Null if never withdrawn. */
+  withdrawnAt: string | null;
+  withdrawnBy: string | null;
+  withdrawnReason: string | null;
+  /** Every stretch of time this version spent in force, oldest first. */
+  publications: PublicationEpisode[];
 }
 
 export type PathwayRejection =
   | "unknown_version" // published without ever being drafted
   | "duplicate_draft" // this exact content is already a version
-  | "already_published" // a version is published once
+  | "already_published" // it is in force already
+  | "not_in_force" // withdrawing something that is not in force
+  | "missing_withdrawal_reason" // taking a pathway out of force without saying why
   | "hash_mismatch" // the event's hash is not the hash of its criteria
   | "missing_criteria"; // a draft with nothing in it
 
@@ -123,6 +164,22 @@ function canonicalCriterion(c: PathwayCriterion): [string, string, string] {
   // A tuple, not an object: key order in a literal is not something to depend on for a hash
   // that has to be stable across refactors.
   return [c.factCode, c.requires, c.rationale];
+}
+
+/** Close the version's open episode. Nothing else ever writes to a closed one. */
+function endEpisode(
+  version: PathwayVersion,
+  at: string,
+  by: string,
+  reason: "superseded" | "withdrawn",
+  withdrawnReason: string | null,
+): void {
+  const open = version.publications.find((p) => p.endedAt === null);
+  if (!open) return;
+  open.endedAt = at;
+  open.endedBy = by;
+  open.endedReason = reason;
+  open.withdrawnReason = withdrawnReason;
 }
 
 function isEmpty(criteria: PathwayCriteria): boolean {
@@ -187,6 +244,10 @@ export function replayPathway(
         publishedAt: null,
         publishedBy: null,
         supersededAt: null,
+        withdrawnAt: null,
+        withdrawnBy: null,
+        withdrawnReason: null,
+        publications: [],
       };
       versions.push(version);
       byHash.set(version.versionHash, version);
@@ -199,18 +260,54 @@ export function replayPathway(
       reject("unknown_version");
       continue;
     }
-    if (target.state !== "draft") {
+
+    if (event.kind === "version_withdrawn") {
+      // Only something in force can be taken out of force. Withdrawing a draft, a superseded
+      // version or an already-withdrawn one is refused rather than treated as a no-op: each
+      // is somebody believing a pathway is live when it is not, which is worth telling them.
+      if (target.state !== "published") {
+        reject("not_in_force");
+        continue;
+      }
+      if (!event.reason || event.reason.trim() === "") {
+        reject("missing_withdrawal_reason");
+        continue;
+      }
+      endEpisode(target, event.at, event.byEmail, "withdrawn", event.reason);
+      target.state = "withdrawn";
+      target.withdrawnAt = event.at;
+      target.withdrawnBy = event.byEmail;
+      target.withdrawnReason = event.reason;
+      target.supersededAt = null;
+      inForce = null;
+      applied.push(event);
+      continue;
+    }
+
+    // version_published. Refused only when it is ALREADY in force — a version that has left
+    // force, by withdrawal or by supersession, may be published again as a fresh episode.
+    if (target.state === "published") {
       reject("already_published");
       continue;
     }
 
     if (inForce) {
+      endEpisode(inForce, event.at, event.byEmail, "superseded", null);
       inForce.state = "superseded";
       inForce.supersededAt = event.at;
     }
     target.state = "published";
     target.publishedAt = event.at;
     target.publishedBy = event.byEmail;
+    target.supersededAt = null;
+    target.publications.push({
+      publishedAt: event.at,
+      publishedBy: event.byEmail,
+      endedAt: null,
+      endedBy: null,
+      endedReason: null,
+      withdrawnReason: null,
+    });
     inForce = target;
     applied.push(event);
   }
@@ -239,11 +336,11 @@ export function pathwayAt(
   // The rule is one line: a version is in force at an instant if it was published by then and
   // not yet superseded. It is also exactly the invariant the tests assert, so the two can no
   // longer drift.
-  const inForce = replayPathway(events, pathwayId).versions.filter(
-    (v) =>
-      v.publishedAt !== null &&
-      v.publishedAt <= atIso &&
-      (v.supersededAt === null || v.supersededAt > atIso),
+  // Asked of the publication EPISODES, which is the only representation that stays right once
+  // a version can be in force more than once. Reading the version's current publishedAt would
+  // answer with the latest episode and miss an earlier one entirely.
+  const inForce = replayPathway(events, pathwayId).versions.filter((v) =>
+    v.publications.some((p) => p.publishedAt <= atIso && (p.endedAt === null || p.endedAt > atIso)),
   );
   // Replay guarantees at most one; taking the last is a belt-and-braces tie-break rather than
   // a claim that more than one is possible.
@@ -266,6 +363,9 @@ export const SHIPPED_PATHWAYS: readonly PathwayEvent[] = [];
 
 export const PATHWAY_REJECTION_COPY: Record<PathwayRejection, string> = {
   unknown_version: "That version was never drafted, so there is nothing to publish.",
+  not_in_force: "That version is not currently in force, so there is nothing to withdraw.",
+  missing_withdrawal_reason:
+    "A pathway cannot be taken out of force without a reason — the next person needs to know whether it was a safety withdrawal or a tidy-up.",
   duplicate_draft: "This is the same content as an existing version, so it is that version.",
   already_published: "That version has already been published. Draft a new one instead.",
   hash_mismatch: "The version identifier does not match its content, so it was not applied.",

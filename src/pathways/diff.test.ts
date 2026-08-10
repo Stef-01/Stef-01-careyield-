@@ -33,6 +33,10 @@ function version(criteria: PathwayCriteria, over: Partial<PathwayVersion> = {}):
     publishedAt: "2026-03-02",
     publishedBy: "author@x.example",
     supersededAt: null,
+    withdrawnAt: null,
+    withdrawnBy: null,
+    withdrawnReason: null,
+    publications: [],
     ...over,
   };
 }

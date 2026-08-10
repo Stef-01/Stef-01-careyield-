@@ -71,7 +71,23 @@ export type PathwayRefusal =
   | "sign_off_precedes_review"
   | "review_revoked"
   | "sign_off_revoked"
+  | "attested_before_withdrawal"
   | "version_not_published";
+
+/** Any attestation of this kind at all, regardless of date — used only to explain a refusal. */
+function hasAny(
+  attestations: readonly PathwayAttestation[],
+  version: PathwayVersion,
+  kind: PathwayAttestationKind,
+): boolean {
+  return attestations.some(
+    (a) =>
+      a.pathwayId === version.pathwayId &&
+      a.versionHash === version.versionHash &&
+      a.kind === kind &&
+      !a.revokedAt,
+  );
+}
 
 export type UsabilityResult =
   | { usable: true; pathway: UsablePathway }
@@ -81,12 +97,18 @@ function live(
   attestations: readonly PathwayAttestation[],
   version: PathwayVersion,
   kind: PathwayAttestationKind,
+  /** W128: attestations before this instant do not count at all. */
+  since: string | null,
 ): { found: PathwayAttestation | null; revoked: boolean } {
   const matching = attestations.filter(
     (a) =>
       a.pathwayId === version.pathwayId &&
       a.versionHash === version.versionHash &&
-      a.kind === kind,
+      a.kind === kind &&
+      // Filtered BEFORE choosing, not checked after. Choosing the earliest and then testing
+      // it against the boundary would let a stale signature mask a genuinely fresh one,
+      // reporting a re-attested pathway as unusable.
+      (since === null || a.at >= since),
   );
   const unrevoked = matching.filter((a) => !a.revokedAt);
   if (unrevoked.length > 0) {
@@ -111,8 +133,15 @@ export function usablePathway(
   // content is acceptable; being in force is a separate fact, and W118 owns it.
   if (version.state !== "published") return { usable: false, reason: "version_not_published" };
 
-  const review = live(attestations, version, "specialist_review");
+  // W128: a withdrawal resets the clock on both stages. See the note below.
+  const since = version.withdrawnAt;
+  const review = live(attestations, version, "specialist_review", since);
   if (!review.found) {
+    if (since !== null && hasAny(attestations, version, "specialist_review")) {
+      // There ARE signatures, they just predate the withdrawal. Saying "not reviewed" to
+      // somebody looking at a review on screen would read as a bug.
+      return { usable: false, reason: "attested_before_withdrawal" };
+    }
     return { usable: false, reason: review.revoked ? "review_revoked" : "not_reviewed" };
   }
   if (review.found.byEmail === version.draftedBy) {
@@ -121,8 +150,11 @@ export function usablePathway(
     return { usable: false, reason: "reviewer_was_the_author" };
   }
 
-  const signOff = live(attestations, version, "founder_sign_off");
+  const signOff = live(attestations, version, "founder_sign_off", since);
   if (!signOff.found) {
+    if (since !== null && hasAny(attestations, version, "founder_sign_off")) {
+      return { usable: false, reason: "attested_before_withdrawal" };
+    }
     return { usable: false, reason: signOff.revoked ? "sign_off_revoked" : "not_signed_off" };
   }
   if (signOff.found.byEmail === review.found.byEmail) {
@@ -193,6 +225,8 @@ export const PATHWAY_REFUSAL_COPY: Record<PathwayRefusal, string> = {
     "The sign-off is dated before the review it depends on, so it cannot have been informed by it.",
   review_revoked: "The specialist review of this version was withdrawn. It needs reviewing again.",
   sign_off_revoked: "Sign-off for this version was withdrawn. It needs signing off again.",
+  attested_before_withdrawal:
+    "This version was withdrawn after it was signed off. Bringing it back into force needs a fresh review and sign-off, made in the knowledge of why it was withdrawn.",
   version_not_published:
     "This version is not the one in force. Sign-off says the content is acceptable; being in force is a separate thing.",
 };

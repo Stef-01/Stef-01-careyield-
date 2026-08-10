@@ -43,6 +43,10 @@ function signedPathway(): UsablePathway {
     publishedAt: "2026-01-02",
     publishedBy: "author@x.example",
     supersededAt: null,
+    withdrawnAt: null,
+    withdrawnBy: null,
+    withdrawnReason: null,
+    publications: [],
   };
   const attestations: PathwayAttestation[] = [
     {

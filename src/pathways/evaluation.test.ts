@@ -51,6 +51,10 @@ function signedPathway(c: PathwayCriteria = criteria()): UsablePathway {
     publishedAt: "2026-01-02",
     publishedBy: "author@x.example",
     supersededAt: null,
+    withdrawnAt: null,
+    withdrawnBy: null,
+    withdrawnReason: null,
+    publications: [],
   };
   const attestations: PathwayAttestation[] = [
     {
@@ -255,6 +259,10 @@ describe("W120 G7: no function takes symptoms and returns a pathway", () => {
       pathwayId: "path-1", versionHash: versionHash(c), ordinal: 1, criteria: c,
       state: "published", draftedAt: "2026-01-01", draftedBy: "a@x.example",
       publishedAt: "2026-01-02", publishedBy: "a@x.example", supersededAt: null,
+ withdrawnAt: null,
+ withdrawnBy: null,
+ withdrawnReason: null,
+ publications: [],
     };
     // @ts-expect-error — evaluatePathway takes UsablePathway; a bare version is not one.
     void (() => evaluatePathway({ version: unsigned }, []));
