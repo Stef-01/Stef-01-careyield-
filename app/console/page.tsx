@@ -63,6 +63,12 @@ export default async function ConsoleHome() {
           Usefulness audit
         </Link>
         <Link
+          href="/console/outreach"
+          className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
+        >
+          Outreach
+        </Link>
+        <Link
           href="/console/ops"
           className="inline-block text-sm font-medium text-stone-700 underline hover:text-stone-900"
         >
