@@ -46,6 +46,10 @@ test.beforeEach(async ({ page, request }) => {
   await page.getByLabel("Holdout share (%)").fill("10");
   await page.getByRole("button", { name: "Create practice" }).click();
   await page.waitForURL(/\/console$/);
+  // W113: seed and link, so the credentials page is scanned POPULATED. The unlinked refusal
+  // renders one paragraph and no form — scanning that instead would pass while leaving the
+  // list, the status chips and the withdraw forms untested.
+  await request.post("/api/mock/credentials?linkEmail=manager@demo.practice.example");
 });
 
 test("console surfaces pass WCAG A/AA", async ({ page }) => {
@@ -65,6 +69,7 @@ test("console surfaces pass WCAG A/AA", async ({ page }) => {
     "/console/interest",
     "/console/case-mix", // W81
     "/console/outreach", // W95 — landed after the W101 sweep was claimed
+    "/console/credentials", // W113
     "/console/setup/practice",
   ];
   for (const path of surfaces) {

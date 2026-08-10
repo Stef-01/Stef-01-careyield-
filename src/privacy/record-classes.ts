@@ -83,6 +83,12 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
     rationale: "W94 records barriers as data attached to a referral, which is itself derived — and barriers are never inferred, so there is no independent store.",
   },
   {
+    module: "src/credentials/ledger.ts",
+    what: "Per-practice credential verification logs",
+    handling: "no_patient_identity",
+    rationale: "W113 stores W110's append-only lifecycle events — who submitted, checked and verified a CLINICIAN's credential, and when. No patient field exists on any event, so there is nothing to scrub on a patient erasure. As with the vault, the clinician's own rights over this history are a separate obligation from the patient-identity question this registry answers.",
+  },
+  {
     module: "src/credentials/vault.ts",
     what: "Evidence documents behind a clinician's credential",
     handling: "no_patient_identity",
