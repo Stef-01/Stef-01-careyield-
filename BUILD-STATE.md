@@ -161,7 +161,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W68 | available | — | — | — | W66 |
 | W69 | blocked | — | — | — | FOUNDER GATE G5 (clinical content sign-off) — workspace may be built, content stays unusable until sign-off; W68 |
 | W70 | available | — | — | — | [P] W66 |
-| W71 | available | — | — | — | W58 |
+| W71 | claimed | builder-B | 2026-08-10T05:10Z | — | W58 |
 | W72 | available | — | — | — | [P] W64 |
 | W73 | available | — | — | — | W68 |
 | W74 | available | — | — | — | [P] W66 |
