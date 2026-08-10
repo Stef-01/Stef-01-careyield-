@@ -61,6 +61,7 @@ test("console surfaces pass WCAG A/AA", async ({ page }) => {
     "/console/privacy",
     "/console/complaints",
     "/console/registers", // W60
+    "/console/capability", // W83
     "/console/interest",
     "/console/case-mix", // W81
     "/console/setup/practice",
