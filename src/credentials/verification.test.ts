@@ -228,6 +228,27 @@ describe("W110 self-verification is unreachable, not discouraged", () => {
   });
 });
 
+describe("W116 a duplicate submission cannot erase a verification", () => {
+  it("replay ignores a second submitted rather than resetting the record", () => {
+    // Unreachable through appendVerification, which refuses it — but replayVerification is
+    // exported and total over ANY log, including one rehydrated from storage later, and the
+    // failure mode of a reset is silent loss of the provenance the log exists to keep.
+    const clean = build(submitted(), checked(), verified());
+    const tampered = [...clean, { ...submitted(), seq: clean.length }] as VerificationLog;
+    const record = replayVerification(tampered, "2026-06-01").credentials[0];
+    expect(record?.status).toBe("verified");
+    expect(record?.verifiedBy).toBe("owner@a.example");
+    expect(record?.verifiedOn).toBe("2026-01-14");
+  });
+
+  it("appendVerification still refuses to create such a log in the first place", () => {
+    expect(appendVerification(build(submitted()), submitted())).toEqual({
+      ok: false,
+      reason: "out_of_order",
+    });
+  });
+});
+
 describe("W110 the state machine", () => {
   it("the declared table IS the behaviour, for every state and every event", () => {
     // Drives each state through all five event kinds and compares what was accepted against

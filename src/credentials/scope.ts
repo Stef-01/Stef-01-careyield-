@@ -85,11 +85,10 @@ export interface ScopeInput {
 }
 
 /** Every rule a scope label is checked against — the union of both linters, not a third list. */
+// W116 finding: deduplicated. `no-urgency` exists in BOTH linters, so the union carried it
+// twice and any caller rendering this list showed a rule the label is checked against once.
 export const SCOPE_LABEL_RULES: readonly string[] = [
-  ...LANDING_RULES,
-  ...MESSAGE_BANNED_RULES,
-  "no-specialist-title",
-  "label-missing",
+  ...new Set([...LANDING_RULES, ...MESSAGE_BANNED_RULES, "no-specialist-title", "label-missing"]),
 ];
 
 /** True when the scope names one thing rather than describing general registration. */

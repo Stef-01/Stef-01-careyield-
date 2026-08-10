@@ -17,6 +17,7 @@ import {
   explainEvidenceRejection,
   listEvidence,
   listEvidenceForClinician,
+  evidenceByteLength,
   MAX_EVIDENCE_BYTES,
   openVault,
   readEvidence,
@@ -236,6 +237,34 @@ describe("W109 what the vault refuses", () => {
     for (const reason of reasons) {
       expect(explainEvidenceRejection(reason).length, reason).toBeGreaterThan(10);
     }
+  });
+});
+
+describe("W116 the size limit measures bytes, as its name promises", () => {
+  it("counts UTF-8 bytes, not UTF-16 code units", () => {
+    // The finding: `content.length` counts code units. For anything but ASCII that is not the
+    // byte count, so a constant called MAX_EVIDENCE_*BYTES* was admitting multiples of its
+    // stated limit and `byteLength` was recording a number that was not bytes.
+    expect(evidenceByteLength("x".repeat(10))).toBe(10);
+    expect(evidenceByteLength("é".repeat(10))).toBe(20);
+    expect(evidenceByteLength("🩺".repeat(10))).toBe(40);
+  });
+
+  it("refuses a document that is under the limit in characters but over it in bytes", () => {
+    // Half the character count of the limit, twice the bytes per character: previously
+    // accepted at ~2x the stated maximum.
+    const a = grantFor("owner@a.example", "prac-a");
+    const oversize = "é".repeat(MAX_EVIDENCE_BYTES / 2 + 1);
+    expect(oversize.length).toBeLessThan(MAX_EVIDENCE_BYTES);
+    expect(evidenceByteLength(oversize)).toBeGreaterThan(MAX_EVIDENCE_BYTES);
+    const result = storeEvidence(a, doc({ content: oversize }));
+    expect(!result.ok && result.errors).toContain("too_large");
+  });
+
+  it("records the stored size in bytes", () => {
+    const a = grantFor("owner@a.example", "prac-a");
+    const stored = storeEvidence(a, doc({ content: "%PDF-é" }));
+    expect(stored.ok && stored.summary.byteLength).toBe(7);
   });
 });
 

@@ -218,6 +218,12 @@ export function replayVerification(log: VerificationLog, asOf: string): Replayed
 
   for (const entry of log) {
     if (entry.kind === "submitted") {
+      // W116 finding: this used to overwrite unconditionally. `appendVerification` refuses a
+      // second `submitted`, so it is unreachable today — but `replayVerification` is exported
+      // and total over ANY log, including one rehydrated from storage later, and the failure
+      // mode of a reset is silent loss of a verification's provenance. Ignoring degrades
+      // safely; resetting destroys the record the log exists to keep.
+      if (byId.has(entry.credentialId)) continue;
       byId.set(entry.credentialId, {
         credentialId: entry.credentialId,
         subjectClinicianId: entry.subjectClinicianId,

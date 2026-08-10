@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import type { ClinicianId, ConditionCode } from "@/domain/types";
 import { clinicianForEmail } from "@/console/clinician-identity";
 import { getConsole } from "@/console/store";
+import { authorize } from "@/tenancy/tenancy";
 import { getInterestState } from "@/capability/store";
 import { clearInterest, saveInterest } from "@/capability/interest";
 import { getRegisters } from "@/registers/store";
@@ -16,6 +17,15 @@ export async function stateInterest(formData: FormData): Promise<void> {
   const email = await requireSession();
   const console_ = getConsole();
   if (!console_.practice) redirect("/console/onboarding");
+  // W116 finding: this was the only console action with no membership check. Being on the
+  // clinician ROSTER is not the same as being a member of the practice — the roster is a list
+  // of names a practice types during setup, and an email can sit on it without any membership
+  // row existing. Resolving the actor from the session already stopped anyone acting AS
+  // someone else, so nothing was exploitable; what was missing is the decision itself, and
+  // "authorized because the roster happens to contain your address" is not one anybody made.
+  if (!authorize(console_.memberships, email, console_.practice.id, "view_dashboard").allowed) {
+    redirect("/console/case-mix?error=denied");
+  }
 
   const identity = clinicianForEmail(console_.clinicians, email);
   if (!identity.linked) redirect("/console/case-mix?error=not_linked");

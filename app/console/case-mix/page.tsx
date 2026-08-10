@@ -20,6 +20,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Your case mix — CareYield" };
 
 const ERROR_COPY: Record<string, string> = {
+  denied: "You do not have access to that.",
   not_linked:
     "Your sign-in is not linked to a clinician on this practice's roster, so there is nobody to record a preference for.",
   not_own_interest: "You can only state your own case-mix preferences.",
