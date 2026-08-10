@@ -67,6 +67,15 @@ export const REFERRAL_SCOPING: readonly ScopingEntry[] = [
     }),
   ),
 
+  {
+    module: "src/referrals/analytics.ts", fn: "buildReferralAnalytics", answer: "takes_practice_id",
+    rationale: "W141: takes practiceId, counts only referrals whose fromPracticeId matches it, and passes it to detectLeakage. A referral sent TO this practice is the other one's process and is excluded by the same filter.",
+  },
+  {
+    module: "src/referrals/analytics.ts", fn: "renderReferralAnalytics", answer: "scoped_by_argument",
+    rationale: "Renders a report the caller already built for one practice, and the report itself carries no patient, referral or receiving-practice identifier to leak.",
+  },
+
   // --- pure modules: no state, so they can only leak what a caller hands them ---
   {
     module: "src/referrals/tracking.ts", fn: "trackReferral", answer: "takes_practice_id",
