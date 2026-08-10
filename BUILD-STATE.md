@@ -199,7 +199,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 > **Year 3 — Scope Yield foundations** (expanded by W104, 2026-08-10; definitions in docs/FIVE-YEAR-PLAN.md §5c). Q9 W105–W117 · Q10 W118–W130 (**G5 load-bearing throughout**) · Q11 W131–W143 · Q12 W144–W156 (**behind proposed gate G8 — third-party model processing, awaiting founder ratification; the loop must not decide this itself**).
 
 | W105 | claimed | builder-B | 2026-08-10T09:00Z | — | Close PRIV-1: access control for the community interest register — a Meherr-staff role, or move it out of the practice console. Verify: a practice user can neither read nor export it; e2e. **Deadline 2026-12-10 (APP 1.7)** |
-| W106 | available | — | — | — | Close PRIV-2: APP 12 export + APP 11 retention cover every Y2 record class (register membership, referrals, barriers, capability). Verify: an access request returns them all, retention prunes them, and the test ENUMERATES the record classes so a new class fails the suite until handled. **Deadline 2026-12-10** |
+| W106 | claimed | builder-A | 2026-08-10T15:40Z | — | Y3 Q9 |
 | W107 | available | — | — | — | [P] Dependency allowlist review ahead of the 2026-11-09 expiry. Verify: audit:gate green with no acceptance past its review date, none extended without a fresh rationale |
 | W108 | available | — | — | — | Credential record model — issuer, scope, evidence, verified-by, expiry, provenance required BY THE TYPE (W79 pattern). Verify: no credential representable without a verifier and a date |
 | W109 | available | — | — | — | Evidence vault: documents attached to a credential. Verify: isolation tests; no route serves an evidence document without authorization; nothing public (G6) |
