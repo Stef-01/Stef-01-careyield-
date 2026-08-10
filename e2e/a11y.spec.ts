@@ -73,12 +73,23 @@ test("console surfaces pass WCAG A/AA", async ({ page }) => {
   }
 });
 
-test("sign-in and onboarding pass WCAG A/AA", async ({ page }) => {
+test("sign-in and onboarding pass WCAG A/AA", async ({ page, request }) => {
   await page.getByRole("button", { name: "Sign out" }).click();
   await page.waitForURL(/\/console\/signin$/);
   await page.waitForLoadState("networkidle");
   await expect(page).toHaveTitle(/Sign in/);
   await expectNoViolations(page, "/console/signin");
+
+  // W101: this test has been named "and onboarding" since W49 while only ever scanning
+  // sign-in. Onboarding is the first authenticated form a practice ever meets, so it is
+  // scanned properly now — reaching it needs a signed-in session with NO practice yet.
+  await request.post("/api/mock/console");
+  await page.goto("/console");
+  await page.getByLabel("Work email").fill("manager@demo.practice.example");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.waitForURL(/\/console\/onboarding$/);
+  await page.waitForLoadState("networkidle");
+  await expectNoViolations(page, "/console/onboarding");
 });
 
 test("patient booking states pass WCAG A/AA", async ({ page, request }) => {
