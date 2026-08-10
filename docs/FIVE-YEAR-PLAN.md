@@ -54,6 +54,7 @@ Next.js (App Router) + TypeScript strict + Tailwind · Supabase (Postgres + RLS 
 - **G6** — network/directory public launch (Ahpra advertising review of all profile copy; Y4)
 - **G7** — any feature that could constitute TGA-regulated CDSS (default: keep matching keyed to clinician attributes, never symptom-based patient triage)
 - **G8** — **PROPOSED at W104, awaiting founder ratification.** Third-party model processing: no patient-derived content, identified or not, is sent to any third-party model API until the founder has signed off the vendor, the data-flow and the retention terms. Proposed because Y3 Q12 is the first time anything would leave this tree to a third party, and no existing gate covers it — G2 governs holding real patient data, G5 governs clinical content, G7 governs CDSS, and none of them says whether de-identified case context may be transmitted to a model vendor at all. W146 and W147 are written to be buildable behind it; **the loop must not decide this itself.**
+- **G9** — **PROPOSED at W156, awaiting founder ratification.** Third-party organisational reporting: no practice-identifiable data is disclosed to any third-party organisation until the founder has signed off the recipient, the aggregation level, and the practice's own consent to that specific disclosure. Proposed because Y4 Q16 is the first time anything about a PRACTICE leaves this tree to an external body — one that also commissions services from that practice — and no existing gate covers it: G2 governs holding real patient data, G6 governs public-facing copy, G8 governs model vendors. W202 and W203 are written to be buildable behind it; **the loop must not decide this itself.**
 
 ## 5. Year 1 weekly ledger (W1–W52)
 
@@ -311,6 +312,115 @@ data-flow and the retention terms.* W144, W146 and W147 are written to be builda
 - **W154** Q12 hardening → verify: zero criticals.
 - **W155** Y3 full-system audit (W51 method: whole tree, not a diff) → verify: audit report + green suite.
 - **W156** Y4 expansion: derive Q13–Q16 into §5d + BUILD-STATE → verify: 52 new units appended with verify gates; founder gates inherited intact.
+
+## 5d. Year 4 weekly ledger (W157–W208) — Network launch
+
+Expanded by W156 on 2026-08-11 per the §6 rule, from the Y4 themes in §6. Same contract: each
+unit is **build → verify**, `[P]` = parallel-safe. Founder gates are inherited, never expanded
+away.
+
+**What Year 3 leaves on the table, and where it lands here.** Five things are derived from what was
+actually built and from `docs/AUDIT-Y3.md`, because a just-in-time plan that ignores its own audit
+is not just-in-time.
+
+1. **G5 is no longer a scheduling problem, it is the product.** Year 3 shipped nine `SHIPPED_*`
+   registries, all empty and pinned by tests, plus every mechanism to fill them: W69's authoring
+   workspace, W119's two-person sign-off, W152's unrenderable-without-a-source branding. Q13's
+   theme is *content*. Unlike Q10 — which could ship an engine and call the emptiness a gate —
+   **there is no mechanism gap left to build in front of the ruling.** So Q13 splits explicitly:
+   the assembly machinery ships and is exercised against synthetic placeholder verticals, and
+   every unit that would author cardiometabolic or CKD content is `blocked` from the outset
+   (W161–W163). Q13 delivers an empty vertical without G5, and this plan says so rather than
+   discovering it in week eleven.
+2. **Nothing has ever been sent, and Q14 is about outcomes.** The send path has been unwired since
+   W28/W29/W36; Y3's plan promised nothing would assume it until G3, and nothing did. Outcome
+   auditing therefore audits the **recorded rail** — bookings, referrals, returns, escalations —
+   and the message-outcome half is `blocked` (W174). A dashboard that measures the effect of
+   interventions nobody sent would show zeros and call it monitoring.
+3. **The console still cannot represent two practices** (Y2 finding B2, restated as Y3 audit item
+   6 and open for two years). It was an annoyance while every surface was single-tenant. Q15's
+   directory and Q16's PHN reporting are both inherently cross-practice, so it moves onto the
+   critical path and gets an early unit (W166) rather than another audit note.
+4. **The order-dependence class is now eight instances** (W123, W129, W137, W142, two caught
+   pre-emptively in Q11, and Y3-1/Y3-2). Y3's audit turned it into a stated rule. A rule that
+   depends on the next reviewer remembering it is the control this tree has watched fail before,
+   so W167 makes it mechanical, in the W102/W140/W150/W153 shape.
+5. **One dated failure falls inside Q13** and is a unit, not a surprise: both audit-allowlist
+   acceptances carry `reviewBy: 2026-11-09` and `audit:gate` starts failing that morning (W165).
+
+**G8 is still unratified at the close of Year 3.** W146/W147 remain `blocked`, and W153's scanner
+fails the day any adapter lands without the ruling. Nothing in Year 4 assumes model processing.
+
+**Proposed new gate, for founder ratification — G9: third-party organisational reporting.** Q16
+sends practice-level data to PHNs and health systems, which is the first time anything about a
+*practice* leaves Meherr to an external organisation. Existing gates do not cover it: G2 governs
+holding real patient data, G6 governs public-facing directory copy, G8 governs model vendors, and
+none says whether a practice's own performance data may be transmitted to a funder or health
+system at all — a body that also commissions services from that practice. Proposed wording: *no
+practice-identifiable data is disclosed to any third-party organisation until the founder has
+signed off the recipient, the aggregation level, and the practice's own consent to that specific
+disclosure.* W202 and W203 are written to be buildable behind it; **the loop must not decide this
+itself.**
+
+### Q13 — Cardiometabolic + early-CKD vertical assembly (W157–W169) — **G5 load-bearing; the content units are blocked from day one**
+- **W157** Vertical model: a named bundle of pathways, registers, intervals and education items, versioned as one → verify: a vertical is unusable unless every member is usable — W119/W152's branding COMPOSED, not re-implemented — and a vertical with one unsigned member is refused with the member named.
+- **W158** [P] Vertical completeness report: what a vertical would need before it could ship → verify: golden report over a synthetic vertical; states its own coverage; asserts zero real clinical content present.
+- **W159** Cross-member consistency: two pathways in one vertical whose criteria disagree → verify: the contradiction is DETECTED and REPORTED, never silently resolved — and the resolver reads the detection (Y3-1's corollary).
+- **W160** [P] Vertical versioning and migration: a practice bound to v1 when v2 publishes → verify: the bound practice stays on the version it accepted; no silent upgrade; W128's withdrawal semantics inherited rather than restated.
+- **W161** Cardiometabolic pathway content → verify: two-person sign-off recorded per W119. **Blocked on G5.**
+- **W162** Early-CKD pathway content → verify: as W161. **Blocked on G5.**
+- **W163** [P] Cardiometabolic/CKD interval values — W56's question at vertical scale → verify: every interval carries a citation and a review date. **Blocked on G5.**
+- **W164** [P] Vertical console: which verticals exist and what each still needs → verify: e2e + axe zero violations; the zero state SAYS why it is empty rather than rendering a blank grid (W127's rule).
+- **W165** [P] Dependency allowlist review before the 2026-11-09 expiry → verify: `audit:gate` green with no acceptance past its review date, and no extension without a fresh rationale recorded against the advisory.
+- **W166** Two-practice console: `ConsoleState` holds a set and the hardcoded `prac-console` literal goes → verify: the console renders two practices, and the scoping assertions impossible since Y2 finding B2 now run end-to-end.
+- **W167** [P] Order-dependence made mechanical: a shared "two records tying on the sort key, both orders, same answer" property helper, plus a declared register of every module that folds a collection to one answer → verify: the register is checked against the tree, and a new fold site fails the suite until it carries a tie-break test or a written rationale.
+- **W168** Q13 hardening (code-review + security-review) → verify: zero criticals.
+- **W169** Q13 gate dossier: what G5 now costs, priced → verify: dossier names exactly which units unblock, in what order, and what the product gains on the day the ruling lands.
+
+### Q14 — Outcome auditing + escalation monitoring (W170–W182)
+- **W170** Outcome model: what "this went somewhere" means, as a chain of recorded facts → verify: every outcome traces to recorded events; nothing is concluded from silence (W120's three-valued rule inherited).
+- **W171** [P] Escalation monitoring over time: W121's unrouted escalations, aged → verify: an unrouted escalation stays visible and ages; the absence of an escalation is never reported as "none needed".
+- **W172** Specialist-agreement sampling: did the reviewer agree with the pathway's verdict? → verify: the sample is seeded and reproducible so it cannot be chosen to flatter, and disagreement renders with equal prominence to agreement.
+- **W173** [P] Outcome dashboard → verify: e2e + axe zero violations; states its own denominator; ranks no clinician (W83's floor).
+- **W174** Message-outcome auditing: did an invitation lead anywhere? → verify: outcomes trace to delivery receipts. **Blocked on G3 — nothing has ever been sent.**
+- **W175** Holdout integrity at vertical scale → verify: holdout membership is stable across a vertical version change; a migration cannot move a practice between arms.
+- **W176** [P] Time-to-escalation reported, never targeted → verify: no threshold, target or SLA exists anywhere in the module (export-list + copy assertions); the copy states why a target would change clinical behaviour.
+- **W177** Practice audit-trail export → verify: golden export that carries its own caveats where it travels away from the product that explains it (W149's pattern).
+- **W178** [P] Regression corpus: the eight order-dependence findings as a permanent fixture set → verify: each historical defect has a test that fails against its own pre-fix behaviour, proven by reverting each fix once.
+- **W179** Zero-because-nothing-happened is not zero-because-nothing-arrived → verify: a dead feed and a quiet week render as DIFFERENT states, because they lead an operator to opposite actions (W127's lesson, applied to live data).
+- **W180** [P] Q14 privacy pass: outcome records against W106's registry → verify: every new record class declared with its handling, and erasure composed rather than remembered.
+- **W181** Q14 hardening → verify: zero criticals.
+- **W182** Q14 gate dossier: what G3 now costs, priced → verify: names what opens on the day, and what stays shut.
+
+### Q15 — Dermatology reference vertical + network directory (W183–W195) — **G6 load-bearing**
+- **W183** Directory profile model: what a public profile may contain → verify: the type admits no rating, no testimonial and no free-text endorsement; a niche scope beside the word "specialist" is unrepresentable rather than linted out.
+- **W184** [P] Directory copy linter over every field a profile can emit → verify: W6/W114's rules APPLIED not re-implemented, and the emitting fields are checked against the tree so a new one fails until it is declared.
+- **W185** Public directory launch → verify: Ahpra advertising review passed; every profile field traced to a reviewed claim. **Blocked on G6.**
+- **W186** Dermatology pathway content → verify: two-person sign-off per W119. **Blocked on G5.**
+- **W187** [P] Stating an extended scope without implying a specialty → verify: s 133 compliance asserted on rendered copy; the compile-time guarantee from W183 exercised by a `@ts-expect-error` case.
+- **W188** Network membership: who is in the network and on what basis → verify: membership is a recorded practice decision, never inferred from activity (W57's rule); no clinician is ranked.
+- **W189** [P] Directory search that does not select a clinician for a patient → verify: results are ordered by declared, checkable attributes only; no symptom input exists (G7); the ordering basis is stated and describes the order actually used (W151's rule).
+- **W190** Profile correction rights: a clinician can correct what the directory says about them → verify: every control reduces or corrects a claim; none adds one (W113's rule).
+- **W191** [P] Dermatology vertical assembly against W157's model → verify: the vertical is refused while its content is unsigned, with the missing member named.
+- **W192** Directory accessibility and copy sweep → verify: axe zero violations on every public surface; no clinical claim on any of them.
+- **W193** [P] Q15 privacy pass: a public profile is a disclosure → verify: what leaves the tenancy is enumerated, and a clinician's non-directory data cannot reach a public surface by type.
+- **W194** Q15 hardening → verify: zero criticals.
+- **W195** Q15 gate dossier: the G6 decision, priced → verify: dossier names what launches, what stays internal, and which Y3 units (W117, W133) unblock with it.
+
+### Q16 — PHN/health-system reporting, fee transparency, compliance hardening (W196–W208) — **proposes G9**
+- **W196** Reporting model: what a PHN or health system may be told → verify: every figure traces to a recorded fact; no figure identifies a patient; aggregation floors are declared as data, not chosen per report.
+- **W197** [P] Small-cell suppression → verify: a cohort below the declared floor is suppressed rather than rounded, and suppression is stated in the report rather than left as a gap (W145's "named, not omitted" rule).
+- **W198** Fee transparency: what a practice charges, stated plainly → verify: no comparison, no ranking, no "value" language; the copy linter reaches every fee field.
+- **W199** [P] Reporting console + export → verify: golden report; e2e + axe zero violations; the report states its own coverage and denominator.
+- **W200** TGA CDSS boundary re-review at vertical scale → verify: security/compliance review; the four rail properties plus W150's fifth re-derived against everything Y4 added, not assumed to have survived.
+- **W201** [P] APP/ADM transparency refresh: the automated-decisions page against what the software now decides → verify: the page enumerates every decision the tree makes, checked against the source rather than written from memory.
+- **W202** Practice consent to disclosure: a practice decides what leaves it → verify: fail-closed; no report can be produced for a recipient the practice has not consented to. **Blocked on G9.**
+- **W203** PHN/health-system delivery → verify: recipient allowlist; constructor refuses live endpoints until the gate opens (G1/G3 shape). **Blocked on G9.**
+- **W204** [P] Retention and deletion for reporting artefacts → verify: a produced report is itself a record class in W106's registry, with a stated life.
+- **W205** Q16 hardening → verify: zero criticals.
+- **W206** Y4 full-system audit (W51 method: whole tree, not a diff) → verify: audit report + green suite.
+- **W207** Y4 gate dossier: G5, G6 and proposed G9 in one place → verify: every outstanding founder decision priced, with the units each unblocks named.
+- **W208** Y5 expansion: derive Q17–Q20 into §5e + BUILD-STATE → verify: 52 new units appended with verify gates; founder gates inherited intact.
 
 ## 6. Years 2–5 — quarterly themes + expansion rule
 
