@@ -28,6 +28,11 @@ import { isoDaysFrom } from "@/lib/dates";
 import { assertFireAndForgetSafe, handleStop, MockSmsAdapter } from "@/messaging/adapter";
 import { renderCompliant } from "@/messaging/templates";
 import { generatePractice, type SyntheticPractice } from "@/synthetic/generate";
+import {
+  buildRegisterLayer,
+  DEFAULT_REGISTER_SIM,
+  type RegisterSimConfig,
+} from "@/registers/sim-registers";
 import { chance, intBetween, mulberry32 } from "@/synthetic/rng";
 import {
   append,
@@ -59,6 +64,11 @@ export interface SimConfig {
    * (no RNG draws), keeping earlier goldens byte-stable.
    */
   lateCancellationRate: number;
+  /**
+   * W63: care-gap registers. Disabled by default and short-circuited when disabled, so
+   * every committed golden stays byte-identical — the register layer draws no RNG.
+   */
+  registers?: RegisterSimConfig;
   /** Probability a sent invitation triggers STOP instead. */
   optOutRate: number;
   /** DNA probability on generated bookings. */
@@ -82,6 +92,7 @@ export const DEFAULT_SIM_CONFIG: SimConfig = {
   switches: ALL_CLEAR,
   responseRate: 0.25,
   lateCancellationRate: 0,
+  registers: DEFAULT_REGISTER_SIM,
   optOutRate: 0.01,
   dnaRate: 0.05,
   organicWeeklyRate: 0.05,
@@ -181,6 +192,17 @@ export function runSim(config: SimConfig): SimResult {
     );
     const at = `${isoDaysFrom(config.todayIso, week * 7 + 1)}T08:00:00Z`;
     const patients = [...patientById.values()];
+    // Rebuilt weekly: gaps close as patients attend, and that closure is the effect W63
+    // measures. Null when registers are off, which short-circuits every register call site.
+    const registerLayer =
+      config.registers?.enabled === true
+        ? buildRegisterLayer(
+            patients,
+            config.registers,
+            config.seed,
+            isoDaysFrom(config.todayIso, week * 7),
+          )
+        : null;
 
     // 1. Pool + compliant send, one session per clinician-date with open capacity.
     // Operational switches gate sending: a kill-switch or a paused practice sends
@@ -226,7 +248,16 @@ export function runSim(config: SimConfig): SimResult {
           config.session,
         );
         if (offerable.length === 0) continue;
-        const pool = buildInvitationPool(sessionDate, clinician, offerable, eligible, config.pool);
+        // W63: the register layer narrows (W59) and reorders (W61) within what W4 already
+        // allows. Built once per week above; disabled configs skip it entirely.
+        const pool = buildInvitationPool(
+          sessionDate,
+          clinician,
+          offerable,
+          registerLayer ? registerLayer.narrow(eligible) : eligible,
+          config.pool,
+          registerLayer ? registerLayer.rank : undefined,
+        );
         if (pool.length === 0) continue;
         // The offerable set is fixed at pool time; bookings are confined to it below,
         // so protected/out-of-window/wrong-type slots stay untouched by the loop.

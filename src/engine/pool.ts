@@ -45,12 +45,19 @@ export function buildInvitationPool(
   openAppointments: Appointment[],
   eligible: Patient[],
   config: PoolConfig,
+  /**
+   * W61 seam: how to order the eligible set. Defaults to W5's ranking, so every existing
+   * caller and every committed golden is byte-unchanged. A gap-aware ranker (W61) slots in
+   * here; whatever is passed must be a PERMUTATION of `eligible` — ordering is not the
+   * place to add or remove a recipient.
+   */
+  rank: (eligible: Patient[]) => Patient[] = rankCandidates,
 ): Invitation[] {
   const slots = openAppointments.filter(
     (a) => a.clinicianId === clinician.id && a.status === "open" && a.startsAt.startsWith(sessionDate),
   ).length;
   const size = batchSize(slots, config);
-  return rankCandidates(eligible)
+  return rank(eligible)
     .slice(0, size)
     .map((patient, i) => ({
       id: `inv-${sessionDate}-${clinician.id}-${i}` as InvitationId,
