@@ -173,7 +173,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W80 | done | builder-B | 2026-08-10T06:34Z | 9bf378f | src/capability/experience.ts. Only writer of experience. Gate ("no self-reported data promoted") enforced THREE ways not trusted: (1) the INPUTS cannot carry a self-report — CaseMixInput takes appointments/memberships/outcomes and has no parameter a stated claim could arrive through, asserted by a test on the input key list, so the guarantee is an ABSENCE not a rule; (2) output pinned to the literal W79 CHECK admits, so any other provenance is unconstructible in SQL and in TS; (3) attendance is the only qualifying event (booked/DNA/cancelled/open all excluded). W15 usefulness carried ALONGSIDE the count, never folded in — a visit judged unreasonable still counts as experience because they still saw it; discounting would make a number that is neither a count nor a judgement, the blend W79 exists to prevent. Dual-register visits count toward BOTH (same overlap W72 reports) so cells do not sum to the clinician total and nothing claims they do. Unmeasured pairs return null, never a zero row. Verify: 20 fixtures |
 | W81 | claimed | builder-B | 2026-08-10T06:40Z | — | W79 |
 | W82 | available | — | — | — | W80, W81 |
-| W83 | available | — | — | — | [P] W79 |
+| W83 | claimed | builder-A | 2026-08-10T13:10Z | — | capability console: own profile vs panel view; e2e + isolation |
 | W84 | available | — | — | — | W82 |
 | W85 | available | — | — | — | W84 |
 | W86 | available | — | — | — | [P] W84 |
