@@ -151,7 +151,7 @@ function getRequestPriorities(value: string) {
   const words = value.toLowerCase();
   const priorities = [
     { label: "Gestational diabetes", terms: ["gestational diabetes", "pregnancy diabetes"] },
-    { label: "PMOS (formerly PCOS) expertise", terms: ["pcos", "pmos", "polycystic"] },
+    { label: "PMOS expertise", terms: ["pcos", "pmos", "polycystic"] },
     { label: "Post-birth recovery", terms: ["post-birth", "post birth", "postpartum", "after birth", "giving birth"] },
     { label: "Complex mental-health shared care", terms: ["ptsd", "bipolar", "psychiatrist", "psychiatric"] },
     { label: "Maternal depression", terms: ["maternal depression", "postnatal depression", "depression after birth", "persistently low"] },
@@ -178,8 +178,7 @@ function Wordmark() {
 function FinderContext() {
   return (
     <aside className="finder-context">
-      <p>Early demo · Western Sydney</p>
-      <strong>All clinician profiles and availability are synthetic.</strong>
+      <p>Early demo in Western Sydney. All clinician profiles and availability are synthetic.</p>
     </aside>
   );
 }
@@ -195,7 +194,7 @@ function WaveformMark({ active = false }: { active?: boolean }) {
 export function CareFinder() {
   const [stage, setStage] = useState<Stage>("welcome");
   const [archetypeIndex, setArchetypeIndex] = useState(0);
-  const [showScenarios, setShowScenarios] = useState(true);
+  const [showScenarios, setShowScenarios] = useState(false);
   // The welcome showcase rotates scenarios on its own until the visitor takes over.
   const [autoCycle, setAutoCycle] = useState(true);
   const reducedMotion = useReducedMotion();
@@ -329,8 +328,6 @@ export function CareFinder() {
               </Link>
             </header>
 
-            <FinderContext />
-
             <motion.div className="voice-core" variants={reducedMotion ? undefined : introStagger}>
               <motion.div className="voice-prompt" variants={reducedMotion ? undefined : introItem}>
                 <h1>
@@ -338,59 +335,7 @@ export function CareFinder() {
                   <em>that gets you.</em>
                 </h1>
                 <p className="voice-promise">Say what matters to you. We listen for the rest.</p>
-                <p className="voice-scope">
-                  Starting with PMOS, the condition long known as PCOS. The rest of women&rsquo;s health follows.
-                </p>
-              </motion.div>
-
-              <motion.div className="scenario-block" variants={reducedMotion ? undefined : introItem}>
-                <button
-                  className="scenario-toggle"
-                  type="button"
-                  aria-expanded={showScenarios}
-                  aria-controls="demo-scenarios"
-                  onClick={() => setShowScenarios((current) => !current)}
-                >
-                  <span>Try a demo scenario</span>
-                  <small>{archetypeIndex + 1} of {careArchetypes.length}</small>
-                  <CaretRight className={showScenarios ? "is-open" : ""} size={17} weight="bold" aria-hidden="true" />
-                </button>
-
-                <AnimatePresence initial={false}>
-                  {showScenarios && (
-                    <motion.div
-                      key="demo-scenarios"
-                      initial={reducedMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      animate={reducedMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
-                      exit={reducedMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                      style={{ overflow: "hidden" }}
-                    >
-                      <div id="demo-scenarios" className="archetype-switcher" role="group" aria-label="Demo care scenarios">
-                        <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(-1); }} aria-label="Previous care scenario">
-                          <CaretLeft size={19} weight="light" aria-hidden="true" />
-                        </Pressable>
-                        <AnimatePresence mode="wait" initial={false}>
-                          <motion.div
-                            className="archetype-switcher-copy"
-                            key={archetype.id}
-                            initial={{ opacity: 0, x: matchDirection * 7 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: matchDirection * -7 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <span>{archetype.eyebrow}</span>
-                            <strong>{archetype.title}</strong>
-                            <q className="example">{archetype.example}</q>
-                          </motion.div>
-                        </AnimatePresence>
-                        <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(1); }} aria-label="Next care scenario">
-                          <CaretRight size={19} weight="light" aria-hidden="true" />
-                        </Pressable>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <p className="voice-scope">Starting with PMOS. The rest of women&rsquo;s health follows.</p>
               </motion.div>
             </motion.div>
 
@@ -398,14 +343,75 @@ export function CareFinder() {
               className="voice-actions"
               initial={reducedMotion ? undefined : { opacity: 0, y: 14 }}
               animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-              transition={{ delay: 0.28, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ delay: 0.24, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
               <Pressable className="mic-button" type="button" onClick={startListening} aria-label="Start voice description">
                 <Microphone size={38} weight="light" aria-hidden="true" />
                 <span>Talk for 20 seconds</span>
               </Pressable>
-              <button className="text-action" type="button" onClick={() => setStage("type")}>Type instead</button>
+
+              <div className="scenario-block">
+                <button
+                  className="scenario-toggle"
+                  type="button"
+                  aria-expanded={showScenarios}
+                  aria-controls="demo-scenarios"
+                  onClick={() => setShowScenarios((current) => !current)}
+                >
+                  Try a demo scenario
+                  <CaretRight className={showScenarios ? "is-open" : ""} size={14} weight="bold" aria-hidden="true" />
+                </button>
+
+                <AnimatePresence>
+                  {showScenarios && (
+                    <motion.div
+                      key="demo-scenarios"
+                      id="demo-scenarios"
+                      className="scenario-pop"
+                      role="group"
+                      aria-label="Demo care scenarios"
+                      initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.98 }}
+                      animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+                      exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <div className="archetype-switcher">
+                        <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(-1); }} aria-label="Previous care scenario">
+                          <CaretLeft size={19} weight="light" aria-hidden="true" />
+                        </Pressable>
+                        <AnimatePresence mode="wait" initial={false}>
+                          <motion.button
+                            className="scenario-quote"
+                            type="button"
+                            key={archetype.id}
+                            initial={{ opacity: 0, x: matchDirection * 7 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: matchDirection * -7 }}
+                            transition={{ duration: 0.2 }}
+                            onClick={() => {
+                              setShowScenarios(false);
+                              findMatches(archetype.request);
+                            }}
+                            aria-label={`Try this scenario: ${archetype.title}`}
+                          >
+                            <q>{archetype.example}</q>
+                            <span>
+                              Try this one <CaretRight size={12} weight="bold" aria-hidden="true" />
+                            </span>
+                          </motion.button>
+                        </AnimatePresence>
+                        <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(1); }} aria-label="Next care scenario">
+                          <CaretRight size={19} weight="light" aria-hidden="true" />
+                        </Pressable>
+                      </div>
+                      <p className="scenario-count">{archetypeIndex + 1} of {careArchetypes.length}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
+
+            <FinderContext />
 
           </MotionScreen>
         )}
@@ -452,7 +458,6 @@ export function CareFinder() {
             </header>
 
             <div className="type-content">
-              <FinderContext />
               <p className="eyebrow">In your own words</p>
               <h1>
                 <span>PMOS care</span>
@@ -463,7 +468,7 @@ export function CareFinder() {
                 id="doctor-request"
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
-                placeholder="For example: A woman GP with PMOS or PCOS experience who understands South Indian family dynamics."
+                placeholder="For example: A woman GP with PMOS experience who understands South Indian family dynamics."
                 autoFocus
               />
             </div>

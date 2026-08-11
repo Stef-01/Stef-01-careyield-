@@ -24,7 +24,7 @@ const stages: Array<{ id: Stage; label: string }> = [
 ];
 
 const womenHealthConditions = [
-  { id: "pcos", label: "PMOS (formerly PCOS)", detail: "Demo anchor", locked: true },
+  { id: "pcos", label: "PMOS", detail: "Demo anchor", locked: true },
   { id: "gestational-diabetes", label: "Gestational diabetes", detail: "Pregnancy and follow-up" },
   { id: "endometriosis", label: "Endometriosis & pelvic pain", detail: "Recognition and continuity" },
   { id: "perinatal-mental-health", label: "Perinatal mental health", detail: "Depression, anxiety and shared care" },
@@ -44,7 +44,7 @@ const cases = [
 const resources = [
   {
     id: "guideline",
-    eyebrow: "Current PMOS guideline (formerly PCOS)",
+    eyebrow: "Current PMOS guideline",
     title: "Metabolic management",
     detail: "The relevant section from the 2023 International Evidence-based Guideline.",
     duration: "3 min",

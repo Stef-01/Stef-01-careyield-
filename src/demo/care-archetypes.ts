@@ -17,7 +17,7 @@ export type CareArchetype = {
 export const careArchetypes: CareArchetype[] = [
   {
     id: "south-indian-pcos",
-    title: "PMOS (formerly PCOS) + South Indian context",
+    title: "PMOS + South Indian context",
     eyebrow: "Culture and emotional safety",
     example: "A woman GP with PMOS experience who speaks Tamil or Malayalam and understands family pressure.",
     request:
@@ -32,7 +32,7 @@ export const careArchetypes: CareArchetype[] = [
   },
   {
     id: "hindi-punjabi-pcos",
-    title: "PMOS (formerly PCOS) + Hindi family context",
+    title: "PMOS + Hindi family context",
     eyebrow: "Family dynamics and mood",
     example: "A calm woman GP who speaks Hindi or Punjabi and understands the emotional side of PMOS.",
     request:
@@ -47,7 +47,7 @@ export const careArchetypes: CareArchetype[] = [
   },
   {
     id: "pcos-metabolic-reset",
-    title: "PMOS (formerly PCOS) + sustainable health goals",
+    title: "PMOS + sustainable health goals",
     eyebrow: "Metabolic care without shame",
     example: "A GP who understands PMOS and can help me build sustainable health habits without reducing me to my weight.",
     request:
@@ -61,7 +61,7 @@ export const careArchetypes: CareArchetype[] = [
   },
   {
     id: "pcos-adhd",
-    title: "PMOS (formerly PCOS) care that works with ADHD",
+    title: "PMOS care that works with ADHD",
     eyebrow: "Hormonal health and executive function",
     example: "A GP experienced in both PMOS and ADHD who gives me clear, realistic steps instead of an overwhelming plan.",
     request:
