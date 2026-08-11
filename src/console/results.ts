@@ -11,6 +11,7 @@
 
 import type { DashboardData } from "@/sim/dashboard-data";
 import type { GuardrailAlert, GuardrailConfig } from "@/guardrails/monitors";
+import { counterfactual, withheldCopy, type CounterfactualRefusal } from "@/outcomes/counterfactual";
 
 export interface ResultsOptions {
   /** Practice-configured billing per attended visit (AUD) — same input as W20/W21. */
@@ -20,7 +21,13 @@ export interface ResultsOptions {
 
 export interface PracticeResults {
   weeks: number;
-  /** Appointments the practice would not have had. Null when no comparison group exists. */
+  /**
+   * Appointments the practice would not have had. Null when the claim is withheld.
+   *
+   * W215: "withheld" is no longer only "there is no comparison group". W72's floor now applies
+   * to the practice-wide figure too, so a three-patient holdout arm withholds the claim instead
+   * of scaling a rate off three people into a headline.
+   */
   extraAppointments: number | null;
   extraPerWeek: number | null;
   extraRevenueAud: number | null;
@@ -36,6 +43,9 @@ export interface PracticeResults {
   comparisonPer100: number;
   differencePer100: number | null;
   optOut: { count: number; ofMessages: number; pct: number };
+  /** Why the extra-appointments claim is withheld, in words. Null when it is claimed. */
+  withheldReasons: CounterfactualRefusal[];
+  withheldCopy: string | null;
   alerts: GuardrailAlert[];
   allClear: boolean;
 }
@@ -49,10 +59,15 @@ export function buildPracticeResults(
 ): PracticeResults {
   const { attribution: attr, totals, weeks } = data;
   const bookedFromMessage = attr.naiveGeneratedAttended;
+  // W215: the claim comes from the counterfactual, not from the raw arithmetic. `attr` still
+  // carries `incrementalAttended` and it is deliberately NOT read here — that field is the
+  // arithmetic layer, and reading it directly is how the practice-wide figure escaped W72's
+  // floor for two years while every register cohort honoured it.
+  const cf = counterfactual(attr);
   // Round ONCE, here. Everything downstream prices off the rounded count so the
   // page's own arithmetic checks out — a tile reading "84 visits at $80 each" beside
   // $6,722 invites a practice manager to distrust the whole page.
-  const extra = attr.incrementalAttended === null ? null : Math.round(attr.incrementalAttended);
+  const extra = cf.claimed ? Math.round(cf.figure.difference) : null;
 
   return {
     weeks,
@@ -66,12 +81,14 @@ export function buildPracticeResults(
     comparisonPatients: attr.holdoutArm.patients,
     messagedPer100: per100(attr.inviteArm.attendedPer1000),
     comparisonPer100: per100(attr.holdoutArm.attendedPer1000),
-    differencePer100: attr.incrementalPer1000 === null ? null : per100(attr.incrementalPer1000),
+    differencePer100: cf.claimed ? per100(attr.incrementalPer1000!) : null,
     optOut: {
       count: totals.optedOut,
       ofMessages: totals.invitationsSent,
       pct: Math.round(data.optOutRatePct * 10) / 10,
     },
+    withheldReasons: cf.claimed ? [] : cf.withheld,
+    withheldCopy: withheldCopy(cf),
     alerts,
     allClear: alerts.length === 0,
   };

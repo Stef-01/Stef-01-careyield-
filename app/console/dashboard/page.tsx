@@ -4,6 +4,7 @@
 
 import Link from "next/link";
 import { getDashboardData } from "@/sim/dashboard-data";
+import { counterfactual, withheldCopy } from "@/outcomes/counterfactual";
 import { requireSession } from "../guard";
 import { ConsoleShell } from "../ui";
 import { WeeklyArmsChart } from "./chart";
@@ -24,6 +25,11 @@ export default async function DashboardPage() {
   const email = await requireSession();
   const data = getDashboardData();
   const attr = data.attribution;
+  // W215: the headline is the counterfactual's, not the raw arithmetic's. The tile below used to
+  // read `(attr.incrementalAttended ?? 0).toFixed(0)` and printed a confident `0` for a practice
+  // with no comparison group — a withheld figure rendered as a measured zero.
+  const cf = counterfactual(attr);
+  const withheld = withheldCopy(cf);
 
   return (
     <ConsoleShell email={email}>
@@ -37,12 +43,12 @@ export default async function DashboardPage() {
       <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatTile
           label="Incremental attended / 1,000"
-          value={attr.incrementalPer1000 === null ? "—" : attr.incrementalPer1000.toFixed(1)}
-          detail={attr.incrementalPer1000 === null ? "No holdout arm — no claim" : "North star — invite-arm rate above holdout"}
+          value={cf.claimed ? attr.incrementalPer1000!.toFixed(1) : "—"}
+          detail={cf.claimed ? "North star — invite-arm rate above holdout" : "Withheld — see below"}
         />
         <StatTile
           label="Incremental attended"
-          value={(attr.incrementalAttended ?? 0).toFixed(0)}
+          value={cf.claimed ? cf.figure.difference.toFixed(0) : "—"}
           detail={`vs naive generated count ${attr.naiveGeneratedAttended} (contrast only)`}
         />
         <StatTile
@@ -56,6 +62,15 @@ export default async function DashboardPage() {
           detail={`attended / 1,000 · ${attr.holdoutArm.patients.toLocaleString()} patients`}
         />
       </div>
+
+      {withheld && (
+        <p
+          data-testid="counterfactual-withheld"
+          className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
+          {withheld}
+        </p>
+      )}
 
       <section className="mt-8 rounded-xl border border-stone-200 bg-white p-6">
         <h2 className="mb-4 font-medium text-stone-900">Weekly attended per 1,000 — by arm</h2>

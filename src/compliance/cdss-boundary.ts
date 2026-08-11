@@ -301,6 +301,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports are the reason union, the candidate projection and the floor check. `MATCH_REASON_COPY` is the sentence a practice manager reads about one appointment offer and `MATCH_FLOOR_BREACH_COPY` tells a reviewer why a plan was refused. Both are about capacity, recorded availability and practice-set limits; a test asserts neither can name a condition, a symptom or an urgency, because a reason is the one place a matcher gets to say WHY in words somebody reads.",
   },
   {
+    module: "src/outcomes/counterfactual.ts",
+    operatorCopy: ["COUNTERFACTUAL_WITHHELD_COPY"],
+    notCopy:
+      "The remaining exports are the comparator union, the figure and the refusal check. `COUNTERFACTUAL_WITHHELD_COPY` tells a practice manager why an impact figure is withheld — because there is no comparison group, or because an arm is too small for the arithmetic to carry a claim. It describes the measurement, never a patient, a condition or a next clinical step, and a test asserts the copy never reads as a zero.",
+  },
+  {
     module: "src/outcomes/response.ts",
     operatorCopy: ["RESPONSE_STATE_COPY", "RESPONSE_ABSENCE_COPY", "RESPONSE_REJECTION_COPY"],
     notCopy:

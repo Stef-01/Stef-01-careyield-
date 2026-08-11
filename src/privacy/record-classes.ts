@@ -182,6 +182,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W170 folds `RecordedEvent { chainId, kind, at }`. A chain id is a referral id, not a person, and no field on an Outcome or an OutcomeSummary can hold patient identity — the type has nowhere to put one.",
   },
   {
+    module: "src/outcomes/counterfactual.ts",
+    what: "The counterfactual figure and its refusals",
+    handling: "no_patient_identity",
+    rationale:
+      "W215 takes an `AttributionResult` — two arms as head counts and attended counts — and returns a difference or a refusal. There is no patient in any signature and no field on the figure or its basis a patient identifier could occupy, which is also why the per-patient counterfactual is refused structurally rather than by a rule somebody remembers. Erasure is composed: scrub a patient from the rail and they leave the counts W9 produces, with nothing here to remember to scrub.",
+  },
+  {
     module: "src/outcomes/response.ts",
     what: "The link between an intervention and a recorded fact that answers it",
     handling: "no_patient_identity",

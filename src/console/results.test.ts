@@ -59,10 +59,17 @@ describe("W42 practice results view-model", () => {
   it("renders nothing rather than a fake number when there is no comparison group", () => {
     // A practice with no holdout has no defensible impact figure — the page must show
     // an em dash, never a zero or the raw count dressed up as impact.
+    //
+    // W215 CHANGED THIS FIXTURE, AND THE OLD ONE WAS TESTING THE WRONG THING. It nulled
+    // `incrementalAttended` and `incrementalPer1000` while leaving the holdout arm populated —
+    // the SYMPTOM, not the cause — so it verified that nulls propagate rather than that a
+    // practice without a comparison group gets no claim. Now the claim derives from the arms,
+    // so the fixture empties the arm, which is the condition the test names.
     const noComparison: DashboardData = {
       ...data,
       attribution: {
         ...data.attribution,
+        holdoutArm: { patients: 0, attended: 0, attendedPer1000: 0 },
         incrementalAttended: null,
         incrementalPer1000: null,
       },
@@ -72,8 +79,44 @@ describe("W42 practice results view-model", () => {
     expect(blank.extraRevenueAud).toBeNull();
     expect(blank.extraPerWeek).toBeNull();
     expect(blank.differencePer100).toBeNull();
+    expect(blank.withheldReasons).toEqual(["no_holdout_arm"]);
+    expect(blank.withheldCopy).toContain("no comparison group");
     // The raw count is still known — it just never becomes the headline.
     expect(blank.bookedFromMessage).toBe(r.bookedFromMessage);
+  });
+
+  it("W215: withholds the claim when the holdout arm is below W72's floor, not only when empty", () => {
+    // The gap this unit closed. W72 floored register cohorts two years ago; the practice-wide
+    // figure — the one on the dashboard — withheld only on an EMPTY arm, so three holdout
+    // patients produced a headline scaled off three people.
+    const thin: DashboardData = {
+      ...data,
+      attribution: {
+        ...data.attribution,
+        holdoutArm: { patients: 3, attended: 0, attendedPer1000: 0 },
+      },
+    };
+    const withheld = buildPracticeResults(thin, [], OPTIONS);
+    expect(withheld.extraAppointments).toBeNull();
+    expect(withheld.differencePer100).toBeNull();
+    expect(withheld.withheldReasons).toEqual(["holdout_arm_below_floor"]);
+    // Withheld is not missing: the counts a practice can check are still on the view-model.
+    expect(withheld.messagedPatients).toBe(data.attribution.inviteArm.patients);
+    expect(withheld.comparisonPatients).toBe(3);
+  });
+
+  it("W215: says the claim is withheld in words, and the copy never reads as a zero", () => {
+    const thin: DashboardData = {
+      ...data,
+      attribution: {
+        ...data.attribution,
+        holdoutArm: { patients: 3, attended: 0, attendedPer1000: 0 },
+      },
+    };
+    const copy = buildPracticeResults(thin, [], OPTIONS).withheldCopy;
+    expect(copy).toBeTruthy();
+    expect(copy!).not.toMatch(/\b0\b|zero|no extra/i);
+    expect(copy!).toContain("too small");
   });
 
   it("weekly extras carry one row per week in per-100 units", () => {
