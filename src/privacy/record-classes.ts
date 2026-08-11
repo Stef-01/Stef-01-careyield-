@@ -203,6 +203,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W211 builds a `Response` from W170's `RecordedEvent { chainId, kind, at }` and an `Intervention { interventionId, practiceId, chainId, kind, at }`. Neither type has a field a patient identifier could go in, and the constructor copies only from those two, so the link is a statement about a chain and a practice. Erasure is COMPOSED for the same reason W180 gave: scrub the source rail and the events these rest on are gone, with nothing here to remember to scrub. W218 classifies the GRAPH built over this, which is a different question because a graph can hold shape a single link cannot.",
   },
   {
+    module: "src/outcomes/attribution-v2.ts",
+    what: "The practice-wide attributable claim, and per-kind counts that are not one",
+    handling: "no_patient_identity",
+    rationale:
+      "W219 composes W215's arm figure and W212's graph. Both inputs are already counts — the arms are head-counts, the graph aggregates away the chain — and nothing here holds a chain id, let alone a patient. The stronger guarantee is on the SIGNATURES: no exported function takes a patient, asserted on parameters rather than names, because a per-patient effect estimate is unanswerable and is the input to a triage. Erasure is composed: scrub the source rail and the arms and edges these rest on are gone.",
+  },
+  {
     module: "src/outcomes/response-graph.ts",
     what: "Counts of how each kind of intervention was answered, over the synthetic loop",
     handling: "no_patient_identity",

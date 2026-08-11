@@ -219,6 +219,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "CONFIGURATION_KINDS is a kind list. The caveats are operator copy in the strongest sense — W149's rule is that they travel with the export, away from the product that would explain them.",
   },
   {
+    module: "src/outcomes/attribution-v2.ts",
+    operatorCopy: ["NOT_ATTRIBUTABLE_PER_KIND"],
+    notCopy:
+      "REFUSED_SCOPES is reviewer-facing — it argues, scope by scope, why a figure does not exist, and names the tempting ones in order to refuse them. The renderer composes from counts and from the one caveat that does render.",
+  },
+  {
     module: "src/outcomes/dashboard.ts",
     operatorCopy: ["DASHBOARD_BASIS", "SETTLEMENT_ASK_COPY"],
     notCopy:
