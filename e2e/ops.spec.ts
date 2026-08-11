@@ -55,3 +55,65 @@ test("ops shows the invitation queue and toggles the kill-switch and pause", asy
   await page.getByRole("button", { name: "Resume this practice" }).click();
   await expect(page.getByTestId("sending-status")).toHaveText(/Sending is active/);
 });
+
+// W179 verify gate: "a dead feed and a quiet week render as DIFFERENT states, because they lead
+// an operator to opposite actions". The count is zero in both, so the count is not the test —
+// what the page TELLS AN OPERATOR TO DO is.
+
+async function opsWith(
+  page: import("@playwright/test").Page,
+  request: import("@playwright/test").APIRequestContext,
+  query: string,
+) {
+  await request.post(`/api/mock/ops?emptyQueue=1${query}`);
+  await request.post("/api/mock/console");
+  await signInAndOnboard(page);
+  await page.goto("/console/ops");
+  await expect(page.getByText("Outstanding offers (0)")).toBeVisible();
+}
+
+test("a quiet week and a dead feed are different states, not the same zero", async ({ page, request }) => {
+  await opsWith(page, request, "&feed=well");
+  await expect(page.getByTestId("silence-nothing_eligible")).toBeVisible();
+  const quiet = (await page.getByTestId("silence").innerText()).trim();
+  expect(quiet).toContain("No action needed");
+
+  await opsWith(page, request, "&feed=down");
+  await expect(page.getByTestId("silence-feed_down")).toBeVisible();
+  const dead = (await page.getByTestId("silence").innerText()).trim();
+  expect(dead).toContain("Check the connection");
+
+  // The gate, asserted on the rendered page rather than on the module: same count, and an
+  // operator reading one is not reading the other.
+  expect(dead).not.toBe(quiet);
+  await expect(page.getByTestId("silence-nothing_eligible")).toHaveCount(0);
+});
+
+test("an unknown feed says it does not know, rather than reading as quiet", async ({ page, request }) => {
+  // The default state of the store: nothing recorded about the feed. The dangerous rendering is
+  // the reassuring one, so this asserts the reassurance is ABSENT, not merely that copy appeared.
+  await opsWith(page, request, "");
+  await expect(page.getByTestId("silence-cannot_determine")).toBeVisible();
+  await expect(page.getByTestId("silence-nothing_eligible")).toHaveCount(0);
+  await expect(page.getByTestId("silence-nothing_arrived")).toHaveCount(0);
+});
+
+test("a halt and a dead feed are both named, so fixing one does not look like fixing it", async ({ page, request }) => {
+  await opsWith(page, request, "&feed=down");
+  await page.getByRole("button", { name: "Engage kill switch" }).click();
+  await expect(page.getByTestId("sending-status")).toHaveText(/kill switch engaged/);
+  await expect(page.getByTestId("silence-held_by_switch")).toBeVisible();
+  await expect(page.getByTestId("silence-feed_down")).toBeVisible();
+
+  // Releasing the switch removes ONE cause and leaves the other standing — the operator is not
+  // told the problem is solved.
+  await page.getByRole("button", { name: "Release kill switch" }).click();
+  await expect(page.getByTestId("silence-held_by_switch")).toHaveCount(0);
+  await expect(page.getByTestId("silence-feed_down")).toBeVisible();
+});
+
+test("a never-connected practice is not shown as an outage", async ({ page, request }) => {
+  await opsWith(page, request, "&feed=never");
+  await expect(page.getByTestId("silence-never_connected")).toBeVisible();
+  await expect(page.getByTestId("silence")).toContainText("Finish connecting");
+});

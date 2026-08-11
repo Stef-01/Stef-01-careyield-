@@ -5,16 +5,25 @@
 import { getStore } from "@/booking/store";
 import type { AuditEvent, InvitationStatus, PracticeId } from "@/domain/types";
 import { ALL_CLEAR, setKillSwitch, setPracticePaused, type OpsSwitches } from "@/ops/switches";
+import type { FeedEvidence } from "@/ops/silence";
 
 export interface OpsState {
   switches: OpsSwitches;
   auditEvents: AuditEvent[];
+  /**
+   * W179: what is known about the appointment feed, or null for NOTHING KNOWN.
+   *
+   * Null is the honest default rather than an optimistic one. A fresh store has recorded no
+   * observation of the feed, and the surface says exactly that instead of rendering a bare zero
+   * a reader would take for a quiet week.
+   */
+  feed: FeedEvidence | null;
 }
 
 const globalStore = globalThis as { __careyieldOps?: OpsState };
 
 function initial(): OpsState {
-  return { switches: { ...ALL_CLEAR, pausedPracticeIds: [] }, auditEvents: [] };
+  return { switches: { ...ALL_CLEAR, pausedPracticeIds: [] }, auditEvents: [], feed: null };
 }
 
 export function getOps(): OpsState {
@@ -68,4 +77,9 @@ export function applyPracticePause(practiceId: string, paused: boolean, at: stri
   if (state.switches.pausedPracticeIds.includes(practiceId) === paused) return;
   state.switches = setPracticePaused(state.switches, practiceId, paused);
   audit(state, at, practiceId, `practice sending ${paused ? "paused" : "resumed"}`);
+}
+
+/** W179: record what the feed did. Synthetic only in this phase — set by the sim and the mock route. */
+export function recordFeedEvidence(feed: FeedEvidence | null): void {
+  getOps().feed = feed;
 }

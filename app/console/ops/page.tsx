@@ -4,6 +4,7 @@
 import { redirect } from "next/navigation";
 import { getConsole } from "@/console/store";
 import { getOps, queueView } from "@/ops/store";
+import { SILENCE_COPY, readCount } from "@/ops/silence";
 import { canSend, isPracticePaused } from "@/ops/switches";
 import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
@@ -26,6 +27,8 @@ export default async function OpsPage({
   const killed = ops.switches.killSwitch;
   const paused = isPracticePaused(ops.switches, practiceId);
   const sending = canSend(ops.switches, practiceId);
+  // The zero and its cause are computed together, so the page cannot render one without the other.
+  const reading = readCount(queue.outstanding.length, ops.feed, !sending);
 
   const statuses: Array<[string, number]> = [
     ["Queued", queue.counts.queued],
@@ -91,8 +94,22 @@ export default async function OpsPage({
         <h3 className="mt-6 mb-2 text-sm font-medium text-stone-700">
           Outstanding offers ({queue.outstanding.length})
         </h3>
-        {queue.outstanding.length === 0 ? (
-          <p className="text-sm text-stone-500">No offers outstanding.</p>
+        {reading.kind === "none" ? (
+          // W179: a zero that says WHICH zero it is. "No offers outstanding" was true of a quiet
+          // week and of a feed that died on Tuesday, and those send an operator opposite ways.
+          <div className="flex flex-col gap-3" data-testid="silence">
+            {reading.causes.map((cause) => (
+              <div
+                key={cause}
+                data-testid={`silence-${cause}`}
+                className="rounded-lg border border-stone-200 bg-stone-50 p-4"
+              >
+                <p className="text-sm font-medium text-stone-900">{SILENCE_COPY[cause].headline}</p>
+                <p className="mt-1 text-sm text-stone-600">{SILENCE_COPY[cause].detail}</p>
+                <p className="mt-2 text-sm text-stone-800">{SILENCE_COPY[cause].action}</p>
+              </div>
+            ))}
+          </div>
         ) : (
           <ul className="divide-y divide-stone-100 text-sm">
             {queue.outstanding.map((o) => (
