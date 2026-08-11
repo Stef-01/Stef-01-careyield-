@@ -162,14 +162,22 @@ export const FIELD_LINTING: Readonly<Record<string, FieldLinting>> = {
   },
 };
 
-/** Apply the full union to one string. */
-function lintCopy(text: string, field: string): ProfileCopyViolation[] {
+/**
+ * Apply the full union to one string.
+ *
+ * Exported since W187, which lints COMPOSED copy — the sentence a page renders out of several
+ * fields, which no per-field check sees. Exported rather than copied, for the reason this whole
+ * module exists: a second implementation of the union starts identical and drifts in silence.
+ */
+export function lintDirectoryText(text: string, field: string): ProfileCopyViolation[] {
   return [
     ...lintLandingCopy(text).map((v) => ({ field, rule: v.rule, match: v.match })),
     ...lintMessageText(text).map((v) => ({ field, rule: v.rule, match: v.match })),
     ...lintDirectoryOnly(text, field),
   ];
 }
+
+const lintCopy = lintDirectoryText;
 
 function lintDirectoryOnly(text: string, field: string): ProfileCopyViolation[] {
   const out: ProfileCopyViolation[] = [];
