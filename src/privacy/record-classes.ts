@@ -182,6 +182,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W170 folds `RecordedEvent { chainId, kind, at }`. A chain id is a referral id, not a person, and no field on an Outcome or an OutcomeSummary can hold patient identity — the type has nowhere to put one.",
   },
   {
+    module: "src/outcomes/response-console.ts",
+    what: "The responses console view-model: which silence a reader is shown",
+    handling: "no_patient_identity",
+    rationale:
+      "W220 takes W218's already-disclosable graph — aggregate counts with small cells withheld — plus one integer, the number of recorded events, and returns either that graph or a named empty reading. There is no patient in any signature and no field on the view a patient identifier could occupy. Erasure is composed twice over: the counts derive from the synthetic loop's log, and the disclosable form has already dropped every chain id before this module sees it.",
+  },
+  {
     module: "src/outcomes/graph-privacy.ts",
     what: "The disclosable form of a response graph, with small cells withheld",
     handling: "no_patient_identity",

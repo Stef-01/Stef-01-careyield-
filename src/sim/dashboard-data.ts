@@ -65,9 +65,23 @@ export function buildDashboardData(result: SimResult): DashboardData {
 }
 
 let cached: DashboardData | null = null;
+let cachedResult: SimResult | null = null;
 
 /** Deterministic, so computed once per server process. */
 export function getDashboardData(): DashboardData {
-  cached ??= buildDashboardData(runSim(DEFAULT_SIM_CONFIG));
+  cachedResult ??= runSim(DEFAULT_SIM_CONFIG);
+  cached ??= buildDashboardData(cachedResult);
   return cached;
+}
+
+/**
+ * The raw run behind the dashboard.
+ *
+ * W220 needs the event log rather than the derived totals, and running the sim a second time to
+ * get it would double the work AND risk two surfaces describing different runs. Memoised through
+ * the same cache for exactly that reason.
+ */
+export function getSimResult(): SimResult {
+  cachedResult ??= runSim(DEFAULT_SIM_CONFIG);
+  return cachedResult;
 }

@@ -113,6 +113,14 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    module: "src/outcomes/response-console.ts",
+    folds: 1,
+    disposition: {
+      kind: "rationale",
+      why: "W220 sums how many cells W218 withheld, so the page can explain them once rather than per row. Addition over a set, to a scalar: no element's contribution depends on any other's position, and the input arrives already sorted by `disclosableGraph`. A test asserts the count equals the same predicate applied independently, so the fold cannot drift from what it claims to count.",
+    },
+  },
+  {
     // W176: declared as the register intends — a new fold site fails the suite until it is here.
     module: "src/outcomes/time-to-escalation.ts",
     folds: 1,
