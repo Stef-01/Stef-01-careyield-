@@ -95,9 +95,16 @@ describe("W173 the rail becomes one verdict per referral", () => {
 describe("W173 the unsettled pile becomes a list of things to record", () => {
   it("counts chains per ask, most-settling first", () => {
     // ref-a waits on an appointment or a cancellation; ref-b waits on a completion.
+    //
+    // W181: the cancellation was missing from this assertion while the comment above it named
+    // it. `wouldSettleIt` read the NEXT stage's stop kinds instead of the current stage's, so a
+    // referral sitting at "written" was never told that recording a cancellation would settle
+    // it — and `SETTLEMENT_ASK_COPY.referral_cancelled` was dead copy as a result. Ties are
+    // ordered by name, so the third ask sorts last.
     expect(whatWouldSettleIt(referralChainOutcomes(RAIL))).toEqual([
       { kind: "appointment_recorded", chains: 1 },
       { kind: "completion_recorded", chains: 1 },
+      { kind: "referral_cancelled", chains: 1 },
     ]);
   });
 

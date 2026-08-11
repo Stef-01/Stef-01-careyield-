@@ -1,9 +1,7 @@
 // W19: admin ops console — invitation queue visibility, the global kill-switch,
 // and per-practice pause. Factual, operational copy; no clinical content.
 
-import { redirect } from "next/navigation";
-import { getConsole } from "@/console/store";
-import { getOps, queueView } from "@/ops/store";
+import { feedEvidenceFor, getOps, queueView } from "@/ops/store";
 import { SILENCE_COPY, readCount } from "@/ops/silence";
 import { canSend, isPracticePaused } from "@/ops/switches";
 import { requirePractice } from "../guard";
@@ -18,17 +16,16 @@ export default async function OpsPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { email, record } = await requirePractice();
-  const console_ = getConsole();
   const { error } = await searchParams;
 
   const practiceId = record.practice.id;
   const ops = getOps();
-  const queue = queueView();
+  const queue = queueView(practiceId);
   const killed = ops.switches.killSwitch;
   const paused = isPracticePaused(ops.switches, practiceId);
   const sending = canSend(ops.switches, practiceId);
   // The zero and its cause are computed together, so the page cannot render one without the other.
-  const reading = readCount(queue.outstanding.length, ops.feed, !sending);
+  const reading = readCount(queue.outstanding.length, feedEvidenceFor(practiceId), !sending);
 
   const statuses: Array<[string, number]> = [
     ["Queued", queue.counts.queued],

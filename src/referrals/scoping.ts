@@ -49,6 +49,10 @@ export const REFERRAL_SCOPING: readonly ScopingEntry[] = [
     rationale: "Same finding and same fix as actsFor: chain events narrowed to referrals the practice is party to.",
   },
   {
+    module: "src/referrals/store.ts", fn: "sentEventsFor", answer: "takes_practice_id",
+    rationale: "W181. Scoped to referrals this practice SENT, which is a narrower question than eventsFor's tenancy scope. The outcomes console asks 'did what we wrote go anywhere' and was using the party-to query, so an inbound referral was counted by both practices under descriptions that cannot both be true. Kept separate from eventsFor rather than added as a flag, for sentBy/sentTo's reason.",
+  },
+  {
     module: "src/referrals/store.ts", fn: "returnFor", answer: "scoped_by_argument",
     rationale: "Keyed by referral id alone. Every caller obtains that id from sentBy/sentTo, so it is already this practice's referral. Deliberately not re-scoped: a return report belongs to the referral, and both practices are entitled to it.",
   },

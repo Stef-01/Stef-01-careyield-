@@ -152,7 +152,7 @@ describe("W172 disagreement renders with equal prominence", () => {
   });
 
   it("reports counts alongside the rate rather than only a percentage", () => {
-    expect(report.counts).toEqual({ agreed: 2, disagreed: 1, notReviewed: 1, total: 4 });
+    expect(report.counts).toEqual({ agreed: 2, disagreed: 1, notReviewed: 1, noRecord: 0, total: 4 });
     const rendered = renderAgreementReport(report);
     expect(rendered).toContain("concluded otherwise (1)");
     expect(rendered).toContain("concurred (2)");
@@ -177,7 +177,7 @@ describe("W172 an unreviewed case is not an agreement", () => {
       reviewed({ caseId: id, answer: "not_reviewed", reviewedBy: null, reviewedAt: null }),
     );
     const report = buildAgreementReport(sample, cases);
-    expect(report.counts).toEqual({ agreed: 0, disagreed: 0, notReviewed: 3, total: 3 });
+    expect(report.counts).toEqual({ agreed: 0, disagreed: 0, notReviewed: 3, noRecord: 0, total: 3 });
     expect(report.basis).toContain("not an agreement");
     expect(AGREEMENT_ANSWER_COPY.not_reviewed).toContain("not agreement");
   });
@@ -197,5 +197,72 @@ describe("W172 an unreviewed case is not an agreement", () => {
       reviewed({ caseId: "case-not-drawn", answer: "agreed" }),
     ]);
     expect(report.counts.total).toBe(2);
+  });
+});
+
+describe("W181 a sampled case with no record is counted, not dropped", () => {
+  const sample = {
+    period: { fromIso: "2026-03-01", toIso: "2026-03-31" },
+    caseIds: ["c-1", "c-2", "c-3", "c-4", "c-5"],
+    populationSize: 40,
+    populationFingerprint: "fp-1",
+    seed: 1234,
+  };
+
+  it("keeps the denominator at the SAMPLE size, not the number of records filed", () => {
+    // The defect: sampled ids with no matching record were filtered away, so `total` became
+    // "cases someone happened to file". A sample of five with one review reported on one.
+    const report = buildAgreementReport(sample, []);
+    expect(report.counts.total).toBe(5);
+    expect(report.counts.noRecord).toBe(5);
+  });
+
+  it("never claims a sample was fully reviewed when nothing was", () => {
+    // The rendered contradiction this produced: "Sampled 5 of 40" above "All 0 sampled case(s)
+    // have been reviewed" — the reassuring sentence computed over exactly the cases that could
+    // not contradict it.
+    const report = buildAgreementReport(sample, []);
+    expect(report.basis).not.toContain("All 0");
+    expect(report.basis).toContain("no review recorded");
+    expect(renderAgreementReport(report)).not.toMatch(/All \d+ sampled case\(s\) have been reviewed/);
+  });
+
+  it("separates never-opened from opened-and-unanswerable, which ask different people", () => {
+    // Both are absences and both must be visible, but one needs a reviewer assigned and the
+    // other is a finding about the case. One word for both sends the reader after the wrong one.
+    const opened = {
+      caseId: "c-1",
+      pathwayId: "path-1",
+      versionHash: "hash-abcdefghijkl",
+      verdict: "eligible",
+      answer: "not_reviewed" as const,
+      basis: null,
+      note: null,
+      reviewedBy: "reviewer@example.test",
+      reviewedAt: "2026-03-10",
+    };
+    const report = buildAgreementReport(sample, [opened]);
+    expect(report.counts.notReviewed).toBe(1);
+    expect(report.counts.noRecord).toBe(4);
+    expect(report.counts.total).toBe(5);
+    expect(report.basis).toContain("no review recorded");
+    expect(report.basis).toContain("could not be answered");
+  });
+
+  it("still says all reviewed when every sampled case really has an answer", () => {
+    const cases = sample.caseIds.map((caseId) => ({
+      caseId,
+      pathwayId: "path-1",
+      versionHash: "hash-abcdefghijkl",
+      verdict: "eligible",
+      answer: "agreed" as const,
+      basis: null,
+      note: null,
+      reviewedBy: "reviewer@example.test",
+      reviewedAt: "2026-03-10",
+    }));
+    const report = buildAgreementReport(sample, cases);
+    expect(report.counts).toEqual({ agreed: 5, disagreed: 0, notReviewed: 0, noRecord: 0, total: 5 });
+    expect(report.basis).toBe("All 5 sampled case(s) have been reviewed.");
   });
 });

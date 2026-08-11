@@ -51,8 +51,12 @@ describe("W170 silence is not a conclusion", () => {
   });
 
   it("says what would settle it, so silence becomes a list of things to record", () => {
+    // W181 CORRECTED THIS EXPECTATION, WHICH PINNED A DEFECT. It previously asked for
+    // `appointment_cancelled` — a stop declared on the stage AFTER this one, for an appointment
+    // that has not been recorded — while omitting `referral_cancelled`, the way a referral
+    // sitting at "written" actually stops. The assertion had been written to match the code.
     const outcome = outcomeOf("ref-1", [at("referral_written")], REFERRAL);
-    expect(outcome.wouldSettleIt).toEqual(["appointment_recorded", "appointment_cancelled"]);
+    expect(outcome.wouldSettleIt).toEqual(["appointment_recorded", "referral_cancelled"]);
   });
 
   it("says in words that a silent record is not a failure", () => {
@@ -217,5 +221,27 @@ describe("W170 this is not a quality measure", () => {
     for (const key of Object.keys(outcome)) {
       expect(key).not.toMatch(/narrative|note|comment|quality|score|rating/i);
     }
+  });
+});
+
+describe("W181 hardening findings", () => {
+  it("asks for the stop this stage owns, not the next stage's", () => {
+    // A referral that has only been written can settle two ways: an appointment is recorded, or
+    // it is cancelled. `stoppedBy` is declared on the stage it applies to, so reading the NEXT
+    // stage's stop kinds asked for one that stage does not have — and dropped the cancellation.
+    const outcome = outcomeOf(
+      "ref-a",
+      [at("referral_written", "2026-03-01", "ref-a")],
+      REFERRAL,
+    );
+    expect(outcome.verdict).toBe("not_recorded");
+    expect(outcome.wouldSettleIt).toContain("appointment_recorded");
+    expect(outcome.wouldSettleIt).toContain("referral_cancelled");
+  });
+
+  it("refuses a chain with no stages rather than calling it reached", () => {
+    // Both indices are -1, so the equality that means "at the final stage" was satisfied by a
+    // definition with no stages — returning `reached` with no evidence at all.
+    expect(() => outcomeOf("x", [], { name: "Empty", stages: [] })).toThrow(/no stages/);
   });
 });

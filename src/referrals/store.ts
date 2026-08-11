@@ -90,6 +90,23 @@ export function eventsFor(practiceId: PracticeId): ReferralEvent[] {
 }
 
 /**
+ * Chain events for referrals this practice SENT.
+ *
+ * W181: `eventsFor` is scoped for TENANCY — party to either side — which is right for "may this
+ * practice see it" and wrong for "did what we sent go anywhere". The outcomes console asked the
+ * second question with the first query, so an inbound referral counted in the sender's totals
+ * AND the receiver's, under descriptions that cannot both be true. Both practices were entitled
+ * to the row; only one of them wrote it.
+ *
+ * A separate function rather than a flag on `eventsFor`: a boolean is one argument from the
+ * wrong answer, and this is the same reasoning `sentBy`/`sentTo` were split for.
+ */
+export function sentEventsFor(practiceId: PracticeId): ReferralEvent[] {
+  const mine = new Set(sentBy(practiceId).map((document) => document.referralId));
+  return state().events.filter((event) => mine.has(event.referralId));
+}
+
+/**
  * Referrals this practice SENT.
  *
  * Filters on `fromPracticeId` as the query, not afterwards — W123's rule, and the reason

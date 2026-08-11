@@ -38,7 +38,16 @@ export type RailScenario = "standard" | "telehealth";
 
 export const SEED_SESSION_DATE = "2026-09-01";
 
-const PRACTICE_ID = "prac-demo" as PracticeId;
+/**
+ * The practice the synthetic rail is seeded for.
+ *
+ * Exported since W181: the console generates its own ids (`prac-${n}`), so the seed's practice
+ * and a signed-in practice are different by construction. `queueView` used to fold the whole
+ * rail with no filter, which hid that — the ops page showed this practice's invitations to
+ * whoever was signed in. Fixtures that need the two to line up now say so explicitly.
+ */
+export const SEED_PRACTICE_ID = "prac-demo" as PracticeId;
+const PRACTICE_ID = SEED_PRACTICE_ID;
 const CLINICIAN_ID = "clin-demo" as ClinicianId;
 
 function seed(scenario: RailScenario = "standard"): RailStore {

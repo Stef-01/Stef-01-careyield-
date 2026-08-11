@@ -8,12 +8,22 @@
 // independently rather than infer one from the other.
 
 import { NextResponse } from "next/server";
-import { getStore, resetStore } from "@/booking/store";
+import { SEED_PRACTICE_ID, getStore, resetStore } from "@/booking/store";
 import { getOps, queueView, recordFeedEvidence, resetOps } from "@/ops/store";
 import type { FeedEvidence } from "@/ops/silence";
+import type { PracticeId } from "@/domain/types";
 import { assertMockRoutesEnabled } from "@/lib/mock-guard";
 
 export const dynamic = "force-dynamic";
+
+// The id the e2e onboarding flow produces for its first practice (W166 generates `prac-${n}`).
+//
+// W181: the rail seeds for SEED_PRACTICE_ID and the console mints its own ids, so the two never
+// matched. `queueView` folded the whole rail with no practice filter, which hid the mismatch —
+// the ops page rendered the seed practice's queue to whoever was signed in. With the filter in
+// place the seed has to be re-keyed deliberately, which is this fixture's job and is stated
+// rather than left as a coincidence that used to work.
+const PRACTICE = "prac-1" as PracticeId;
 
 /** Named feed states, so a spec asks for "a dead feed" rather than assembling four fields. */
 const FEEDS: Record<string, FeedEvidence> = {
@@ -51,7 +61,12 @@ const FEEDS: Record<string, FeedEvidence> = {
 
 function snapshot() {
   const ops = getOps();
-  return { switches: ops.switches, auditEvents: ops.auditEvents, feed: ops.feed, queue: queueView() };
+  return {
+    switches: ops.switches,
+    auditEvents: ops.auditEvents,
+    feed: ops.feed,
+    queue: queueView(PRACTICE),
+  };
 }
 
 export async function GET() {
@@ -65,7 +80,11 @@ export async function POST(request: Request) {
   resetStore();
 
   const params = new URL(request.url).searchParams;
-  // Absent `feed` leaves the evidence null — the honest default, and its own renderable state.
+  // Absent `feed` leaves the practice unrecorded — the honest default, and its own state.
+  // `practice` targets a specific one so a spec can give two practices different feeds, which
+  // is what W181 needed to prove the evidence is no longer global.
+  const target = (params.get("practice") ?? PRACTICE) as PracticeId;
+
   const feed = params.get("feed");
   if (feed) {
     const evidence = FEEDS[feed];
@@ -75,7 +94,13 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    recordFeedEvidence(evidence);
+    recordFeedEvidence(target, evidence);
+  }
+
+  // Re-key the seeded rail onto the practice under test, so the console's practice and the
+  // rail's are the same one. Synthetic fixture only — the product never rewrites a practice id.
+  for (const invitation of getStore().state.invitations) {
+    if (invitation.practiceId === SEED_PRACTICE_ID) invitation.practiceId = target;
   }
 
   // An empty queue is the precondition for every silence state; the seed ships three offers.

@@ -120,6 +120,17 @@ export function outcomeOf(
   const finalIndex = definition.stages.length - 1;
   const furthestStage = furthestIndex >= 0 ? definition.stages[furthestIndex]!.stage : null;
 
+  // W181: a chain with no stages would make `finalIndex` and `furthestIndex` both -1, and the
+  // equality below would then return `reached` with an empty evidence list — a chain reported
+  // as completed on the strength of nothing. The module's rule is that no path returns a
+  // verdict without a citation, so a definition with no stages is refused rather than answered.
+  if (definition.stages.length === 0) {
+    throw new Error(
+      `chain "${definition.name}" declares no stages, so no outcome can be evidenced. ` +
+        "An empty definition cannot distinguish reached from not-recorded and must not answer.",
+    );
+  }
+
   // A stop is only meaningful short of the end: an event recording a cancellation AFTER the
   // chain demonstrably completed is a record to look at, not a reason to call the chain stopped.
   if (stopEvidence.length > 0 && furthestIndex < finalIndex) {
@@ -141,11 +152,17 @@ export function outcomeOf(
     verdict: "not_recorded",
     furthestStage,
     evidence: reachedEvidence,
-    // What would settle it: the next stage's arrival kinds, and the ways it could be recorded
-    // as stopping. Both are things somebody would have to write down.
+    // What would settle it: the next stage's arrival kinds, and the ways THIS stage could be
+    // recorded as stopping. Both are things somebody would have to write down.
+    //
+    // W181: the stop kinds come from the CURRENT stage, not the next one. `stoppedBy` is
+    // matched against the stage it is declared on (see the scan above), so reading the next
+    // stage's asked for a stop that stage does not own — a referral sitting at "written" was
+    // told only that an appointment would settle it, never that a cancellation would, which is
+    // the other half of the answer and the one that closes the chain.
     wouldSettleIt: [
       ...(definition.stages[furthestIndex + 1]?.reachedBy ?? []),
-      ...(definition.stages[furthestIndex + 1]?.stoppedBy ?? []),
+      ...(definition.stages[furthestIndex]?.stoppedBy ?? []),
     ],
   };
 }

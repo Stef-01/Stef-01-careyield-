@@ -158,15 +158,32 @@ export interface AgreementReport {
   disagreed: ReviewedCase[];
   agreed: ReviewedCase[];
   notReviewed: ReviewedCase[];
+  /**
+   * Sampled cases with NO review record at all — nobody has opened them.
+   *
+   * W181: distinct from `notReviewed`, where a reviewer looked and answered "not reviewed".
+   * Both are absences, and collapsing them would lose which kind. Held as ids because there is
+   * no record to hold.
+   */
+  noRecord: string[];
   /** Counts, alongside the rate rather than replaced by it. */
-  counts: { agreed: number; disagreed: number; notReviewed: number; total: number };
+  counts: { agreed: number; disagreed: number; notReviewed: number; noRecord: number; total: number };
   basis: string;
 }
 
 export function buildAgreementReport(sample: Sample, cases: readonly ReviewedCase[]): AgreementReport {
+  const found = new Map(cases.map((c) => [c.caseId, c]));
   const inSample = sample.caseIds
-    .map((id) => cases.find((c) => c.caseId === id))
+    .map((id) => found.get(id))
     .filter((c): c is ReviewedCase => c !== undefined);
+
+  // W181: SAMPLED CASES WITH NO RECORD ARE COUNTED, NOT DROPPED. They used to be filtered away
+  // silently, which shrank the denominator to "cases someone happened to file" — so a sample of
+  // ten with two reviews reported on two, and the document said "All 2 sampled case(s) have been
+  // reviewed" on the same page as "Sampled 10". That is the survivorship reading this module
+  // exists to refuse, arriving through the back door: the reassuring number was computed over
+  // exactly the cases that could not contradict it.
+  const noRecord = sample.caseIds.filter((id) => !found.has(id));
 
   const by = (answer: AgreementAnswer) => inSample.filter((c) => c.answer === answer);
   const disagreed = by("disagreed");
@@ -178,17 +195,39 @@ export function buildAgreementReport(sample: Sample, cases: readonly ReviewedCas
     disagreed,
     agreed,
     notReviewed,
+    noRecord,
     counts: {
       agreed: agreed.length,
       disagreed: disagreed.length,
       notReviewed: notReviewed.length,
-      total: inSample.length,
+      noRecord: noRecord.length,
+      // The SAMPLE size, not the number of records found. The denominator is what was asked
+      // about; anything else lets the total shrink toward whatever happens to have been filed.
+      total: sample.caseIds.length,
     },
-    basis:
-      notReviewed.length > 0
-        ? `${notReviewed.length} of ${inSample.length} sampled case(s) have not been reviewed yet. They are counted separately: an unreviewed case is not an agreement, and an audit that has not happened should not read as one that went well.`
-        : `All ${inSample.length} sampled case(s) have been reviewed.`,
+    basis: basisFor(sample.caseIds.length, notReviewed.length, noRecord.length),
   };
+}
+
+/**
+ * The sentence stating what the numbers rest on.
+ *
+ * The two absences are named separately because they ask different people for different things:
+ * an unopened case needs a reviewer assigned, a reviewed-but-unanswerable one is a finding about
+ * the case. Saying "not reviewed" for both would send the reader after the wrong one.
+ */
+function basisFor(total: number, notReviewed: number, noRecord: number): string {
+  if (notReviewed === 0 && noRecord === 0) {
+    return `All ${total} sampled case(s) have been reviewed.`;
+  }
+  const parts: string[] = [];
+  if (noRecord > 0) parts.push(`${noRecord} have no review recorded against them at all`);
+  if (notReviewed > 0) parts.push(`${notReviewed} were opened and could not be answered`);
+  return (
+    `Of ${total} sampled case(s), ${parts.join(" and ")}. They are counted separately: an ` +
+    "unreviewed case is not an agreement, and an audit that has not happened should not read " +
+    "as one that went well."
+  );
 }
 
 const BASIS_COPY: Record<DisagreementBasis, string> = {

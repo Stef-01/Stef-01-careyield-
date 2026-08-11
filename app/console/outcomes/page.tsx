@@ -33,7 +33,7 @@ import {
   whatWouldSettleIt,
 } from "@/outcomes/dashboard";
 import { OUTCOME_VERDICT_COPY, summarise, type OutcomeVerdict } from "@/outcomes/model";
-import { eventsFor } from "@/referrals/store";
+import { sentEventsFor } from "@/referrals/store";
 import { authorize } from "@/tenancy/tenancy";
 import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
@@ -58,7 +58,7 @@ export default async function OutcomesPage() {
 
   // Scoped in the query, not filtered afterwards — W123's rule, and the reason W91/W103 gave:
   // a later filter is a line somebody can delete, and the deletion looks like a simplification.
-  const outcomes = referralChainOutcomes(eventsFor(practiceId));
+  const outcomes = referralChainOutcomes(sentEventsFor(practiceId));
   const summary = summarise(outcomes, REFERRAL_CHAIN);
   const asks = whatWouldSettleIt(outcomes);
 
