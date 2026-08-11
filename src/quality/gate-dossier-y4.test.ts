@@ -16,13 +16,31 @@ const ROOT = process.cwd();
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
 const DOSSIER = readFileSync(path.join(ROOT, "docs", "GATE-DOSSIER-Y4.md"), "utf8");
 
-/** Rows the ledger currently marks blocked, with the note that says what they wait on. */
+/**
+ * The last unit that existed when this dossier was written.
+ *
+ * W208 added Year 5 and five of its rows are `blocked` from day one, which broke every count here
+ * — correctly, in the sense that the test noticed, and wrongly, in the sense that the Y4 dossier
+ * did not become inaccurate when Year 5 was planned. **A point-in-time document pinned against
+ * the LIVE ledger is pinned against a moving target**, and every future year-close dossier
+ * inherits the same bug unless it scopes itself the way this now does. The document prices the
+ * decisions outstanding at the close of Year 4; rows numbered above W208 are a later year's
+ * problem and belong to a later dossier.
+ */
+const Y4_LAST_UNIT = 208;
+
+/** Rows the ledger marks blocked, as of the close of Year 4. */
 const blockedRows = (): { id: string; note: string }[] =>
   LEDGER.split("\n")
     .filter((line) => /^\| [A-Z0-9-]+ \| blocked \|/.test(line))
     .map((line) => {
       const cells = line.split("|").map((c) => c.trim());
       return { id: cells[1]!, note: cells.slice(6).join("|") };
+    })
+    // Un-numbered rows (SUP-1, SUP-2) are Y2-era and stay in scope; W209+ are Year 5.
+    .filter((row) => {
+      const numbered = /^W(\d+)$/.exec(row.id);
+      return !numbered || Number(numbered[1]) <= Y4_LAST_UNIT;
     });
 
 /**

@@ -55,6 +55,7 @@ Next.js (App Router) + TypeScript strict + Tailwind · Supabase (Postgres + RLS 
 - **G7** — any feature that could constitute TGA-regulated CDSS (default: keep matching keyed to clinician attributes, never symptom-based patient triage)
 - **G8** — **PROPOSED at W104, awaiting founder ratification.** Third-party model processing: no patient-derived content, identified or not, is sent to any third-party model API until the founder has signed off the vendor, the data-flow and the retention terms. Proposed because Y3 Q12 is the first time anything would leave this tree to a third party, and no existing gate covers it — G2 governs holding real patient data, G5 governs clinical content, G7 governs CDSS, and none of them says whether de-identified case context may be transmitted to a model vendor at all. W146 and W147 are written to be buildable behind it; **the loop must not decide this itself.**
 - **G9** — **PROPOSED at W156, awaiting founder ratification.** Third-party organisational reporting: no practice-identifiable data is disclosed to any third-party organisation until the founder has signed off the recipient, the aggregation level, and the practice's own consent to that specific disclosure. Proposed because Y4 Q16 is the first time anything about a PRACTICE leaves this tree to an external body — one that also commissions services from that practice — and no existing gate covers it: G2 governs holding real patient data, G6 governs public-facing copy, G8 governs model vendors. W202 and W203 are written to be buildable behind it; **the loop must not decide this itself.**
+- **G10** — **PROPOSED at W208, awaiting founder ratification.** Payer and insurer data flows: no patient-linked data is exchanged with any payer or insurer until the founder has signed off the counterparty, the direction of flow, the minimum data set, and the patient's own consent to that specific exchange. Proposed because Y5 Q19 connects to payers, and no existing gate covers the relationship — G9 governs disclosure to a body that commissions services from the practice, and a payer differs from that in the way that matters: it has a financial interest in the individual patient's care and in whether that care happens at all. G1 governs credentials, G2 real patient data, G8 model vendors, and none of them says whether patient-linked clinical or claim data may flow to an insurer. W240 and W241 are written to be buildable behind it; **the loop must not decide this itself.**
 
 ## 5. Year 1 weekly ledger (W1–W52)
 
@@ -421,6 +422,131 @@ itself.**
 - **W206** Y4 full-system audit (W51 method: whole tree, not a diff) → verify: audit report + green suite.
 - **W207** Y4 gate dossier: G5, G6 and proposed G9 in one place → verify: every outstanding founder decision priced, with the units each unblocks named.
 - **W208** Y5 expansion: derive Q17–Q20 into §5e + BUILD-STATE → verify: 52 new units appended with verify gates; founder gates inherited intact.
+
+## 5e. Year 5 weekly ledger (W209–W260) — Intelligence & scale
+
+Expanded by W208 on 2026-08-11 per the §6 rule, from the Y5 themes in §6. Same contract: each
+unit is **build → verify**, `[P]` = parallel-safe. Founder gates are inherited, never expanded
+away — and §4 now carries a tenth, proposed below.
+
+**What Year 4 leaves on the table, and where it lands here.** Derived from what was actually
+built, from `docs/AUDIT-Y4.md` and from `docs/GATE-DOSSIER-Y4.md`, because a just-in-time plan
+that ignores its own audit is not just-in-time.
+
+1. **THE HEADLINE OF Y5 COLLIDES WITH A PUBLISHED LEGAL NOTICE, AND THE PLAN SAYS SO NOW RATHER
+   THAN IN WEEK NINE.** §6 wrote Q17 in Year 1 as "matching optimisation (deterministic
+   eligibility first, learned ranking second)". Since then W201 published the ADM-transparency
+   statement, and its *never automated* list says: **"No ordering of patients by need or by how
+   unwell they are, and no list of who is most at risk."** A learned ranker over patients is that
+   sentence. It is also close to G7's line, which is why W83 refused ranking clinicians and W61
+   ranks only on explainable factors. So Q17 delivers the response graph and deterministic
+   matching, W216 prices the question, and **W217 is `blocked` from day one on a founder decision
+   the loop must not take** — one that would require changing a published notice, not merely a
+   config. This is the Q13 lesson applied earlier: a unit that cannot ship is scheduled as
+   blocked, not discovered blocked.
+2. **The response graph has no responses.** Nothing has ever been sent — G1/G2/G3 unresolved
+   since Year 1, W174 still blocked — so an intervention-response graph over sent interventions is
+   a graph over zero rows. Same posture as Q14: the structure ships, it is exercised against W12's
+   synthetic harness, and every figure states its own basis (W196's rule) so a demo cannot be
+   mistaken for evidence.
+3. **PRIV-3's sweep is unfinished and its severity has changed.** Y4-1 was a HIGH cross-tenant
+   leak — every practice could read every other practice's complaints — created when W166 made two
+   practices real and converted a dormant `"prac-console"` literal into a live disclosure. The
+   audit did not reach `src/audit/store.ts`. W209 finishes the sweep in week one, on the argument
+   §5d used for W166: a cross-practice product puts single-tenant assumptions on the critical path.
+4. **A RECORDED FINDING IS NOT A CLOSED ONE, and Y4-1 is the proof.** PRIV-3 recorded half the
+   problem in Year 2 and sat `available` for two years. What was never written down is what the
+   literal would *do* once multi-practice landed — so nothing announced itself when the modelling
+   gap became a disclosure. W210 makes that mechanical: a recorded finding carries the condition
+   that would make it live, and the suite fails when the condition becomes true. This is the
+   W102/W150/W168 shape applied to findings instead of to code.
+5. **Six founder decisions are outstanding at the start of Y5 and four of them wait on gates
+   nobody has ruled on** (`docs/GATE-DOSSIER-Y4.md`). Y5 is planned so it does not stall on any of
+   them: every unit that needs a ruling is `blocked` in this expansion rather than half-built, and
+   the quarter dossiers (W216, W232, W245, W257) re-price rather than re-argue.
+6. **The plan runs out at W260.** The five-year arc ends inside Q20, so W260 writes the
+   next-horizon plan and renews the expansion rule itself — the one week where the rule has to
+   describe its own succession.
+
+**W156 checked the last expansion by hand** and wrote "plan and ledger checked unit-for-unit" in
+its commit message. W168 exists because the previous hand-checked ledger property — no gaps, no
+duplicates — broke silently the moment nobody was looking. The expansion property is the same
+class, so W208 ships `src/quality/plan-ledger.test.ts`: the plan and the ledger must name the same
+units in both directions, every planned unit must state a verify gate, and **every gate a blocked
+row names must be defined in §4** — which is "founder gates inherited, never expanded away" made
+mechanical instead of promised.
+
+**Proposed new gate, for founder ratification — G10: payer and insurer data flows.** Q19 connects
+to payers and insurers, and no existing gate covers it. G9 governs disclosure to a third-party
+*organisation* that commissions services from the practice; a payer is a different relationship,
+because it has a financial interest in the individual patient's care and in whether that care
+happens. G1 governs credentials for reading a practice's own systems, G2 real patient data, G8
+model vendors — none says whether patient-linked clinical or claim data may flow to an insurer at
+all. Proposed wording: *no patient-linked data is exchanged with any payer or insurer until the
+founder has signed off the counterparty, the direction of flow, the minimum data set, and the
+patient's own consent to that specific exchange.* W240 and W241 are written to be buildable behind
+it; **the loop must not decide this itself.** Proposed here on the W104/W156 precedent: the
+expansion unit proposes the gate for the year it is expanding.
+
+### Q17 — Intervention-response graph + deterministic matching (W209–W221) — **the learned half is blocked from day one**
+- **W209** PRIV-3 completion: finish the practice-scoping sweep Y4-1 started, `src/audit/store.ts` and every remaining unscoped store read → verify: every exported store read either takes a practice or is declared cross-practice with the erasure reason (W106's shape), checked both directions; Y4-1's non-vacuity method reused — unscope the read and watch named tests fail.
+- **W210** [P] Latent-finding register: a recorded finding carries the condition that would make it live → verify: PRIV-3's two-year history is the fixture; a finding whose trigger condition is now true fails the suite, and a finding with no stated trigger is refused.
+- **W211** [P] Intervention-response model: what a response to an intervention IS, as recorded facts → verify: no response can be constructed without the intervention it answers; an absent response is `not_recorded` and never "no response" (W170's rule inherited, not restated).
+- **W212** Response graph over the synthetic harness → verify: golden graph over W12's sim; asserts zero real interventions; every edge states the recorded facts it rests on (W196's basis rule).
+- **W213** [P] Matching explainability floor, built BEFORE any optimisation exists → verify: W86's total-explanation posture extended to matching — every decision renders its reason, no fallback branch, adding a reason without copy fails to typecheck.
+- **W214** Deterministic matching v2: multi-constraint slot assignment that never orders patients by need → verify: assignment is order-independent (entered in W167's fold register); a patient's position never depends on a clinical attribute, asserted structurally rather than by inspection.
+- **W215** [P] Counterfactual accounting: what would have happened without the intervention → verify: the holdout arm is the only comparator; no model-based counterfactual exists as a function; the figure refuses over a cohort below W72's floors.
+- **W216** Q17 dossier: the learned-ranking question, priced → verify: names the collision with W201's published ADM statement and with G7, states what a ruling would release and what it would cost, and takes no position; counts pinned by a test in W207's shape.
+- **W217** Learned ranking of patients → verify: n/a until ruled. **Blocked. FOUNDER DECISION — Q17 action 1, recorded in docs/GATE-DOSSIER-Q17.md: whether the product may order patients by anything a model learns, which would require changing the published ADM notice.**
+- **W218** [P] Response-graph privacy classification → verify: W106's record classes extended in the same commit; the graph holds no patient identity it does not need, and erasure reaches every class it does.
+- **W219** Intervention attribution v2 over the response graph → verify: cohort-level only; per-patient effect estimates are refused BY ABSENCE — no function exists, asserted on the module namespace.
+- **W220** [P] Q17 console: the response graph as a practice reads it → verify: e2e + axe; no clinical claim; the empty state distinguishes nothing happened from nothing recorded (W179).
+- **W221** Q17 hardening → verify: code-review + security-review skills; every new register checked both directions; W201's ADM register re-derived against anything Q17 added.
+
+### Q18 — Capacity forecasting + session-opening recommendations (W222–W234)
+- **W222** [P] Capacity model: sessions, slots and recorded utilisation → verify: over the synthetic practice; a session with no recorded history yields no forecast rather than a default.
+- **W223** Forecast as a stated interval, never a point — "open 6 slots Thursday → 4 to 6 fill" → verify: every forecast carries its basis and its uncertainty, and refuses below a floor of recorded weeks rather than emitting a confident number over thin data (W196's zero argument).
+- **W224** [P] Forecast honesty: every forecast is scored against what actually happened → verify: back-test over the sim; the score is recorded and rendered beside the forecast, so a forecaster that is usually wrong cannot present as one that is usually right.
+- **W225** Session-opening recommendation, addressed to the PRACTICE about its own diary → verify: no patient id can enter the recommendation type; asserted as an absence, not a filter.
+- **W226** [P] Recommendation copy and refusals → verify: compliance linter; W201's ADM register updated in the same commit, which is the rule W201 made mechanical rather than hopeful.
+- **W227** Seasonality and public holidays as declared data with a source → verify: nothing seasonal is inferred from the practice's own history; the calendar is data with provenance, W56's shape.
+- **W228** [P] Forecast drift monitor → verify: a forecaster that has stopped tracking reality is REPORTED, never silently recalibrated (W120's rule: report the disagreement, do not resolve it).
+- **W229** Capacity console → verify: e2e + axe; empty states distinguish no data from no capacity.
+- **W230** [P] Q18 privacy pass → verify: W106 classification; a forecast is practice-level and no figure can identify a patient, by type rather than by scrubbing.
+- **W231** Forecast → invitation-volume coupling, shipped explicitly OFF → verify: the coupling exists as a declared, disabled control; enabling it is a practice decision recorded with a reason, and the disabled state is pinned by its own test.
+- **W232** [P] Q18 dossier: what a forecast implies operationally, priced → verify: states what changes the day a practice acts on one.
+- **W233** Capacity attribution: did opening slots help? → verify: holdout-based only; refuses to answer without an arm rather than answering from the trend.
+- **W234** Q18 hardening → verify: review skills; registers both directions; zero criticals.
+
+### Q19 — FHIR/e-referral interoperability + payer integrations (W235–W247) — **proposes G10**
+- **W235** [P] FHIR R4 resource mapping as data → verify: round-trip over synthetic records; an unmapped field is NAMED in the output rather than dropped silently.
+- **W236** e-referral document profile → verify: W131's structured referral rendered to the profile; no clinical text is authored, generated or edited by this tree (G7's fourth property re-derived at the boundary).
+- **W237** [P] Interop conformance harness → verify: contract tests against recorded synthetic fixtures in W27/W28's shape; no live endpoint exists to call.
+- **W238** Terminology binding (SNOMED CT-AU, LOINC) as declared data → verify: every code carries provenance; an unbound code is refused rather than guessed, and the refusal names the code.
+- **W239** [P] Outbound disclosure ledger → verify: what left, to whom and when; W204's unresolved question — whether the log holds the FIGURES or only the fact of sending — is named in the module and left to the founder, with the model built so either answer is a one-line change.
+- **W240** Payer/insurer integration model → verify: n/a until ratified. **Blocked. FOUNDER GATE G10.**
+- **W241** Payer claim-status read → verify: n/a until ratified. **Blocked. FOUNDER GATE G10.**
+- **W242** [P] Interop credentials posture → verify: no credential in the tree; the loader enforces the gate rather than the values doing it (W56's shape); G1 named as the blocker for anything live.
+- **W243** Consent-to-disclose model → verify: a disclosure without a recorded patient consent is refused BY TYPE; silence is never consent (W135), and no timeout grants it (W134).
+- **W244** [P] Interop error semantics → verify: a failed or unacknowledged exchange is `unknown`, never "delivered" — W170's rule applied at the one boundary where the tree cannot see the other side.
+- **W245** Q19 dossier: G10 priced → verify: what G10 releases, what it costs, and what it does not cover; counts pinned by a test.
+- **W246** [P] Interop console → verify: e2e + axe; shows what was exchanged and, more importantly, what was not.
+- **W247** Q19 hardening → verify: security-review skill over every new boundary; the disclosure ledger's own W106 classification.
+
+### Q20 — Expansion verticals, platform APIs, five-year review (W248–W260) — **G5 load-bearing for the content units**
+- **W248** [P] Women's health vertical assembly, machinery only → verify: W157's model reused, not re-implemented; the vertical is refused with each missing member named; asserts zero clinical content present.
+- **W249** Women's health pathway content → verify: two-person sign-off recorded per W119. **Blocked. FOUNDER GATE G5.**
+- **W250** [P] Respiratory vertical assembly, machinery only → verify: same machinery; W158's completeness report states exactly which members are missing and who must act.
+- **W251** Respiratory pathway content → verify: two-person sign-off recorded per W119. **Blocked. FOUNDER GATE G5.**
+- **W252** [P] Vertical scaling: the registers at N verticals → verify: order-independence and a stated time budget over 20 synthetic verticals; the budget is asserted in the test body, W48's shape.
+- **W253** Platform API surface, read-only and practice-scoped → verify: every endpoint takes a practice as the QUERY (W123's rule); no endpoint can return cross-practice data, asserted the way Y4-1 should have been.
+- **W254** [P] API scope model → verify: scopes are declared data checked against the endpoint census in both directions; no production credential enters the tree.
+- **W255** API refusal semantics → verify: no patient data on any error path, asserted over every refusal branch rather than sampled.
+- **W256** [P] Five-year full-system audit (W51 method: the whole tree, not a diff) → verify: every sweep re-run from source rather than carried from AUDIT-Y4; independence of the reviewer stated plainly.
+- **W257** Five-year gate dossier: every decision still outstanding, priced → verify: counts derived from the ledger and pinned row-by-row by a test, W207's shape, so the document cannot go stale.
+- **W258** [P] The ADM register at five years → verify: W201's decision register re-derived against everything Y5 added, not assumed to have survived; the published notice regenerated from it.
+- **W259** The G7 boundary at five years → verify: W200's five rail properties re-derived; Q17's matching optimisation tested against them explicitly, since it is the first Y5 work that could have moved the line.
+- **W260** **YEAR 5 CLOSE.** Y6 horizon plan + expansion-rule renewal → verify: next-horizon plan written from the W256 audit and the W257 dossier; §6's expansion rule states what succeeds it now the five-year arc is spent; `plan-ledger` green over the whole ledger.
 
 ## 6. Years 2–5 — quarterly themes + expansion rule
 
