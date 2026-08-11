@@ -283,6 +283,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "W204 declares how long a produced report lives. Every export here is reviewer-facing: `REPORT_RETENTION` and `PROPOSED_DISCLOSURE_LOG` argue a retention posture to somebody auditing it, and `REPORTING_ARTEFACTS` is a checklist of what this product does and does not keep. None of it reaches an operator, and none of it describes anybody's care.",
   },
   {
+    module: "src/outcomes/response.ts",
+    operatorCopy: ["RESPONSE_STATE_COPY", "RESPONSE_ABSENCE_COPY", "RESPONSE_REJECTION_COPY"],
+    notCopy:
+      "The remaining exports are the model and its declared kind table. `RESPONSE_STATE_COPY` is W170's own wording re-exported rather than rewritten, `RESPONSE_ABSENCE_COPY` is the sentence a surface uses instead of \"no response\", and the rejection copy tells an operator why an event was not linked. None of it describes a patient, a condition or a next clinical step.",
+  },
+  {
     module: "src/tenancy/store-reads.ts",
     operatorCopy: [],
     notCopy:

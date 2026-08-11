@@ -181,6 +181,14 @@ export const AUTOMATED_DECISIONS: readonly AutomatedDecision[] = [
     registry: null,
   },
   {
+    id: "intervention-response-link",
+    title: "Whether something in your record counts as an answer to something we did.",
+    what: "Built and not in use. Where your practice sent you an availability message or wrote a referral, the software can link a later recorded fact — a booking, an attendance, a decline, an opt-out — to the thing that came before it, so the practice can see what its own actions led to. It links only facts somebody wrote down, only where the later fact comes after the earlier one, and only kinds it has been told to expect. Where nothing is recorded it says nothing is recorded: that is never read as you having declined, ignored us, or made any choice at all. Nothing in it is a judgement about you or your health, and no page in the product shows it yet.",
+    decidedBy: ["src/outcomes/response.ts"],
+    status: "built_not_in_use",
+    registry: null,
+  },
+  {
     id: "pathway-criteria",
     title: "Whether the facts on your file match a pathway your practice signed off.",
     what: "Built and not in use. Where a practice adopts a care pathway, the software compares facts already recorded on your file against the criteria in that pathway and flags the pathway for the practice to look at, including criteria that ask a clinician to look sooner. It reaches no conclusion about your health, it reads nothing but facts somebody recorded, and where a fact is missing it says so rather than assuming. No pathway has been signed off for use, so this decision is not currently being taken about anybody.",

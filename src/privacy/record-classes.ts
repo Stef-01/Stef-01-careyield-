@@ -182,6 +182,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W170 folds `RecordedEvent { chainId, kind, at }`. A chain id is a referral id, not a person, and no field on an Outcome or an OutcomeSummary can hold patient identity — the type has nowhere to put one.",
   },
   {
+    module: "src/outcomes/response.ts",
+    what: "The link between an intervention and a recorded fact that answers it",
+    handling: "no_patient_identity",
+    rationale:
+      "W211 builds a `Response` from W170's `RecordedEvent { chainId, kind, at }` and an `Intervention { interventionId, practiceId, chainId, kind, at }`. Neither type has a field a patient identifier could go in, and the constructor copies only from those two, so the link is a statement about a chain and a practice. Erasure is COMPOSED for the same reason W180 gave: scrub the source rail and the events these rest on are gone, with nothing here to remember to scrub. W218 classifies the GRAPH built over this, which is a different question because a graph can hold shape a single link cannot.",
+  },
+  {
     module: "src/outcomes/escalation-monitor.ts",
     what: "Unrouted escalations, aged",
     handling: "no_patient_identity",
