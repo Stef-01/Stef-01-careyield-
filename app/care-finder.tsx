@@ -334,8 +334,6 @@ export function CareFinder() {
                   <span>PMOS care</span>
                   <em>that gets you.</em>
                 </h1>
-                <p className="voice-promise">Say what matters to you. We listen for the rest.</p>
-                <p className="voice-scope">Starting with PMOS. The rest of women&rsquo;s health follows.</p>
               </motion.div>
             </motion.div>
 

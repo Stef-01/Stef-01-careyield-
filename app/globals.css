@@ -4472,18 +4472,6 @@ textarea:focus-visible {
   letter-spacing: -0.04em;
 }
 
-.patient-v2 .voice-screen .voice-promise {
-  max-width: 36ch;
-  margin: 18px auto 0;
-}
-
-.patient-v2 .voice-scope {
-  max-width: 46ch;
-  margin: 10px auto 0;
-  color: var(--faint);
-  font-size: 12px;
-  line-height: 1.6;
-}
 
 /* Demo scenarios live behind one quiet trigger; the panel pops out above it. */
 .patient-v2 .scenario-block {
@@ -4601,14 +4589,6 @@ textarea:focus-visible {
   margin: 0;
   padding: 0;
   border: 0;
-}
-
-.patient-v2 .voice-promise {
-  margin: 26px 0 0;
-  max-width: 34ch;
-  color: var(--muted);
-  font-size: 15px;
-  line-height: 1.6;
 }
 
 /* Finder desktop (2026-08-11 overhaul): the welcome and type stages once painted
