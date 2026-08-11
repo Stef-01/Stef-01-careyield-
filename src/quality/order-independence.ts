@@ -154,6 +154,17 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    // W178: the register caught the corpus on its first run — the corpus's own pre-fix
+    // reconstructions are folds, because they are copies of folds. Declared rather than
+    // excluded by name: an excluded file is a place to hide something (W168's rule).
+    module: "src/quality/order-regressions.ts",
+    folds: 5,
+    disposition: {
+      kind: "tie_break_test",
+      test: "src/quality/order-regressions.test.ts :: W178 the fixture still discriminates the fix (every entry, both orders)",
+    },
+  },
+  {
     module: "src/referrals/store.ts",
     folds: 1,
     disposition: {
