@@ -149,13 +149,20 @@ export const LATENT_FINDINGS: readonly LatentFinding[] = [
       "A gate dossier prices the founder decisions outstanding at a point in time, and its arithmetic is pinned by a test that reads the LIVE ledger. W207's did, and went red the moment W208 planned Year 5 and added five blocked rows — the document had not become wrong, the check had. Every future year-close dossier inherits the shape unless it bounds itself to its own year.",
     recordedBy: "W208",
     triggerStatement:
-      "A gate-dossier test reads BUILD-STATE without bounding itself to the units that existed when its dossier was written — a `_LAST_UNIT` bound, or equivalent.",
+      "A gate-dossier test reads BUILD-STATE without bounding itself to the units that existed when its dossier was written. The bound is recognised BY NAME — a constant ending `_LAST_UNIT` or `_LAST` — because a grep cannot detect the semantics, and saying which names count is honest where 'or equivalent' was not.",
     trigger: () =>
       readdirSync(path.join(SRC, "quality"))
         .filter((name) => /^gate-dossier-.*\.test\.ts$/.test(name))
         .some((name) => {
           const text = readFileSync(path.join(SRC, "quality", name), "utf8");
-          return text.includes("BUILD-STATE.md") && !/_LAST_UNIT/.test(text);
+          // W216 widened this from `_LAST_UNIT` alone, and it is a drift finding rather than a
+          // convenience. The statement above said "or equivalent" and the predicate accepted one
+          // literal identifier, so `gate-dossier-q17.test.ts` — bounded by `Q17_FIRST`/`Q17_LAST`
+          // from its first line — fired the finding on the firing that wrote it. Renaming the
+          // constant to satisfy the grep was the wrong fix: that is a check pushing an author
+          // into a worse shape, which is what W198 refused. The predicate now matches what its
+          // own sentence promises, and the sentence now names exactly what the predicate accepts.
+          return text.includes("BUILD-STATE.md") && !/_LAST(_UNIT)?\b/.test(text);
         }),
     status: "open",
   }),

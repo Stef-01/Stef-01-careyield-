@@ -14,8 +14,10 @@
 //   same instant. Each is broken on an identifier — `candidateRef`, then `slotId` — and **the
 //   tie-break is arbitrary on purpose**. Any tie-break that meant something would be a judgement
 //   about who deserves an appointment more, which is the one thing this matcher must not contain.
-//   W189 made the same argument about directory ordering. The register in W167 carries this
-//   module, and a shuffled-input test asserts the property rather than trusting the sorts.
+//   W189 made the same argument about directory ordering. NOT in W167's register, and that is a
+//   decision rather than an omission: that register counts FOLDS (`.reduce`, `.at(-1)`, last-index
+//   reads) and this matcher contains none, so an entry would fail its own both-directions check.
+//   A shuffled-input test over both inputs asserts the property directly instead.
 //
 //   FEASIBLE COUNTS ARE COMPUTED ONCE, AND THE REASON IS NOT THE OBVIOUS ONE. The first draft of
 //   this note said recomputing them as slots fill would reintroduce order-dependence. That is
@@ -89,8 +91,9 @@ export function matchSlots(
   const decisions = new Map<string, MatchDecision>();
   const taken = new Set<string>();
 
-  // Computed once, over the full offered set, before anything is assigned. See the module note:
-  // recomputing these as slots fill is how input order creeps back in behind total-looking sorts.
+  // Computed once, over the full offered set, before anything is assigned — so that "fewer
+  // options" means the options a candidate was OFFERED, which is what W213's copy tells a
+  // practice. See the module note: this is about meaning, not about order-dependence.
   const feasible = new Map<string, MatchSlot[]>();
   const eligible: MatchCandidate[] = [];
 
