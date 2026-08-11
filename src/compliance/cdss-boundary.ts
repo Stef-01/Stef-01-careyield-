@@ -241,6 +241,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "W201's ADM notice, and the one module here whose copy is read by a PATIENT rather than an operator — so it answers to W192's sweep at the `patient_notice` audience, which `automated-decisions.test.ts` runs over exactly this text, and not to the advice rules. The distinction is not a dodge, it is the finding: `lintEducationCopy` bundles W6's patient-MESSAGE vocabulary, and a legal notice must say the words a message may not. Running it here flags five strings and all five are the notice refusing the thing — \"not a judgement about whether you need to be seen\", \"no diagnosis\", \"no list of who is most at risk\", \"does not read your test results\". Seventh instance of W198's pattern, and the second time the answer is the audience rather than the string. NOT_A_DECISION is reviewer-facing besides, naming decisions in order to rule them out.",
   },
   {
+    module: "src/quality/latent-findings.ts",
+    operatorCopy: [],
+    notCopy:
+      "W210's register of findings that are not yet defects. Every string is written to whoever reads the register — the defect, and the condition that would make it live — and it quotes the language of the defects it describes, PRIV-3's cross-practice reads among them.",
+  },
+  {
     module: "src/quality/order-independence.ts",
     operatorCopy: [],
     notCopy:
