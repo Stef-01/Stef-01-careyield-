@@ -85,7 +85,9 @@ export type FigureRefusal =
   /** No period, or a period that runs backwards. */
   | "period_missing_or_unreadable"
   /** The basis does not name where it came from. */
-  | "source_missing";
+  | "source_missing"
+  /** The value is not a whole number at or above zero. NaN and negatives both land here. */
+  | "value_not_a_count";
 
 export type FigureResult =
   | { ok: true; figure: Figure }
@@ -138,6 +140,13 @@ export function figure(kind: FigureKind, value: number, basis: RecordedBasis): F
   if (!ISO_DATE.test(basis.fromIso) || !ISO_DATE.test(basis.toIso) || basis.fromIso > basis.toIso) {
     errors.push("period_missing_or_unreadable");
   }
+  // W205: a value must be a count before any of the arithmetic below means anything. NaN is the
+  // dangerous one and it is dangerous silently — every comparison against NaN is false, so
+  // `value > basis` did not catch it and W197's `value < floor` did not either. A NaN figure was
+  // constructed and PUBLISHED past the floor. Negative counts are refused in the same check
+  // because a count below zero is not a small cell, it is a broken caller.
+  if (!Number.isInteger(value) || value < 0) errors.push("value_not_a_count");
+
   // Zero records is a refusal rather than a zero figure. See the module note: the two readings of
   // "0" are opposite claims and only the wrong one is flattering.
   if (basis.recordedFacts <= 0) errors.push("nothing_recorded");
@@ -167,6 +176,8 @@ export const REFUSED_FIGURES: Readonly<Record<string, string>> = {
 };
 
 export const FIGURE_REFUSAL_COPY: Record<FigureRefusal, string> = {
+  value_not_a_count:
+    "A figure has to be a whole number of things that were counted. Anything else — a fraction, a negative, or an arithmetic result that came out as NaN — is a broken calculation rather than a small answer, and publishing it would put a number in front of a reader that no record supports.",
   nothing_recorded:
     "Nothing was recorded in this period, so there is no figure. This is not zero: zero would say the thing did not happen, and what is true is that the record does not show it happening.",
   value_exceeds_basis:

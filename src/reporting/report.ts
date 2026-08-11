@@ -65,13 +65,23 @@ export interface Coverage {
   /** Kinds present in the document, published or named as withheld. */
   reported: FigureKind[];
   /**
-   * Kinds with nothing recorded in the period.
+   * Kinds this report TRIED to compute and found nothing recorded for.
    *
    * W196 refuses to emit a figure over zero records, so these are absent from the figures rather
-   * than present as zeroes. Named here because otherwise the absence is indistinguishable from
-   * "we do not report this", and those lead a reader to opposite questions.
+   * than present as zeroes.
    */
   nothingRecorded: FigureKind[];
+  /**
+   * Kinds this product does not derive at all yet.
+   *
+   * W205 ADDED THIS LIST, because without it W199's two-list design was committing the exact
+   * conflation it existed to prevent. `nothingRecorded` was "every kind the caller did not pass",
+   * and nothing in the tree computes `register_membership` or `care_gaps_detected` — so every
+   * live report told a practice "the record held nothing to count" about two figures nobody had
+   * ever tried to count. That is a claim about the practice's rails made on the strength of a
+   * gap in this product.
+   */
+  notComputed: FigureKind[];
 }
 
 export const KIND_LABELS: Record<FigureKind, string> = {
@@ -95,16 +105,27 @@ export function buildPracticeReport(
   practiceName: string,
   period: ReportPeriod,
   figures: readonly Figure[],
+  /**
+   * The kinds this caller ATTEMPTED to compute.
+   *
+   * Required, and required for the reason W205 found: without it the report cannot tell a kind
+   * that came back empty from a kind nobody asked about, and it was reporting the second as the
+   * first. Defaulting it would restore exactly the bug — the caller is the only party that knows.
+   */
+  attempted: readonly FigureKind[],
 ): PracticeReport {
   const disclosure = suppressReport(figures);
   const reported = [...new Set(figures.map((f) => f.kind))].sort();
-  const nothingRecorded = ALL_FIGURE_KINDS.filter((kind) => !reported.includes(kind));
+  const nothingRecorded = attempted.filter((kind) => !reported.includes(kind)).sort();
+  const notComputed = ALL_FIGURE_KINDS.filter(
+    (kind) => !reported.includes(kind) && !attempted.includes(kind),
+  );
   return {
     practiceId,
     practiceName,
     period,
     disclosure,
-    coverage: { reported, nothingRecorded },
+    coverage: { reported, nothingRecorded, notComputed },
   };
 }
 
@@ -149,14 +170,23 @@ export function renderPracticeReport(report: PracticeReport, generatedAt: string
       : `Nothing was reported for this period.`,
   );
 
-  // Two lists rather than one, because the two silences lead a reader to opposite questions.
+  // Three lists rather than one, because the silences lead a reader to different questions and
+  // only one of them is a question about the practice.
   lines.push(
     report.coverage.nothingRecorded.length > 0
-      ? `Nothing recorded in this period: ${report.coverage.nothingRecorded
+      ? `Looked for and found nothing recorded in this period: ${report.coverage.nothingRecorded
           .map((k) => KIND_LABELS[k])
           .join(", ")}. These are absent because the record held nothing to count, not because they are withheld and not because the answer is zero.`
-      : `Every figure this report can carry had something recorded in this period.`,
+      : `Everything this report looked for had something recorded in this period.`,
   );
+
+  if (report.coverage.notComputed.length > 0) {
+    lines.push(
+      `Not produced by this product yet: ${report.coverage.notComputed
+        .map((k) => KIND_LABELS[k])
+        .join(", ")}. Nothing was looked for, so this says nothing about your practice — it is a gap in Meherr, not in your record.`,
+    );
+  }
 
   lines.push(``);
   return lines.join("\n");
@@ -170,6 +200,11 @@ export function renderPracticeReport(report: PracticeReport, generatedAt: string
  * — a kind with nothing recorded produces no figure at all rather than a zero, which is W196's
  * refusal and the reason `Coverage` has a `nothingRecorded` list to put it in.
  */
+export const REFERRAL_DERIVED_KINDS: readonly FigureKind[] = [
+  "referrals_written",
+  "referrals_with_recorded_completion",
+];
+
 export function figuresFromReferrals(
   written: number,
   withRecordedCompletion: number,

@@ -22,6 +22,7 @@ import { redirect } from "next/navigation";
 import { getConsole } from "@/console/store";
 import {
   KIND_LABELS,
+  REFERRAL_DERIVED_KINDS,
   REPORT_CAVEATS,
   buildPracticeReport,
   figuresFromReferrals,
@@ -37,19 +38,41 @@ export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Reporting — Meherr" };
 
-const PERIOD = { fromIso: "2026-04-01", toIso: "2026-06-30" };
+/**
+ * The window this page reports on.
+ *
+ * W205 FOUND THE DEFECT THIS CONSTANT CAUSED. The page stamped a hardcoded quarter onto counts
+ * that were never filtered by it: `sentBy(practiceId).length` is every referral the practice has
+ * ever written, and the synthetic rail dates every one of them 2026-02-01 — outside the quarter
+ * the document claimed. So the page rendered a true number under a false period, which is the
+ * exact failure W196 and W199 were both written to prevent, arriving through the one input
+ * neither of them validates.
+ *
+ * The calendar year in the synthetic phase, and the figures are now COUNTED WITHIN IT below. A
+ * real deployment takes the period from the request; what it must never do again is take the
+ * figures from one window and the label from another.
+ */
+const PERIOD = { fromIso: "2026-01-01", toIso: "2026-12-31" };
+
+const withinPeriod = (iso: string) => iso >= PERIOD.fromIso && iso <= PERIOD.toIso;
 
 export default async function ReportingPage() {
   const { email, record } = await requirePractice();
   const console_ = getConsole();
   const practiceId = record.practice.id;
+  // The document says when it was made. Stamping the period's end date claimed every render was
+  // produced on 30 June, on a page that recomputes on every request (W205).
+  const generatedAt = new Date().toISOString().slice(0, 10);
   if (!authorize(console_.memberships, email, practiceId, "view_dashboard").allowed) {
     redirect("/console");
   }
 
   // Scoped in the query, not filtered afterwards — W123's rule, and W181's finding.
-  const written = sentBy(practiceId).length;
-  const completed = referralChainOutcomes(sentEventsFor(practiceId)).filter(
+  // Then filtered BY PERIOD, which is W205's fix: a figure and the window it is labelled with
+  // have to come from the same place.
+  const written = sentBy(practiceId).filter((doc) => withinPeriod(doc.createdAt)).length;
+  const events = sentEventsFor(practiceId).filter((event) => withinPeriod(event.at));
+  const completed = referralChainOutcomes(events).filter(
     (outcome) => outcome.verdict === "reached",
   ).length;
 
@@ -58,8 +81,11 @@ export default async function ReportingPage() {
     record.practice.name,
     PERIOD,
     figuresFromReferrals(written, completed, PERIOD),
+    // What this page TRIED to compute. The other two kinds are not derived anywhere in the tree,
+    // and saying so is different from saying the practice's record held nothing (W205).
+    REFERRAL_DERIVED_KINDS,
   );
-  const document = renderPracticeReport(report, PERIOD.toIso);
+  const document = renderPracticeReport(report, generatedAt);
 
   return (
     <ConsoleShell email={email}>
@@ -114,11 +140,18 @@ export default async function ReportingPage() {
         </p>
         <p className="mt-2 text-sm text-stone-600" data-testid="coverage-absent">
           {report.coverage.nothingRecorded.length > 0
-            ? `Nothing recorded in this period: ${report.coverage.nothingRecorded
+            ? `Looked for and found nothing recorded in this period: ${report.coverage.nothingRecorded
                 .map((k) => KIND_LABELS[k])
                 .join(", ")}. These are absent because the record held nothing to count, not because they are withheld and not because the answer is zero.`
-            : "Every figure this report can carry had something recorded in this period."}
+            : "Everything this report looked for had something recorded in this period."}
         </p>
+        {report.coverage.notComputed.length > 0 && (
+          <p className="mt-2 text-sm text-stone-600" data-testid="coverage-not-computed">
+            {`Not produced by this product yet: ${report.coverage.notComputed
+              .map((k) => KIND_LABELS[k])
+              .join(", ")}. Nothing was looked for, so this says nothing about your practice — it is a gap in Meherr, not in your record.`}
+          </p>
+        )}
       </section>
 
       <section className="mt-6 rounded-xl border border-stone-200 bg-white p-6">

@@ -43,11 +43,20 @@ test("every figure on the page carries its denominator and its period", async ({
   const figures = page.getByTestId("figures");
   await expect(figures).toContainText(`Referrals written: ${written}`);
   await expect(figures).toContainText(`Counted over ${written} recorded fact(s)`);
-  await expect(figures).toContainText("2026-04-01 to 2026-06-30");
+  await expect(figures).toContainText("2026-01-01 to 2026-12-31");
   await expect(page.getByTestId("coverage-reported")).toContainText("Referrals written");
+
+  // W205: the figure and the period it is labelled with must come from the same window. This
+  // spec previously asserted a quarter the seeded referrals all fall OUTSIDE — every one is
+  // dated 2026-02-01 — so it locked in a true count under a false period, which is the exact
+  // failure W196 and W199 were both written to prevent.
+  const inPeriod = ((await seeded.json()) as { sent: { createdAt: string }[] }).sent.filter(
+    (doc) => doc.createdAt >= "2026-01-01" && doc.createdAt <= "2026-12-31",
+  ).length;
+  expect(inPeriod, "the fixture must sit inside the reported period").toBe(written);
 });
 
-test("the coverage section names what is absent and why, not only what is present", async ({
+test("the coverage section separates our gap from the practice's record", async ({
   page,
   request,
 }) => {
@@ -55,12 +64,34 @@ test("the coverage section names what is absent and why, not only what is presen
   await request.post("/api/mock/referrals?cancelled=1");
   await page.goto("/console/reporting");
 
-  // The three silences, distinguished. A reader who cannot tell absence-of-measurement from
-  // absence-of-activity assumes the second, because it needs no explanation.
+  // W205 split this into two claims because the page was making the wrong one. Nothing in the
+  // tree derives register membership or care gaps, and the page used to report them as the
+  // practice's record holding nothing — a claim about their rails made on the strength of a gap
+  // in Meherr. It now names them as ours.
+  await expect(page.getByTestId("coverage-not-computed")).toContainText(
+    "it is a gap in Meherr, not in your record",
+  );
+  await expect(page.getByTestId("coverage-not-computed")).toContainText("Register membership");
+});
+
+test("an attempted kind with nothing recorded reads differently from one we never compute", async ({
+  page,
+  request,
+}) => {
+  await signInAsMember(page);
+  // An empty rail: the page LOOKED for referral figures and found nothing, which is the other
+  // silence and the one that is genuinely about the practice's record.
+  await request.post("/api/mock/referrals?empty=1");
+  await page.goto("/console/reporting");
+
   const absent = page.getByTestId("coverage-absent");
-  await expect(absent).toContainText("the record held nothing to count");
+  await expect(absent).toContainText("Looked for and found nothing recorded");
   await expect(absent).toContainText("not because they are withheld");
   await expect(absent).toContainText("not because the answer is zero");
+
+  // Both sentences present at once, saying different things about different kinds — which is the
+  // whole point of the split.
+  await expect(page.getByTestId("coverage-not-computed")).toContainText("gap in Meherr");
 });
 
 test("a withheld figure appears as a named withholding, never as a gap", async ({

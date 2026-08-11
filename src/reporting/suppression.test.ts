@@ -97,13 +97,32 @@ describe("W197 two figures that each clear the floor can disclose a cell that do
   });
 
   it("leaves the differenceable pair unreconstructable in the document", () => {
-    const text = renderSuppressedReport(
-      suppressReport([
-        built("referrals_written", WRITTEN, 60),
-        built("referrals_with_recorded_completion", 38, 60),
-      ]),
-    ).join(" ");
+    // W205 STRENGTHENED THIS TEST, and the reason is that it passed against a document that
+    // leaked. It only checked the literal 38 was absent — but the statement said "the difference
+    // between them is fewer than 5 people", which beside the published 40 bounds the subset to
+    // [36,40] and the hidden group to [0,4]. That is the `band` this module refuses, arriving as
+    // an explanation, and a test looking for one number could not see it.
+    const report = suppressReport([
+      built("referrals_written", WRITTEN, 60),
+      built("referrals_with_recorded_completion", 38, 60),
+    ]);
+    const text = renderSuppressedReport(report).join(" ");
     expect(text).not.toMatch(/\b38\b/);
+
+    // No quantity at all in the complement statement: any number here narrows the range a reader
+    // can place the withheld figure in, which is the whole disclosure.
+    const statement = report.suppressed[0]!.statement;
+    expect(statement, "the complement statement quantifies the gap").not.toMatch(/\d/);
+    expect(statement).not.toMatch(/fewer than|less than|under \d|at most|no more than/i);
+    expect(statement).toContain("is the thing being protected");
+  });
+
+  it("still calibrates a value_below_floor suppression, where the floor reveals nothing new", () => {
+    // The two statements differ on purpose, and the asymmetry is the finding. For a plain
+    // small cell the floor is the reader's only calibration and tells them nothing they could
+    // not infer from the scheme existing. For a complement it IS the disclosure.
+    const plain = suppressReport([built("referrals_written", 3, 40)]).suppressed[0]!;
+    expect(plain.statement).toContain(`fewer than ${FLOOR}`);
   });
 
   it("publishes both when the difference clears the floor", () => {

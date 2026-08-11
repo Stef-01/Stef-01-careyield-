@@ -29,12 +29,23 @@ const built = (kind: FigureKind, value: number, recordedFacts: number): Figure =
 
 const FIGURES = [built("referrals_written", 40, 60), built("register_membership", 22, 60)];
 
+// What each fixture ATTEMPTED to compute. W205 made this an argument rather than an inference:
+// without it the report cannot tell a kind that came back empty from one nobody asked about.
+const ATTEMPTED: FigureKind[] = ["referrals_written", "register_membership"];
+const WITH_GAPS: FigureKind[] = [...ATTEMPTED, "care_gaps_detected"];
+const ALL_ATTEMPTED: FigureKind[] = [
+  "care_gaps_detected",
+  "referrals_with_recorded_completion",
+  "referrals_written",
+  "register_membership",
+];
+
 describe("W199 the report states its own denominator", () => {
   it("carries what every published figure was counted over", () => {
     // W196's argument, reaching the document: "4" is an impression, "4, counted over 12" is a
     // fact. A report that dropped the denominator would undo the unit that built it in.
     const rendered = renderPracticeReport(
-      buildPracticeReport("prac-1", "Demo Family Practice", PERIOD, FIGURES),
+      buildPracticeReport("prac-1", "Demo Family Practice", PERIOD, FIGURES, ATTEMPTED),
       "2026-07-01",
     );
     expect(rendered).toContain("counted over 60 recorded fact(s)");
@@ -48,7 +59,7 @@ describe("W199 the report states its own denominator", () => {
 
   it("repeats the period on every figure, because a quoted figure loses the heading first", () => {
     const rendered = renderPracticeReport(
-      buildPracticeReport("prac-1", "Demo", PERIOD, FIGURES),
+      buildPracticeReport("prac-1", "Demo", PERIOD, FIGURES, ATTEMPTED),
       "2026-07-01",
     );
     // Matched on the figure form specifically: the caveats also say "counted over", and a
@@ -61,30 +72,44 @@ describe("W199 the report states its own denominator", () => {
   });
 });
 
-describe("W199 the report states its own coverage", () => {
-  it("names the kinds it reports and the kinds it does not", () => {
-    const report = buildPracticeReport("prac-1", "Demo", PERIOD, FIGURES);
-    expect(report.coverage.reported).toEqual(["referrals_written", "register_membership"]);
-    expect(report.coverage.nothingRecorded).toEqual([
+describe("W199/W205 the report states its own coverage, in THREE lists", () => {
+  it("separates looked-for-and-empty from never-looked-for", () => {
+    // W205's finding. `nothingRecorded` used to be "every kind the caller did not pass", and
+    // nothing in the tree computes register membership or care gaps — so every live report told
+    // a practice "the record held nothing to count" about two figures nobody had ever tried to
+    // count. That is a claim about the practice's rails made on the strength of a gap in Meherr.
+    const report = buildPracticeReport("prac-1", "Demo", PERIOD, FIGURES, [
+      ...ATTEMPTED,
       "care_gaps_detected",
-      "referrals_with_recorded_completion",
     ]);
+    expect(report.coverage.reported).toEqual(["referrals_written", "register_membership"]);
+    expect(report.coverage.nothingRecorded).toEqual(["care_gaps_detected"]);
+    expect(report.coverage.notComputed).toEqual(["referrals_with_recorded_completion"]);
   });
 
-  it("distinguishes 'nothing recorded' from 'withheld' and from zero", () => {
-    // Three silences, three different next questions. W196 refuses to emit a figure over zero
-    // records, so an absent kind is invisible unless the document says why it is absent — and a
-    // reader who cannot tell absence-of-measurement from absence-of-activity assumes the second.
+  it("says of an un-attempted kind that the gap is ours, not the practice's", () => {
     const rendered = renderPracticeReport(
-      buildPracticeReport("prac-1", "Demo", PERIOD, FIGURES),
+      buildPracticeReport("prac-1", "Demo", PERIOD, FIGURES, ATTEMPTED),
       "2026-07-01",
     );
-    expect(rendered).toContain("the record held nothing to count");
+    expect(rendered).toContain("Not produced by this product yet");
+    expect(rendered).toContain("it is a gap in Meherr, not in your record");
+  });
+
+  it("distinguishes looked-for-and-empty from withheld and from zero", () => {
+    const rendered = renderPracticeReport(
+      buildPracticeReport("prac-1", "Demo", PERIOD, FIGURES, [
+        ...ATTEMPTED,
+        "care_gaps_detected",
+      ]),
+      "2026-07-01",
+    );
+    expect(rendered).toContain("Looked for and found nothing recorded");
     expect(rendered).toContain("not because they are withheld");
     expect(rendered).toContain("not because the answer is zero");
   });
 
-  it("states coverage even when every kind was reported", () => {
+  it("states coverage even when every attempted kind reported", () => {
     // The sentence must not appear only on incomplete reports, or its presence becomes the
     // signal. W120's rule about silence, applied to a caveat rather than to a figure.
     const all = [
@@ -94,19 +119,32 @@ describe("W199 the report states its own coverage", () => {
       built("care_gaps_detected", 11, 60),
     ];
     const rendered = renderPracticeReport(
-      buildPracticeReport("prac-1", "Demo", PERIOD, all),
+      buildPracticeReport("prac-1", "Demo", PERIOD, all, ALL_ATTEMPTED),
       "2026-07-01",
     );
-    expect(rendered).toContain("Every figure this report can carry had something recorded");
+    expect(rendered).toContain("Everything this report looked for had something recorded");
+    expect(rendered).not.toContain("Not produced by this product yet");
   });
 
   it("states coverage on an empty report rather than rendering a blank", () => {
     const rendered = renderPracticeReport(
-      buildPracticeReport("prac-1", "Demo", PERIOD, []),
+      buildPracticeReport("prac-1", "Demo", PERIOD, [], ATTEMPTED),
       "2026-07-01",
     );
     expect(rendered).toContain("Nothing was reported for this period.");
-    expect(rendered).toContain("Nothing recorded in this period:");
+    expect(rendered).toContain("Looked for and found nothing recorded");
+  });
+
+  it("attributes nothing to the practice when nothing was attempted at all", () => {
+    // The whole-report version of the same distinction: an empty attempted list means this
+    // product looked for nothing, and the document must not read as a description of a quiet
+    // practice.
+    const rendered = renderPracticeReport(
+      buildPracticeReport("prac-1", "Demo", PERIOD, [], []),
+      "2026-07-01",
+    );
+    expect(rendered).toContain("Not produced by this product yet");
+    expect(rendered).not.toContain("Looked for and found nothing recorded");
   });
 
   it("labels every kind it can name", () => {
@@ -126,7 +164,7 @@ describe("W199 G9 — nothing is disclosed from here", () => {
 
   it("says on the document that nothing has been sent", () => {
     const rendered = renderPracticeReport(
-      buildPracticeReport("prac-1", "Demo", PERIOD, FIGURES),
+      buildPracticeReport("prac-1", "Demo", PERIOD, FIGURES, ATTEMPTED),
       "2026-07-01",
     );
     expect(rendered).toContain("Nothing here has been sent to anybody");
@@ -134,7 +172,7 @@ describe("W199 G9 — nothing is disclosed from here", () => {
   });
 
   it("names the practice it belongs to, so it cannot be read as a group's", () => {
-    const report = buildPracticeReport("prac-1", "Demo Family Practice", PERIOD, FIGURES);
+    const report = buildPracticeReport("prac-1", "Demo Family Practice", PERIOD, FIGURES, ATTEMPTED);
     expect(renderPracticeReport(report, "2026-07-01")).toContain("prac-1");
   });
 });
@@ -143,7 +181,7 @@ describe("W199 suppression reaches the document", () => {
   it("renders a withheld figure as a named withholding, never as a gap", () => {
     const withSmall = [...FIGURES, built("care_gaps_detected", 2, 60)];
     const rendered = renderPracticeReport(
-      buildPracticeReport("prac-1", "Demo", PERIOD, withSmall),
+      buildPracticeReport("prac-1", "Demo", PERIOD, withSmall, WITH_GAPS),
       "2026-07-01",
     );
     expect(rendered).toContain("Care gaps detected: withheld");
@@ -154,10 +192,7 @@ describe("W199 suppression reaches the document", () => {
   it("counts a withheld kind as REPORTED, not as nothing recorded", () => {
     // The distinction the coverage section exists for: withheld means measured, and listing it
     // under "nothing recorded" would be the exact misreading W197's statements prevent.
-    const report = buildPracticeReport("prac-1", "Demo", PERIOD, [
-      ...FIGURES,
-      built("care_gaps_detected", 2, 60),
-    ]);
+    const report = buildPracticeReport("prac-1", "Demo", PERIOD, [...FIGURES, built("care_gaps_detected", 2, 60)], WITH_GAPS);
     expect(report.coverage.reported).toContain("care_gaps_detected");
     expect(report.coverage.nothingRecorded).not.toContain("care_gaps_detected");
   });
@@ -167,11 +202,11 @@ describe("W199 the report is golden", () => {
   it("renders the same bytes whatever order the figures arrive in", () => {
     // A golden document that depends on input order is a golden document for one caller.
     const forwards = renderPracticeReport(
-      buildPracticeReport("prac-1", "Demo Family Practice", PERIOD, FIGURES),
+      buildPracticeReport("prac-1", "Demo Family Practice", PERIOD, FIGURES, ATTEMPTED),
       "2026-07-01",
     );
     const backwards = renderPracticeReport(
-      buildPracticeReport("prac-1", "Demo Family Practice", PERIOD, [...FIGURES].reverse()),
+      buildPracticeReport("prac-1", "Demo Family Practice", PERIOD, [...FIGURES].reverse(), ATTEMPTED),
       "2026-07-01",
     );
     expect(backwards).toBe(forwards);
@@ -179,10 +214,7 @@ describe("W199 the report is golden", () => {
 
   it("matches the golden document", () => {
     const rendered = renderPracticeReport(
-      buildPracticeReport("prac-1", "Demo Family Practice", PERIOD, [
-        ...FIGURES,
-        built("care_gaps_detected", 2, 60),
-      ]),
+      buildPracticeReport("prac-1", "Demo Family Practice", PERIOD, [...FIGURES, built("care_gaps_detected", 2, 60)], WITH_GAPS),
       "2026-07-01",
     );
     expect(rendered).toBe(
@@ -206,7 +238,8 @@ describe("W199 the report is golden", () => {
         `## Coverage`,
         ``,
         `Reported here: Care gaps detected, Referrals written, Register membership.`,
-        `Nothing recorded in this period: Referrals with a recorded completion. These are absent because the record held nothing to count, not because they are withheld and not because the answer is zero.`,
+        `Everything this report looked for had something recorded in this period.`,
+        `Not produced by this product yet: Referrals with a recorded completion. Nothing was looked for, so this says nothing about your practice — it is a gap in Meherr, not in your record.`,
         ``,
       ].join("\n"),
     );

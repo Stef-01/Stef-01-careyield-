@@ -97,8 +97,20 @@ export interface SuppressedReport {
 const REASON_COPY: Record<SuppressionReason, (kind: FigureKind, floor: number) => string> = {
   value_below_floor: (kind, floor) =>
     `${LABELS[kind]}: withheld. This figure describes fewer than ${floor} people, and publishing it could identify them. It was measured; it is not missing.`,
-  complement_below_floor: (kind, floor) =>
-    `${LABELS[kind]}: withheld. It counts part of a larger figure in this report, and the difference between them is fewer than ${floor} people. Publishing both numbers would identify that group even though neither number is small. It was measured; it is not missing.`,
+  // W205: DELIBERATELY UNQUANTIFIED, and this is a correction to W197's own copy.
+  //
+  // The first version said "the difference between them is fewer than N people". Beside the
+  // PUBLISHED whole that sentence is a band: a reader holding 40 and the words "the difference
+  // is under 5" knows the withheld subset lies in [36,40] and the hidden group in [0,4]. That is
+  // precisely the `band` treatment `REFUSED_SUPPRESSION_TREATMENTS` refuses two screens further
+  // down — the module contradicted itself, and the explanation was the leak.
+  //
+  // Without the quantity, a reader knows only that the subset is somewhere in [0, whole], which
+  // is what "subset" already meant. The cost is that this statement cannot calibrate the way the
+  // value_below_floor one does, and that is the right trade: there the floor is the reader's only
+  // calibration and reveals nothing they could not infer; here it is the entire disclosure.
+  complement_below_floor: (kind) =>
+    `${LABELS[kind]}: withheld. It counts part of a larger figure in this report, and publishing both would identify a small group even though neither number is small on its own. It was measured; it is not missing. How much smaller it is, is the thing being protected, so this report does not say.`,
 };
 
 /**
@@ -111,6 +123,13 @@ const REASON_COPY: Record<SuppressionReason, (kind: FigureKind, floor: number) =
  */
 export const NESTED_KINDS: readonly { whole: FigureKind; part: FigureKind }[] = [
   { whole: "referrals_written", part: "referrals_with_recorded_completion" },
+  // W205: added. W196 defines a care gap as "a condition plus an overdue interval", so everybody
+  // with a gap is on the register for that condition — the containment follows from the
+  // definition rather than from a coincidence of the data. It was missing, and an undeclared
+  // nesting is a differencing channel nobody is checking that looks exactly like no channel.
+  // Neither figure is computed anywhere yet, which is why it went unnoticed and why declaring it
+  // now costs nothing: the register is meant to be ahead of the callers.
+  { whole: "register_membership", part: "care_gaps_detected" },
 ];
 
 const LABELS: Record<FigureKind, string> = {

@@ -134,7 +134,10 @@ const FEE_PATTERNS: Array<{ rule: string; pattern: RegExp }> = [
   },
   {
     rule: "no-price-comparison",
-    pattern: /\b(lower|less) than\b|\bcompared? (?:to|with)\b|\bbeat(?:s|ing)? (?:any|the)\b|\bmarket rate\b|\bbelow average\b/i,
+    // W205 narrowed the first alternative. `\b(lower|less) than\b` matched "Bulk billed for
+    // children less than 16", refusing an entire fee schedule over an age threshold. A price
+    // comparison needs a price on the other side of it, so the pattern now requires one.
+    pattern: /\b(?:lower|less) than\s+(?:\$|the\s+(?:usual|average|market|standard)|average|market|other|others|elsewhere|anywhere)\b|\bcompared? (?:to|with)\b|\bbeat(?:s|ing)? (?:any|the)\b|\bmarket rate\b|\bbelow average\b/i,
   },
   {
     rule: "no-out-of-pocket-estimate",
@@ -183,6 +186,12 @@ export const SERVICE_WORD_EXEMPTIONS: Readonly<Record<string, string>> = {
   reviews: "The plural of the same service name, for a line that lists more than one.",
 };
 
+/** The exempt service words as one pattern, so masking them needs no fold. */
+const SERVICE_WORD_PATTERN = new RegExp(
+  `\\b(?:${Object.keys(SERVICE_WORD_EXEMPTIONS).join("|")})\\b`,
+  "gi",
+);
+
 /**
  * Filed for the next hardening week, in the suite rather than in a commit message.
  *
@@ -202,11 +211,27 @@ function lintFeeOnly(text: string, field: string): ProfileCopyViolation[] {
   return out;
 }
 
-/** The full union applied to one fee string: W23, W6, W184's directory rules, and these. */
+/**
+ * The full union applied to one fee string: W23, W6, W184's directory rules, and these.
+ *
+ * W205 FIXED A HOLE HERE, AND THE SHAPE OF IT IS WORTH KEEPING. The exemption used to be a
+ * FILTER over the results: drop a `no-ratings` violation whose matched word is a service name.
+ * But a linter returns the FIRST match per rule, so one exempt word consumed the whole rule for
+ * that string — "Medication review clinic, rated 5/5 by patients" produced exactly one
+ * `no-ratings` violation, matching "review", which the filter then removed. The rating claim
+ * went out unlinted, and the same string without the word "review" was correctly refused.
+ *
+ * The exemption is now applied to the TEXT rather than to the findings: service words are masked
+ * before linting, so they cannot be the match, and everything else in the sentence is still
+ * checked. Masking preserves length so any offsets stay meaningful.
+ */
 export function lintFeeText(text: string, field: string): ProfileCopyViolation[] {
-  return [...lintDirectoryText(text, field), ...lintFeeOnly(text, field)].filter(
-    (v) => !(v.rule === "no-ratings" && v.match.toLowerCase() in SERVICE_WORD_EXEMPTIONS),
-  );
+  // One alternation rather than a fold over the words: with a fold, whether "reviews" survives
+  // depends on which key was masked first, and although both orders happen to agree here (the
+  // word boundaries make the two disjoint) that is a fact somebody would have to re-derive.
+  // W167's register exists for folds like it; not writing one is better than declaring one.
+  const masked = text.replace(SERVICE_WORD_PATTERN, (word) => "x".repeat(word.length));
+  return [...lintDirectoryText(masked, field), ...lintFeeOnly(masked, field)];
 }
 
 /** Every rule a fee schedule answers to, assembled rather than transcribed (W139's device). */

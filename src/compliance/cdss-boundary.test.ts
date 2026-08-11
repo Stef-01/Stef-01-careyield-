@@ -201,7 +201,15 @@ describe("W200 the product informs and never advises, across everything Y4 added
       ).toBe(true);
       expect(accepted.why.length, `${accepted.module} is accepted without an argument`).toBeGreaterThan(150);
       expect(accepted.reviewBy).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(accepted.reviewBy > "2026-08-11", `${accepted.module}'s acceptance has expired`).toBe(true);
+      // W205: compared against the CLOCK, not a frozen date. It was `> "2026-08-11"`, so every
+      // acceptance passed forever — the review date was recorded and never enforced, which is a
+      // control that looks exactly like a control that works. `src/security/audit-gate.ts` uses
+      // a real clock for the same reason: an expiry a test cannot reach is a comment.
+      const today = new Date().toISOString().slice(0, 10);
+      expect(
+        accepted.reviewBy > today,
+        `${accepted.module}'s copy acceptance expired on ${accepted.reviewBy} and needs re-reviewing`,
+      ).toBe(true);
     }
     expect(ACCEPTED_COPY_FINDINGS.length, "an acceptance list nobody had to write").toBeGreaterThan(0);
   });
