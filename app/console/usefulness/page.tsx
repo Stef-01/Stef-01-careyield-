@@ -2,9 +2,9 @@
 // Copy stays factual and non-clinical (no patient names — synthetic de-identified
 // labels only). Each visit is a single quick form: tap what happened, submit.
 
-import { getAudit, pendingVisits } from "@/audit/store";
+import { outcomesFor, pendingVisitsFor } from "@/audit/store";
 import { tallyOutcomes, USEFULNESS_OPTIONS } from "@/audit/usefulness";
-import { requireSession } from "../guard";
+import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
 import { submitUsefulness } from "./actions";
 
@@ -25,11 +25,13 @@ export default async function UsefulnessPage({
 }: {
   searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
-  const email = await requireSession();
+  // W209: the page reads THIS practice's queue. It used to read the whole store, which held
+  // every practice's attended appointments under an id no console mints.
+  const { email, record } = await requirePractice();
   const { saved, error } = await searchParams;
-  const state = getAudit();
-  const pending = pendingVisits(state);
-  const tally = tallyOutcomes(state.outcomes);
+  const practiceId = record.practice.id;
+  const pending = pendingVisitsFor(practiceId);
+  const tally = tallyOutcomes(outcomesFor(practiceId));
 
   return (
     <ConsoleShell email={email}>

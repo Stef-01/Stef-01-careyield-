@@ -27,10 +27,10 @@ const item = (itemId: string, conditionCode: string): EducationItem => ({
   relevantFactCodes: [],
 });
 
-function entry(entryId: string, clinicianId: string, at: string): CpdEntry {
+function entry(entryId: string, clinicianId: string, at: string, practiceId = "prac-1"): CpdEntry {
   const result = recordCpdEntry(
     {
-      entryId, clinicianId, kind: "opened", itemId: "item-a",
+      entryId, practiceId, clinicianId, kind: "opened", itemId: "item-a",
       sourceRef: "src-item-a", itemTitle: "Placeholder material item-a.", at,
     },
     [],
@@ -63,20 +63,20 @@ describe("W151 the CPD trail stays the clinician's", () => {
     for (const order of [BOTH, [...BOTH].reverse()]) {
       resetEducation();
       addCpdEntries(order);
-      expect(cpdEntriesFor("clin-1").map((e) => e.entryId).sort()).toEqual(["e1", "e3"]);
-      expect(cpdEntriesFor("clin-2").map((e) => e.entryId)).toEqual(["e2"]);
-      expect(JSON.stringify(cpdEntriesFor("clin-1"))).not.toContain("clin-2");
+      expect(cpdEntriesFor("prac-1", "clin-1").map((e) => e.entryId).sort()).toEqual(["e1", "e3"]);
+      expect(cpdEntriesFor("prac-1", "clin-2").map((e) => e.entryId)).toEqual(["e2"]);
+      expect(JSON.stringify(cpdEntriesFor("prac-1", "clin-1"))).not.toContain("clin-2");
     }
   });
 
   it("gives a clinician with no entries an empty list rather than everyone's", () => {
     addCpdEntries(BOTH);
-    expect(cpdEntriesFor("clin-nobody")).toEqual([]);
+    expect(cpdEntriesFor("prac-1", "clin-nobody")).toEqual([]);
   });
 
   it("hands W149 a trail that is already scoped, so the fold cannot widen it", () => {
     addCpdEntries(BOTH);
-    const trail = trailFor(cpdEntriesFor("clin-1"), "clin-1");
+    const trail = trailFor(cpdEntriesFor("prac-1", "clin-1"), "prac-1", "clin-1");
     expect(trail.entries.map((e) => e.entryId)).toEqual(["e1", "e3"]);
   });
 
@@ -84,9 +84,9 @@ describe("W151 the CPD trail stays the clinician's", () => {
     for (const order of [BOTH, [...BOTH].reverse()]) {
       resetEducation();
       addCpdEntries(order);
-      expect(scrubClinicianCpd("clin-1")).toBe(2);
-      expect(cpdEntriesFor("clin-2").map((e) => e.entryId)).toEqual(["e2"]);
-      expect(cpdEntriesFor("clin-1")).toEqual([]);
+      expect(scrubClinicianCpd("prac-1", "clin-1")).toBe(2);
+      expect(cpdEntriesFor("prac-1", "clin-2").map((e) => e.entryId)).toEqual(["e2"]);
+      expect(cpdEntriesFor("prac-1", "clin-1")).toEqual([]);
     }
   });
 });
@@ -113,6 +113,47 @@ describe("W151 the library is content, not practice data", () => {
     resetEducation();
     expect(getLibrary()).toEqual([]);
     expect(getTriggers()).toEqual([]);
-    expect(cpdEntriesFor("clin-1")).toEqual([]);
+    expect(cpdEntriesFor("prac-1", "clin-1")).toEqual([]);
+  });
+});
+
+describe("W209 a clinician id is only unique inside its practice", () => {
+  // W166 mints `clin-${n}` from a PER-PRACTICE counter and said so at the time: "a clinician id
+  // is only ever resolved inside the practice that minted it." This module resolved one without
+  // a practice, so `clin-1` at two practices shared a trail — and the page rendered the other
+  // person's reading record as the reader's own.
+  const A_CLIN1 = entry("a1", "clin-1", "2026-03-01", "prac-1");
+  const B_CLIN1 = entry("b1", "clin-1", "2026-03-02", "prac-2");
+
+  it("returns one practice's entries for a clinician id both practices minted", () => {
+    addCpdEntries([A_CLIN1, B_CLIN1]);
+    expect(cpdEntriesFor("prac-1", "clin-1").map((e) => e.entryId)).toEqual(["a1"]);
+    expect(cpdEntriesFor("prac-2", "clin-1").map((e) => e.entryId)).toEqual(["b1"]);
+  });
+
+  it("folds the same way, so the trail cannot widen what the read narrowed", () => {
+    addCpdEntries([A_CLIN1, B_CLIN1]);
+    const trail = trailFor([A_CLIN1, B_CLIN1], "prac-1", "clin-1");
+    expect(trail.entries.map((e) => e.entryId)).toEqual(["a1"]);
+  });
+
+  it("erases within the practice only — a clinician leaving A has not left B", () => {
+    // The opposite direction from patient erasure, which must reach every practice (W106).
+    // A clinician's trail at B is a different practice's record of a different engagement.
+    addCpdEntries([A_CLIN1, B_CLIN1]);
+    expect(scrubClinicianCpd("prac-1", "clin-1")).toBe(1);
+    expect(cpdEntriesFor("prac-2", "clin-1").map((e) => e.entryId)).toEqual(["b1"]);
+  });
+
+  it("refuses a correction aimed at the same clinician id at another practice", () => {
+    const attempt = recordCpdEntry(
+      {
+        entryId: "b2", practiceId: "prac-2", clinicianId: "clin-1", kind: "corrected",
+        itemId: "item-a", sourceRef: "src-item-a", itemTitle: "Placeholder material item-a.",
+        at: "2026-03-04", correctsEntryId: "a1", note: "Not mine to correct.",
+      },
+      [A_CLIN1],
+    );
+    expect(!attempt.ok && attempt.errors).toContain("not_your_entry");
   });
 });

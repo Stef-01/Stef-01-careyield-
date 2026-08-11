@@ -16,10 +16,15 @@ export async function submitUsefulness(formData: FormData): Promise<void> {
   if (!decision.allowed) redirect("/console/usefulness?error=denied");
   const appointmentId = formData.get("appointmentId");
   if (typeof appointmentId !== "string") redirect("/console/usefulness?error=1");
-  const result = recordOutcome({
-    appointmentId: appointmentId as string,
-    usefulness: formData.getAll("usefulness").map(String),
-    clinicianJudgedReasonable: formData.get("clinicianJudgedReasonable") === "on",
-  });
+  // W209: the same practice the grant was checked against. It was checked here and then dropped,
+  // so the write landed on a queue that belonged to nobody — see src/audit/store.ts.
+  const result = recordOutcome(
+    {
+      appointmentId: appointmentId as string,
+      usefulness: formData.getAll("usefulness").map(String),
+      clinicianJudgedReasonable: formData.get("clinicianJudgedReasonable") === "on",
+    },
+    record.practice.id,
+  );
   redirect(result.ok ? "/console/usefulness?saved=1" : `/console/usefulness?error=${result.error}`);
 }

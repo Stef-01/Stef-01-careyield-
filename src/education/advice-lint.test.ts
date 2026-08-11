@@ -87,13 +87,13 @@ describe("W150 the linter reaches every education surface", () => {
   it("passes every string W149's CPD export actually emits", () => {
     const built = recordCpdEntry(
       {
-        entryId: "e1", clinicianId: "clin-1", kind: "opened", itemId: "item-1",
+        entryId: "e1", practiceId: "prac-1", clinicianId: "clin-1", kind: "opened", itemId: "item-1",
         sourceRef: "src-1", itemTitle: "Placeholder material title.", at: "2026-03-01",
       },
       [],
     );
     if (!built.ok) throw new Error("fixture rejected");
-    const rendered = renderCpdExport(trailFor([built.entry], "clin-1"), "2026-08-11");
+    const rendered = renderCpdExport(trailFor([built.entry], "prac-1", "clin-1"), "2026-08-11");
     expect(lintEducationCopy(rendered)).toEqual([]);
     for (const copy of Object.values(CPD_REJECTION_COPY)) {
       expect(lintEducationCopy(copy), copy).toEqual([]);

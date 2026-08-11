@@ -73,19 +73,29 @@ export function addCpdEntries(entries: readonly CpdEntry[]): void {
 }
 
 /**
- * CPD entries for one clinician.
+ * CPD entries for one clinician at one practice.
  *
- * Takes the clinician id as the query, and there is deliberately no sibling returning everyone's
- * — W149's absence, preserved at the storage layer so it cannot be reintroduced by a page that
+ * Takes the pair as the query, and there is deliberately no sibling returning everyone's —
+ * W149's absence, preserved at the storage layer so it cannot be reintroduced by a page that
  * "just needs the list".
  */
-export function cpdEntriesFor(clinicianId: string): CpdEntry[] {
-  return state().cpd.filter((entry) => entry.clinicianId === clinicianId);
+export function cpdEntriesFor(practiceId: string, clinicianId: string): CpdEntry[] {
+  return state().cpd.filter(
+    (entry) => entry.practiceId === practiceId && entry.clinicianId === clinicianId,
+  );
 }
 
-/** Every CPD entry, for erasure and reset only. Never for a view. */
-export function scrubClinicianCpd(clinicianId: string): number {
+/**
+ * Drop one clinician's trail at one practice. For erasure and reset only, never for a view.
+ *
+ * PRACTICE-SCOPED, unlike patient erasure. A clinician leaving practice A has not left practice
+ * B, and their trail there is a different practice's record of a different engagement — W106's
+ * distinction, which is also why `scrubPatientFromComplaints` deliberately takes no practice.
+ */
+export function scrubClinicianCpd(practiceId: string, clinicianId: string): number {
   const before = state().cpd.length;
-  state().cpd = state().cpd.filter((entry) => entry.clinicianId !== clinicianId);
+  state().cpd = state().cpd.filter(
+    (entry) => !(entry.practiceId === practiceId && entry.clinicianId === clinicianId),
+  );
   return before - state().cpd.length;
 }

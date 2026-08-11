@@ -86,16 +86,33 @@ test("a signed-in non-member cannot record an outcome (W51)", async ({ page, req
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.waitForURL(/\/console(\/onboarding)?$/);
 
-  // The PAGE still renders — it shows the synthetic audit queue, which belongs to no practice —
-  // so the refusal is where it always was: in the action, which is the independently-invocable
-  // endpoint (W13). What changed is the wording of the refusal, not its existence.
+  // W209 CHANGED WHAT THE STRANGER SEES, and the old comment here recorded the defect as though
+  // it were a design: "the PAGE still renders — it shows the synthetic audit queue, which belongs
+  // to no practice". It belonged to no practice because the store stamped an id no console mints,
+  // and the page read the whole store to show anything at all. Now the queue belongs to a
+  // practice and the page asks which one, so a stranger never reaches a form.
   await page.goto("/console/usefulness");
-  const firstCard = page.locator("form").filter({ has: page.getByRole("button", { name: "Save" }) }).first();
-  await firstCard.getByText("Medication reviewed").click();
-  await firstCard.getByRole("button", { name: "Save" }).click();
-
   await expect(page).toHaveURL(/\/console\/onboarding$/);
+  await expect(page.getByRole("button", { name: "Save" })).toHaveCount(0);
+
   // The invariant this test exists for, checked at the store rather than on screen.
   const after = await (await request.get("/api/mock/usefulness")).json();
   expect(after.outcomes).toHaveLength(0);
+});
+
+test("W209: a second practice's audit queue is empty, not the first practice's", async ({ page, request }) => {
+  // The defect this unit closed, on screen. Before, whichever practice signed in saw every
+  // attended appointment in the store and could record an outcome against any of them — a WRITE
+  // across a tenancy boundary, and one the console authorized against its own practice first.
+  await signInAsMember(page);
+  await page.goto("/console/usefulness");
+  await expect(page.getByText("Patient 4821")).toBeVisible();
+
+  // Re-key the seeded queue onto a practice this session is not a member of.
+  await request.post("/api/mock/usefulness?practice=prac-99");
+  await page.reload();
+
+  await expect(page.getByText("No visits waiting for audit.")).toBeVisible();
+  await expect(page.getByText("Patient 4821")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Save" })).toHaveCount(0);
 });

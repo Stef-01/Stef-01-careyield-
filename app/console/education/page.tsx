@@ -49,7 +49,8 @@ export default async function EducationPage() {
     redirect("/console");
   }
 
-  const practiceConditionCodes = registersFor(record.practice.id)
+  const practiceId = record.practice.id;
+  const practiceConditionCodes = registersFor(practiceId)
     .filter((row) => row.enabled)
     .map((row) => row.condition.code as string);
 
@@ -76,7 +77,7 @@ export default async function EducationPage() {
 
   const identity = clinicianForEmail(record.clinicians, email);
   const trail = identity.linked
-    ? trailFor(cpdEntriesFor(identity.clinician.id), identity.clinician.id)
+    ? trailFor(cpdEntriesFor(practiceId, identity.clinician.id), practiceId, identity.clinician.id)
     : null;
   const corrected = new Set(trail?.correctedEntryIds ?? []);
 

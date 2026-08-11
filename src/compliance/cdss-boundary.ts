@@ -277,6 +277,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "W204 declares how long a produced report lives. Every export here is reviewer-facing: `REPORT_RETENTION` and `PROPOSED_DISCLOSURE_LOG` argue a retention posture to somebody auditing it, and `REPORTING_ARTEFACTS` is a checklist of what this product does and does not keep. None of it reaches an operator, and none of it describes anybody's care.",
   },
   {
+    module: "src/tenancy/store-reads.ts",
+    operatorCopy: [],
+    notCopy:
+      "W209's scope registry. `STORE_MODULES` is a file list and every `reason` in `STORE_READS` is addressed to a reviewer asking why a read is not narrowed to one practice. None of it reaches an operator, and none of it describes a patient, a condition or a next clinical step — the strings are about the shape of the code, not about anybody's care.",
+  },
+  {
     module: "src/verticals/binding.ts",
     operatorCopy: ["RESOLUTION_COPY", "ACCEPT_REFUSAL_COPY"],
     notCopy: "The remaining exports resolve which version a practice has accepted.",

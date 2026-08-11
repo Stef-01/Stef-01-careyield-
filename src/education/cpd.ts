@@ -34,7 +34,17 @@ export type CpdEntryKind =
 
 export interface CpdEntry {
   entryId: string;
-  /** Whose trail this is. Every read takes this and returns nothing else's. */
+  /**
+   * Which practice minted the clinician id below.
+   *
+   * W209: REQUIRED, because a clinician id is only unique inside its practice — W166 mints
+   * `clin-${n}` from a per-practice counter and said so at the time ("a clinician id is only ever
+   * resolved inside the practice that minted it"). This module resolved one WITHOUT a practice,
+   * so `clin-1` at two practices shared one trail: a reader saw another person's reading record
+   * rendered as their own, and a correction could be made about somebody else's entry.
+   */
+  practiceId: string;
+  /** Whose trail this is. Every read takes this AND the practice, and returns nothing else's. */
   clinicianId: string;
   kind: CpdEntryKind;
   itemId: string;
@@ -55,7 +65,8 @@ export type CpdRejection =
   | "correction_without_target"
   | "correction_without_note"
   | "correction_of_a_correction"
-  | "not_your_entry";
+  | "not_your_entry"
+  | "practice_missing";
 
 export type CpdResult = { ok: true; entry: CpdEntry } | { ok: false; errors: CpdRejection[] };
 
@@ -63,6 +74,7 @@ const ISO = /^\d{4}-\d{2}-\d{2}/;
 
 export interface CpdInput {
   entryId: string;
+  practiceId: string;
   clinicianId: string;
   kind: CpdEntryKind;
   itemId: string;
@@ -82,6 +94,7 @@ export interface CpdInput {
  */
 export function recordCpdEntry(input: CpdInput, existing: readonly CpdEntry[]): CpdResult {
   const errors: CpdRejection[] = [];
+  if (input.practiceId.trim() === "") errors.push("practice_missing");
   if (input.clinicianId.trim() === "") errors.push("clinician_missing");
   if (input.itemId.trim() === "") errors.push("item_missing");
   if (input.sourceRef.trim() === "") errors.push("source_missing");
@@ -91,7 +104,10 @@ export function recordCpdEntry(input: CpdInput, existing: readonly CpdEntry[]): 
     const target = existing.find((entry) => entry.entryId === input.correctsEntryId);
     if (!input.correctsEntryId || !target) errors.push("correction_without_target");
     if (!input.note || input.note.trim() === "") errors.push("correction_without_note");
-    if (target && target.clinicianId !== input.clinicianId) errors.push("not_your_entry");
+    // W209: the pair, not the clinician id alone. `clin-1` at another practice is another
+    // person, and a correction is a claim about somebody's professional record.
+    if (target && (target.clinicianId !== input.clinicianId || target.practiceId !== input.practiceId))
+      errors.push("not_your_entry");
     if (target && target.kind === "corrected") errors.push("correction_of_a_correction");
   }
 
@@ -100,6 +116,7 @@ export function recordCpdEntry(input: CpdInput, existing: readonly CpdEntry[]): 
     ok: true,
     entry: {
       entryId: input.entryId,
+      practiceId: input.practiceId,
       clinicianId: input.clinicianId,
       kind: input.kind,
       itemId: input.itemId,
@@ -113,6 +130,7 @@ export function recordCpdEntry(input: CpdInput, existing: readonly CpdEntry[]): 
 }
 
 export interface CpdTrail {
+  practiceId: string;
   clinicianId: string;
   /** Oldest first. Corrections appear in place, alongside what they correct. */
   entries: CpdEntry[];
@@ -123,15 +141,19 @@ export interface CpdTrail {
 /**
  * One clinician's own trail.
  *
- * Takes the clinician id as its query rather than filtering afterwards — W123's rule — and there
- * is deliberately no sibling that returns a practice's trails. A permission on such a function
- * would be a decision somebody could reverse; its absence is not.
+ * Takes the practice and the clinician id as its query rather than filtering afterwards —
+ * W123's rule — and there is deliberately no sibling that returns a practice's trails. A
+ * permission on such a function would be a decision somebody could reverse; its absence is not.
+ *
+ * W209 made the practice part of the query. Without it the filter matched a clinician id that is
+ * only unique inside one practice, which is not a filter at all once two practices exist.
  */
-export function trailFor(entries: readonly CpdEntry[], clinicianId: string): CpdTrail {
+export function trailFor(entries: readonly CpdEntry[], practiceId: string, clinicianId: string): CpdTrail {
   const mine = entries
-    .filter((entry) => entry.clinicianId === clinicianId)
+    .filter((entry) => entry.practiceId === practiceId && entry.clinicianId === clinicianId)
     .sort((a, b) => a.at.localeCompare(b.at) || a.entryId.localeCompare(b.entryId));
   return {
+    practiceId,
     clinicianId,
     entries: mine,
     correctedEntryIds: mine
@@ -180,6 +202,7 @@ export function renderCpdExport(trail: CpdTrail, asOf: string): string {
 }
 
 export const CPD_REJECTION_COPY: Record<CpdRejection, string> = {
+  practice_missing: "Say which practice this record belongs to.",
   clinician_missing: "Say whose record this is.",
   item_missing: "Say which material it was.",
   source_missing: "Record where the material came from, so an export can be checked.",

@@ -18,6 +18,7 @@ import {
 
 const input = (over: Partial<CpdInput> = {}): CpdInput => ({
   entryId: "e1",
+  practiceId: "prac-1",
   clinicianId: "clin-1",
   kind: "opened",
   itemId: "item-1",
@@ -62,23 +63,23 @@ describe("W149 the record belongs to the clinician", () => {
   });
 
   it("takes the clinician id as the query, not as a filter afterwards", () => {
-    expect(trailFor(ALL, "clin-1").entries.map((e) => e.entryId)).toEqual(["e1", "e2", "e4"]);
-    expect(trailFor(ALL, "clin-2").entries.map((e) => e.entryId)).toEqual(["e3"]);
+    expect(trailFor(ALL, "prac-1", "clin-1").entries.map((e) => e.entryId)).toEqual(["e1", "e2", "e4"]);
+    expect(trailFor(ALL, "prac-1", "clin-2").entries.map((e) => e.entryId)).toEqual(["e3"]);
   });
 
   it("another clinician's entries are absent, not merely unshown", () => {
-    expect(JSON.stringify(trailFor(ALL, "clin-1"))).not.toContain("clin-2");
-    expect(JSON.stringify(trailFor(ALL, "clin-1"))).not.toContain("e3");
+    expect(JSON.stringify(trailFor(ALL, "prac-1", "clin-1"))).not.toContain("clin-2");
+    expect(JSON.stringify(trailFor(ALL, "prac-1", "clin-1"))).not.toContain("e3");
   });
 
   it("a clinician with no entries gets an empty trail rather than everyone's", () => {
-    const empty = trailFor(ALL, "clin-nobody");
+    const empty = trailFor(ALL, "prac-1", "clin-nobody");
     expect(empty.entries).toEqual([]);
     expect(empty.clinicianId).toBe("clin-nobody");
   });
 
   it("says in the export that nobody else can see it", () => {
-    const rendered = renderCpdExport(trailFor(ALL, "clin-1"), "2026-08-11");
+    const rendered = renderCpdExport(trailFor(ALL, "prac-1", "clin-1"), "2026-08-11");
     expect(rendered).toContain("Meherr provides no view of it to anybody else");
   });
 });
@@ -87,13 +88,13 @@ describe("W149 correctable by its subject", () => {
   it("appends a correction rather than overwriting the original", () => {
     // The reading really did get logged. A record that can be silently rewritten is not
     // evidence of anything, which is the point of a CPD trail.
-    const trail = trailFor(ALL, "clin-1");
+    const trail = trailFor(ALL, "prac-1", "clin-1");
     expect(trail.entries.map((e) => e.entryId)).toContain("e1");
     expect(trail.correctedEntryIds).toEqual(["e1"]);
   });
 
   it("marks the corrected entry in the export instead of removing it", () => {
-    const rendered = renderCpdExport(trailFor(ALL, "clin-1"), "2026-08-11");
+    const rendered = renderCpdExport(trailFor(ALL, "prac-1", "clin-1"), "2026-08-11");
     expect(rendered).toContain("the clinician has since said this was wrong");
     expect(rendered).toContain("Opened by accident on a shared screen.");
   });
@@ -134,8 +135,12 @@ describe("W149 it records reading, not comprehension", () => {
   it("has no field for understanding, agreement or action", () => {
     // The moment there is one, a practice has a measure of whether its clinicians are learning
     // properly — a different product, and a worse one.
+    // W209 added `practiceId`, and this pin fired — which is what it is for. It is a scope key,
+    // not a measure of the clinician: it says which practice minted the id in `clinicianId`,
+    // because that id is only unique inside one. Nothing about attainment came with it.
     expect(Object.keys(OPENED).sort()).toEqual([
-      "at", "clinicianId", "correctsEntryId", "entryId", "itemId", "itemTitle", "kind", "note", "sourceRef",
+      "at", "clinicianId", "correctsEntryId", "entryId", "itemId", "itemTitle", "kind", "note",
+      "practiceId", "sourceRef",
     ]);
     for (const key of Object.keys(OPENED)) {
       expect(key).not.toMatch(/understood|comprehen|score|quiz|passed|agree|applied|acted/i);
@@ -153,22 +158,22 @@ describe("W149 it records reading, not comprehension", () => {
   it("says so in the export, where the record travels away from the product", () => {
     // An export leaves the product that explains it, and a reader will otherwise supply their
     // own meaning for what "read" means here.
-    const rendered = renderCpdExport(trailFor(ALL, "clin-1"), "2026-08-11");
+    const rendered = renderCpdExport(trailFor(ALL, "prac-1", "clin-1"), "2026-08-11");
     expect(rendered).toContain("not a record of comprehension, agreement, or of anything being acted on");
   });
 });
 
 describe("W149 fixtures and the export", () => {
   it("orders oldest first, deterministically", () => {
-    const forwards = trailFor(ALL, "clin-1").entries.map((e) => e.entryId);
-    const backwards = trailFor([...ALL].reverse(), "clin-1").entries.map((e) => e.entryId);
+    const forwards = trailFor(ALL, "prac-1", "clin-1").entries.map((e) => e.entryId);
+    const backwards = trailFor([...ALL].reverse(), "prac-1", "clin-1").entries.map((e) => e.entryId);
     expect(backwards).toEqual(forwards);
     expect(forwards).toEqual(["e1", "e2", "e4"]);
   });
 
   it("carries the source on every entry, so an export can be checked", () => {
-    for (const e of trailFor(ALL, "clin-1").entries) expect(e.sourceRef).toBeTruthy();
-    expect(renderCpdExport(trailFor(ALL, "clin-1"), "2026-08-11")).toContain("signed-off-source-1");
+    for (const e of trailFor(ALL, "prac-1", "clin-1").entries) expect(e.sourceRef).toBeTruthy();
+    expect(renderCpdExport(trailFor(ALL, "prac-1", "clin-1"), "2026-08-11")).toContain("signed-off-source-1");
   });
 
   it.each<[Partial<CpdInput>, CpdRejection]>([
@@ -193,7 +198,7 @@ describe("W149 fixtures and the export", () => {
   });
 
   it("renders an empty trail without implying anything about it", () => {
-    const rendered = renderCpdExport(trailFor([], "clin-1"), "2026-08-11");
+    const rendered = renderCpdExport(trailFor([], "prac-1", "clin-1"), "2026-08-11");
     expect(rendered).toContain("0 entr(y/ies)");
     expect(rendered.toLowerCase()).not.toMatch(/behind|overdue|insufficient|should/);
   });

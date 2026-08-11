@@ -51,10 +51,10 @@ const ITEMS: EducationItem[] = [
   },
 ];
 
-function cpd(entryId: string, clinicianId: string, at: string, itemId: string): CpdEntry {
+function cpd(entryId: string, practiceId: string, clinicianId: string, at: string, itemId: string): CpdEntry {
   const result = recordCpdEntry(
     {
-      entryId, clinicianId, kind: "opened", itemId,
+      entryId, practiceId, clinicianId, kind: "opened", itemId,
       sourceRef: `signed-off-source-${itemId.replace("item-", "")}`,
       itemTitle: `Placeholder material ${itemId.replace("item-", "").toUpperCase()} — fixture only.`,
       at,
@@ -154,11 +154,11 @@ export async function POST(request: NextRequest) {
   }
 
   if (mine) {
-    const own = cpd("cpd-1", mine.id, "2026-03-01", "item-a1");
-    const correctable = cpd("cpd-2", mine.id, "2026-03-02", "item-a2");
+    const own = cpd("cpd-1", record!.practice.id, mine.id, "2026-03-01", "item-a1");
+    const correctable = cpd("cpd-2", record!.practice.id, mine.id, "2026-03-02", "item-a2");
     const correction = recordCpdEntry(
       {
-        entryId: "cpd-3", clinicianId: mine.id, kind: "corrected", itemId: "item-a2",
+        entryId: "cpd-3", practiceId: record!.practice.id, clinicianId: mine.id, kind: "corrected", itemId: "item-a2",
         sourceRef: "signed-off-source-a2", itemTitle: correctable.itemTitle, at: "2026-03-04",
         correctsEntryId: "cpd-2", note: "Opened by accident on a shared screen.",
       },
@@ -168,7 +168,7 @@ export async function POST(request: NextRequest) {
     if (correction.ok) entries.push(correction.entry);
     // A colleague's entry, which must never reach the signed-in clinician's record.
     const other = record!.clinicians[1];
-    if (other) entries.push(cpd("cpd-colleague", other.id, "2026-03-03", "item-a1"));
+    if (other) entries.push(cpd("cpd-colleague", record!.practice.id, other.id, "2026-03-03", "item-a1"));
     addCpdEntries(entries);
   }
 
