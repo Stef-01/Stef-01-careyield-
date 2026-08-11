@@ -186,6 +186,12 @@ describe("W178 the corpus and W167's register agree", () => {
       "src/messaging/approval.ts",
       "src/pathways/approval.ts",
       "src/verticals/binding.ts",
+      // W188, added by this control catching it on the day the module landed — which is the
+      // register working rather than the register being edited around. A same-day join/leave
+      // tie was resolved at design time (departure wins, so a practice is never published on an
+      // unresolvable day), so nothing shipped wrong and there is no pre-fix behaviour to
+      // reproduce.
+      "src/directory/membership.ts",
     ]);
     const inCorpus = new Set(
       [...ORDER_REGRESSIONS.map((r) => r.site), Q11_2.site].map((s) => s.split(" :: ")[0]!),

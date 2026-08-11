@@ -79,6 +79,16 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    // W188: a same-day join/leave pair is a real tie on a day-granular date, and the tie-break
+    // is a safety decision rather than a guess — see the test.
+    module: "src/directory/membership.ts",
+    folds: 1,
+    disposition: {
+      kind: "tie_break_test",
+      test: "src/directory/membership.test.ts :: W188 a join and a leave on the same day resolve to NOT a member, either way round",
+    },
+  },
+  {
     module: "src/engine/continuity.ts",
     folds: 1,
     disposition: {
