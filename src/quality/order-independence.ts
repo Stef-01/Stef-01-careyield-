@@ -282,7 +282,9 @@ export function discoverFoldSites(root: string): Array<{ module: string; folds: 
       // somebody who has not read the code — the failure mode a register exists to prevent.
       const source = stripComments(readFileSync(full, "utf8"));
       const count = (source.match(FOLD_RE) ?? []).length;
-      if (count > 0) found.push({ module: full.slice(root.length + 1), folds: count });
+      // Repo-relative with posix separators on every platform: the register is written
+      // with "/" and Windows walks produce "\", which read as 20 phantom drifts.
+      if (count > 0) found.push({ module: full.slice(root.length + 1).replaceAll("\\", "/"), folds: count });
     }
   };
 

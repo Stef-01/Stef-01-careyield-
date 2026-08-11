@@ -142,7 +142,8 @@ export function reachableFromApp(root: string): ReachResult {
     }
   }
 
-  const rel = (p: string) => p.slice(root.length + 1);
+  // Posix separators on every platform, matching how callers and tests name files.
+  const rel = (p: string) => p.slice(root.length + 1).replaceAll("\\", "/");
   return {
     files: [...seen].map(rel).sort(),
     packages: [...packages].sort(),

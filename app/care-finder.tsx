@@ -60,6 +60,17 @@ const reducedStageVariants: Variants = {
   exit: { opacity: 0, transition: { duration: 0.1 } },
 };
 
+// Welcome intro: children rise in sequence under the screen-level fade.
+const introStagger: Variants = {
+  initial: {},
+  animate: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+};
+
+const introItem: Variants = {
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+};
+
 const matchVariants: Variants = {
   initial: (direction: number) => ({ opacity: 0, x: direction * 28 }),
   animate: {
@@ -320,60 +331,81 @@ export function CareFinder() {
 
             <FinderContext />
 
-            <div className="voice-core">
-              <div className="voice-prompt">
+            <motion.div className="voice-core" variants={reducedMotion ? undefined : introStagger}>
+              <motion.div className="voice-prompt" variants={reducedMotion ? undefined : introItem}>
                 <h1>
-                  <span>Meet the doctor</span>
-                  <em>who gets you.</em>
+                  <span>PMOS care</span>
+                  <em>that gets you.</em>
                 </h1>
                 <p className="voice-promise">Say what matters to you. We listen for the rest.</p>
-              </div>
+                <p className="voice-scope">
+                  Starting with PMOS, the condition long known as PCOS. The rest of women&rsquo;s health follows.
+                </p>
+              </motion.div>
 
-              <button
-                className="scenario-toggle"
-                type="button"
-                aria-expanded={showScenarios}
-                aria-controls="demo-scenarios"
-                onClick={() => setShowScenarios((current) => !current)}
-              >
-                <span>Try a demo scenario</span>
-                <small>{archetypeIndex + 1} of {careArchetypes.length}</small>
-                <CaretRight className={showScenarios ? "is-open" : ""} size={17} weight="bold" aria-hidden="true" />
-              </button>
+              <motion.div className="scenario-block" variants={reducedMotion ? undefined : introItem}>
+                <button
+                  className="scenario-toggle"
+                  type="button"
+                  aria-expanded={showScenarios}
+                  aria-controls="demo-scenarios"
+                  onClick={() => setShowScenarios((current) => !current)}
+                >
+                  <span>Try a demo scenario</span>
+                  <small>{archetypeIndex + 1} of {careArchetypes.length}</small>
+                  <CaretRight className={showScenarios ? "is-open" : ""} size={17} weight="bold" aria-hidden="true" />
+                </button>
 
-              {showScenarios && (
-                <div id="demo-scenarios" className="archetype-switcher" role="group" aria-label="Demo care scenarios">
-                  <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(-1); }} aria-label="Previous care scenario">
-                    <CaretLeft size={19} weight="light" aria-hidden="true" />
-                  </Pressable>
-                  <AnimatePresence mode="wait" initial={false}>
+                <AnimatePresence initial={false}>
+                  {showScenarios && (
                     <motion.div
-                      className="archetype-switcher-copy"
-                      key={archetype.id}
-                      initial={{ opacity: 0, x: matchDirection * 7 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: matchDirection * -7 }}
-                      transition={{ duration: 0.2 }}
+                      key="demo-scenarios"
+                      initial={reducedMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                      animate={reducedMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
+                      exit={reducedMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                      style={{ overflow: "hidden" }}
                     >
-                      <span>{archetype.eyebrow}</span>
-                      <strong>{archetype.title}</strong>
-                      <q className="example">{archetype.example}</q>
+                      <div id="demo-scenarios" className="archetype-switcher" role="group" aria-label="Demo care scenarios">
+                        <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(-1); }} aria-label="Previous care scenario">
+                          <CaretLeft size={19} weight="light" aria-hidden="true" />
+                        </Pressable>
+                        <AnimatePresence mode="wait" initial={false}>
+                          <motion.div
+                            className="archetype-switcher-copy"
+                            key={archetype.id}
+                            initial={{ opacity: 0, x: matchDirection * 7 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: matchDirection * -7 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <span>{archetype.eyebrow}</span>
+                            <strong>{archetype.title}</strong>
+                            <q className="example">{archetype.example}</q>
+                          </motion.div>
+                        </AnimatePresence>
+                        <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(1); }} aria-label="Next care scenario">
+                          <CaretRight size={19} weight="light" aria-hidden="true" />
+                        </Pressable>
+                      </div>
                     </motion.div>
-                  </AnimatePresence>
-                  <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(1); }} aria-label="Next care scenario">
-                    <CaretRight size={19} weight="light" aria-hidden="true" />
-                  </Pressable>
-                </div>
-              )}
-            </div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </motion.div>
 
-            <div className="voice-actions">
+            <motion.div
+              className="voice-actions"
+              initial={reducedMotion ? undefined : { opacity: 0, y: 14 }}
+              animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.28, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
               <Pressable className="mic-button" type="button" onClick={startListening} aria-label="Start voice description">
                 <Microphone size={38} weight="light" aria-hidden="true" />
                 <span>Talk for 20 seconds</span>
               </Pressable>
               <button className="text-action" type="button" onClick={() => setStage("type")}>Type instead</button>
-            </div>
+            </motion.div>
 
           </MotionScreen>
         )}
@@ -423,8 +455,8 @@ export function CareFinder() {
               <FinderContext />
               <p className="eyebrow">In your own words</p>
               <h1>
-                <span>Meet the doctor</span>
-                <em>who gets you.</em>
+                <span>PMOS care</span>
+                <em>that gets you.</em>
               </h1>
               <label className="sr-only" htmlFor="doctor-request">Describe the GP you want to see</label>
               <textarea

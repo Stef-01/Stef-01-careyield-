@@ -25,6 +25,10 @@ function runAudit(): string {
     return execFileSync("pnpm", ["audit", "--audit-level", DEFAULT_THRESHOLD, "--json"], {
       encoding: "utf8",
       maxBuffer: 32 * 1024 * 1024,
+      // Windows installs pnpm as pnpm.cmd, which CreateProcess cannot exec directly;
+      // without a shell the gate dies with ENOENT before it ever reads a report.
+      // The command and its arguments are fixed strings, so the shell adds no injection surface.
+      shell: process.platform === "win32",
     });
   } catch (error) {
     // `pnpm audit` exits non-zero whenever it finds anything, so a non-zero exit is

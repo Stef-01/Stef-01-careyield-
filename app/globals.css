@@ -4480,30 +4480,78 @@ textarea:focus-visible {
   gap: 5px;
 }
 
+/* Finder welcome (2026-08-11 overhaul) — a single centred column on the paper
+   ground every other stage already uses. PMOS carries the headline; the scope
+   line under the promise names the expansion quietly. */
 .patient-v2 .voice-screen .voice-prompt {
-  padding: 30px 22px 16px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 26px 26px 0;
+  text-align: center;
 }
 
 .patient-v2 .voice-screen .voice-prompt h1 {
-  max-width: 390px;
-  font-size: clamp(44px, 11vw, 58px);
+  max-width: none;
+  margin-top: 0;
+  font-size: clamp(46px, 11vw, 58px);
+}
+
+.patient-v2 .voice-screen .voice-prompt h1 span,
+.patient-v2 .voice-screen .voice-prompt h1 em {
+  display: block;
+}
+
+.patient-v2 .voice-screen .voice-prompt h1 span {
+  font-family: "Inter Variable", Inter, system-ui, sans-serif;
+  font-size: 0.8em;
+  font-weight: 420;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.patient-v2 .voice-screen .voice-prompt h1 em {
+  margin-top: 6px;
+  padding-bottom: 5px;
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: 1.06em;
+  font-weight: 390;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.patient-v2 .voice-screen .voice-promise {
+  max-width: 36ch;
+  margin: 18px auto 0;
+}
+
+.patient-v2 .voice-scope {
+  max-width: 46ch;
+  margin: 10px auto 0;
+  color: var(--faint);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.patient-v2 .scenario-block {
+  display: flex;
+  flex-direction: column;
 }
 
 .patient-v2 .scenario-toggle {
-  display: grid;
-  width: calc(100% - 44px);
-  min-height: 48px;
-  grid-template-columns: 1fr auto 18px;
-  gap: 8px;
+  display: inline-flex;
+  width: min(400px, calc(100% - 44px));
+  min-height: 46px;
+  gap: 9px;
   align-items: center;
-  margin: 0 22px;
+  justify-content: center;
+  margin: 4px auto 0;
   padding: 0;
   border: 0;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   color: var(--ink);
   background: transparent;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
 }
 
@@ -4527,10 +4575,16 @@ textarea:focus-visible {
 }
 
 .patient-v2 .voice-screen .voice-actions {
+  align-items: center;
   padding-bottom: 28px;
 }
 
+.patient-v2 .voice-screen .mic-button {
+  width: min(340px, 100%);
+}
+
 .patient-v2 .voice-screen .voice-actions .text-action {
+  width: max-content;
   min-height: 38px;
   margin-top: 6px;
   border: 0;
@@ -4550,81 +4604,11 @@ textarea:focus-visible {
   text-wrap: pretty;
 }
 .patient-v2 .archetype-switcher {
+  width: min(460px, calc(100% - 44px));
   min-height: 0;
-  padding: 4px 0;
-}
-
-/* Deliberately NOT two-column on wide viewports: the finder renders inside a fixed
-   ~520px app shell shared by every stage, so a viewport-keyed media query splits that
-   520px in half and overflows the headline (tried it; the headline bled past its column
-   and the quote laddered one word per line). A real desktop composition means widening
-   the shell for every stage — a bigger change than this pass, and one that deserves its
-   own unit. Container queries on .voice-core are the right tool when that happens. */
-
-/* Finder welcome — editorial full-bleed treatment; ground is Deep (#292800)
-   from the rose-rebrand's supporting olive pair. */
-.patient-v2[data-stage="welcome"] .voice-screen {
-  isolation: isolate;
-  color: #fff;
-  background: #292800;
-}
-
-.patient-v2[data-stage="welcome"] .minimal-header,
-.patient-v2[data-stage="welcome"] .finder-context,
-.patient-v2[data-stage="welcome"] .voice-core,
-.patient-v2[data-stage="welcome"] .voice-actions {
-  position: relative;
-  z-index: 1;
-}
-
-.patient-v2[data-stage="welcome"] .minimal-header {
-  border-color: rgb(255 255 255 / 22%);
-}
-
-.patient-v2[data-stage="welcome"] .wordmark,
-.patient-v2[data-stage="welcome"] .quiet-link,
-.patient-v2[data-stage="welcome"] .text-action {
-  color: #fff;
-}
-
-.patient-v2[data-stage="welcome"] .finder-context {
-  border-color: rgb(255 255 255 / 24%);
-}
-
-.patient-v2[data-stage="welcome"] .finder-context p {
-  color: #E0AEBA;
-}
-
-.patient-v2[data-stage="welcome"] .finder-context strong {
-  color: rgb(255 255 255 / 72%);
-}
-
-.patient-v2[data-stage="welcome"] .voice-core {
-  justify-content: center;
-  padding-block: 20px;
-}
-
-.patient-v2[data-stage="welcome"] .voice-prompt h1 span,
-.patient-v2[data-stage="welcome"] .voice-prompt h1 em {
-  display: block;
-}
-
-.patient-v2[data-stage="welcome"] .voice-prompt h1 span {
-  font-family: "Inter Variable", Inter, system-ui, sans-serif;
-  font-size: 0.82em;
-  font-weight: 410;
-  line-height: 1;
-  letter-spacing: -0.06em;
-}
-
-.patient-v2[data-stage="welcome"] .voice-prompt h1 em {
-  margin-top: 6px;
-  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
-  font-size: 1.08em;
-  font-weight: 390;
-  line-height: 1.02;
-  letter-spacing: -0.045em;
-  padding-bottom: 4px;
+  margin: 0 auto;
+  padding: 6px 0;
+  border-top: 0; /* the toggle above already draws this hairline */
 }
 
 .patient-v2 .voice-promise {
@@ -4635,219 +4619,72 @@ textarea:focus-visible {
   line-height: 1.6;
 }
 
-.patient-v2[data-stage="welcome"] .voice-promise {
-  color: rgb(255 255 255 / 74%);
-}
-
-.patient-v2[data-stage="welcome"] .scenario-toggle {
-  border-color: rgb(255 255 255 / 28%);
-  color: #fff;
-}
-
-.patient-v2[data-stage="welcome"] .scenario-toggle small {
-  color: rgb(255 255 255 / 68%);
-}
-
-/* Tulip Bloom interactive accent on Deep (decorative icon, 4.6:1) */
-.patient-v2[data-stage="welcome"] .scenario-toggle svg,
-.patient-v2[data-stage="welcome"] .archetype-switcher > button {
-  color: #D17484;
-}
-
-.patient-v2[data-stage="welcome"] .archetype-switcher {
-  border-color: rgb(255 255 255 / 28%);
-}
-
-.patient-v2[data-stage="welcome"] .archetype-switcher > button,
-.patient-v2[data-stage="welcome"] .archetype-switcher-copy span {
-  color: #E0AEBA;
-}
-
-.patient-v2[data-stage="welcome"] .archetype-switcher-copy strong {
-  color: #fff;
-}
-
-.patient-v2[data-stage="welcome"] .archetype-switcher-copy .example {
-  color: rgb(255 255 255 / 76%);
-}
-
-.patient-v2[data-stage="welcome"] .voice-screen .mic-button {
-  width: auto;
-  min-width: 214px;
-  height: 48px;
-  justify-content: flex-start;
-  padding: 0;
-  border-bottom: 1px solid rgb(255 255 255 / 72%);
-  border-radius: 0;
-  color: #fff;
-  background: transparent;
-}
-
-.patient-v2[data-stage="welcome"] .voice-screen .mic-button:hover {
-  background: transparent;
-}
-
-.patient-v2[data-stage="welcome"] .voice-screen .voice-actions .text-action {
-  width: max-content;
-  color: rgb(255 255 255 / 78%);
-}
-
+/* Finder desktop (2026-08-11 overhaul): the welcome and type stages once painted
+   a #292800 olive card with petal-pink accents inside a 1180px shadow box while
+   every other stage stayed paper. One theme now: a seamless paper ground, a single
+   centred column, the intro group optically centred between header and foot. */
 @media (min-width: 820px) {
-  .patient-v2[data-stage="welcome"] {
-    display: grid;
-    min-height: 100svh;
-    padding: 32px;
-    background: #f7f3ea;
-    place-items: center;
+  .patient-v2 .care-shell,
+  .patient-v2 .screen {
+    transition: width 280ms ease;
   }
 
   .patient-v2[data-stage="welcome"] .care-shell,
-  .patient-v2[data-stage="welcome"] .voice-screen {
-    width: min(1180px, calc(100vw - 64px));
-    min-height: calc(100svh - 64px);
+  .patient-v2[data-stage="welcome"] .screen,
+  .patient-v2[data-stage="type"] .care-shell,
+  .patient-v2[data-stage="type"] .screen {
+    width: min(640px, 100%);
+    border: 0;
   }
 
-  .patient-v2[data-stage="welcome"] .care-shell {
-    overflow: hidden;
-    border: 1px solid rgb(255 255 255 / 24%);
-    border-radius: 28px;
-    box-shadow: 0 28px 80px rgb(22 22 20 / 20%);
-  }
-
-  .patient-v2[data-stage="welcome"] .minimal-header {
-    min-height: 82px;
-    padding-inline: 46px;
-  }
-
-  .patient-v2[data-stage="welcome"] .voice-core {
-    width: min(78%, 920px);
-    align-items: flex-start;
-    justify-content: center;
-    padding: 84px 48px 170px;
-  }
-
-  .patient-v2[data-stage="welcome"] .voice-prompt {
-    width: 100%;
-    max-width: 900px;
-    padding: 0;
-  }
-
-  .patient-v2[data-stage="welcome"] .voice-prompt h1 {
-    max-width: 900px;
-    font-size: clamp(66px, 6vw, 88px);
-  }
-
-  .patient-v2[data-stage="welcome"] .scenario-toggle,
-  .patient-v2[data-stage="welcome"] .archetype-switcher {
-    width: min(460px, 100%);
-    margin-inline: 0;
+  .patient-v2[data-stage="welcome"] .minimal-header,
+  .patient-v2[data-stage="type"] .minimal-header {
+    min-height: 84px;
+    border-bottom: 0;
   }
 
   .patient-v2[data-stage="welcome"] .finder-context {
-    position: absolute;
-    right: auto;
-    bottom: 42px;
-    left: 48px;
-    width: 290px;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 4px;
-    margin: 0;
-    padding-bottom: 12px;
+    width: min(460px, 100%);
+    margin-inline: auto;
   }
 
-  .patient-v2[data-stage="welcome"] .finder-context strong {
-    text-align: left;
+  .patient-v2[data-stage="welcome"] .voice-core {
+    flex: 0 1 auto;
+    margin-top: auto;
+    padding: 34px 0 0;
   }
 
   .patient-v2[data-stage="welcome"] .voice-actions {
-    position: absolute;
-    right: auto;
-    bottom: 38px;
-    left: 390px;
-    width: 250px;
-    align-items: flex-start;
-    padding: 0;
+    margin-top: 34px;
+    margin-bottom: auto;
+    padding-bottom: 12px;
   }
 
-  .patient-v2[data-stage="type"] {
-    display: grid;
-    min-height: 100svh;
-    padding: 32px;
-    background: #f7f3ea;
-    place-items: center;
-  }
-
-  .patient-v2[data-stage="type"] .care-shell,
-  .patient-v2[data-stage="type"] .type-screen {
-    width: min(1180px, calc(100vw - 64px));
-    min-height: calc(100svh - 64px);
-  }
-
-  .patient-v2[data-stage="type"] .care-shell {
-    overflow: hidden;
-    border: 1px solid #d9d7cf;
-    border-radius: 28px;
-    box-shadow: 0 28px 80px rgb(22 22 20 / 14%);
-  }
-
-  .patient-v2[data-stage="type"] .minimal-header {
-    min-height: 82px;
-    padding-inline: 46px;
+  .patient-v2 .voice-screen .voice-prompt h1 {
+    font-size: clamp(56px, 5.2vw, 66px);
   }
 
   .patient-v2[data-stage="type"] .type-content {
-    width: 100%;
-    padding: 54px 72px 190px;
-  }
-
-  .patient-v2[data-stage="type"] .type-content .finder-context {
-    margin-bottom: 42px;
-  }
-
-  .patient-v2[data-stage="type"] .type-content h1 {
-    max-width: 920px;
-    padding: 18px 0 38px;
-    font-size: clamp(62px, 5.4vw, 80px);
-    line-height: 0.96;
-  }
-
-  .patient-v2[data-stage="type"] .type-content textarea {
-    width: min(760px, 72%);
-    min-height: 220px;
-    border-radius: 8px;
-    font-size: 24px;
-    line-height: 1.45;
+    flex: 0 1 auto;
+    margin-top: auto;
+    padding: 26px 34px 0;
   }
 
   .patient-v2[data-stage="type"] .bottom-action {
-    position: absolute;
-    bottom: 42px;
-    left: 72px;
-    width: 300px;
-    align-items: flex-start;
-    padding: 0;
+    margin-top: 0;
+    margin-bottom: auto;
   }
 
-  .patient-v2[data-stage="type"] .primary-button {
-    width: 220px;
-    min-height: 46px;
-    justify-content: flex-start;
-    padding: 0;
-    border: 0;
-    border-bottom: 1px solid var(--ink);
-    border-radius: 0;
-    color: var(--ink);
-    background: transparent;
+  .patient-v2[data-stage="type"] .type-content h1 {
+    font-size: clamp(46px, 4.6vw, 56px);
   }
 
-  .patient-v2[data-stage="type"] .primary-button:hover:not(:disabled) {
-    color: var(--sage);
-    background: transparent;
+  .patient-v2[data-stage="type"] .type-content textarea {
+    min-height: 200px;
   }
 
-  .patient-v2[data-stage="type"] .bottom-action > p {
-    text-align: left;
+  .patient-v2[data-stage="type"] .bottom-action {
+    padding-bottom: 40px;
   }
 }
 
