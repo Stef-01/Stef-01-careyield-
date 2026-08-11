@@ -7,6 +7,26 @@ import type { ReactNode } from "react";
 import { InterestForm } from "./interest-form";
 
 /**
+ * A11Y-2 — WHY NOTHING HERE ANIMATES OPACITY.
+ *
+ * motion/react renders `initial` on the SERVER, and `useReducedMotion()` cannot read a media
+ * query during SSR, so an `initial` containing `opacity: 0` ships as an inline style in the
+ * HTML. This page did that on 24 elements, including the `<h1>`. The copy was then invisible
+ * until React hydrated, invisible permanently if the bundle never arrived, and a reduced-motion
+ * reader still got the entrance because the preference is only honoured after mount.
+ *
+ * The chosen fix is to animate from a VISIBLE state: the slide-up and its easing are unchanged,
+ * the opacity fade is gone. It is the only option that holds in every failure mode — a mounted
+ * flag would suppress the animation entirely (motion reads `initial` once, so flipping it after
+ * mount does nothing), and a `<noscript>` override rescues scripting-disabled readers but not a
+ * bundle that fails to load.
+ *
+ * THE TRADE IS REAL AND IS A DESIGN CALL, SO IT IS WRITTEN DOWN RATHER THAN BURIED: this page
+ * loses its fade. The judgement is that a health product's landing copy must be readable when
+ * the JavaScript is not, and a slide without a fade is a smaller loss than a blank page. Any
+ * `opacity: 0` reintroduced into an `initial` or a `hidden` variant here brings the defect back,
+ * and e2e/landing.spec.ts fails on it.
+ *
  * The founder storybook: a first-person account, in Narayani's voice, of the
  * logical progression from overlooked women -> lymphoedema research -> VR rehab
  * -> Meherr. One desktop-optimised page with scroll-revealed chapters.
@@ -28,8 +48,8 @@ function Reveal({
   return (
     <motion.div
       className={className}
-      initial={reduce ? false : { opacity: 0, y: 26 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reduce ? false : { y: 26 }}
+      whileInView={{ y: 0 }}
       viewport={{ once: true, amount: 0.35 }}
       transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
     >
@@ -43,8 +63,8 @@ const stagger: Variants = {
   show: { transition: { staggerChildren: 0.09 } },
 };
 const item: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+  hidden: { y: 18 },
+  show: { y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
 };
 
 export function StoryLanding() {
@@ -91,8 +111,8 @@ export function StoryLanding() {
 
           <motion.figure
             className="story-portrait"
-            initial={reduce ? false : { opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={reduce ? false : { y: 18 }}
+            animate={{ y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
             <Image
