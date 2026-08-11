@@ -46,6 +46,33 @@ export const careArchetypes: CareArchetype[] = [
     },
   },
   {
+    id: "pcos-metabolic-reset",
+    title: "PMOS (formerly PCOS) + sustainable health goals",
+    eyebrow: "Metabolic care without shame",
+    example: "A GP who understands PMOS and can help me build sustainable health habits without reducing me to my weight.",
+    request:
+      "I want to feel stronger and healthier while managing PMOS. I need a woman GP with metabolic-health experience who will talk about sleep, food, movement and mental wellbeing without shame or extreme targets.",
+    headline: "PMOS and sustainable health, without shame.",
+    expectedFirstMatch: "sofia-alvarez",
+    requirements: {
+      careAreas: ["pcos", "metabolic"],
+      preferredGender: "woman",
+    },
+  },
+  {
+    id: "pcos-adhd",
+    title: "PMOS (formerly PCOS) care that works with ADHD",
+    eyebrow: "Hormonal health and executive function",
+    example: "A GP experienced in both PMOS and ADHD who gives me clear, realistic steps instead of an overwhelming plan.",
+    request:
+      "I have PMOS and ADHD and feel overwhelmed by complicated health plans. I want a GP experienced in both who understands executive-function barriers, gives me a few clear steps at a time and checks what is genuinely realistic for me.",
+    headline: "PMOS care that works with your brain.",
+    expectedFirstMatch: "grace-chen",
+    requirements: {
+      careAreas: ["pcos", "adhd"],
+    },
+  },
+  {
     id: "spanish-gestational-diabetes",
     title: "Gestational diabetes + Spanish",
     eyebrow: "Language and practical nutrition",
@@ -146,20 +173,6 @@ export const careArchetypes: CareArchetype[] = [
     },
   },
   {
-    id: "pcos-metabolic-reset",
-    title: "PMOS (formerly PCOS) + sustainable health goals",
-    eyebrow: "Metabolic care without shame",
-    example: "A GP who understands PMOS and can help me build sustainable health habits without reducing me to my weight.",
-    request:
-      "I want to feel stronger and healthier while managing PMOS. I need a woman GP with metabolic-health experience who will talk about sleep, food, movement and mental wellbeing without shame or extreme targets.",
-    headline: "PMOS and sustainable health, without shame.",
-    expectedFirstMatch: "sofia-alvarez",
-    requirements: {
-      careAreas: ["pcos", "metabolic"],
-      preferredGender: "woman",
-    },
-  },
-  {
     id: "trauma-sensitive-womens-care",
     title: "Trauma-sensitive women’s care",
     eyebrow: "Consent, control and emotional safety",
@@ -210,19 +223,6 @@ export const careArchetypes: CareArchetype[] = [
     expectedFirstMatch: "camila-torres",
     requirements: {
       careAreas: ["gestational-diabetes", "post-birth", "metabolic"],
-    },
-  },
-  {
-    id: "pcos-adhd",
-    title: "PMOS (formerly PCOS) care that works with ADHD",
-    eyebrow: "Hormonal health and executive function",
-    example: "A GP experienced in both PMOS and ADHD who gives me clear, realistic steps instead of an overwhelming plan.",
-    request:
-      "I have PMOS and ADHD and feel overwhelmed by complicated health plans. I want a GP experienced in both who understands executive-function barriers, gives me a few clear steps at a time and checks what is genuinely realistic for me.",
-    headline: "PMOS care that works with your brain.",
-    expectedFirstMatch: "grace-chen",
-    requirements: {
-      careAreas: ["pcos", "adhd"],
     },
   },
 ];
