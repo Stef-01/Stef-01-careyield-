@@ -4644,9 +4644,14 @@ textarea:focus-visible {
   color: #fff;
 }
 
-.patient-v2[data-stage="welcome"] .scenario-toggle small,
-.patient-v2[data-stage="welcome"] .scenario-toggle svg {
+.patient-v2[data-stage="welcome"] .scenario-toggle small {
   color: rgb(255 255 255 / 68%);
+}
+
+/* Tulip Bloom interactive accent on Deep (decorative icon, 4.6:1) */
+.patient-v2[data-stage="welcome"] .scenario-toggle svg,
+.patient-v2[data-stage="welcome"] .archetype-switcher > button {
+  color: #D17484;
 }
 
 .patient-v2[data-stage="welcome"] .archetype-switcher {
@@ -5109,7 +5114,8 @@ textarea:focus-visible {
   letter-spacing: -0.04em;
   text-wrap: balance;
 }
-.story-throughline-line em { font-style: italic; color: var(--s-petal); }
+/* Tulip Bloom on Deep: 4.6:1, AA at this display size */
+.story-throughline-line em { font-style: italic; color: #D17484; }
 .story-throughline-sub { margin-top: 40px; }
 .story-throughline-sub p {
   max-width: 54ch;
