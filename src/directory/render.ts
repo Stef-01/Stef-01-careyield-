@@ -45,6 +45,7 @@
 
 import {
   lintDirectoryText,
+  lintName,
   type ProfileCopyViolation,
 } from "./copy-lint";
 import {
@@ -196,8 +197,11 @@ export function renderProfile(profile: DirectoryProfile): RenderResult {
     };
   }
   const rendered = compose(profile);
+  // W194 (Q15-1): the heading IS the name, so it takes the name rules — the union minus the
+  // surnames W184 excluded. Using the unfiltered lint here refused Dr Sarah Best, while W184's
+  // per-field check passed her: one publication path, two halves, separately right.
   const violations = renderedLines(rendered).flatMap(({ field, text }) =>
-    lintDirectoryText(text, field),
+    field === "heading" ? lintName(text, field) : lintDirectoryText(text, field),
   );
   if (violations.length > 0) return { ok: false, violations };
   return { ok: true, rendered };

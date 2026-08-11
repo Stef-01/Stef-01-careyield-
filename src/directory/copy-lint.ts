@@ -109,8 +109,14 @@ export function directoryCopyRules(
 export const NAME_WORD_EXCLUSIONS: Readonly<Record<string, string>> = {
   best: "Best is a common surname. Refusing to publish Dr Sarah Best protects nobody and would push somebody into misspelling their own name.",
   leading: "Leading is a surname, rarer than Best but attested, and the same argument applies.",
-  top: "Top is a surname of Dutch origin. Included because leaving it out would mean deciding case by case, which is how the list stops being reviewable.",
 };
+
+// W194 (Q15-2), found by mutation-checking Q15-1's fix: `top` was here too, and reverting the fix
+// did not fail its case — because no rule matches the bare word. `no-superlatives` has
+// "top-rated", not "top". An exclusion that excludes nothing is a dead register entry, and this
+// tree keeps finding that the stale entry is the dangerous one: it makes the list look like it is
+// doing more than it is, and the next reader trusts the size of it. Removed, and the test below
+// now requires every entry to be one a rule would otherwise have caught.
 
 export interface ProfileCopyViolation {
   /** Dotted path of the field, e.g. "focus[0].label" or "displayName". */
@@ -179,6 +185,26 @@ export function lintDirectoryText(text: string, field: string): ProfileCopyViola
 
 const lintCopy = lintDirectoryText;
 
+/**
+ * Lint a line that IS a person's name.
+ *
+ * W194 finding (Q15-1). This existed only as a filter inside `lintProfile`, so W187 — which lints
+ * the composed lines and reaches the heading, which is the name — used the unfiltered
+ * `lintDirectoryText` and refused Dr Sarah Best. The two halves of one publication path disagreed,
+ * and the disagreement went the worst way: a real person could not be listed because of her
+ * surname, and the workaround a practice would find is to misspell it.
+ *
+ * So the exclusion is a FUNCTION now rather than a filter in one caller. Both paths call it, there
+ * is one definition of "rules that apply to a name", and a cross-path test asserts the two agree —
+ * because the defect was not either half being wrong, it was the two halves being separately
+ * right.
+ */
+export function lintName(text: string, field: string): ProfileCopyViolation[] {
+  return lintDirectoryText(text, field).filter(
+    (v) => !(v.match.toLowerCase() in NAME_WORD_EXCLUSIONS),
+  );
+}
+
 function lintDirectoryOnly(text: string, field: string): ProfileCopyViolation[] {
   const out: ProfileCopyViolation[] = [];
   for (const { rule, pattern } of DIRECTORY_PATTERNS) {
@@ -208,11 +234,7 @@ export function lintProfile(profile: DirectoryProfile): ProfileCopyViolation[] {
 
     if (field === "displayName") {
       // The full union minus the named exclusions — see the header on why this direction.
-      out.push(
-        ...lintCopy(profile.displayName, "displayName").filter(
-          (v) => !(v.match.toLowerCase() in NAME_WORD_EXCLUSIONS),
-        ),
-      );
+      out.push(...lintName(profile.displayName, "displayName"));
       continue;
     }
     if (field === "languages") {

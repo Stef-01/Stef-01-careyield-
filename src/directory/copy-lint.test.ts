@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { LANDING_RULES, lintLandingCopy } from "@/compliance/landing";
-import { MESSAGE_BANNED_RULES } from "@/messaging/templates";
+import { MESSAGE_BANNED_RULES, lintMessageText } from "@/messaging/templates";
 import {
   DIRECTORY_ONLY_RULES,
   DIRECTORY_RULE_COPY,
@@ -132,6 +132,14 @@ describe("W184 the s 133 claim made without the banned word", () => {
     }
     for (const [word, why] of Object.entries(NAME_WORD_EXCLUSIONS)) {
       expect(why.length, `${word} is exempt without an argument`).toBeGreaterThan(40);
+      // W194 (Q15-2). Both directions, the way every register in this tree is checked: an entry
+      // that no rule would have caught is DEAD, and a dead entry makes the list look like it is
+      // doing more than it is. `top` was here and excluded nothing — `no-superlatives` carries
+      // "top-rated", not "top" — and only a mutation check noticed.
+      expect(
+        lintLandingCopy(`Dr Sarah ${word}`).length + lintMessageText(`Dr Sarah ${word}`).length,
+        `"${word}" is excluded from name checks but no rule objects to it — a dead exemption`,
+      ).toBeGreaterThan(0);
     }
   });
 });
