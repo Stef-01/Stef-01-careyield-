@@ -20,7 +20,9 @@ export default async function ConsoleHome() {
     ["Ongoing-care patients only", rules.chronicCareOnly ? "Yes" : "No"],
   ];
 
-  const openComplaints = openComplaintCount();
+  // W206: scoped. This counted the whole store, so a practice with no complaints of its own
+  // was told to review somebody else's.
+  const openComplaints = openComplaintCount(record.practice.id as string);
 
   return (
     <ConsoleShell

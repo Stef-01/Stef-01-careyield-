@@ -40,8 +40,26 @@ export function resetComplaints(): ComplaintsState {
   return globalStore.__careyieldComplaints;
 }
 
-export function openComplaintCount(): number {
-  return getComplaints().complaints.filter((c) => c.status === "open").length;
+/**
+ * Open complaints for ONE practice.
+ *
+ * W206: took no practice and counted the whole store. The console home rendered the result as
+ * "N open complaints — review now" to whichever practice was signed in, so a practice with none
+ * of its own was told to review somebody else's. The same shape as W181's ops queue, on a store
+ * that also holds a patient identifier.
+ */
+export function openComplaintCount(practiceId: string): number {
+  return complaintsFor(practiceId).filter((c) => c.status === "open").length;
+}
+
+/**
+ * Complaints belonging to one practice.
+ *
+ * Filtered as the query rather than afterwards — W123's rule, and the reason W91/W103/W181 all
+ * gave: a later filter is a line somebody can delete, and the deletion looks like a tidy-up.
+ */
+export function complaintsFor(practiceId: string): ComplaintRecord[] {
+  return getComplaints().complaints.filter((c) => c.practiceId === practiceId);
 }
 
 interface OptOutOutcome {
@@ -99,11 +117,18 @@ function suppressPatient(patientId: string, at: string): void {
   }
 }
 
-export function submitComplaint(input: IntakeInput, at: string): FieldErrors {
+/**
+ * Take a complaint for a named practice.
+ *
+ * W206 made `practiceId` an argument. It was stamped `"prac-console"` inside `intakeComplaint`,
+ * an id no console ever mints, so every complaint in the store belonged to nobody and every read
+ * had to be unscoped to show anything at all.
+ */
+export function submitComplaint(input: IntakeInput, at: string, practiceId: string): FieldErrors {
   const errors = validateIntake(input);
   if (Object.keys(errors).length > 0) return errors;
   const state = getComplaints();
-  const record = intakeComplaint(input, `cmp-${state.seq++}`, at);
+  const record = intakeComplaint(input, `cmp-${state.seq++}`, at, practiceId);
   if (input.wantsOptOut && record.patientId) {
     const { closed, matched } = applyOptOutToRail(record.patientId, at);
     suppressPatient(record.patientId, at);

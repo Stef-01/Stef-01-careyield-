@@ -49,10 +49,24 @@ export function validateIntake(input: IntakeInput): FieldErrors {
   return errors;
 }
 
-export function intakeComplaint(input: IntakeInput, id: string, at: string): ComplaintRecord {
+/**
+ * W206: takes the practice, rather than stamping a literal.
+ *
+ * `"prac-console"` was a placeholder from before W166 made two practices real, and it matched no
+ * id the console ever mints (`prac-1`, `prac-2`, …). PRIV-3 recorded the literal as a modelling
+ * gap; the Y4 audit found what it had become — every complaint filed under an id belonging to
+ * nobody, so no read could scope on it even though `Complaint` has carried a `practiceId` all
+ * along. The field existed and the writer ignored it, which is why the readers could too.
+ */
+export function intakeComplaint(
+  input: IntakeInput,
+  id: string,
+  at: string,
+  practiceId: string,
+): ComplaintRecord {
   return {
     id,
-    practiceId: "prac-console",
+    practiceId,
     at,
     channel: input.channel,
     summary: input.summary.trim(),

@@ -3,7 +3,7 @@
 // home, and the W16 guardrail treats any open complaint as critical.
 
 import { redirect } from "next/navigation";
-import { getComplaints } from "@/complaints/store";
+import { complaintsFor } from "@/complaints/store";
 import { getConsole } from "@/console/store";
 import { authorize } from "@/tenancy/tenancy";
 import { requirePractice } from "../guard";
@@ -31,7 +31,9 @@ export default async function ComplaintsPage({
     redirect("/console");
   }
   const params = await searchParams;
-  const { complaints } = getComplaints();
+  // W206: the whole store used to render here, so every practice could read every other
+  // practice's complaints — including the patient identifier each one carries.
+  const complaints = complaintsFor(record.practice.id as string);
   const open = complaints.filter((c) => c.status === "open");
   const resolved = complaints.filter((c) => c.status === "resolved");
 
