@@ -160,6 +160,23 @@ export const LATENT_FINDINGS: readonly LatentFinding[] = [
     status: "open",
   }),
   declareFinding({
+    id: "MATCH-1",
+    what:
+      "`rankCandidates` in `src/engine/pool.ts` orders the live invitation pool by `chronicCare` first and then by time since last visit, whose own comment reads \"older date = longer overdue = first\". W201's published ADM notice says, in its *never automated* list, \"No ordering of patients by need or by how unwell they are\" — so a published legal notice and the live ranker disagree. W213 made the same observation about the code; reading it against the notice is what makes it a contradiction rather than a smell. W214's matcher cannot express this (its candidate type has nowhere to put a clinical attribute) and deliberately did not change the live ranker, because resolving it means either changing who gets invited or changing the notice, and both are the founder's.",
+    recordedBy: "W214",
+    triggerStatement:
+      "W214's matcher becomes a live path while `rankCandidates` still orders on a clinical attribute. Two orderings of the same patients would then be in production, one of which the published notice denies exists.",
+    trigger: () => {
+      const pool = readFileSync(path.join(SRC, "engine", "pool.ts"), "utf8");
+      const stillOrdersOnCondition = /a\.chronicCare !== b\.chronicCare/.test(pool);
+      const live = sourceFiles().some(
+        ({ module, text }) => module !== "src/matching/match.ts" && /from "@\/matching\/match"/.test(text),
+      );
+      return stillOrdersOnCondition && live;
+    },
+    status: "open",
+  }),
+  declareFinding({
     id: "CENSUS-1",
     what:
       "W200's copy surface decides which modules it must cover by reading each module's `// W<n>` header, so a module with NO header is invisible to it — not declared, not linted, and not reported as missing. Eleven such modules exist and all are Year-1 infrastructure that holds no operator copy, which is why this is latent rather than live.",

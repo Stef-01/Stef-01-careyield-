@@ -196,6 +196,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
     notCopy: "A test helper comparing experiment arms. No strings but identifiers and failure messages.",
   },
   {
+    module: "src/matching/match.ts",
+    operatorCopy: [],
+    notCopy:
+      "W214's matcher decides; W213's `MATCH_REASON_COPY` is where every sentence a practice reads about a decision lives, and this module composes nothing of its own. `REASONS_THIS_MATCHER_PRODUCES` holds reason identifiers, not prose.",
+  },
+  {
     module: "src/ops/silence.ts",
     operatorCopy: ["SILENCE_COPY"],
     notCopy:
