@@ -160,6 +160,55 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
     handling: "stored",
     rationale: "Holds a name and email for people who are NOT patients of a subscribing practice — a different collection to everything else here (see the Y2 gate dossier). Access and erasure apply; it is file-backed rather than in-memory, so it is handled separately from the rail.",
   },
+  // W180 — the Q14 outcome surface. Six modules, none of them a store, all declared anyway.
+  //
+  // The point of declaring a module that holds nothing is that "holds nothing" is a CLAIM, and
+  // this registry is where claims about patient identity get written down and checked. Q14 built
+  // an outcome rail on top of the referral rail; the privacy question for a rail built on a rail
+  // is not "what does it store" but "does erasing the source empty it", and `derived` is the
+  // answer W106 already has for exactly that.
+  {
+    module: "src/outcomes/dashboard.ts",
+    what: "Referral outcome verdicts, per referral",
+    handling: "derived",
+    rationale:
+      "W173 derives every verdict from the referral rail at read time and persists nothing. Patient identity does not survive the transform either: `ReferralEvent` carries a patientId and the chain events built from it carry only referralId, kind and at, so the verdict cannot name a patient. Erasing a patient from the rail (W137's scrub) removes their referrals and the verdicts go with them — composed, not remembered.",
+  },
+  {
+    module: "src/outcomes/model.ts",
+    what: "Outcome verdicts over a declared chain",
+    handling: "no_patient_identity",
+    rationale:
+      "W170 folds `RecordedEvent { chainId, kind, at }`. A chain id is a referral id, not a person, and no field on an Outcome or an OutcomeSummary can hold patient identity — the type has nowhere to put one.",
+  },
+  {
+    module: "src/outcomes/escalation-monitor.ts",
+    what: "Unrouted escalations, aged",
+    handling: "no_patient_identity",
+    rationale:
+      "W171 keys a sighting on pathwayId, versionHash and factCode. An escalation is a question about a PATHWAY criterion, not about the record that triggered it, so nothing here identifies whose fact fired it.",
+  },
+  {
+    module: "src/outcomes/time-to-escalation.ts",
+    what: "Interval between a fact being recorded and an escalation firing",
+    handling: "no_patient_identity",
+    rationale:
+      "W176 measures two instants on the same pathway criterion and carries no subject. The module argues at length that the interval is a fact about the record rather than about a person; the type is what makes that true rather than aspirational.",
+  },
+  {
+    module: "src/outcomes/agreement.ts",
+    what: "Specialist-agreement sample",
+    handling: "no_patient_identity",
+    rationale:
+      "W172 samples pathway verdicts by their own identity to compare reviewer and engine, and holds no patient field. The sample is over VERDICTS, and a verdict names a pathway version rather than the person it was computed for.",
+  },
+  {
+    module: "src/outcomes/audit-export.ts",
+    what: "Practice configuration audit trail, exported",
+    handling: "no_patient_identity",
+    rationale:
+      "W177 exports practice CONFIGURATION history, and this is the class where that matters most: an export leaves the product, so erasure can never reach it — a downloaded file is gone. Holding no patient identity is therefore not a convenience here but the only handling that is safe, and the test asserts the absence rather than trusting it.",
+  },
 ];
 
 /** Classes whose rows must be reachable by an access request and removable by erasure. */
