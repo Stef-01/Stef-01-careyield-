@@ -162,9 +162,8 @@ export function StoryLanding() {
           </Reveal>
           <Reveal delay={0.05} className="story-prose story-prose-lead">
             <p>
-              In my family the symptoms ran through every generation. My mother had them, my
-              sister had them, so we assumed this was simply how the women in our family were
-              built.
+              In my family the symptoms ran through every generation. My mother had them too,
+              so we assumed this was simply how the women in our family were built.
             </p>
             <p>
               It took me years to learn that what felt normal was PMOS, the condition long known
@@ -294,8 +293,8 @@ export function StoryLanding() {
               <p>Practical PMOS sessions in the language schools, temples, mosques and women&rsquo;s groups where women already gather.</p>
             </motion.li>
             <motion.li variants={item}>
-              <h3>A private self-check</h3>
-              <p>A calm way to recognise the signs and carry a clear summary into a conversation with a GP.</p>
+              <h3>Know the signs, privately</h3>
+              <p>Answer a few quiet questions at home, then walk into a GP conversation with a clear summary.</p>
             </motion.li>
             <motion.li variants={item}>
               <h3>An appointment that fits</h3>
@@ -341,15 +340,26 @@ export function StoryLanding() {
             <div className="story-cofounder-id">
               <strong>Stefan Thottunkal</strong>
               <span>Co-founder</span>
-              <a
-                href="https://med.stanford.edu/nourish-project.html"
-                target="_blank"
-                rel="noreferrer"
-                className="story-nourish-link"
-                aria-label="NOURISH, culturally tailored nutrition research at Stanford Medicine"
-              >
-                <Image src="/nourish-logo.png" alt="NOURISH" width={446} height={80} />
-              </a>
+              <div className="story-affiliations">
+                <a
+                  href="https://med.stanford.edu/nourish-project.html"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="story-nourish-link"
+                  aria-label="NOURISH, culturally tailored nutrition research at Stanford Medicine"
+                >
+                  <Image src="/nourish-logo.png" alt="NOURISH" width={446} height={80} />
+                </a>
+                <a
+                  href="https://hsph.harvard.edu/research/health-systems-innovation-lab/team/#scholars"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="story-hsil-link"
+                  aria-label="Health Systems Innovation Lab, Harvard T.H. Chan School of Public Health"
+                >
+                  Harvard&nbsp;HSIL
+                </a>
+              </div>
             </div>
           </Reveal>
         </div>

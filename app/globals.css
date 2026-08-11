@@ -4911,22 +4911,38 @@ textarea:focus-visible {
 .story-demo-link {
   display: inline-flex;
   align-items: center;
-  min-height: 38px;
-  padding: 0 17px;
-  border: 1px solid #c9c6ba;
+  min-height: 40px;
+  padding: 0 19px;
+  border: 0;
   border-radius: 999px;
-  color: var(--s-ink);
-  font-size: 12.5px;
-  font-weight: 600;
+  color: #fff;
+  background: var(--s-sage);
+  font-size: 13px;
+  font-weight: 640;
   letter-spacing: 0.01em;
   text-decoration: none;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
+  animation: story-demo-nudge 5s ease-in-out infinite;
 }
 .story-demo-link:hover,
 .story-demo-link:focus-visible {
-  border-color: var(--s-ink);
-  background: color-mix(in srgb, var(--s-ink) 5%, transparent);
-  outline: 2px solid transparent;
+  background: #711d31;
+  animation-play-state: paused;
+}
+.story-demo-link:focus-visible { outline: 3px solid var(--s-petal); outline-offset: 3px; }
+.story-demo-link:active { transform: translateY(1px); }
+
+/* One soft double-hop every 5s, then rest. */
+@keyframes story-demo-nudge {
+  0%, 82%, 100% { transform: translateY(0); }
+  86% { transform: translateY(-4px); }
+  90% { transform: translateY(0); }
+  93% { transform: translateY(-2px); }
+  96% { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-demo-link { animation: none; }
 }
 
 /* Shared eyebrow ---------------------------------------------------------- */
@@ -4944,14 +4960,13 @@ textarea:focus-visible {
 .story-hero-grid {
   display: grid;
   grid-template-columns: 1.12fr 0.88fr;
-  align-items: end;
+  align-items: center;
   gap: 32px;
   min-height: calc(100dvh - 66px);
-  padding-top: 40px;
+  padding-block: 24px 48px;
 }
 .story-hero-copy {
   align-self: center;
-  padding-bottom: 7vh;
   max-width: none;
 }
 .story-hero-copy h1 {
@@ -5000,13 +5015,13 @@ textarea:focus-visible {
 /* Hero portrait cut-out on paper ----------------------------------------- */
 .story-portrait {
   position: relative;
-  align-self: end;
+  align-self: center;
   justify-self: center;
   margin: 0;
   width: 100%;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
 }
 .story-portrait-img {
   position: relative;
@@ -5014,7 +5029,7 @@ textarea:focus-visible {
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: min(82vh, 720px);
+  max-height: min(72vh, 640px);
   object-fit: contain;
 }
 
@@ -5184,15 +5199,34 @@ textarea:focus-visible {
   color: var(--s-muted);
   font-size: 13.5px;
 }
+.story-affiliations {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-top: 16px;
+}
 .story-nourish-link {
   display: inline-flex;
-  margin-top: 14px;
   opacity: 0.85;
   transition: opacity 0.2s ease;
 }
 .story-nourish-link:hover,
 .story-nourish-link:focus-visible { opacity: 1; outline-offset: 4px; }
-.story-nourish-link img { width: 118px; height: auto; }
+.story-nourish-link img { width: 112px; height: auto; }
+/* HSIL has no published logo mark; a typographic lockup in the site's own
+   voice is the honest equivalent. */
+.story-hsil-link {
+  padding-left: 22px;
+  border-left: 1px solid var(--s-line);
+  color: #3d4038;
+  font-size: 15px;
+  font-weight: 680;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.story-hsil-link:hover,
+.story-hsil-link:focus-visible { color: var(--s-sage); }
 
 /* Register ---------------------------------------------------------------- */
 .story-register {

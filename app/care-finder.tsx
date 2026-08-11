@@ -184,7 +184,10 @@ function WaveformMark({ active = false }: { active?: boolean }) {
 export function CareFinder() {
   const [stage, setStage] = useState<Stage>("welcome");
   const [archetypeIndex, setArchetypeIndex] = useState(0);
-  const [showScenarios, setShowScenarios] = useState(false);
+  const [showScenarios, setShowScenarios] = useState(true);
+  // The welcome showcase rotates scenarios on its own until the visitor takes over.
+  const [autoCycle, setAutoCycle] = useState(true);
+  const reducedMotion = useReducedMotion();
   const [draft, setDraft] = useState("");
   const [request, setRequest] = useState(exampleRequest);
   const [matches, setMatches] = useState(() => rankClinicians(exampleRequest));
@@ -219,6 +222,22 @@ export function CareFinder() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [stage]);
+
+  useEffect(() => {
+    if (stage !== "welcome" || !showScenarios || !autoCycle || reducedMotion) return;
+    const timer = window.setInterval(() => {
+      setArchetypeIndex((current) => {
+        const nextIndex = (current + 1) % careArchetypes.length;
+        const nextArchetype = careArchetypes[nextIndex] ?? defaultArchetype;
+        setRequest(nextArchetype.request);
+        setMatches(rankClinicians(nextArchetype.request));
+        setMatchIndex(0);
+        setMatchDirection(1);
+        return nextIndex;
+      });
+    }, 5500);
+    return () => window.clearInterval(timer);
+  }, [stage, showScenarios, autoCycle, reducedMotion]);
 
   const requestSummary = useMemo(() => {
     const cleaned = request.trim().replace(/[.!?]+$/, "");
@@ -324,7 +343,7 @@ export function CareFinder() {
 
               {showScenarios && (
                 <div id="demo-scenarios" className="archetype-switcher" role="group" aria-label="Demo care scenarios">
-                  <Pressable type="button" onClick={() => cycleArchetype(-1)} aria-label="Previous care scenario">
+                  <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(-1); }} aria-label="Previous care scenario">
                     <CaretLeft size={19} weight="light" aria-hidden="true" />
                   </Pressable>
                   <AnimatePresence mode="wait" initial={false}>
@@ -341,7 +360,7 @@ export function CareFinder() {
                       <q className="example">{archetype.example}</q>
                     </motion.div>
                   </AnimatePresence>
-                  <Pressable type="button" onClick={() => cycleArchetype(1)} aria-label="Next care scenario">
+                  <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(1); }} aria-label="Next care scenario">
                     <CaretRight size={19} weight="light" aria-hidden="true" />
                   </Pressable>
                 </div>
