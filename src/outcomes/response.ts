@@ -24,10 +24,27 @@
 // no `responseRate`, no `nonResponders`. Every one of those is a boolean or a denominator built
 // on treating `not_recorded` as "no", and the moment one exists a console will render it.
 //
-// A RESPONSE MUST COME AFTER WHAT IT ANSWERS. Obvious, and the reason it is checked is that the
-// error it prevents is the flattering one: fold an earlier fact into an intervention's responses
-// and the intervention looks effective. `respondTo` refuses an event at or before the
-// intervention's own timestamp, and says so rather than dropping it.
+// A RESPONSE MUST NOT COME BEFORE WHAT IT ANSWERS. The error this prevents is the flattering one:
+// fold an earlier fact into an intervention's responses and the intervention looks effective.
+//
+// W212 AMENDED THIS, AND THE AMENDMENT IS THE INTERESTING PART. The first version refused an event
+// at OR BEFORE the intervention's timestamp, and a test pinned the same-instant case as refused.
+// Then W212 ran the model over W12's synthetic loop and linked NOTHING: the sim's spine stamps one
+// timestamp per simulated week, so all 1,552 recorded responses in a six-week run share the
+// instant of the offer they answer. Zero were strictly after.
+//
+// The rule was not merely inconvenient there, it was WRONG IN THE MODULE'S OWN TERMS. Refusing all
+// 1,552 would have made `responseState` return `not_recorded` for interventions the record plainly
+// shows were answered — a claim about the record that the record contradicts, which is the exact
+// failure the third value exists to prevent. An event recorded at the same instant is not an
+// earlier fact; it is a fact the clock cannot separate, and `at` was being treated as a total
+// order on recorded facts when the append-only log's total order is its sequence, not its clock.
+//
+// So: strictly-earlier events are still refused, because that is what the flattering error looks
+// like. Same-instant events are linked, and the `Response` RECORDS WHICH IT RESTS ON — `ordering`
+// is `"clock"` when the timestamps separate them and `"recorded_link"` when they do not and the
+// link comes from the event naming the intervention's chain. W212's edges carry the split, so a
+// reader can see how much of a graph rests on a clock that could not tell.
 //
 // NOT A TRIAGE, NOT A CLINICAL JUDGEMENT (founder gate, plan §4). Nothing here reads a symptom,
 // scores a patient, or decides who should be seen. An intervention kind is a declared operational
@@ -97,6 +114,19 @@ export const RESPONSE_KINDS: Record<
 
 export const ALL_INTERVENTION_KINDS = Object.keys(RESPONSE_KINDS) as InterventionKind[];
 
+/**
+ * What the ordering of a link rests on.
+ *
+ * Carried rather than assumed: at a clock resolution coarser than the process being recorded —
+ * the sim's weekly tick, and any real system stamping to the second — cause and effect routinely
+ * share a timestamp, and a graph should be able to say how much of itself is in that position.
+ */
+export type LinkOrdering =
+  /** The event's timestamp is strictly later than the intervention's. */
+  | "clock"
+  /** Same recorded instant; the link rests on the event naming the intervention's chain. */
+  | "recorded_link";
+
 declare const responseBrand: unique symbol;
 
 /**
@@ -114,6 +144,8 @@ export interface Response {
   readonly kind: string;
   readonly at: string;
   readonly verdict: ResponseVerdict;
+  /** Whether the clock separated these two facts, or only the record did. */
+  readonly ordering: LinkOrdering;
   /** The event this rests on, so a reader can check the link rather than believe it (W196). */
   readonly evidence: RecordedEvent;
 }
@@ -121,8 +153,8 @@ export interface Response {
 export type ResponseRejection =
   /** The event belongs to a different chain, so it answers something else or nothing. */
   | "event_on_another_chain"
-  /** The event is not later than the intervention, so it cannot be an answer to it. */
-  | "event_not_after_intervention"
+  /** The event was recorded BEFORE the intervention, so it cannot be an answer to it. */
+  | "event_recorded_before_intervention"
   /** The kind is not declared as a response to this intervention kind. */
   | "kind_not_a_declared_response";
 
@@ -144,7 +176,7 @@ export type ResponseResult =
 export function respondTo(intervention: Intervention, event: RecordedEvent): ResponseResult {
   const errors: ResponseRejection[] = [];
   if (event.chainId !== intervention.chainId) errors.push("event_on_another_chain");
-  if (event.at <= intervention.at) errors.push("event_not_after_intervention");
+  if (event.at < intervention.at) errors.push("event_recorded_before_intervention");
 
   const declared = RESPONSE_KINDS[intervention.kind];
   const advances = declared.advances.includes(event.kind);
@@ -161,6 +193,7 @@ export function respondTo(intervention: Intervention, event: RecordedEvent): Res
       kind: event.kind,
       at: event.at,
       verdict: advances ? "reached" : "stopped",
+      ordering: event.at > intervention.at ? "clock" : "recorded_link",
       evidence: event,
     } as Response,
   };
@@ -243,8 +276,8 @@ export const RESPONSE_ABSENCE_COPY =
 export const RESPONSE_REJECTION_COPY: Record<ResponseRejection, string> = {
   event_on_another_chain:
     "That event belongs to a different chain, so it answers something else. It has not been linked.",
-  event_not_after_intervention:
-    "That event was recorded at or before the intervention, so it cannot be an answer to it. It has not been linked.",
+  event_recorded_before_intervention:
+    "That event was recorded before the intervention, so it cannot be an answer to it. It has not been linked.",
   kind_not_a_declared_response:
     "That kind of event is not one of the declared answers to this kind of intervention. It has not been linked, and adding it means declaring it.",
 };

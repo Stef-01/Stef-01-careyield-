@@ -230,6 +230,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
     notCopy: "`summarise` composes its basis sentence from counts; the rest are types and folds.",
   },
   {
+    module: "src/outcomes/response-graph.ts",
+    operatorCopy: ["SPINE_NOT_RESPONSES"],
+    notCopy:
+      "SPINE_RESPONSE_KINDS is a translation table of event identifiers. The rendered graph composes from counts, W211's absence copy and the per-kind reasons in SPINE_NOT_RESPONSES, which is the only prose the module authors itself.",
+  },
+  {
     module: "src/outcomes/time-to-escalation.ts",
     operatorCopy: ["NO_MEASUREMENT_COPY", "WHY_NO_TARGET"],
     notCopy: "The renderer composes from those two and from measured day counts.",

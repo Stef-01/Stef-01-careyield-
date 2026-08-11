@@ -78,13 +78,26 @@ describe("W211 a response cannot exist without the intervention it answers", () 
     expect(!result.ok && result.errors).toContain("event_on_another_chain");
   });
 
-  it("refuses an event that is not after the intervention", () => {
-    // The flattering error: fold an earlier fact into an intervention's responses and the
-    // intervention looks effective. Checked at the boundary and at one second before it.
-    const same = respondTo(INVITE, event({ at: INVITE.at }));
+  it("refuses an event recorded before the intervention", () => {
+    // The flattering error: fold an EARLIER fact into an intervention's responses and the
+    // intervention looks effective.
     const before = respondTo(INVITE, event({ at: "2026-04-30T09:00:00Z" }));
-    expect(!same.ok && same.errors).toContain("event_not_after_intervention");
-    expect(!before.ok && before.errors).toContain("event_not_after_intervention");
+    expect(!before.ok && before.errors).toContain("event_recorded_before_intervention");
+  });
+
+  it("links a same-instant event and says the clock did not separate them", () => {
+    // AMENDED AT W212, which found the first version linked nothing at all over W12's sim: the
+    // spine stamps one timestamp per simulated week, so all 1,552 recorded responses in a
+    // six-week run share the instant of the offer they answer. Refusing them would have made
+    // `responseState` say `not_recorded` for interventions the record shows were answered —
+    // this module's own headline failure. Same instant is not an earlier fact.
+    const same = respondTo(INVITE, event({ at: INVITE.at }));
+    expect(same.ok).toBe(true);
+    if (!same.ok) return;
+    expect(same.response.ordering).toBe("recorded_link");
+    // And a link the clock DOES separate says so, so the distinction is not cosmetic.
+    const later = respondTo(INVITE, event({ at: "2026-05-03T09:00:00Z" }));
+    expect(later.ok && later.response.ordering).toBe("clock");
   });
 
   it("refuses an undeclared kind rather than guessing what it means", () => {

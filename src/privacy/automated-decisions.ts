@@ -272,6 +272,7 @@ export const NOT_A_DECISION: Readonly<Record<string, string>> = {
   "src/registers/analytics.ts": "Gap-closure rates by condition across a cohort. Group arithmetic.",
   "src/registers/attribution.ts": "Incrementality per register cohort, including when the cohort is too small to claim anything. Group arithmetic.",
   "src/registers/sim-registers.ts": "The register layer as the simulator sees it. Synthetic.",
+  "src/outcomes/response-graph.ts": "W212 counts how interventions were answered, over the synthetic loop only. It aggregates facts already recorded and decides nothing about anybody; its `GraphRefusal` union is about whether a graph may be built at all, not about a patient.",
   "src/reporting/model.ts": "Figures about a practice that a commissioner could be told. Nothing is disclosed, and no figure can name a patient.",
   "src/reporting/suppression.ts": "Suppresses cells too small to disclose. It removes information rather than deciding anything about a person.",
   "src/security/audit-gate.ts": "The dependency-advisory gate. Engineering.",

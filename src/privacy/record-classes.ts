@@ -189,6 +189,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W211 builds a `Response` from W170's `RecordedEvent { chainId, kind, at }` and an `Intervention { interventionId, practiceId, chainId, kind, at }`. Neither type has a field a patient identifier could go in, and the constructor copies only from those two, so the link is a statement about a chain and a practice. Erasure is COMPOSED for the same reason W180 gave: scrub the source rail and the events these rest on are gone, with nothing here to remember to scrub. W218 classifies the GRAPH built over this, which is a different question because a graph can hold shape a single link cannot.",
   },
   {
+    module: "src/outcomes/response-graph.ts",
+    what: "Counts of how each kind of intervention was answered, over the synthetic loop",
+    handling: "no_patient_identity",
+    rationale:
+      "W212 aggregates W211's links into edges holding an intervention kind, a response kind, a verdict, a count and a basis. No chain id and no patient id survives the aggregation — the edge type has nowhere to put one. W211's own entry flags that a GRAPH can hold shape a single link cannot, and that is right about SMALL CELLS rather than about identity: a count of one is a person, in the way W196's aggregation floors describe. It is not a live exposure here because nothing ships (`SHIPPED_RESPONSE_GRAPHS` is pinned empty) and the only builder takes a `SimResult`. W218 is where the floor question is settled, and this entry is deliberately about what the type can hold rather than a promise that it is safe to disclose.",
+  },
+  {
     module: "src/outcomes/escalation-monitor.ts",
     what: "Unrouted escalations, aged",
     handling: "no_patient_identity",
