@@ -101,5 +101,18 @@ export async function POST(request: NextRequest) {
     ]);
   }
 
+  // W199: a rail large enough for a figure to clear the reporting floor of 5. Without it every
+  // figure on /console/reporting is suppressed, and the denominator rendering — the thing W196
+  // and W199 both exist for — is never exercised by any test.
+  if (request.nextUrl.searchParams.get("reportable") === "1") {
+    for (let n = 1; n <= 6; n++) {
+      const id = `ref-bulk-${n}`;
+      addReferralDocuments([make(id, practiceId, OTHER, `pat-b${n}`)]);
+      addReferralEvents([
+        { practiceId, patientId: `pat-b${n}` as PatientId, referralId: id, kind: "referral_written", at: "2026-02-01" },
+      ]);
+    }
+  }
+
   return NextResponse.json({ sent: sentBy(practiceId), received: sentTo(practiceId) });
 }
