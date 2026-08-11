@@ -10,13 +10,15 @@
   --paper: #fbfaf7;
   --stone: #eeece5;
   --line: #dfddd6;
-  /* Darkened from #728356 (3.94:1 on --paper) — failed WCAG AA as body text. Now 4.7:1.
-     Fixed at the token rather than per-rule: --sage is a text colour in nine places and
-     axe only reaches the finder's opening screen, so the same failure was latent in the
-     listening/match/profile stages it never scans. Same hue, same posture as W49's
-     stone-400 → stone-500 sweep. */
-  --sage: #66774a;
-  --sage-soft: #eef1e8;
+  /* 2026-08-10 rebrand: accent moved from sage green to Crushed Rose (#8B263E),
+     from the founder-supplied rose palette (Blush Petal #E0AEBA, Tulip Bloom #D17484,
+     Crushed Rose #8B263E). Token name kept so every accent usage flips in one move.
+     Contrast on --paper: 7.8:1 — passes WCAG AA/AAA as text everywhere the old
+     sage (4.7:1) did. --sage-soft is now a blush surface wash. */
+  --sage: #8B263E;
+  --sage-soft: #f6e8ea;
+  --rose-mid: #D17484;
+  --rose-petal: #E0AEBA;
 }
 
 * {
@@ -4463,8 +4465,9 @@ textarea:focus-visible {
   font-family: "Newsreader Variable", Newsreader, Georgia, serif;
   font-size: 1.04em;
   font-weight: 390;
-  line-height: 0.92;
+  line-height: 1.02;
   letter-spacing: -0.04em;
+  padding-bottom: 4px;
 }
 
 .patient-v2 .finder-wordmark {
@@ -4558,11 +4561,12 @@ textarea:focus-visible {
    the shell for every stage — a bigger change than this pass, and one that deserves its
    own unit. Container queries on .voice-core are the right tool when that happens. */
 
-/* Finder welcome — editorial full-bleed treatment derived from the supplied reference. */
+/* Finder welcome — editorial full-bleed treatment; ground is Deep (#292800)
+   from the rose-rebrand's supporting olive pair. */
 .patient-v2[data-stage="welcome"] .voice-screen {
   isolation: isolate;
   color: #fff;
-  background: #171713;
+  background: #292800;
 }
 
 .patient-v2[data-stage="welcome"] .minimal-header,
@@ -4588,7 +4592,7 @@ textarea:focus-visible {
 }
 
 .patient-v2[data-stage="welcome"] .finder-context p {
-  color: #f1eadc;
+  color: #E0AEBA;
 }
 
 .patient-v2[data-stage="welcome"] .finder-context strong {
@@ -4618,8 +4622,21 @@ textarea:focus-visible {
   font-family: "Newsreader Variable", Newsreader, Georgia, serif;
   font-size: 1.08em;
   font-weight: 390;
-  line-height: 0.9;
+  line-height: 1.02;
   letter-spacing: -0.045em;
+  padding-bottom: 4px;
+}
+
+.patient-v2 .voice-promise {
+  margin: 26px 0 0;
+  max-width: 34ch;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.patient-v2[data-stage="welcome"] .voice-promise {
+  color: rgb(255 255 255 / 74%);
 }
 
 .patient-v2[data-stage="welcome"] .scenario-toggle {
@@ -4638,7 +4655,7 @@ textarea:focus-visible {
 
 .patient-v2[data-stage="welcome"] .archetype-switcher > button,
 .patient-v2[data-stage="welcome"] .archetype-switcher-copy span {
-  color: #f1eadc;
+  color: #E0AEBA;
 }
 
 .patient-v2[data-stage="welcome"] .archetype-switcher-copy strong {
@@ -4675,7 +4692,7 @@ textarea:focus-visible {
     display: grid;
     min-height: 100svh;
     padding: 32px;
-    background: #b9b9b5;
+    background: #f7f3ea;
     place-items: center;
   }
 
@@ -4752,7 +4769,7 @@ textarea:focus-visible {
     display: grid;
     min-height: 100svh;
     padding: 32px;
-    background: #b9b9b5;
+    background: #f7f3ea;
     place-items: center;
   }
 
@@ -4840,14 +4857,17 @@ textarea:focus-visible {
   --s-paper-2: #f1ece1;
   --s-ink: #1f221c;
   --s-muted: #63665d;
-  --s-sage: #55663f;
-  --s-sage-soft: #e9ecdd;
+  /* Rose rebrand: accent = Crushed Rose, wash = Blush Petal over paper,
+     dark beat ground = Deep (#292800) from the supporting olive pair. */
+  --s-sage: #8B263E;
+  --s-sage-soft: #f3e2e6;
+  --s-petal: #E0AEBA;
   --s-line: #e0ddd2;
-  --s-dark: #1b1c17;
+  --s-dark: #292800;
   /* Tokens the reused InterestForm (.community-*) reads; map to the story palette */
   --community-ink: #1f221c;
   --community-muted: #63665d;
-  --community-sage: #55663f;
+  --community-sage: #8B263E;
   min-height: 100dvh;
   color: var(--s-ink);
   background: var(--s-paper);
@@ -4970,7 +4990,7 @@ textarea:focus-visible {
 }
 .story-primary-link:hover { background: #34382d; }
 .story-primary-link:active { transform: translateY(1px); }
-.story-primary-link:focus-visible { outline: 3px solid #a9b592; outline-offset: 3px; }
+.story-primary-link:focus-visible { outline: 3px solid var(--s-petal); outline-offset: 3px; }
 
 /* Hero portrait cut-out on paper ----------------------------------------- */
 .story-portrait {
@@ -5089,7 +5109,7 @@ textarea:focus-visible {
   letter-spacing: -0.04em;
   text-wrap: balance;
 }
-.story-throughline-line em { font-style: italic; }
+.story-throughline-line em { font-style: italic; color: var(--s-petal); }
 .story-throughline-sub { margin-top: 40px; }
 .story-throughline-sub p {
   max-width: 54ch;
@@ -5129,19 +5149,44 @@ textarea:focus-visible {
   line-height: 1.65;
   max-width: 46ch;
 }
-.story-cofounder {
-  margin-top: 60px;
-  padding-top: 32px;
-  border-top: 1px solid var(--s-line);
+/* Co-founder section: one split, photo cut-out + name + NOURISH link ------- */
+.story-cofounder-split { align-items: center; }
+.story-cofounder-card {
+  display: grid;
+  justify-items: center;
+  gap: 0;
 }
-.story-cofounder p {
-  max-width: 62ch;
-  margin: 0;
+.story-cofounder-photo {
+  width: min(100%, 300px);
+  height: auto;
+}
+.story-cofounder-id {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin-top: 18px;
+  text-align: center;
+}
+.story-cofounder-id strong {
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: 23px;
+  font-weight: 480;
+  letter-spacing: -0.02em;
+  color: var(--s-ink);
+}
+.story-cofounder-id > span {
   color: var(--s-muted);
-  font-size: clamp(16px, 1.2vw, 19px);
-  line-height: 1.7;
+  font-size: 13.5px;
 }
-.story-cofounder strong { color: var(--s-ink); font-weight: 640; }
+.story-nourish-link {
+  display: inline-flex;
+  margin-top: 14px;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+.story-nourish-link:hover,
+.story-nourish-link:focus-visible { opacity: 1; outline-offset: 4px; }
+.story-nourish-link img { width: 118px; height: auto; }
 
 /* Register ---------------------------------------------------------------- */
 .story-register {
@@ -5166,6 +5211,21 @@ textarea:focus-visible {
 .story .community-interest-options label > span { font-size: 12.5px; }
 .story .community-consent > span { font-size: 12.5px !important; }
 .story .community-form-privacy { font-size: 12px; }
+/* Rose rebrand of the form's green-tinted details */
+.story .community-interest-form { border-color: #dfc3ca; }
+.story .community-interest-form input:focus-visible {
+  border-color: var(--s-sage);
+  outline-color: #ecd0d7;
+}
+.story .community-interest-options input:checked + span {
+  border-color: var(--s-sage);
+  background: #f3dde2;
+}
+.story .community-interest-options input:focus-visible + span { outline-color: var(--s-petal); }
+.story .community-interest-form > button:hover,
+.story .community-interest-form > button:focus-visible { outline-color: var(--s-petal); }
+.story .community-form-success { border-color: #dfb9c2; }
+.story .community-register { border-top-color: #e5cdd3; }
 
 /* Footer ------------------------------------------------------------------ */
 .story-footer {

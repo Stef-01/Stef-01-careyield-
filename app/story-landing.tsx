@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useReducedMotion, type Variants } from "motion/react";
-import type { ReactNode } from "react";
+import { motion, useReducedMotion, useScroll, useTransform, type Variants } from "motion/react";
+import { useRef, type ReactNode } from "react";
 import { InterestForm } from "./interest-form";
 
 /**
@@ -69,10 +69,20 @@ const item: Variants = {
 
 export function StoryLanding() {
   const reduce = useReducedMotion();
+  const heroRef = useRef<HTMLElement | null>(null);
+  // Gentle parallax: the portrait drifts up slightly as the hero scrolls away.
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const portraitY = useTransform(scrollYProgress, [0, 1], [0, -56]);
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, -20]);
 
   return (
     <main className="story">
-      <header className="story-header">
+      <motion.header
+        className="story-header"
+        initial={reduce ? false : { y: -10 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
         <div className="story-wrap story-header-inner">
           <Link href="/" className="story-wordmark" aria-label="Meherr home">
             Meherr
@@ -81,13 +91,14 @@ export function StoryLanding() {
             Early demo
           </Link>
         </div>
-      </header>
+      </motion.header>
 
       {/* Hero: asymmetric split, portrait cut-out on paper */}
-      <section className="story-hero" aria-labelledby="story-hero-title">
+      <section ref={heroRef} className="story-hero" aria-labelledby="story-hero-title">
         <div className="story-wrap story-hero-grid">
           <motion.div
             className="story-hero-copy"
+            style={reduce ? undefined : { y: copyY }}
             initial={reduce ? false : "hidden"}
             animate="show"
             variants={stagger}
@@ -103,27 +114,40 @@ export function StoryLanding() {
               led me here.
             </motion.p>
             <motion.div className="story-hero-actions" variants={item}>
-              <a className="story-primary-link" href="#register">
+              <motion.a
+                className="story-primary-link"
+                href="#register"
+                whileHover={reduce ? undefined : { y: -2 }}
+                whileTap={reduce ? undefined : { scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 400, damping: 24 }}
+              >
                 Register interest
-              </a>
+              </motion.a>
             </motion.div>
           </motion.div>
 
+          {/* Outer figure carries the scroll parallax; the inner div owns the
+              entrance slide so the two y-drivers never fight. No opacity in
+              `initial` anywhere on this page (A11Y-2 above). */}
           <motion.figure
             className="story-portrait"
-            initial={reduce ? false : { y: 18 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            style={reduce ? undefined : { y: portraitY }}
           >
-            <Image
-              src={PORTRAIT_SRC}
-              alt="Narayani, founder of Meherr"
-              width={439}
-              height={610}
-              priority
-              sizes="(min-width: 900px) 40vw, 78vw"
-              className="story-portrait-img"
-            />
+            <motion.div
+              initial={reduce ? false : { y: 18 }}
+              animate={{ y: 0 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Image
+                src={PORTRAIT_SRC}
+                alt="Narayani, founder of Meherr"
+                width={439}
+                height={610}
+                priority
+                sizes="(min-width: 900px) 40vw, 78vw"
+                className="story-portrait-img"
+              />
+            </motion.div>
           </motion.figure>
         </div>
       </section>
@@ -279,12 +303,54 @@ export function StoryLanding() {
             </motion.li>
           </motion.ol>
 
-          <Reveal delay={0.05} className="story-cofounder">
-            <p>
-              <strong>I build Meherr with Stefan</strong>, a physician-in-training and
-              health-systems researcher who has spent years on primary-care innovation and public
-              health. He brings the systems. I keep us close to the women we are building for.
-            </p>
+        </div>
+      </section>
+
+      {/* Chapter 06: Stefan, co-founder */}
+      <section className="story-chapter" aria-labelledby="cofounder-title">
+        <div className="story-wrap story-split story-cofounder-split">
+          <div className="story-split-lead">
+            <Reveal>
+              <h2 id="cofounder-title" className="story-heading">
+                I do not build this alone.
+              </h2>
+            </Reveal>
+            <Reveal delay={0.05} className="story-prose">
+              <p>
+                Stefan Thottunkal is a physician-in-training and health-systems researcher at
+                Stanford Medicine, working on precision pharmacogenomic treatment in
+                Stanford&rsquo;s concierge medicine clinic and on LLM-driven, culturally tailored
+                nutrition research at NOURISH.
+              </p>
+              <p>
+                The same conviction runs through his work and mine: care lands better when it is
+                built around the person, their culture and their family.
+              </p>
+            </Reveal>
+          </div>
+
+          <Reveal delay={0.1} className="story-cofounder-card">
+            <Image
+              src="/stefan.png"
+              alt="Stefan Thottunkal, co-founder of Meherr"
+              width={1368}
+              height={1817}
+              sizes="(min-width: 900px) 26vw, 60vw"
+              className="story-cofounder-photo"
+            />
+            <div className="story-cofounder-id">
+              <strong>Stefan Thottunkal</strong>
+              <span>Co-founder</span>
+              <a
+                href="https://med.stanford.edu/nourish-project.html"
+                target="_blank"
+                rel="noreferrer"
+                className="story-nourish-link"
+                aria-label="NOURISH, culturally tailored nutrition research at Stanford Medicine"
+              >
+                <Image src="/nourish-logo.png" alt="NOURISH" width={446} height={80} />
+              </a>
+            </div>
           </Reveal>
         </div>
       </section>

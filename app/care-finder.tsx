@@ -161,7 +161,7 @@ function getRequestPriorities(value: string) {
 }
 
 function Wordmark() {
-  return <Link href="/" className="wordmark finder-wordmark" aria-label="Meherr — back to main home">Meherr</Link>;
+  return <Link href="/" className="wordmark finder-wordmark" aria-label="Meherr, back to main home">Meherr</Link>;
 }
 
 function FinderContext() {
@@ -304,9 +304,10 @@ export function CareFinder() {
             <div className="voice-core">
               <div className="voice-prompt">
                 <h1>
-                  <span>Who would you feel</span>
-                  <em>comfortable seeing?</em>
+                  <span>Meet the doctor</span>
+                  <em>who gets you.</em>
                 </h1>
+                <p className="voice-promise">Say what matters to you. We listen for the rest.</p>
               </div>
 
               <button
@@ -370,7 +371,7 @@ export function CareFinder() {
             <div className="voice-prompt listening-copy">
               <p className="eyebrow">Listening</p>
               <h1>Describe the GP you’d feel comfortable with.</h1>
-              <p className="example">Health needs, culture, emotional support—whatever matters to you.</p>
+              <p className="example">Health needs, culture, emotional support. Whatever matters to you.</p>
             </div>
 
             <div className="voice-actions">
@@ -403,8 +404,8 @@ export function CareFinder() {
               <FinderContext />
               <p className="eyebrow">In your own words</p>
               <h1>
-                <span>Who would you feel</span>
-                <em>comfortable seeing?</em>
+                <span>Meet the doctor</span>
+                <em>who gets you.</em>
               </h1>
               <label className="sr-only" htmlFor="doctor-request">Describe the GP you want to see</label>
               <textarea
@@ -730,7 +731,7 @@ export function CareFinder() {
 
             <div className="bottom-action">
               <Pressable className="primary-button" type="button" disabled={!selectedTime} onClick={() => setStage("confirmed")}>Send request</Pressable>
-              <p>Demo only—nothing will be sent.</p>
+              <p>Demo only. Nothing will be sent.</p>
             </div>
           </MotionScreen>
         )}
