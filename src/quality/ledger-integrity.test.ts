@@ -93,13 +93,36 @@ describe("W168 the ledger is a usable lock", () => {
     expect(missing.map((r) => `${r.id} (sha field: "${r.sha}")`)).toEqual([]);
   });
 
-  it("makes every blocked unit name the gate blocking it", () => {
+  it("makes every blocked unit name what the founder has to decide", () => {
     // The founder needs to read the ledger and see what their decision unblocks. A blocked row
-    // that does not name a gate is a unit that has quietly stopped being anybody's.
-    const unexplained = ROWS.filter(
-      (r) => r.status === "blocked" && !/FOUNDER GATE G\d/.test(r.note),
-    );
+    // that names nothing is a unit that has quietly stopped being anybody's.
+    //
+    // W195 widened this from `FOUNDER GATE G\d` alone, and the reason is a finding rather than a
+    // convenience: NOT EVERY FOUNDER BLOCKER IS A NUMBERED GATE. W133 waits on the A-or-B ruling
+    // on cross-boundary credential visibility, which is a founder decision with no G-number —
+    // and while the matcher demanded one, the row carried `FOUNDER GATE G6`, which does not
+    // block it at all. The narrow check was therefore ENFORCING a mislabel: the only way to
+    // satisfy it was to name a numbered gate, true or not.
+    //
+    // Deliberately not widened to "mentions a founder": an un-numbered decision must point at
+    // the document where it is written down, so a reader can find the actual question.
+    const named = (note: string) =>
+      /FOUNDER GATE G\d/.test(note) ||
+      /FOUNDER DECISION[^|]*docs\/GATE-DOSSIER-[\w.-]+\.md/.test(note);
+    const unexplained = ROWS.filter((r) => r.status === "blocked" && !named(r.note));
     expect(unexplained.map((r) => r.id)).toEqual([]);
+  });
+
+  it("still refuses a blocked row that names no decision at all", () => {
+    // Non-vacuity for the widening above, in the suite rather than in a scratch run: the
+    // loosened matcher must still reject the thing the strict one existed to catch.
+    const named = (note: string) =>
+      /FOUNDER GATE G\d/.test(note) ||
+      /FOUNDER DECISION[^|]*docs\/GATE-DOSSIER-[\w.-]+\.md/.test(note);
+    expect(named("blocked because it is hard")).toBe(false);
+    expect(named("FOUNDER DECISION — somebody should rule on this")).toBe(false);
+    expect(named("FOUNDER GATE G5 — not buildable")).toBe(true);
+    expect(named("FOUNDER DECISION — Q9 action 1, recorded in docs/GATE-DOSSIER-Q9.md")).toBe(true);
   });
 
   it("gives every claimed or in-progress unit an owner and a timestamp", () => {
