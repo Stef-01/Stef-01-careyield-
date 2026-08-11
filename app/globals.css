@@ -5213,20 +5213,16 @@ textarea:focus-visible {
 .story-nourish-link:hover,
 .story-nourish-link:focus-visible { opacity: 1; outline-offset: 4px; }
 .story-nourish-link img { width: 112px; height: auto; }
-/* HSIL has no published logo mark; a typographic lockup in the site's own
-   voice is the honest equivalent. */
 .story-hsil-link {
+  display: inline-flex;
   padding-left: 22px;
   border-left: 1px solid var(--s-line);
-  color: #3d4038;
-  font-size: 15px;
-  font-weight: 680;
-  letter-spacing: -0.01em;
-  text-decoration: none;
-  transition: color 0.2s ease;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
 }
 .story-hsil-link:hover,
-.story-hsil-link:focus-visible { color: var(--s-sage); }
+.story-hsil-link:focus-visible { opacity: 1; outline-offset: 4px; }
+.story-hsil-link img { width: 196px; height: auto; }
 
 /* Register ---------------------------------------------------------------- */
 .story-register {

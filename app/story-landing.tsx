@@ -186,13 +186,15 @@ export function StoryLanding() {
             <Reveal delay={0.05} className="story-prose">
               <p>
                 At Macquarie&rsquo;s ALERT lymphoedema clinic I worked inside a multidisciplinary
-                team on women&rsquo;s recovery before and after surgery, tracking dermal backflow
-                and the small measurements that decide whether someone is really healing.
+                team on women&rsquo;s recovery before and after surgery. Lymphoedema is a condition
+                women are quietly expected to live with: stigmatised, brushed off as cosmetic, when
+                it changes how a woman dresses, works, moves and feels in her own body.
               </p>
               <p>
-                So I rebuilt how that data was kept, and the work was recognised. What stayed with
-                me was how much good care quietly depends on one person caring enough to get the
-                details right.
+                Tracking dermal backflow pulled me into the measurement side of that gap, and
+                opened the door to lymphoedema device innovation. I rebuilt how our recovery data
+                was kept, and the work was recognised. What stayed with me was how much good care
+                quietly depends on one person caring enough to get the details right.
               </p>
             </Reveal>
           </div>
@@ -357,7 +359,7 @@ export function StoryLanding() {
                   className="story-hsil-link"
                   aria-label="Health Systems Innovation Lab, Harvard T.H. Chan School of Public Health"
                 >
-                  Harvard&nbsp;HSIL
+                  <Image src="/hsil-logo.png" alt="Harvard T.H. Chan School of Public Health, Health Systems Innovation Lab" width={472} height={54} />
                 </a>
               </div>
             </div>
