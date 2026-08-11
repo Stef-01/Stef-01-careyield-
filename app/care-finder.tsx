@@ -20,6 +20,7 @@ import { clinicians, getPersonalizedMatch, rankClinicians, type Clinician } from
 
 type Stage =
   | "welcome"
+  | "scenarios"
   | "listening"
   | "type"
   | "review"
@@ -194,8 +195,7 @@ function WaveformMark({ active = false }: { active?: boolean }) {
 export function CareFinder() {
   const [stage, setStage] = useState<Stage>("welcome");
   const [archetypeIndex, setArchetypeIndex] = useState(0);
-  const [showScenarios, setShowScenarios] = useState(false);
-  // The welcome showcase rotates scenarios on its own until the visitor takes over.
+  // The scenario browser rotates on its own until the visitor takes over.
   const [autoCycle, setAutoCycle] = useState(true);
   const reducedMotion = useReducedMotion();
   const [draft, setDraft] = useState("");
@@ -234,7 +234,7 @@ export function CareFinder() {
   }, [stage]);
 
   useEffect(() => {
-    if (stage !== "welcome" || !showScenarios || !autoCycle || reducedMotion) return;
+    if (stage !== "scenarios" || !autoCycle || reducedMotion) return;
     const timer = window.setInterval(() => {
       setArchetypeIndex((current) => {
         const nextIndex = (current + 1) % careArchetypes.length;
@@ -247,7 +247,7 @@ export function CareFinder() {
       });
     }, 5500);
     return () => window.clearInterval(timer);
-  }, [stage, showScenarios, autoCycle, reducedMotion]);
+  }, [stage, autoCycle, reducedMotion]);
 
   const requestSummary = useMemo(() => {
     const cleaned = request.trim().replace(/[.!?]+$/, "");
@@ -348,69 +348,64 @@ export function CareFinder() {
                 <span>Talk for 20 seconds</span>
               </Pressable>
 
-              <div className="scenario-block">
-                <button
-                  className="scenario-toggle"
-                  type="button"
-                  aria-expanded={showScenarios}
-                  aria-controls="demo-scenarios"
-                  onClick={() => setShowScenarios((current) => !current)}
-                >
-                  Try a demo scenario
-                  <CaretRight className={showScenarios ? "is-open" : ""} size={14} weight="bold" aria-hidden="true" />
-                </button>
-
-                <AnimatePresence>
-                  {showScenarios && (
-                    <motion.div
-                      key="demo-scenarios"
-                      id="demo-scenarios"
-                      className="scenario-pop"
-                      role="group"
-                      aria-label="Demo care scenarios"
-                      initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.98 }}
-                      animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-                      exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
-                      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <div className="archetype-switcher">
-                        <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(-1); }} aria-label="Previous care scenario">
-                          <CaretLeft size={19} weight="light" aria-hidden="true" />
-                        </Pressable>
-                        <AnimatePresence mode="wait" initial={false}>
-                          <motion.button
-                            className="scenario-quote"
-                            type="button"
-                            key={archetype.id}
-                            initial={{ opacity: 0, x: matchDirection * 7 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: matchDirection * -7 }}
-                            transition={{ duration: 0.2 }}
-                            onClick={() => {
-                              setShowScenarios(false);
-                              findMatches(archetype.request);
-                            }}
-                            aria-label={`Try this scenario: ${archetype.title}`}
-                          >
-                            <q>{archetype.example}</q>
-                            <span>
-                              Try this one <CaretRight size={12} weight="bold" aria-hidden="true" />
-                            </span>
-                          </motion.button>
-                        </AnimatePresence>
-                        <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(1); }} aria-label="Next care scenario">
-                          <CaretRight size={19} weight="light" aria-hidden="true" />
-                        </Pressable>
-                      </div>
-                      <p className="scenario-count">{archetypeIndex + 1} of {careArchetypes.length}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              <button
+                className="scenario-toggle"
+                type="button"
+                onClick={() => {
+                  setAutoCycle(true);
+                  setStage("scenarios");
+                }}
+              >
+                Try a demo scenario
+                <CaretRight size={14} weight="bold" aria-hidden="true" />
+              </button>
             </motion.div>
 
             <FinderContext />
 
+          </MotionScreen>
+        )}
+
+        {stage === "scenarios" && (
+          <MotionScreen key="scenarios" className="scenario-screen">
+            <header className="minimal-header">
+              <button className="icon-button" type="button" onClick={() => setStage("welcome")} aria-label="Back to start">
+                <ArrowLeft size={25} weight="light" aria-hidden="true" />
+              </button>
+              <Wordmark />
+              <span className="header-spacer" />
+            </header>
+
+            <div className="scenario-core">
+              <p className="eyebrow">Demo scenarios</p>
+              <div className="archetype-switcher" role="group" aria-label="Demo care scenarios">
+                <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(-1); }} aria-label="Previous care scenario">
+                  <CaretLeft size={22} weight="light" aria-hidden="true" />
+                </Pressable>
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.blockquote
+                    className="scenario-quote"
+                    key={archetype.id}
+                    initial={{ opacity: 0, x: matchDirection * 9 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: matchDirection * -9 }}
+                    transition={{ duration: 0.22 }}
+                  >
+                    <q>{archetype.example}</q>
+                  </motion.blockquote>
+                </AnimatePresence>
+                <Pressable type="button" onClick={() => { setAutoCycle(false); cycleArchetype(1); }} aria-label="Next care scenario">
+                  <CaretRight size={22} weight="light" aria-hidden="true" />
+                </Pressable>
+              </div>
+              <p className="scenario-count">{archetypeIndex + 1} of {careArchetypes.length}</p>
+            </div>
+
+            <div className="bottom-action">
+              <Pressable className="primary-button" type="button" onClick={() => findMatches(archetype.request)}>
+                Try this scenario
+              </Pressable>
+            </div>
           </MotionScreen>
         )}
 

@@ -1701,13 +1701,11 @@ textarea:focus-visible {
 
 .patient-v2 .archetype-switcher {
   display: grid;
-  width: calc(100% - 44px);
-  min-height: 70px;
+  width: min(600px, 100%);
   grid-template-columns: 44px minmax(0, 1fr) 44px;
   align-items: center;
-  margin: 0 22px 12px;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  gap: 6px;
+  margin: 0 auto;
 }
 
 .patient-v2 .archetype-switcher > button {
@@ -4370,14 +4368,14 @@ textarea:focus-visible {
    carries the composition instead of framing it in white.
    --------------------------------------------------------------------------- */
 
+/* Headline and actions travel as ONE optically-centred group between the header
+   and the foot line — never a floating headline with a CTA pinned far below it. */
 .patient-v2 .voice-core {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  justify-content: center;
-  gap: 18px;
   min-height: 0;
-  padding: 24px 0;
+  margin-top: auto;
+  padding: 24px 0 0;
 }
 
 /* One quiet line at the foot of the welcome screen; the flow needs no more context. */
@@ -4473,15 +4471,9 @@ textarea:focus-visible {
 }
 
 
-/* Demo scenarios live behind one quiet trigger; the panel pops out above it. */
-.patient-v2 .scenario-block {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
+/* Demo scenarios live behind one quiet trigger on the welcome; the browser is
+   its own full-screen stage, entered with the same transition as every other
+   step. No overlay, no second material, nothing to layer. */
 .patient-v2 .scenario-toggle {
   display: inline-flex;
   min-height: 42px;
@@ -4505,90 +4497,60 @@ textarea:focus-visible {
 
 .patient-v2 .scenario-toggle svg {
   color: var(--sage);
-  transition: transform 160ms ease;
 }
 
-.patient-v2 .scenario-toggle svg.is-open {
-  transform: rotate(90deg);
+.patient-v2 .scenario-screen {
+  display: flex;
+  flex-direction: column;
 }
 
-.patient-v2 .scenario-pop {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 10px);
-  left: 0;
-  z-index: 30;
-  width: min(430px, 100%);
-  margin-inline: auto;
-  padding: 14px 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: var(--paper);
-  box-shadow: 0 18px 44px rgb(28 25 23 / 14%);
-}
-
-/* Beats the 44px arrow sizing that `.archetype-switcher > button` applies. */
-.patient-v2 .archetype-switcher > .scenario-quote {
-  display: block;
-  width: 100%;
-  height: auto;
-  min-width: 0;
-  padding: 6px 2px;
-  border: 0;
-  color: var(--ink);
-  background: transparent;
+.patient-v2 .scenario-core {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  min-height: 0;
+  padding: 24px 22px;
   text-align: center;
-  cursor: pointer;
-  place-items: initial;
+}
+
+.patient-v2 .scenario-quote {
+  margin: 0;
+  min-width: 0;
+  padding: 0 4px;
 }
 
 .patient-v2 .scenario-quote q {
   display: block;
-  max-width: 30ch;
+  max-width: 22ch;
   margin: 0 auto;
-  font-size: 14px;
-  line-height: 1.5;
+  font-family: "Newsreader Variable", Newsreader, Georgia, serif;
+  font-size: clamp(24px, 5.6vw, 31px);
+  font-weight: 420;
+  line-height: 1.32;
+  letter-spacing: -0.02em;
   quotes: "\201C" "\201D";
   text-wrap: pretty;
 }
 
-.patient-v2 .scenario-quote > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  margin-top: 9px;
-  color: var(--sage);
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.patient-v2 .scenario-quote:hover > span {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
 .patient-v2 .scenario-count {
-  margin: 8px 0 0;
+  margin: 0;
   color: var(--faint);
-  font-size: 10px;
+  font-size: 11px;
   text-align: center;
 }
 
 .patient-v2 .voice-screen .voice-actions {
   align-items: center;
-  padding-bottom: 28px;
+  margin-top: 34px;
+  margin-bottom: auto;
+  padding-bottom: 0;
 }
 
 .patient-v2 .voice-screen .mic-button {
   width: min(340px, 100%);
-}
-
-.patient-v2 .voice-screen .archetype-switcher {
-  width: 100%;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
 }
 
 /* Finder desktop (2026-08-11 overhaul): the welcome and type stages once painted
@@ -4603,6 +4565,8 @@ textarea:focus-visible {
 
   .patient-v2[data-stage="welcome"] .care-shell,
   .patient-v2[data-stage="welcome"] .screen,
+  .patient-v2[data-stage="scenarios"] .care-shell,
+  .patient-v2[data-stage="scenarios"] .screen,
   .patient-v2[data-stage="type"] .care-shell,
   .patient-v2[data-stage="type"] .screen {
     width: min(640px, 100%);
@@ -4610,21 +4574,10 @@ textarea:focus-visible {
   }
 
   .patient-v2[data-stage="welcome"] .minimal-header,
+  .patient-v2[data-stage="scenarios"] .minimal-header,
   .patient-v2[data-stage="type"] .minimal-header {
     min-height: 84px;
     border-bottom: 0;
-  }
-
-  .patient-v2[data-stage="welcome"] .voice-core {
-    flex: 0 1 auto;
-    margin-top: auto;
-    padding: 34px 0 0;
-  }
-
-  .patient-v2[data-stage="welcome"] .voice-actions {
-    margin-top: 34px;
-    margin-bottom: auto;
-    padding-bottom: 12px;
   }
 
   .patient-v2 .voice-screen .voice-prompt h1 {
