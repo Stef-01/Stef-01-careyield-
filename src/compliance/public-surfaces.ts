@@ -207,13 +207,6 @@ export const ACCEPTED_FINDINGS: readonly AcceptedFinding[] = [
     reviewBy: "2027-02-11",
   },
   {
-    path: "/privacy/automated-decisions",
-    rule: "no-ratings",
-    match: "review",
-    why: "`no-ratings` matches the word review because a patient review is a prohibited testimonial. This page uses it twice in the opposite sense — \"Last reviewed 10 August 2026\", and a scheduled clinical review — and an ADM notice is REQUIRED to say how a decision can be reviewed. A sentence-level collision in one legal context, so it is accepted here rather than made a page class or a hole in the rule.",
-    reviewBy: "2027-02-11",
-  },
-  {
     path: "/",
     rule: "no-diagnosis-or-condition",
     match: "diagnosis",

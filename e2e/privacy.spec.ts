@@ -3,6 +3,7 @@
 // public privacy/ADM pages render.
 
 import { expect, test } from "@playwright/test";
+import { AUTOMATED_DECISIONS } from "../src/privacy/automated-decisions";
 
 interface MockState {
   invitations: Array<{ id: string; status: string; token: string }>;
@@ -79,4 +80,15 @@ test("public privacy policy and ADM-transparency pages render the required state
   await expect(page.getByRole("heading", { name: "What is never automated" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Human controls" })).toBeVisible();
   await expect(page.getByText("No clinical decision of any kind")).toBeVisible();
+
+  // W201: the list is rendered from `AUTOMATED_DECISIONS`, so the count is the register's and a
+  // decision added to the tree reaches the published page or fails the unit suite first.
+  const automated = page.locator("section", { has: page.getByRole("heading", { name: "What is automated" }) });
+  await expect(automated.locator("li")).toHaveCount(AUTOMATED_DECISIONS.length);
+  for (const decision of AUTOMATED_DECISIONS) {
+    await expect(automated.getByText(decision.title, { exact: false })).toBeVisible();
+  }
+  // Named here as well as in the register: the holdout arm withholds an offer of an appointment
+  // from a specific person and went undisclosed from W8 to W201.
+  await expect(page.getByText("the group we deliberately leave alone")).toBeVisible();
 });

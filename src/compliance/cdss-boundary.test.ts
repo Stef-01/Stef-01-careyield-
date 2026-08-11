@@ -67,6 +67,7 @@ const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/outcomes/escalation-monitor.ts": () => import("@/outcomes/escalation-monitor"),
   "src/outcomes/model.ts": () => import("@/outcomes/model"),
   "src/outcomes/time-to-escalation.ts": () => import("@/outcomes/time-to-escalation"),
+  "src/privacy/automated-decisions.ts": () => import("@/privacy/automated-decisions"),
   "src/quality/order-independence.ts": () => import("@/quality/order-independence"),
   "src/quality/order-regressions.ts": () => import("@/quality/order-regressions"),
   "src/reporting/model.ts": () => import("@/reporting/model"),
@@ -127,6 +128,15 @@ describe("W200 the declared copy surface is checked against the tree", () => {
     // has stopped describing the tree, and W102's rule is that both fail.
     expect(OPERATOR_COPY_SURFACES.map((s) => s.module).sort()).toEqual(y4Modules());
     expect(y4Modules().length).toBeGreaterThan(20);
+  });
+
+  it("declares each module once", () => {
+    // Named separately because the set comparison above reports a duplicate as a length mismatch
+    // and buries which module it was. Two parallel builders declared `reporting/report.ts` in the
+    // same merge window — W205 and W201 — and the diff took longer to read than the fix.
+    const declared = OPERATOR_COPY_SURFACES.map((s) => s.module);
+    const twice = declared.filter((m, i) => declared.indexOf(m) !== i);
+    expect(twice, "declared twice").toEqual([]);
   });
 
   it("has a namespace loader for every declared module", () => {
