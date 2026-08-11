@@ -301,6 +301,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports are the reason union, the candidate projection and the floor check. `MATCH_REASON_COPY` is the sentence a practice manager reads about one appointment offer and `MATCH_FLOOR_BREACH_COPY` tells a reviewer why a plan was refused. Both are about capacity, recorded availability and practice-set limits; a test asserts neither can name a condition, a symptom or an urgency, because a reason is the one place a matcher gets to say WHY in words somebody reads.",
   },
   {
+    module: "src/outcomes/graph-privacy.ts",
+    operatorCopy: ["CELL_SUPPRESSION_COPY"],
+    notCopy:
+      "The remaining exports are the floor, the disclosable shape and its renderer. `CELL_SUPPRESSION_COPY` tells a reader why a count is withheld — because it describes too few people, or because publishing it would let another withheld number be recovered by subtraction. It describes the arithmetic of the disclosure, never a patient, a condition or a next clinical step, and a test asserts it carries no numeral at all so a withheld cell can never render as one.",
+  },
+  {
     module: "src/outcomes/counterfactual.ts",
     operatorCopy: ["COUNTERFACTUAL_WITHHELD_COPY"],
     notCopy:

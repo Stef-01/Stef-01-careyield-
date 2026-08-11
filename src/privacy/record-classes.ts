@@ -182,6 +182,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W170 folds `RecordedEvent { chainId, kind, at }`. A chain id is a referral id, not a person, and no field on an Outcome or an OutcomeSummary can hold patient identity — the type has nowhere to put one.",
   },
   {
+    module: "src/outcomes/graph-privacy.ts",
+    what: "The disclosable form of a response graph, with small cells withheld",
+    handling: "no_patient_identity",
+    rationale:
+      "W218. Holds the same aggregate counts W212 produces, minus the ones the floor withholds, and the withheld cells are carried as `null` with a reason rather than dropped. No chain id, no invitation id and no patient id: a test scans every string in a graph built over a real six-week run and asserts none of the 1,552 chain ids it was handed survived the aggregation, which is a stronger claim than the type makes. The class exists because W212 correctly flagged that a GRAPH can hold shape a single link cannot — a cell of one is a person even when no field names one — and this module is where that shape is removed. `SHIPPED_DISCLOSABLE_GRAPHS` is pinned empty: a non-empty registry would be the first thing in the tree cleared for disclosure, and G9 is unratified.",
+  },
+  {
     module: "src/outcomes/counterfactual.ts",
     what: "The counterfactual figure and its refusals",
     handling: "no_patient_identity",
@@ -200,7 +207,7 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
     what: "Counts of how each kind of intervention was answered, over the synthetic loop",
     handling: "no_patient_identity",
     rationale:
-      "W212 aggregates W211's links into edges holding an intervention kind, a response kind, a verdict, a count and a basis. No chain id and no patient id survives the aggregation — the edge type has nowhere to put one. W211's own entry flags that a GRAPH can hold shape a single link cannot, and that is right about SMALL CELLS rather than about identity: a count of one is a person, in the way W196's aggregation floors describe. It is not a live exposure here because nothing ships (`SHIPPED_RESPONSE_GRAPHS` is pinned empty) and the only builder takes a `SimResult`. W218 is where the floor question is settled, and this entry is deliberately about what the type can hold rather than a promise that it is safe to disclose.",
+      "W212 aggregates W211's links into edges holding an intervention kind, a response kind, a verdict, a count and a basis. No chain id and no patient id survives the aggregation — the edge type has nowhere to put one. W211's own entry flags that a GRAPH can hold shape a single link cannot, and that is right about SMALL CELLS rather than about identity: a count of one is a person, in the way W196's aggregation floors describe. It is not a live exposure here because nothing ships (`SHIPPED_RESPONSE_GRAPHS` is pinned empty) and the only builder takes a `SimResult`. **W218 settled the floor question in `src/outcomes/graph-privacy.ts`**, which is where a graph is put into disclosable form: this entry stays about what the type can hold, and that one is about what may be published from it.",
   },
   {
     module: "src/outcomes/escalation-monitor.ts",
