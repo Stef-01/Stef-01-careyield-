@@ -251,6 +251,7 @@ export const NOT_A_DECISION: Readonly<Record<string, string>> = {
   "src/engine/continuity.ts": "Practice-level continuity measurement — what share of appointments were with a patient's usual GP.",
   "src/interest/types.ts": "The reasons a practice can pick on the interest form. Chosen by a person.",
   "src/loop/claims.ts": "Which build session may claim a ledger row. Engineering, not product.",
+  "src/matching/explain.ts": "W213's explainability floor. It renders the reason a matching decision carries and REFUSES a plan that leaves anybody unaccounted for; it chooses nothing itself. The decision it constrains is W214's, and the projection here is what stops that decision from being able to read a clinical attribute at all.",
   "src/ops/store.ts": "Storage for the admin-operations console. It holds what staff did and what the rails recorded, and takes no view of its own.",
   "src/pathways/approval.ts": "The G5 sign-off workflow for pathway content. A decision about content, taken by people.",
   "src/pms/adapter.ts": "The read interface onto practice software.",

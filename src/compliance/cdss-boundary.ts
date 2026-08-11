@@ -289,6 +289,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "W204 declares how long a produced report lives. Every export here is reviewer-facing: `REPORT_RETENTION` and `PROPOSED_DISCLOSURE_LOG` argue a retention posture to somebody auditing it, and `REPORTING_ARTEFACTS` is a checklist of what this product does and does not keep. None of it reaches an operator, and none of it describes anybody's care.",
   },
   {
+    module: "src/matching/explain.ts",
+    operatorCopy: ["MATCH_REASON_COPY", "MATCH_FLOOR_BREACH_COPY"],
+    notCopy:
+      "The remaining exports are the reason union, the candidate projection and the floor check. `MATCH_REASON_COPY` is the sentence a practice manager reads about one appointment offer and `MATCH_FLOOR_BREACH_COPY` tells a reviewer why a plan was refused. Both are about capacity, recorded availability and practice-set limits; a test asserts neither can name a condition, a symptom or an urgency, because a reason is the one place a matcher gets to say WHY in words somebody reads.",
+  },
+  {
     module: "src/outcomes/response.ts",
     operatorCopy: ["RESPONSE_STATE_COPY", "RESPONSE_ABSENCE_COPY", "RESPONSE_REJECTION_COPY"],
     notCopy:
