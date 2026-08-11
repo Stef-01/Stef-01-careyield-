@@ -203,6 +203,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W172 samples pathway verdicts by their own identity to compare reviewer and engine, and holds no patient field. The sample is over VERDICTS, and a verdict names a pathway version rather than the person it was computed for.",
   },
   {
+    module: "src/reporting/report.ts",
+    what: "The reporting summary a practice reads about itself",
+    handling: "derived",
+    rationale:
+      "W204. Recomputed from the practice's own live rails on every read and never persisted, so erasing a source record is automatically effective on every figure derived from it. Storing a produced report would create a second copy that erasure does not reach — W51's failure in a new place. `derived` here is the reviewed answer W106 requires and not an exemption: the claim that nothing is written is checked against the tree by src/reporting/retention.test.ts, and the day G9 opens a DISCLOSURE LOG becomes mandatory and is a stored class with its own life.",
+  },
+  {
     module: "src/outcomes/audit-export.ts",
     what: "Practice configuration audit trail, exported",
     handling: "no_patient_identity",

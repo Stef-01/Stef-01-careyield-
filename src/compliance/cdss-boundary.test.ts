@@ -70,6 +70,8 @@ const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/quality/order-independence.ts": () => import("@/quality/order-independence"),
   "src/quality/order-regressions.ts": () => import("@/quality/order-regressions"),
   "src/reporting/model.ts": () => import("@/reporting/model"),
+  "src/reporting/report.ts": () => import("@/reporting/report"),
+  "src/reporting/retention.ts": () => import("@/reporting/retention"),
   "src/reporting/suppression.ts": () => import("@/reporting/suppression"),
   "src/verticals/binding.ts": () => import("@/verticals/binding"),
   "src/verticals/completeness.ts": () => import("@/verticals/completeness"),

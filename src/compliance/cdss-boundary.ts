@@ -259,6 +259,18 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "NESTED_KINDS is a kind list and REFUSED_SUPPRESSION_TREATMENTS is reviewer-facing. `renderSuppressedReport` composes inline from figure kinds and the suppression marker — the known bound in the module note.",
   },
   {
+    module: "src/reporting/report.ts",
+    operatorCopy: ["REPORT_CAVEATS", "KIND_LABELS"],
+    notCopy:
+      "The remaining exports assemble and render the document. `REPORT_CAVEATS` and the coverage sentences are read by a practice manager, and they describe what the record holds and what it does not — never a patient, a condition or a next clinical step.",
+  },
+  {
+    module: "src/reporting/retention.ts",
+    operatorCopy: [],
+    notCopy:
+      "W204 declares how long a produced report lives. Every export here is reviewer-facing: `REPORT_RETENTION` and `PROPOSED_DISCLOSURE_LOG` argue a retention posture to somebody auditing it, and `REPORTING_ARTEFACTS` is a checklist of what this product does and does not keep. None of it reaches an operator, and none of it describes anybody's care.",
+  },
+  {
     module: "src/verticals/binding.ts",
     operatorCopy: ["RESOLUTION_COPY", "ACCEPT_REFUSAL_COPY"],
     notCopy: "The remaining exports resolve which version a practice has accepted.",
