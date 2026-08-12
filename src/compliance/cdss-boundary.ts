@@ -427,6 +427,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification. W262 drives the first-connection path while every credential is still refused, and nobody in the product reads any of it: the stage observations are diagnostic strings a reviewer reads in a trace, and `WHAT_THIS_DOES_NOT_PROVE` is addressed to whoever would otherwise quote a green rehearsal as evidence that an integration works. `REFUSED_REHEARSAL_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the shortened walk, the boolean return and the faked credential it exists to forbid. The remaining exports are the stage union, the walk and the trace reader.",
   },
   {
+    module: "src/sim/fleet-y5.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W269 runs fifty synthetic practices through the Y5 surfaces and reports numbers; every string in it is addressed to whoever reads a budget violation — `checkY5FleetBudgets` returns sentences like `p95 capacity 300.0ms > 250ms` because a boolean cannot be acted on, and the two share violations name the defect each end would mean. No clinician or practice manager sees any of it, and nothing here renders. `REFUSED_Y5_FLEET_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the carried-over cost envelope, the ceiling-only share and the fleet with nothing to refuse that it exists to forbid.",
+  },
+  {
     module: "src/security/page-reach.ts",
     operatorCopy: [],
     notCopy:

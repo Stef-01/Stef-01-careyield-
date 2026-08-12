@@ -238,6 +238,14 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    module: "src/sim/fleet-y5.ts",
+    folds: 5,
+    disposition: {
+      kind: "rationale",
+      why: "FIVE integer sums and no selection among them. One totals a session pattern's offerable slots before a forecast is asked for; four total counts across the fleet's practices before two shares are divided out. Integer addition is commutative, every divisor is a count taken from the same pass, and none of the five returns an element — so there is no record whose identity could depend on which order the runs happened to be in, which is the failure the register exists for.",
+    },
+  },
+  {
     module: "src/sim/fleet.ts",
     folds: 1,
     disposition: {
