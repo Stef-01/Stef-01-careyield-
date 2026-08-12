@@ -361,6 +361,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification rather than an omission. W237 is a test harness: `FIXTURE_REJECTION_COPY` is read by whoever wrote a bad fixture, and `WHAT_THIS_PROVES` / `WHAT_THIS_DOES_NOT_PROVE` are addressed to a reviewer deciding how much a green run is worth. No clinician or practice manager sees any of it in the product, so linting it as operator copy would be W200's own category error — and these strings QUOTE what they warn about ('no receiving system has ever seen any of this'), which is the collision that split this register in the first place. The remaining exports are pure detectors and the contract itself.",
   },
   {
+    module: "src/interop/console.ts",
+    operatorCopy: ["INTEROP_CONSOLE_COPY", "WHAT_THIS_PAGE_CANNOT_SHOW"],
+    notCopy:
+      "The remaining exports are the view-model, the ledger-state inverse and the blocker derivation. `INTEROP_CONSOLE_COPY` and `WHAT_THIS_PAGE_CANNOT_SHOW` are what a practice manager reads on `/console/interop`: that nothing has been ATTEMPTED rather than that nothing was exchanged, that an unanswered exchange is neither a delivery nor a failure, that there is nothing to press because sending again may duplicate a clinical document at the other end, and — the one this surface exists for — that a list built from what LEFT can never show a failure to send. Every sentence is about this practice's own outbound records and the state of a connection; none names a patient, a condition or a clinical step, and a test runs all of them through W6's shared linter. `REFUSED_CONSOLE_BEHAVIOURS` is reviewer-facing in W200's split, since its content is naming the retry control and the delivered column it exists to forbid.",
+  },
+  {
     module: "src/interop/consent-to-disclose.ts",
     operatorCopy: ["CONSENT_VERDICT_COPY", "SCOPE_MISMATCH_COPY"],
     notCopy:

@@ -136,6 +136,7 @@ test("console surfaces pass WCAG A/AA", async ({ page }) => {
     "/console/reporting", // W199 — same referral seed populates it
   "/console/responses", // W220 — populated from the synthetic loop, no seed needed
     "/console/capacity", // W229 — same synthetic diary, populated with no seed
+    "/console/interop", // W246 — scanned in its EMPTY state, which is the state it ships in
     "/console/setup/practice",
   ];
   for (const path of surfaces) {
