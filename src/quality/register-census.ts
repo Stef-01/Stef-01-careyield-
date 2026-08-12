@@ -281,6 +281,18 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
   },
   {
+    file: "src/quality/g5-rehearsal.test.ts",
+    derives: "Every non-test module under `src/` and `app/`, looking for an import of the G5 rehearsal.",
+    checkedAgainst:
+      "W264's rule that nothing the product ships imports it — the one route by which synthetic pathway content could reach a page.",
+    proof: {
+      kind: "walk_unproven",
+      contentProof:
+        "src/quality/g5-rehearsal.test.ts :: proves the linter would object to content that DID read clinically",
+      remedy: EXPORT_THE_WALK,
+    },
+  },
+  {
     file: "src/quality/latent-findings.ts",
     derives: "Every module with no `// W<n>` header — one recorded finding's live condition.",
     checkedAgainst: "W210's `HEADERLESS_AT_W210`, so the count becoming worse fires the finding.",

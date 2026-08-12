@@ -415,6 +415,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification. W262 drives the first-connection path while every credential is still refused, and nobody in the product reads any of it: the stage observations are diagnostic strings a reviewer reads in a trace, and `WHAT_THIS_DOES_NOT_PROVE` is addressed to whoever would otherwise quote a green rehearsal as evidence that an integration works. `REFUSED_REHEARSAL_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the shortened walk, the boolean return and the faked credential it exists to forbid. The remaining exports are the stage union, the walk and the trace reader.",
   },
   {
+    module: "src/quality/g5-rehearsal.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W264 drives W119's two-person sign-off on content that means nothing, and no operator sees any of it: the stage observations are diagnostic strings a reviewer reads in a trace, and each refusal scenario is a sentence explaining an arrangement to whoever reads the drive. `SYNTHETIC_CRITERIA` carries the only strings that could be mistaken for copy, and they are the fixture rather than the product — their rationales say they stand for nothing and the test lints them with W121's clinical vocabulary check. `WHAT_THIS_DOES_NOT_PROVE` and `REFUSED_G5_REHEARSAL_SHAPES` are reviewer-facing in W200's split for the usual reason: their content QUOTES the plausible clinical fixture, the seeded registry and the single-refusal walk they exist to forbid.",
+  },
+  {
     module: "src/quality/gate-readiness.ts",
     operatorCopy: [],
     notCopy:
