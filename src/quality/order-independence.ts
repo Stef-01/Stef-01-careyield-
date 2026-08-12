@@ -71,6 +71,14 @@ export interface FoldSite {
  */
 export const FOLD_SITES: readonly FoldSite[] = [
   {
+    module: "src/capacity/backtest.ts",
+    folds: 2,
+    disposition: {
+      kind: "rationale",
+      why: "TWO last-element reads, and the register caught me declaring one — `historyBefore` stamps the truncated history's end date, and the score stamps the period it covers. Both read the LAST scorable week's date. The list is W222's `weeks`, already sorted by ISO date and unable to tie — sessions are grouped by (clinician, date), so one clinician has at most one per date. The fold reads a DATE off the last element rather than returning the record, the same argument src/capacity/model.ts and src/outcomes/time-to-escalation.ts make. The walk-forward loop itself is an index scan, not a fold: each week is scored against a truncation of the history before it, so no element's result depends on any later element having been visited.",
+    },
+  },
+  {
     module: "src/capacity/model.ts",
     folds: 1,
     disposition: {
