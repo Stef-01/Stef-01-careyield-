@@ -6,16 +6,22 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { OPERATOR_COPY_SURFACES } from "@/compliance/cdss-boundary";
 import { reachableFromApp } from "@/security/reachability";
+import { RECORD_CLASSES } from "./record-classes";
 import { ACCEPTED_FINDINGS, sweepSurface, unaccepted } from "@/compliance/public-surfaces";
 import {
   AUTOMATED_DECISIONS,
+  DETECTOR_SCANS,
   HUMAN_CONTROLS,
   INFORMATION_USED,
   NEVER_AUTOMATED,
+  NOTICE_HEADING,
+  NOTICE_REVISION,
+  NOTICE_STANDING_PARAGRAPH,
   NOT_A_DECISION,
   PERSON_REFERENCE_TERMS,
   declaredModules,
   pageCopy,
+  reviewedLine,
 } from "./automated-decisions";
 
 const SRC = path.join(__dirname, "..");
@@ -43,12 +49,18 @@ function sourceFiles(): Array<{ module: string; text: string }> {
 /**
  * Modules that could be taking a decision about a patient.
  *
- * The union of two scans, because neither is sound alone — see the module note. The union scan
- * misses `registers/escalation.ts`, whose outcomes are an `EscalationRoute`; the identifier scan
- * misses `engine/eligibility.ts`, which takes ids as plain strings. This register is what closed
- * both holes, so the detector keeps both halves.
+ * The union of the scans declared in `DETECTOR_SCANS`, because none is sound alone — see the
+ * module note. Each declares a module only it reaches, and the test below proves it by checking
+ * the other scans miss that module, so the stated bound is a fact rather than a sentence.
  */
 function patientTouchingModules(): string[] {
+  // W258's third scan, and it is not a regex. W106 already answers "does this module hold patient
+  // identity" by a reviewed human classification, so a module it marks `stored` or `derived` is a
+  // candidate here whatever its own text spells. Composed rather than restated: the two privacy
+  // registers can no longer hide something from each other, which is what they had been doing.
+  const holdsPatientRecords = new Set(
+    RECORD_CLASSES.filter((c) => c.handling !== "no_patient_identity").map((c) => c.module),
+  );
   // Built from the declared register rather than written here, so adding a pseudonym for a
   // person is an edit to `PERSON_REFERENCE_TERMS` and not to a literal buried in a test.
   // Escaped, because this file invites future editors to add terms: `patient.ref` would
@@ -65,7 +77,7 @@ function patientTouchingModules(): string[] {
       // here and is stated rather than pattern-matched: a register that declared itself would be
       // answering its own question.
       if (module === "src/privacy/automated-decisions.ts") return false;
-      return namesAPatient.test(text) || decidesAnOutcome.test(text);
+      return namesAPatient.test(text) || decidesAnOutcome.test(text) || holdsPatientRecords.has(module);
     })
     .map((f) => f.module)
     .sort();
@@ -82,6 +94,61 @@ describe("W201 every decision the tree makes is accounted for", () => {
     expect(found, "the outcome-union scan is what finds the eligibility engine").toContain(
       "src/engine/eligibility.ts",
     );
+  });
+
+  it("states its own bound honestly, with every declared scan load-bearing", () => {
+    // W258. W221 wrote "three scans" in the block whose job is stating the bound and enumerated
+    // two. A prose number beside a list can be wrong, so the count is read off the list — and the
+    // list is checked by making each entry prove it: the module a scan claims to find alone must
+    // be MISSED by every other scan. A scan carried after it stopped earning its place fails here.
+    const found = patientTouchingModules();
+    expect(DETECTOR_SCANS.length).toBe(3);
+    expect(new Set(DETECTOR_SCANS.map((s) => s.id)).size).toBe(DETECTOR_SCANS.length);
+
+    const text = (module: string) =>
+      sourceFiles().find((f) => f.module === module)?.text ?? "";
+    const scanHits: Record<string, (module: string) => boolean> = {
+      "names-a-person": (m) =>
+        new RegExp(Object.keys(PERSON_REFERENCE_TERMS).map((t) => `\\b${t}\\b`).join("|")).test(text(m)),
+      "decides-an-outcome": (m) =>
+        /^export type [A-Za-z]*(Reason|Refusal|Exclusion|Verdict)\b/m.test(text(m)),
+      "holds-patient-records": (m) =>
+        RECORD_CLASSES.some((c) => c.module === m && c.handling !== "no_patient_identity"),
+    };
+    expect(Object.keys(scanHits).sort()).toEqual(DETECTOR_SCANS.map((s) => s.id).sort());
+
+    for (const scan of DETECTOR_SCANS) {
+      const target = scan.onlyThisScanFinds;
+      expect(found, `${scan.id} names a module the detector does not reach`).toContain(target);
+      expect(scanHits[scan.id]!(target), `${scan.id} does not find its own example`).toBe(true);
+      for (const other of DETECTOR_SCANS.filter((s) => s.id !== scan.id)) {
+        expect(
+          scanHits[other.id]!(target),
+          `${target} is also found by ${other.id}, so ${scan.id} is not proved necessary by it`,
+        ).toBe(false);
+      }
+      expect(scan.whyTheOthersMissIt.length, `${scan.id} says nothing`).toBeGreaterThan(60);
+    }
+  });
+
+  it("sees a module whose patient identity arrives through an import", () => {
+    // THE W258 FINDING, pinned at the module that exposed it. Both original scans read a module's
+    // own text; `src/privacy/state.ts` holds the suppression list — the thing that makes "opt-out
+    // is permanent" true, which this notice publishes — inside a type declared next door. It named
+    // no patient identifier, exported no outcome union, and was invisible to this register for
+    // three years from four files away. Nothing about its text changed; the detector did.
+    const found = patientTouchingModules();
+    for (const module of [
+      "src/privacy/state.ts",
+      "src/interest/store.ts",
+      "src/outcomes/dashboard.ts",
+      "src/reporting/report.ts",
+    ]) {
+      expect(found, `${module} is invisible to the detector again`).toContain(module);
+    }
+    // And the verdict this page discloses is now credited to both modules that reach it.
+    const verdict = AUTOMATED_DECISIONS.find((d) => d.id === "referral-outcome-verdict");
+    expect(verdict!.decidedBy).toContain("src/outcomes/dashboard.ts");
   });
 
   it("classifies every one of them, exactly once, in both directions", () => {
@@ -180,6 +247,38 @@ describe("W201 the page is the register, and the copy answers to the sweep", () 
     for (const line of [...NEVER_AUTOMATED, ...HUMAN_CONTROLS, ...INFORMATION_USED]) {
       expect(page, "a list item is hardcoded into the page").not.toContain(line);
     }
+  });
+
+  it("renders its own heading, standing paragraph and review date from the register", () => {
+    // W258. The page was "deliberately thin: it is layout" and still wrote three pieces of prose
+    // itself — which meant they were the only text on a published patient notice `pageCopy()`
+    // never handed to the sweep. A layout file's prose is prose nobody lints.
+    const page = readFileSync(PAGE, "utf8");
+    expect(page).toContain("{NOTICE_HEADING}");
+    expect(page).toContain("{NOTICE_STANDING_PARAGRAPH}");
+    expect(page).toContain("{reviewedLine()}");
+    expect(page, "the heading is hardcoded again").not.toContain(NOTICE_HEADING);
+    expect(page, "the review date is hardcoded again").not.toContain(NOTICE_REVISION.reviewedOn);
+    // And the sweep now reaches all three, which is the point of moving them.
+    for (const text of [NOTICE_HEADING, NOTICE_STANDING_PARAGRAPH, reviewedLine()]) {
+      expect(pageCopy(), "the sweep still cannot see the notice's own prose").toContain(text);
+    }
+  });
+
+  it("fails the build when the register moves under a stated review date", () => {
+    // A review date on a legal notice claims somebody looked at this WHEN THE SOFTWARE LOOKED LIKE
+    // THIS. The page carried `Last reviewed 11 August 2026` as a literal, so it stayed true-looking
+    // through every change beneath it — W102's instruction-in-a-comment, one level up from where
+    // W201 replaced it. The date now travels with counts taken at the review, pinned here: add a
+    // decision or rule out a module and this fails until somebody re-reads the notice and moves it.
+    expect(NOTICE_REVISION.decisionsAtReview, "a decision changed; re-read the notice and move the date").toBe(
+      AUTOMATED_DECISIONS.length,
+    );
+    expect(NOTICE_REVISION.modulesAtReview, "the classified set changed; re-read the notice and move the date").toBe(
+      declaredModules().length,
+    );
+    expect(NOTICE_REVISION.reviewedAt).toMatch(/^W\d+$/);
+    expect(reviewedLine()).toContain(NOTICE_REVISION.reviewedOn);
   });
 
   it("passes W192's public sweep with nothing new accepted", () => {

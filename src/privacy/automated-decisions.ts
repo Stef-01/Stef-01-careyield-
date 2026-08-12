@@ -34,14 +34,29 @@
 // status is a field, and the test READS THE REGISTRY to check it: a decision claiming to be
 // dormant whose content registry has filled up fails.
 //
-// The detector's bound, stated because a register that hides its bound is worse than no register:
-// "touches a patient" is the union of TWO scans — modules naming a declared PERSON-REFERENCE
-// term (of which there are three), and modules exporting a decision-outcome union (`*Reason`,
-// `*Refusal`, `*Exclusion`, `*Verdict`). Neither is sound alone. (W221 first wrote "three scans"
-// here while enumerating two: the wrong count, in the block whose stated job is stating the bound
-// honestly. Caught by the review skill, which is the argument for running it.) The union scan misses `registers/escalation.ts`, which
-// names its outcomes `EscalationRoute`; the identifier scan misses `engine/eligibility.ts`, which
-// takes ids as plain strings.
+// The detector's bound, stated because a register that hides its bound is worse than no register.
+// "Touches a patient" is the union of the scans DECLARED IN `DETECTOR_SCANS` below, and the count
+// is read off that array rather than written in this sentence. W221 first wrote "three scans" here
+// while enumerating two — the wrong count, in the block whose stated job is stating the bound
+// honestly, caught by the review skill. A prose number beside a list is a number that can be
+// wrong; each scan now declares a module that ONLY IT finds, and a test proves each one is
+// load-bearing by checking the other scans miss it.
+//
+// W258 ADDED THE THIRD SCAN, AND WHAT IT CLOSED IS THE SAME HOLE W221 FOUND IN ANOTHER PLACE.
+// The two original scans both read a module's own text: the identifiers it spells, and the unions
+// it exports. **A module that holds patient identity inside an IMPORTED TYPE spells neither.**
+// `src/privacy/state.ts` holds the deletion records and the suppression list — the suppression
+// list being the thing that makes "opt-out is permanent" true, which this page publishes under
+// NEVER_AUTOMATED — and it names no patient token of its own, because the identity is inside a
+// `SuppressionEntry` declared next door. It was invisible to this register for three years, four
+// files from it. So did `outcomes/dashboard.ts`, which derives the very verdict this page
+// discloses, and two more besides.
+//
+// The fix is composition rather than a fourth regex: **W106's record classes already answer
+// "does this module hold patient identity", by a reviewed human classification.** Any module
+// W106 marks `stored` or `derived` is now a candidate here by construction, so the two privacy
+// registers can no longer hide something from each other — which is precisely what W221 said
+// had happened between this register and W213's projection, one register over.
 //
 // THE THIRD TERM WAS ADDED AT W221 AND THE HOLE IT CLOSED IS WORTH RECORDING, because the two
 // controls involved were pulling in opposite directions. W213 deliberately stopped the matcher
@@ -69,6 +84,47 @@ export const PERSON_REFERENCE_TERMS: Readonly<Record<string, string>> = {
   candidateRef:
     "W213's pseudonym for a patient inside the matcher. Deliberately not a `Patient` — that is what keeps a clinical attribute out of the matcher — and precisely because of that it hid `src/matching/match.ts` from this register for a full quarter.",
 };
+
+/**
+ * The scans whose union is "could be taking a decision about a patient".
+ *
+ * Declared data rather than a sentence, so the stated bound cannot be off by one — see the module
+ * note for the time it was. Each entry names a module **only that scan finds**, and a test checks
+ * the other scans miss it, so a scan cannot be carried here after it has stopped earning its place.
+ */
+export interface DetectorScan {
+  id: string;
+  /** What it looks at. */
+  what: string;
+  /** A module this scan alone reaches. Checked against the other scans, both directions. */
+  onlyThisScanFinds: string;
+  /** Why the other scans cannot see it. */
+  whyTheOthersMissIt: string;
+}
+
+export const DETECTOR_SCANS: readonly DetectorScan[] = [
+  {
+    id: "names-a-person",
+    what: "The module's own text names a term declared in PERSON_REFERENCE_TERMS.",
+    onlyThisScanFinds: "src/registers/escalation.ts",
+    whyTheOthersMissIt:
+      "Its outcomes are an `EscalationRoute`, which is not one of the four decision-outcome suffixes, and it stores nothing so W106 does not classify it.",
+  },
+  {
+    id: "decides-an-outcome",
+    what: "The module exports a decision-outcome union — `*Reason`, `*Refusal`, `*Exclusion`, `*Verdict`.",
+    onlyThisScanFinds: "src/engine/eligibility.ts",
+    whyTheOthersMissIt:
+      "It takes patient ids as plain strings, so no declared person-reference term appears in it, and it holds no records of its own.",
+  },
+  {
+    id: "holds-patient-records",
+    what: "W106's record classes mark the module `stored` or `derived` — a reviewed classification rather than a regex.",
+    onlyThisScanFinds: "src/privacy/state.ts",
+    whyTheOthersMissIt:
+      "It holds the deletion records and the suppression list inside types declared next door, so it spells no patient identifier and exports no outcome union. A module whose patient identity arrives through an import is invisible to any scan that reads only the module's own text — which is the hole W258 found, three years after this file was written four doors away from it.",
+  },
+];
 
 /** Whether the decision is actually being taken about anybody today. */
 export type DecisionStatus =
@@ -204,7 +260,11 @@ export const AUTOMATED_DECISIONS: readonly AutomatedDecision[] = [
     id: "referral-outcome-verdict",
     title: "What the record shows happened to your referral.",
     what: "The software forms a verdict on each referral — whether the record contains an appointment, a completion, or nothing yet — so a practice can see what has not closed. The verdict is a statement about which facts were recorded, never about whether the care was right, and \"nothing recorded\" is kept distinct from \"nothing happened\" because they are different.",
-    decidedBy: ["src/outcomes/model.ts"],
+    // W258: `dashboard.ts` was missing. It is the module that applies this verdict to the referral
+    // rail and produces one per referral — the same decision, taken in a second place, invisible
+    // to both original scans because it names no patient identifier and exports no outcome union.
+    // The register said one module took this decision and two did.
+    decidedBy: ["src/outcomes/model.ts", "src/outcomes/dashboard.ts"],
     status: "in_use",
     registry: null,
   },
@@ -281,6 +341,16 @@ export const HUMAN_CONTROLS: readonly string[] = [
  * module here is a module somebody looked at and ruled out.
  */
 export const NOT_A_DECISION: Readonly<Record<string, string>> = {
+  "src/privacy/state.ts":
+    "W33's privacy state: the deletion records and the suppression list, held in a process-global store. It decides nothing — it is where `src/privacy/privacy.ts` puts what a person asked for, and every row in it exists because somebody made a request. **It is declared here because W258's third scan found it, and the finding is worth more than the classification.** The suppression list is what makes \"opt-out is permanent\" true, and that sentence is published on this very page under NEVER_AUTOMATED — so the module enforcing one of the notice's own never-claims was invisible to the register that publishes the notice, four files away from it, for three years. It was invisible because it names no patient identifier of its own: the identity lives inside a `SuppressionEntry` declared next door and imported. No term list closes that; only a scan that asks a register which modules hold patient records does, which is why the third scan reads W106 rather than the source.",
+  "src/interest/store.ts":
+    "Community interest signups — a name and an email for somebody who asked to hear about Meherr. It decides nothing: rows are written when a person submits a form, and read by staff. It is declared here because W106 marks it `stored`, and the honest reason it is not a decision about a PATIENT is that **the people in it are not patients**: they are not on any subscribing practice's list, which is why W106 records it as a different collection with its own access and erasure path. That distinction is exactly the kind that goes unwritten, and an unwritten distinction between two collections of personal information is how one of them ends up handled like the other.",
+  "src/reporting/report.ts":
+    "W199's practice report: figures a practice reads about its own performance, recomputed from its own rails on every read and never persisted. It decides nothing about anybody — no figure in it can name a patient, W197 suppresses cells too small to disclose, and it has no recipient parameter at all because G9 is unratified and sending is not built. Declared here because W106 marks it `derived`; the classification and this one agree, which is the point of running the two registers against each other.",
+  // `src/outcomes/dashboard.ts` is NOT here: W258 found it missing from both halves of the
+  // register and it is declared above, under `referral-outcome-verdict`, because it derives the
+  // verdict this page discloses. Named in this comment so the next reader looking for it here
+  // learns where it went rather than adding a second entry.
   "src/booking/store.ts": "The store behind the booking pages. It records the transitions the rail decides; it decides nothing.",
   "src/interop/credentials.ts":
     "W242 is the credentials posture: which connections this product would need, that it holds none, and that G1 is the founder decision blocking every one of them. It decides nothing about anybody — no patient, condition or appointment reason reaches it, and its only inputs are a slot name and a value it never reads. It is declared here because its refusal union trips the detector, which is the detector working as intended: this is the module that would sit between a decision and a real practice system, and the register that enumerates decisions should be able to see it even though the answer is that nothing is decided and nothing is connected.",
@@ -356,6 +426,55 @@ export const NOT_A_DECISION: Readonly<Record<string, string>> = {
   "src/verticals/model.ts": "A content bundle, versioned as one thing.",
 };
 
+/**
+ * The notice's own opening — heading and standing paragraph.
+ *
+ * W258 moved these out of the page, and the reason is not tidiness. `pageCopy()` feeds W192's
+ * public sweep, and it was assembled from the four registers — so the two sentences the page wrote
+ * ITSELF were the only text on a published patient notice that no sweep ever read. A page that is
+ * "deliberately thin: it is layout" had prose in it, and prose in a layout file is prose nobody
+ * lints. Here it is swept with everything else.
+ */
+export const NOTICE_HEADING = "How Meherr uses automated decision-making";
+
+export const NOTICE_STANDING_PARAGRAPH =
+  "This statement is published to meet the Privacy Act's automated-decision-making transparency requirements, which commence on 10 December 2026, and is kept in step with the software itself.";
+
+/**
+ * When this notice was last reviewed, and what it was reviewed AGAINST.
+ *
+ * A review date on a legal notice is a claim, and the claim it makes is "somebody looked at this
+ * when the software looked like it does now". The page carried `Last reviewed 11 August 2026` as a
+ * literal, so the sentence stayed true-looking through every change to the register underneath it —
+ * which is the drift W102 left an instruction against and W201 replaced with a register, one level
+ * up from where the instruction was.
+ *
+ * So the date travels with a COUNT taken at the review, and a test pins the count against the
+ * register. Add a decision, or rule a module out, and the pin fails until somebody moves the date:
+ * the review date now fails the build when the thing it reviewed changes.
+ */
+export interface NoticeRevision {
+  reviewedOn: string;
+  /** The unit whose author looked. */
+  reviewedAt: string;
+  /** `AUTOMATED_DECISIONS.length` at that review. Pinned, not derived — that is the whole point. */
+  decisionsAtReview: number;
+  /** `declaredModules().length` at that review. */
+  modulesAtReview: number;
+}
+
+export const NOTICE_REVISION: NoticeRevision = {
+  reviewedOn: "13 August 2026",
+  reviewedAt: "W258",
+  decisionsAtReview: 15,
+  modulesAtReview: 96,
+};
+
+/** The line the page renders. Composed, so the page cannot state a date the register disagrees with. */
+export function reviewedLine(): string {
+  return `Last reviewed ${NOTICE_REVISION.reviewedOn}.`;
+}
+
 /** Every module the register accounts for, in either direction. */
 export function declaredModules(): string[] {
   return [
@@ -367,6 +486,11 @@ export function declaredModules(): string[] {
 /** The page's own copy, as one string, for the compliance sweep. */
 export function pageCopy(): string {
   return [
+    // W258: the heading, the standing paragraph and the review line were the only text on this
+    // published notice the sweep never read, because the page wrote them itself.
+    NOTICE_HEADING,
+    NOTICE_STANDING_PARAGRAPH,
+    reviewedLine(),
     ...INFORMATION_USED,
     ...AUTOMATED_DECISIONS.flatMap((d) => [d.title, d.what]),
     ...NEVER_AUTOMATED,

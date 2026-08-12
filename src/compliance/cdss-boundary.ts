@@ -361,6 +361,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W248's shared vertical machinery exports an evidence reader, a spec builder, two assembly calls and a gate list — no strings a clinician or practice manager reads. The one descriptive field it defines, `DeclaredMember.waitsOn`, holds text supplied by each vertical and is linted there, at the declaration, which is where the text actually exists.",
   },
   {
+    module: "src/privacy/adm-y5.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W258's re-derivation of W201's decision register against Y5 is reviewer-facing throughout: ADM_REDERIVATIONS argues, claim by claim, what Y5 added that could have broken each property of the register and what actually happened — including three that broke. Nobody but a reviewer reads it. The copy a patient reads lives in `src/privacy/automated-decisions.ts`, which W200 declares separately as answering to W192's patient_notice sweep rather than to the advice rules, and W258 moved the notice\u2019s heading, standing paragraph and review line INTO that register precisely so the sweep reaches them \u2014 they were the only text on the published notice the page still wrote itself.",
+  },
+  {
     module: "src/verticals/scale.ts",
     operatorCopy: [],
     notCopy:

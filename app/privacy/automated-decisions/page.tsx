@@ -17,6 +17,9 @@ import {
   HUMAN_CONTROLS,
   INFORMATION_USED,
   NEVER_AUTOMATED,
+  NOTICE_HEADING,
+  NOTICE_STANDING_PARAGRAPH,
+  reviewedLine,
 } from "@/privacy/automated-decisions";
 
 export const metadata = { title: "Automated decisions — Meherr" };
@@ -24,13 +27,15 @@ export const metadata = { title: "Automated decisions — Meherr" };
 export default function AutomatedDecisionsPage() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-16">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        How Meherr uses automated decision-making
-      </h1>
+      {/*
+        W258: the heading, the standing paragraph and the review date came out of this file. They
+        were the last prose here, and being the last prose here meant they were the only text on a
+        published patient notice that `pageCopy()` never handed to the compliance sweep — including
+        a review date that stayed true-looking through every change to the register beneath it.
+      */}
+      <h1 className="text-3xl font-semibold tracking-tight">{NOTICE_HEADING}</h1>
       <p className="mt-4 text-sm leading-6 text-stone-500">
-        This statement is published to meet the Privacy Act&apos;s automated-decision-making
-        transparency requirements, which commence on 10 December 2026, and is kept in step with
-        the software itself. Last reviewed 11 August 2026.
+        {NOTICE_STANDING_PARAGRAPH} {reviewedLine()}
       </p>
 
       <div className="mt-10 space-y-8 text-stone-700">
