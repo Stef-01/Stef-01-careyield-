@@ -397,6 +397,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification. W254 models what a MACHINE caller would be permitted to read, and nobody in the product reads any of it: each scope's `grants` sentence is addressed to whoever is granting a token, and `TOKEN_REFUSAL_COPY` is one line a developer gets instead of a credential. `REFUSED_SCOPE_SHAPES` is reviewer-facing in W200's split for the usual reason — its prose QUOTES the wildcard, the write scope and the retroactive widening it exists to forbid, and that collision already moved one of this unit's own source scans. The remaining exports are the scope union, the register, the pure permission check and a token issuer that always refuses.",
   },
   {
+    module: "src/quality/gate-readiness.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W261 says what this tree DOES on the day a founder gate is answered, and it is addressed to that founder and to whoever does the work — no clinician or practice manager sees any of it in the product. Each `onTheDay` describes what becomes buildable and what remains blocked; each step is an instruction naming a file. `REFUSED_READINESS_SHAPES` is reviewer-facing in W200's split for the usual reason: its content is QUOTING the step-with-no-file, the effort estimate and the ordering it exists to forbid, and one of its entries describes pinning a count in order to refuse it.",
+  },
+  {
     module: "src/compliance/rail-y5.ts",
     operatorCopy: [],
     notCopy:
