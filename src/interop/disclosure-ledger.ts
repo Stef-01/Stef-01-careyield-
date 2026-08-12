@@ -127,7 +127,7 @@ export const MODE_CONSEQUENCES: Readonly<Record<DisclosurePayloadMode, ModeConse
       "Did the figures we sent match what our own console showed at the time?",
     ],
     erasureObligation:
-      "A row names a practice, a recipient and a period. It holds no patient identifier and no figure derived from one, so an erasure under W33 has nothing to reach here — which is the same argument W204 made for not storing reports at all.",
+      "A row names a practice, a recipient, a period and a person at the practice who sent it. It holds no patient identifier and no figure derived from one, so an erasure under W33 has nothing to reach here — which is the same argument W204 made for not storing reports at all.",
   },
   figures_included: {
     holdsFigures: true,

@@ -152,9 +152,17 @@ describe("W245 what is already sound, re-derived rather than quoted", () => {
     expect(DOSSIER_FLAT).toContain("`holdout` and `holdoutRate`");
   });
 
-  it("still refuses seven ways of manufacturing a consent", () => {
-    expect(Object.keys(REFUSED_CONSENT_SOURCES)).toHaveLength(7);
-    expect(DOSSIER_FLAT).toContain("seven named routes");
+  it("still names, in the dossier, however many ways of manufacturing a consent there are", () => {
+    // The count was a literal 7 here and the word "seven" in the dossier, and W247 added an eighth
+    // — the point-in-time-document-against-a-moving-target class W208 named, arriving in a Q19
+    // dossier one week after it was written. Derived from the register now, in both places, so
+    // the next unit to add a refusal updates the prose and nothing else.
+    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+    const count = Object.keys(REFUSED_CONSENT_SOURCES).length;
+    expect(count).toBeGreaterThan(6);
+    expect(DOSSIER_FLAT, `the dossier does not say ${words[count]}`).toContain(
+      `${words[count]} named routes`,
+    );
   });
 
   it("has no transport anywhere in the interop surface", () => {

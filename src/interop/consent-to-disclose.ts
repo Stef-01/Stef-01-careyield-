@@ -267,6 +267,24 @@ export type AuthorisationResult =
   | AuthorisationRefused;
 
 /**
+ * The consent scope a disclosure requires, read off the disclosure itself.
+ *
+ * `ConsentScope` and `Disclosure` carry the same four dimensions — practice, recipient class,
+ * kind, period — which is why the scope was derivable all along and why passing it separately was
+ * never a capability, only a way to disagree. Exported so a caller can SHOW a patient what they
+ * are being asked to agree to, which is the one legitimate use of a scope on its own.
+ */
+export function scopeOfDisclosure(disclosure: Disclosure): ConsentScope {
+  return {
+    practiceId: disclosure.practiceId as ConsentScope["practiceId"],
+    recipientClass: disclosure.recipientClass,
+    kind: disclosure.kind,
+    coversFromIso: disclosure.periodFromIso,
+    coversToIso: disclosure.periodToIso,
+  };
+}
+
+/**
  * The only way to obtain an `AuthorisedDisclosure`.
  *
  * ALL SUBJECTS OR NONE. A disclosure whose unconsented subjects were quietly dropped is a
@@ -277,10 +295,18 @@ export type AuthorisationResult =
 export function authoriseDisclosure(
   disclosure: Disclosure,
   subjects: readonly PatientId[],
-  want: ConsentScope,
   acts: readonly ConsentAct[],
   asAtIso: string,
 ): AuthorisationResult {
+  // DERIVED, NEVER PASSED. W247 found this taking the wanted scope as its own parameter and never
+  // checking it described `disclosure` — so a caller who built the scope from a template, from a
+  // previous send, or from a constant obtained a genuine brand-carrying authorisation whose
+  // consent had been checked against a recipient, kind or period the disclosure did not have. It
+  // passed every "is there a consent" check and was a disclosure nobody agreed to, which is the
+  // exact sentence this module's own note calls unrepresentable. It was representable, and it was
+  // one argument away. Deriving removes the parameter rather than validating it: a check somebody
+  // can skip by passing the wrong thing is weaker than having nothing to pass.
+  const want = scopeOfDisclosure(disclosure);
   const decisions = subjects.map((s) => consentDecision(s, want, acts, asAtIso));
   const refusals = decisions.filter((d) => d.verdict !== "given");
   if (subjects.length === 0) {
@@ -315,6 +341,8 @@ export function authoriseDisclosure(
  * `patient.smsConsent`, and reusing it here is one line.
  */
 export const REFUSED_CONSENT_SOURCES: Readonly<Record<string, string>> = {
+  a_scope_that_does_not_describe_the_disclosure:
+    "Checking consent against a scope handed in beside the disclosure rather than read off it. W247 found this module doing exactly that: `authoriseDisclosure` took a `want` parameter and never compared it with the disclosure it was authorising, so a scope built from a template or a previous send produced a real authorisation for a recipient, kind or period nobody had agreed to — and it carried a consent record, which is what made it look checked. The scope is derived now, so there is nothing to disagree with.",
   reusing_sms_consent:
     "Reading `patient.smsConsent` as consent to disclose. It is ONE LINE and it is already in this tree, which is why it is listed first. Agreeing to receive a text message about an appointment is not agreeing that your medical record may be sent to a commissioner, a payer or another practice, and the two would be indistinguishable in the ledger afterwards.",
   silence_after_a_request:

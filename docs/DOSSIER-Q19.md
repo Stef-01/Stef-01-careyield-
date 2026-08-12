@@ -78,7 +78,7 @@ by accident.
   is looked at, so filling the list would change nothing.
 - **Nothing has been sent.** `SHIPPED_DISCLOSURES` is empty and pinned, and there is no transport,
   recipient allowlist or delivery adapter anywhere in `src/interop/`.
-- **Consent cannot be manufactured.** W243 refuses seven named routes, the first being reuse of
+- **Consent cannot be manufactured.** W243 refuses eight named routes, the first being reuse of
   this tree's own `patient.smsConsent`, and no elapsed time moves a verdict towards `given`.
 - **The ledger is evidence, never permission.** A gap in it cannot authorise anything, because
   nothing reads it to decide whether to send.

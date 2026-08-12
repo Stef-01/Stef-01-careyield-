@@ -325,7 +325,7 @@ describe("W243 a disclosure without recorded consent is refused BY TYPE", () => 
     // from the one the operator asked for, it looks complete at both ends, and nobody finds out.
     const subjects = [PATIENT, "pat-2" as PatientId, "pat-3" as PatientId];
     const acts = [given(), given({ patientId: "pat-2" as PatientId })];
-    const result = authoriseDisclosure(disclosure, subjects, WANT, acts, "2026-07-05");
+    const result = authoriseDisclosure(disclosure, subjects, acts, "2026-07-05");
     expect(result.authorised).toBe(false);
     if (result.authorised) return;
     expect(result.refusals.map((r) => r.patientId)).toEqual(["pat-3"]);
@@ -336,7 +336,7 @@ describe("W243 a disclosure without recorded consent is refused BY TYPE", () => 
   it("authorises when every subject has consented, so the refusal is not a wall", () => {
     const subjects = [PATIENT, "pat-2" as PatientId];
     const acts = [given(), given({ patientId: "pat-2" as PatientId })];
-    const result = authoriseDisclosure(disclosure, subjects, WANT, acts, "2026-07-05");
+    const result = authoriseDisclosure(disclosure, subjects, acts, "2026-07-05");
     expect(result.authorised).toBe(true);
     if (!result.authorised) return;
     expect(result.authorisation.subjects).toEqual(subjects);
@@ -347,7 +347,7 @@ describe("W243 a disclosure without recorded consent is refused BY TYPE", () => 
 
   it("refuses an empty subject list rather than authorising vacuously", () => {
     // `every()` over nothing is true, which is how an empty list becomes a general authorisation.
-    const result = authoriseDisclosure(disclosure, [], WANT, [], "2026-07-05");
+    const result = authoriseDisclosure(disclosure, [], [], "2026-07-05");
     expect(result.authorised).toBe(false);
     expect(!result.authorised && result.copy).toContain("nobody having been asked");
   });
@@ -367,7 +367,7 @@ describe("W243 the subjects stay out of W239's ledger row", () => {
   it("does not put a patient on a disclosure row", () => {
     // W239's `fact_of_sending_only` mode holds no patient identifier, and its record class rests
     // on that. This unit needs the patients, so the AUTHORISATION holds them and the row does not.
-    const result = authoriseDisclosure(disclosure, [PATIENT], WANT, [given()], "2026-07-05");
+    const result = authoriseDisclosure(disclosure, [PATIENT], [given()], "2026-07-05");
     expect(result.authorised).toBe(true);
     if (!result.authorised) return;
     expect(JSON.stringify(result.authorisation.disclosure)).not.toContain(PATIENT);
@@ -381,9 +381,12 @@ describe("W243 the subjects stay out of W239's ledger row", () => {
 });
 
 describe("W243 nothing manufactures a consent", () => {
-  it("names the seven ways of manufacturing one it refuses, each with its reason", () => {
+  it("names every way of manufacturing one it refuses, each with its reason", () => {
+    // The count lived in this title and had to be bumped when W247 added the eighth. Named in the
+    // list and not in the prose now, so the register is the only place the number lives.
     expect(Object.keys(REFUSED_CONSENT_SOURCES).sort()).toEqual([
       "a_prior_disclosure_as_precedent",
+      "a_scope_that_does_not_describe_the_disclosure",
       "a_timeout_that_ripens",
       "an_opt_out_window",
       "broad_consent_at_registration",
