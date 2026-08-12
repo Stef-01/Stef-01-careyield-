@@ -325,6 +325,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports are the reason union, the candidate projection and the floor check. `MATCH_REASON_COPY` is the sentence a practice manager reads about one appointment offer and `MATCH_FLOOR_BREACH_COPY` tells a reviewer why a plan was refused. Both are about capacity, recorded availability and practice-set limits; a test asserts neither can name a condition, a symptom or an urgency, because a reason is the one place a matcher gets to say WHY in words somebody reads.",
   },
   {
+    module: "src/interop/ereferral.ts",
+    operatorCopy: ["PROFILE_VOCABULARY", "PROFILE_REFUSAL_COPY"],
+    notCopy:
+      "The remaining exports are the code tables, the unmapped register and the renderer. `PROFILE_VOCABULARY` is the CLOSED SET of strings this module may originate — every one is about the document rather than about a patient, and the narrative-absent sentence exists so a receiving system can tell a clinician who wrote nothing from a system that sends nothing. `REFUSED_PROFILE_CONTENT` is reviewer-facing and necessarily describes the clinical prose it forbids. A test re-derives the property over a rendered profile: every string is a declared vocabulary member, a declared code, an identifier copied from the input, or text a clinician wrote.",
+  },
+  {
     module: "src/capacity/drift.ts",
     operatorCopy: ["DRIFT_VERDICT_COPY", "DRIFT_DIRECTION_COPY"],
     notCopy:
