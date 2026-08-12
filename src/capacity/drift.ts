@@ -211,6 +211,7 @@ export function driftReport(pattern: SessionPattern): DriftReport {
     wouldSettleIt: drifted
       ? [
           "Look at what changed about this session — its length, its clinician, the time it runs, or what the practice offers alongside it.",
+          "Check whether you opened more slots in this session recently. W232 found this line missing: a practice acting on the capacity page is the one cause a reader of that page is most likely to have created themselves, and it was the only cause this list did not name.",
           "Nothing here has been adjusted. If the session genuinely changed, the range will follow as the new weeks accumulate.",
         ]
       : [],
