@@ -343,6 +343,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports are the ledger's types, the shipped (empty) list, the payload-mode switch and the consequences derived from it. `DISCLOSURE_REJECTION_COPY` is read by whoever wrote an incomplete disclosure row — why a row with no author, no period or figures disagreeing with the declared mode is refused. It describes a record of what left a practice, never a patient or a clinical step. `OPEN_QUESTION` and `MODE_CONSEQUENCES` are addressed to the founder deciding W204's question and `REFUSED_LEDGER_BEHAVIOURS` quotes the behaviours it forbids, so all three are reviewer-facing in W200's split.",
   },
   {
+    module: "src/interop/exchange-state.ts",
+    operatorCopy: ["EXCHANGE_STATE_COPY", "RETRY_VERDICT_COPY"],
+    notCopy:
+      "The remaining exports are the state and outcome unions, the declared outcome mapping and the two verdict functions. Both copy maps are read by whoever is looking at an exchange that did not come back: what is actually known about it — nothing left, it left and nothing came back, it was refused, it was confirmed — and whether sending again could duplicate a document at the other end. All of it describes a transport boundary and a document, never a patient or a clinical step. `OUTCOME_MAPPING` and `REFUSED_READINGS` are reviewer-facing in W200's split, because their whole content is arguing the readings they reject.",
+  },
+  {
     module: "src/interop/credentials.ts",
     operatorCopy: ["CREDENTIAL_REFUSAL_COPY"],
     notCopy:
