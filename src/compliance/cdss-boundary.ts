@@ -373,6 +373,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification rather than an omission. W237 is a test harness: `FIXTURE_REJECTION_COPY` is read by whoever wrote a bad fixture, and `WHAT_THIS_PROVES` / `WHAT_THIS_DOES_NOT_PROVE` are addressed to a reviewer deciding how much a green run is worth. No clinician or practice manager sees any of it in the product, so linting it as operator copy would be W200's own category error — and these strings QUOTE what they warn about ('no receiving system has ever seen any of this'), which is the collision that split this register in the first place. The remaining exports are pure detectors and the contract itself.",
   },
   {
+    module: "src/api/surface.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W253's API is read by a practice's own developer over HTTP, not by a clinician or a practice manager in the product: `API_REFUSAL_COPY` is three sentences a caller gets instead of data, and every endpoint `summary` describes what a call returns. `REFUSED_API_SHAPES` is reviewer-facing in W200's split for the usual reason — its content is QUOTING the practice parameter, the write verb and the vacuous exclusion test it exists to forbid, and one of its entries had already collided with this unit's own source scan. The remaining exports are the context type, the endpoint register, the envelope and the dispatcher lookup.",
+  },
+  {
     module: "src/interop/console.ts",
     operatorCopy: ["INTEROP_CONSOLE_COPY", "WHAT_THIS_PAGE_CANNOT_SHOW"],
     notCopy:
