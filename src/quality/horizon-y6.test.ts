@@ -86,11 +86,15 @@ describe("W260 the horizon is derived from the ledger, row by row", () => {
   });
 
   it("states the unit and blocked counts the ledger actually holds", () => {
+    // The counts pinned here are the ones that MEAN something changed: how many units exist, and
+    // how many are blocked. The first version also pinned `done`, and that was wrong — `done`
+    // moves on every firing, so the document would have gone red once an hour and said nothing
+    // about the position. A pin whose signal is noise gets edited rather than read, which is the
+    // failure mode of every stale document this tree has replaced with a register.
     const all = rows();
     expect(HORIZON).toContain(`The ledger holds **${all.length} units**`);
     const blocked = all.filter((r) => r.status === "blocked");
-    expect(HORIZON).toContain(`**${all.filter((r) => r.status === "done").length} are done.`);
-    expect(HORIZON).toContain(`${blocked.length} are blocked.**`);
+    expect(HORIZON).toContain(`**${blocked.length} are blocked**`);
   });
 
   it("names every blocked unit against the gate the ledger says blocks it", () => {

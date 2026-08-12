@@ -10,7 +10,7 @@ goes red — which is the signal to re-derive it, not a defect in it.
 
 ## The position, stated first
 
-The ledger holds **273 units**. **242 are done. 16 are blocked.** Every blocked row waits on G3,
+The ledger holds **273 units**, of which **16 are blocked**. Every blocked row waits on G3,
 G5, G6, G8, G9, G10 or the Q17 learned-ranking decision:
 
 | Waiting on | Units | Which |
