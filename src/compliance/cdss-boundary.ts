@@ -361,6 +361,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W248's shared vertical machinery exports an evidence reader, a spec builder, two assembly calls and a gate list — no strings a clinician or practice manager reads. The one descriptive field it defines, `DeclaredMember.waitsOn`, holds text supplied by each vertical and is linted there, at the declaration, which is where the text actually exists.",
   },
   {
+    module: "src/quality/latent-y5.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W268's re-derivation of W210's latent-finding register is reviewer-facing: for each open finding, the claim about the tree that must hold for its predicate to be ABLE to fire, and what a dead anchor would cost. Nobody but a developer reads it. Its longest strings are those `ifDead` arguments, which describe predicates and file layouts and name no patient, condition or appointment reason. Its functions return finding ids and anchors, never a record about anybody.",
+  },
+  {
     module: "src/quality/register-census.ts",
     operatorCopy: [],
     notCopy:

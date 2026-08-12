@@ -303,6 +303,16 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/latent-y5.ts",
+    derives: "Gate-dossier test files under `src/quality/`, to check that DOSSIER-1's scan still has a subject to scan.",
+    checkedAgainst: "W268's `FINDING_ANCHORS` — the claim that must hold for each open finding's predicate to be able to fire.",
+    proof: {
+      kind: "walk_unproven",
+      contentProof: "src/quality/latent-y5.test.ts :: fires DOSSIER-1 against a dossier test with no bound",
+      remedy: EXPORT_THE_WALK,
+    },
+  },
+  {
     file: "src/quality/latent-findings.ts",
     derives: "Every module with no `// W<n>` header — one recorded finding's live condition.",
     checkedAgainst: "W210's `HEADERLESS_AT_W210`, so the count becoming worse fires the finding.",

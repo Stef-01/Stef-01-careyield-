@@ -40,6 +40,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { resetStore } from "@/booking/store";
+import { reachableFromApp } from "@/security/reachability";
 
 const ROOT = path.resolve(__dirname, "../..");
 const SRC = path.join(ROOT, "src");
@@ -183,12 +184,23 @@ export const LATENT_FINDINGS: readonly LatentFinding[] = [
     recordedBy: "W214",
     triggerStatement:
       "W214's matcher becomes a live path while `rankCandidates` still orders on a clinical attribute. Two orderings of the same patients would then be in production, one of which the published notice denies exists.",
+    /**
+     * W268 REPLACED THE LIVENESS HALF, and it carried both defects W221 had already fixed in
+     * W201's dormancy proof for this very module.
+     *
+     * It scanned `src/` for the string `from "@/matching/match"`. That matches ONE SPELLING — a
+     * relative import is invisible to it — and it NEVER LEAVES `src/`, so a page importing the
+     * matcher would not fire it, and a page is precisely where a module becomes live. W221 wrote
+     * both sentences about W201 a year ago; two registers were answering "is the matcher live?"
+     * two ways, and the one that had been fixed was not the one guarding a published notice.
+     *
+     * `reachableFromApp` walks the import graph from `app/` transitively, resolving specifiers
+     * rather than matching their text. Composed, not restated — which is what W201 does here.
+     */
     trigger: () => {
       const pool = readFileSync(path.join(SRC, "engine", "pool.ts"), "utf8");
       const stillOrdersOnCondition = /a\.chronicCare !== b\.chronicCare/.test(pool);
-      const live = sourceFiles().some(
-        ({ module, text }) => module !== "src/matching/match.ts" && /from "@\/matching\/match"/.test(text),
-      );
+      const live = new Set(reachableFromApp(ROOT).files).has("src/matching/match.ts");
       return stillOrdersOnCondition && live;
     },
     status: "open",
