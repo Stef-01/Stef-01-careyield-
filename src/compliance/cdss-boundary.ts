@@ -337,6 +337,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports compute the verdict and render it. Both copy maps are read by a practice manager: what it means that a session's range has stopped fitting, which direction it moved, and — stated rather than implied — that nothing has been adjusted. None of it names a patient, a condition or a clinical step, and every string passes W226's capacity linter.",
   },
   {
+    module: "src/interop/conformance.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification rather than an omission. W237 is a test harness: `FIXTURE_REJECTION_COPY` is read by whoever wrote a bad fixture, and `WHAT_THIS_PROVES` / `WHAT_THIS_DOES_NOT_PROVE` are addressed to a reviewer deciding how much a green run is worth. No clinician or practice manager sees any of it in the product, so linting it as operator copy would be W200's own category error — and these strings QUOTE what they warn about ('no receiving system has ever seen any of this'), which is the collision that split this register in the first place. The remaining exports are pure detectors and the contract itself.",
+  },
+  {
     module: "src/interop/fhir.ts",
     operatorCopy: ["STATUS_REFUSAL_COPY"],
     notCopy:

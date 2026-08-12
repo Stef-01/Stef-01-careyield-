@@ -46,8 +46,13 @@ const SPECIFIER_RE = /^[^\s{}()<>=,;"']+$/;
  *
  * Replaces each comment with an equal number of newlines rather than deleting it, so nothing
  * downstream depends on offsets shifting.
+ *
+ * Exported at W237, which needed the same subtraction for the same reason — a scan for a banned
+ * construct matching the prose that bans it. Reused rather than copied: the tree already carries
+ * a second private copy in `src/quality/order-independence.ts`, and a third would be a third
+ * thing to keep true.
  */
-function stripComments(source: string): string {
+export function stripComments(source: string): string {
   return source
     .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
     .replace(/(^|[^:])\/\/[^\n]*/g, (_m, lead: string) => lead);
