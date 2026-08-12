@@ -213,6 +213,7 @@ describe("W253 the register and its refusals", () => {
     // W255 added `read_failed` and this pin fired, which is the register working: a refusal
     // arriving without a sentence, a status and a driven test is what the census exists to catch.
     expect(Object.keys(API_REFUSAL_COPY).sort()).toEqual([
+      "insufficient_scope",
       "no_practice",
       "no_session",
       "read_failed",

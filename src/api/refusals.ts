@@ -124,6 +124,13 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
       "It does not list what does exist and does not echo what was asked for. Echoing the segment back is a reflection, which is how an error path returns something it was never entitled to hold.",
   },
   {
+    refusal: "insufficient_scope",
+    producedWhen:
+      "W254's scope model does not reach the endpoint from the caller's granted scopes. Not reachable over HTTP today: a console session is granted every scope and no token exists, because G1 blocks the credential. Driven in `scopes.test.ts` against the pure check instead — recorded here rather than left for somebody to discover a branch nobody had exercised.",
+    saysNoMore:
+      "It does not say whether the endpoint holds anything for this practice, and it does not name the scope that would reach it. Naming it turns a refusal into a map of what exists, which is the same reflection an echoed path segment would be.",
+  },
+  {
     refusal: "read_failed",
     producedWhen: "An endpoint's read threw. W255's branch — W253 called `read` bare.",
     saysNoMore:

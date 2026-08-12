@@ -191,3 +191,24 @@ test("W255 a refusal never says whether the thing asked for exists", async ({ pa
   expect(real).toBe(other);
   expect(real).not.toContain("nope-one");
 });
+
+test("W254 the scope model is consulted, and today grants every endpoint", async ({ page }) => {
+  // Scopes are declared and CHECKED — a register nobody calls is documentation that reads as a
+  // control in an audit. A console session is a member of the practice reading their own data, so
+  // it is granted every scope and every endpoint answers. The refusing direction cannot be
+  // provoked over HTTP until a token exists (G1), and is driven against the pure check in
+  // `scopes.test.ts`; W255's branch register records that rather than leaving it to be discovered.
+  await signIn(page);
+  await createPractice(page, "Alpha Family Practice");
+
+  for (const id of ["practice", "capacity", "interop"]) {
+    const response = await page.request.get(`/api/v1/${id}`);
+    expect(response.status(), `${id} was refused by the scope check`).toBe(200);
+  }
+
+  // And no REACHABLE refusal mentions a scope — naming one turns a refusal into a map of what
+  // exists. Stated precisely because this covers the branches HTTP can reach: the scope refusal's
+  // own wording is pinned in `scopes.test.ts`, where the branch can actually be driven.
+  const body = await (await page.request.get("/api/v1/nope")).text();
+  expect(body).not.toContain("read:");
+});

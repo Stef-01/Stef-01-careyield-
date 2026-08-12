@@ -14,6 +14,7 @@
 
 import { cookies } from "next/headers";
 import { endpointFor, type ApiRefusal } from "@/api/surface";
+import { grantedScopes, permits } from "@/api/scopes";
 import { readSafely, refusalResponse } from "@/api/refusals";
 import { SESSION_COOKIE, verifySession } from "@/console/session";
 import { activePracticeFor } from "@/console/store";
@@ -45,6 +46,12 @@ export async function GET(
   const { endpoint: id } = await params;
   const endpoint = endpointFor(id);
   if (!endpoint) return refuse("unknown_endpoint");
+
+  // W254: the scope model is CONSULTED rather than merely declared — a register nobody calls is
+  // documentation that reads as a control in an audit. A console session is granted every scope
+  // (see `grantedScopes`), so this passes today and is the line that stops passing when a token
+  // exists.
+  if (!permits(endpoint, grantedScopes()).permitted) return refuse("insufficient_scope");
 
   // W255: the read is wrapped. W253 called it bare, so a throwing endpoint produced a response
   // this product never wrote — and an exception message is written for a developer.

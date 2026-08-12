@@ -379,6 +379,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification rather than an omission. W237 is a test harness: `FIXTURE_REJECTION_COPY` is read by whoever wrote a bad fixture, and `WHAT_THIS_PROVES` / `WHAT_THIS_DOES_NOT_PROVE` are addressed to a reviewer deciding how much a green run is worth. No clinician or practice manager sees any of it in the product, so linting it as operator copy would be W200's own category error — and these strings QUOTE what they warn about ('no receiving system has ever seen any of this'), which is the collision that split this register in the first place. The remaining exports are pure detectors and the contract itself.",
   },
   {
+    module: "src/api/scopes.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W254 models what a MACHINE caller would be permitted to read, and nobody in the product reads any of it: each scope's `grants` sentence is addressed to whoever is granting a token, and `TOKEN_REFUSAL_COPY` is one line a developer gets instead of a credential. `REFUSED_SCOPE_SHAPES` is reviewer-facing in W200's split for the usual reason — its prose QUOTES the wildcard, the write scope and the retroactive widening it exists to forbid, and that collision already moved one of this unit's own source scans. The remaining exports are the scope union, the register, the pure permission check and a token issuer that always refuses.",
+  },
+  {
     module: "src/api/refusals.ts",
     operatorCopy: [],
     notCopy:
