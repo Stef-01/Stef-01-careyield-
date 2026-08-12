@@ -307,6 +307,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports are the reason union, the candidate projection and the floor check. `MATCH_REASON_COPY` is the sentence a practice manager reads about one appointment offer and `MATCH_FLOOR_BREACH_COPY` tells a reviewer why a plan was refused. Both are about capacity, recorded availability and practice-set limits; a test asserts neither can name a condition, a symptom or an urgency, because a reason is the one place a matcher gets to say WHY in words somebody reads.",
   },
   {
+    module: "src/capacity/model.ts",
+    operatorCopy: ["HISTORY_REFUSAL_COPY"],
+    notCopy:
+      "The remaining exports model sessions, their recorded dispositions and the fill rate. `HISTORY_REFUSAL_COPY` tells a practice why no number is offered for a clinician-weekday nobody has records for, and its whole job is to stop the absence being read as a prediction of an empty diary. It describes a diary and a record, never a patient, a condition or a next clinical step.",
+  },
+  {
     module: "src/outcomes/response-console.ts",
     operatorCopy: ["RESPONSE_CONSOLE_COPY", "EMPTY_READING_COPY", "EMPTY_WOULD_SETTLE_IT"],
     notCopy:

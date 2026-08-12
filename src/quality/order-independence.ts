@@ -71,6 +71,14 @@ export interface FoldSite {
  */
 export const FOLD_SITES: readonly FoldSite[] = [
   {
+    module: "src/capacity/model.ts",
+    folds: 1,
+    disposition: {
+      kind: "rationale",
+      why: "W222 reads the LAST recorded week's date to stamp a pattern's basis. The list is sorted by ISO date on the line above, and two entries cannot tie: sessions are grouped by (clinician, date), so one clinician has at most one session per date. The fold reads a DATE off the last element rather than returning the record, which is the same argument src/outcomes/time-to-escalation.ts makes.",
+    },
+  },
+  {
     module: "src/demo/clinicians.ts",
     folds: 2,
     disposition: {
