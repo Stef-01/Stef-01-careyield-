@@ -16,6 +16,8 @@
 // is a real property of those classes, and writing it down is what stops the next reader
 // assuming it was an oversight.
 
+import { DISCLOSURE_LEDGER_RECORD_CLASS } from "@/interop/disclosure-ledger";
+
 export type Handling =
   /** Rows are stored and must be scrubbed on erasure and returned on an access request. */
   | "stored"
@@ -230,6 +232,11 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
     rationale:
       "W227's calendar is data with a source, about dates rather than about anybody. Nothing seasonal is inferred from a practice's own history, so no patient record is read to produce it.",
   },
+  // W239: SPREAD, not written. The handling and rationale are derived from `PAYLOAD_MODE`, so
+  // answering W204's open question about whether the ledger holds the figures moves this
+  // classification in the same commit. A hand-written `handling: "stored"` here would agree on
+  // the day somebody typed it and disagree the first time the mode changed, invisibly.
+  { ...DISCLOSURE_LEDGER_RECORD_CLASS },
   {
     module: "src/interop/fhir.ts",
     what: "FHIR R4 resources built from this tree's records",

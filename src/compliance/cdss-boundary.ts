@@ -337,6 +337,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports compute the verdict and render it. Both copy maps are read by a practice manager: what it means that a session's range has stopped fitting, which direction it moved, and — stated rather than implied — that nothing has been adjusted. None of it names a patient, a condition or a clinical step, and every string passes W226's capacity linter.",
   },
   {
+    module: "src/interop/disclosure-ledger.ts",
+    operatorCopy: ["DISCLOSURE_REJECTION_COPY"],
+    notCopy:
+      "The remaining exports are the ledger's types, the shipped (empty) list, the payload-mode switch and the consequences derived from it. `DISCLOSURE_REJECTION_COPY` is read by whoever wrote an incomplete disclosure row — why a row with no author, no period or figures disagreeing with the declared mode is refused. It describes a record of what left a practice, never a patient or a clinical step. `OPEN_QUESTION` and `MODE_CONSEQUENCES` are addressed to the founder deciding W204's question and `REFUSED_LEDGER_BEHAVIOURS` quotes the behaviours it forbids, so all three are reviewer-facing in W200's split.",
+  },
+  {
     module: "src/interop/conformance.ts",
     operatorCopy: [],
     notCopy:
