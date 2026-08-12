@@ -199,9 +199,23 @@ export function usableVertical(spec: VerticalSpec, evidence: VerticalEvidence): 
     seen.add(key);
   }
 
+  // W252: the four ref sets are built ONCE, not once per member. `refsIn` constructs a new Set
+  // over the whole evidence array, and calling it inside this loop made the work
+  // members × evidence — invisible while `shippedEvidence()` returns nothing, and quadratic the
+  // day the gates open and evidence stops being empty. Which is to say: invisible exactly until
+  // the moment the feature starts being used.
+  const refsByKind = new Map<VerticalMemberKind, Set<string>>();
+  const refsFor = (kind: VerticalMemberKind): Set<string> => {
+    const found = refsByKind.get(kind);
+    if (found) return found;
+    const built = refsIn(evidence, kind);
+    refsByKind.set(kind, built);
+    return built;
+  };
+
   const unusable: UnusableMember[] = [];
   for (const member of spec.members) {
-    if (!refsIn(evidence, member.kind).has(member.ref)) {
+    if (!refsFor(member.kind).has(member.ref)) {
       unusable.push({ member, reason: "absent_from_signed_off_evidence" });
     }
   }

@@ -159,7 +159,14 @@ export function verticalOutstanding(
  * founder they had a decision to take where they do not.
  */
 export function gatesFor(members: readonly DeclaredMember[]): BlockingGate[] {
-  return [...new Set(members.map((member) => member.gate))].filter((gate) => gate !== "none");
+  // SORTED, and W252 found it was not. W250 gave `blockedCountByGate` a tie-break and left this
+  // returning Set-insertion order — first-appearance, which is to say the order the caller
+  // happened to list the verticals in. Unobservable while every member in the tree waits on one
+  // gate, and wrong the moment a second appears: the same "property tested over a set of one"
+  // W250 wrote down about the rollup, one function along and missed.
+  return [...new Set(members.map((member) => member.gate))]
+    .filter((gate) => gate !== "none")
+    .sort((a, b) => a.localeCompare(b));
 }
 
 /**
