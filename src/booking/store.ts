@@ -46,7 +46,16 @@ export const SEED_SESSION_DATE = "2026-09-01";
  * rail with no filter, which hid that — the ops page showed this practice's invitations to
  * whoever was signed in. Fixtures that need the two to line up now say so explicitly.
  */
-export const SEED_PRACTICE_ID = "prac-demo" as PracticeId;
+/**
+ * The practice the seeded rail belongs to.
+ *
+ * W272 CHANGED THIS FROM `prac-demo`, and the change is a finding rather than a tidy-up. The
+ * console mints `prac-1` for the first practice onboarded, and every console page scopes its
+ * reads by that id — so a rail seeded under `prac-demo` was invisible to every practice-scoped
+ * page, and the one page that DID show it was the privacy export, which was unscoped. The demo
+ * fixture and the demo console had never been the same practice, and the export was what hid it.
+ */
+export const SEED_PRACTICE_ID = "prac-1" as PracticeId;
 const PRACTICE_ID = SEED_PRACTICE_ID;
 const CLINICIAN_ID = "clin-demo" as ClinicianId;
 

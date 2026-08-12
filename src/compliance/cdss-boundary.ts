@@ -271,6 +271,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
     notCopy: "The renderer composes from those two and from measured day counts.",
   },
   {
+    module: "src/privacy/console-export.ts",
+    operatorCopy: ["SCOPED_EXPORT_NOTE"],
+    notCopy:
+      "The rest is the projection and its refusals. `SCOPED_EXPORT_NOTE` IS operator copy and is the only string here a practice manager reads: it sits above the export on `/console/privacy` and says that records held by another practice are not shown and are not counted. It is on the module rather than in the page so the page cannot describe the scoping in words of its own, and so the sweep reaches it — W200's own known bound is that prose composed inline in a render function is not reachable by export name. `REFUSED_SCOPING_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the author-scoped referral, the withheld-record count and the fix-it-in-the-page shortcut it exists to forbid.",
+  },
+  {
     module: "src/privacy/automated-decisions.ts",
     operatorCopy: [],
     notCopy:

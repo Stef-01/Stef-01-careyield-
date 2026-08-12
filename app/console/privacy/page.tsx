@@ -3,7 +3,8 @@
 
 import Link from "next/link";
 import { getConsole } from "@/console/store";
-import { getPrivacy, exportForPatient } from "@/privacy/store";
+import { getPrivacy } from "@/privacy/store";
+import { SCOPED_EXPORT_NOTE, consoleExportFor } from "@/privacy/console-export";
 import { authorize } from "@/tenancy/tenancy";
 import { requirePractice } from "../guard";
 import { ConsoleShell, inputClass, primaryButtonClass } from "../ui";
@@ -24,8 +25,14 @@ export default async function PrivacyPage({
   const console_ = getConsole();
   const mayExport =
     authorize(console_.memberships, email, record.practice.id, "edit_rules").allowed;
+  // W272 finding 1: SCOPED to the practice reading it. The unscoped `exportForPatient` is the
+  // product's answer and is what erasure is checked against; this page is one practice asking what
+  // IT holds, and rendering the product's answer here disclosed another practice's referral
+  // narrative to whoever had a grant at this one.
   const exported =
-    params.export && mayExport ? exportForPatient(params.export, new Date().toISOString()) : null;
+    params.export && mayExport
+      ? consoleExportFor(params.export, record.practice.id, new Date().toISOString())
+      : null;
 
   return (
     <ConsoleShell email={email}>
@@ -74,6 +81,9 @@ export default async function PrivacyPage({
                 </span>
               )}
             </h3>
+            <p className="mt-1 text-xs text-stone-500" data-testid="export-scope-note">
+              {SCOPED_EXPORT_NOTE}
+            </p>
             {exported.held ? (
               <pre
                 data-testid="export-json"

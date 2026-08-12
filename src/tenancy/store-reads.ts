@@ -384,7 +384,12 @@ export const STORE_READS: readonly StoreRead[] = [
     fn: "exportForPatient",
     kind: "patient_keyed",
     reason:
-      "APP 12 access. The answer to 'what do you hold about me' is every practice's holding, so this must not take a practice.",
+      "APP 12 access, at the PRODUCT level. The answer to 'what do you hold about me' is every practice's holding, so this must not take a practice — and it is what `deletePatientEverywhere` is checked against, which is the parity W266 built. W272 found the console rendering this answer to ONE practice's staff, which is a different question with a different reader; `consoleExportFor` is that one, and this stays unscoped.",
+  },
+  {
+    module: "src/privacy/console-export.ts",
+    fn: "consoleExportFor",
+    kind: "practice_scoped",
   },
   {
     module: "src/privacy/store.ts",

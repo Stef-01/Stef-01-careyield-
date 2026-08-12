@@ -90,7 +90,7 @@ function applyOptOutToRail(patientId: string, at: string): OptOutOutcome {
       // is not necessarily (and in a multi-practice rail, is not) the right one.
       practiceId: (getConsole().practices[0]?.practice.id ??
         rail.state.invitations[0]?.practiceId ??
-        "prac-demo") as AuditEvent["practiceId"],
+        "prac-1") as AuditEvent["practiceId"],
       kind: "patient_opted_out",
       at,
       subjectId: patientId,

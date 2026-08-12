@@ -407,6 +407,7 @@ export const NOT_A_DECISION: Readonly<Record<string, string>> = {
   "src/pms/ingest.ts": "Maps records read from practice software onto platform types. Reading is not deciding, and what is read is listed above.",
   "src/pms/synthetic.ts": "The synthetic practice-software adapter. No real patient exists behind it.",
   "src/pms/vendors.ts": "Vendor adapter skeletons behind a flag, with no credentials.",
+  "src/privacy/console-export.ts": "W272's practice-scoped view of an access export. It narrows what one practice is shown to what that practice holds; it decides nothing about a person, and it is executed when somebody asks.",
   "src/privacy/privacy.ts": "Access, export and erasure. Executed when somebody asks, never on the software's initiative.",
   "src/privacy/record-classes.ts": "W106's register of where patient identity can live.",
   "src/privacy/store.ts": "Storage for access, correction and erasure requests and how they were answered. A record of what people asked for.",
@@ -488,9 +489,9 @@ export const NOTICE_REVISION: NoticeRevision = {
   // through any of them. The control is doing what it was built to do: making somebody look at
   // the notice every time the classified set moves, and the answer being "nothing published
   // changed" three times running is the answer, not a reason to loosen the pin.
-  reviewedAt: "W266",
+  reviewedAt: "W272",
   decisionsAtReview: 15,
-  modulesAtReview: 99,
+  modulesAtReview: 100,
 };
 
 /** The line the page renders. Composed, so the page cannot state a date the register disagrees with. */

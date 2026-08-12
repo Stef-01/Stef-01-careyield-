@@ -37,10 +37,10 @@ describe("ops store", () => {
   });
 
   it("pausing a practice is audited and reversible", () => {
-    applyPracticePause("prac-demo", true, NOW);
-    expect(getOps().switches.pausedPracticeIds).toEqual(["prac-demo"]);
+    applyPracticePause("prac-1", true, NOW);
+    expect(getOps().switches.pausedPracticeIds).toEqual(["prac-1"]);
     expect(getOps().auditEvents.at(-1)?.detail).toContain("paused");
-    applyPracticePause("prac-demo", false, NOW);
+    applyPracticePause("prac-1", false, NOW);
     expect(getOps().switches.pausedPracticeIds).toEqual([]);
   });
 
