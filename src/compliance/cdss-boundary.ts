@@ -343,6 +343,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification rather than an omission. W237 is a test harness: `FIXTURE_REJECTION_COPY` is read by whoever wrote a bad fixture, and `WHAT_THIS_PROVES` / `WHAT_THIS_DOES_NOT_PROVE` are addressed to a reviewer deciding how much a green run is worth. No clinician or practice manager sees any of it in the product, so linting it as operator copy would be W200's own category error — and these strings QUOTE what they warn about ('no receiving system has ever seen any of this'), which is the collision that split this register in the first place. The remaining exports are pure detectors and the contract itself.",
   },
   {
+    module: "src/interop/terminology.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W238 binds local catalogue codes to SNOMED CT-AU and LOINC, and nobody in the product reads any of its strings: `BINDING_REJECTION_COPY` is addressed to whoever is filling the catalogue with a release open in front of them, and the `copy` a refusal carries is read by a reviewer looking at why a document went out without a coded concept. `REFUSED_BINDING_STRATEGIES` is reviewer-facing in W200's split for the same reason `REFUSED_MAPPINGS` is — its whole content is QUOTING the fake bindings it forbids, including deriving a condition code from recorded fact codes, so linting it as operator copy would flag the register for naming the thing it exists to prevent. The remaining exports are the system URIs, the (empty) catalogue, the loader and the single branded producer.",
+  },
+  {
     module: "src/interop/fhir.ts",
     operatorCopy: ["STATUS_REFUSAL_COPY"],
     notCopy:
