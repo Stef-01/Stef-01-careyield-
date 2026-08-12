@@ -79,6 +79,14 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    module: "src/capacity/drift.ts",
+    folds: 1,
+    disposition: {
+      kind: "rationale",
+      why: "W228 reads the LAST week of the frozen history to stamp its basis. The list is W222's `weeks`, sorted by ISO date and unable to tie — sessions are grouped by (clinician, date), so one clinician has at most one per date. It reads a DATE off the last element rather than returning the record; the same argument src/capacity/model.ts and src/capacity/backtest.ts make.",
+    },
+  },
+  {
     module: "src/capacity/model.ts",
     folds: 1,
     disposition: {
