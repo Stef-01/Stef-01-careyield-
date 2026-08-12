@@ -39,6 +39,9 @@ const MACHINERY = new Set([
   "consistency.ts",
   "binding.ts",
   "store.ts",
+  // W252: a scale harness, not a vertical. The census caught it on the first run, which is the
+  // census working — a new file in this directory is a declaration until somebody says otherwise.
+  "scale.ts",
 ]);
 
 function verticalModules(): string[] {

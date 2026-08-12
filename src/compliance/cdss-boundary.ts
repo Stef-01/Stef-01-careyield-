@@ -361,6 +361,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W248's shared vertical machinery exports an evidence reader, a spec builder, two assembly calls and a gate list — no strings a clinician or practice manager reads. The one descriptive field it defines, `DeclaredMember.waitsOn`, holds text supplied by each vertical and is linted there, at the declaration, which is where the text actually exists.",
   },
   {
+    module: "src/verticals/scale.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W252's scale harness generates synthetic verticals and times how long the registers take to assess them; nobody reads its output but a developer running the suite. SYNTHETIC_WAITS_ON is one sentence attached to a generated member that describes nothing and will never be signed off, and WHAT_THE_NUMBER_IS_NOT is reviewer-facing — it argues, limit by limit, what a wall-clock measurement is not evidence of, which is the opposite of a claim about care. Both are run through lintLandingCopy and lintMessageText by this module's own test. The generator produces no member of the `interval` kind and no interval evidence, because an interval carries a cadence and a synthetic cadence would be a fabricated clinical claim.",
+  },
+  {
     module: "src/verticals/respiratory.ts",
     operatorCopy: [],
     notCopy:

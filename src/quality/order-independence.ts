@@ -285,6 +285,15 @@ export const FOLD_SITES: readonly FoldSite[] = [
       test: "src/verticals/binding.test.ts :: W167 two acceptances at the same instant resolve the same way",
     },
   },
+  {
+    // W252: the register caught this file on its first run, which is the register working.
+    module: "src/verticals/scale.ts",
+    folds: 1,
+    disposition: {
+      kind: "rationale",
+      why: "The one fold sums member counts across the specs being measured, and addition is commutative — there is no comparison to tie on. The module's own subject is this property: `orderDependence` runs the gate list, the blocked-count rollup and the whole assembly forwards and backwards and reports any disagreement in words, and `checkVerticalScaleBudgets` turns each disagreement into a violation. A tie-break test here would be a test of `+`.",
+    },
+  },
 ];
 
 // W168 widened this. It matched `.reduce(` only, and W167's ledger row concluded from that
