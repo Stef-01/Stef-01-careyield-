@@ -4,7 +4,11 @@
 
 import { getStore } from "@/booking/store";
 import { complaintsForPatient, scrubPatientFromComplaints } from "@/complaints/store";
-import { scrubPatientFromReferrals } from "@/referrals/store";
+import {
+  referralsForPatient,
+  scrubPatientFromReferrals,
+  type PatientReferrals,
+} from "@/referrals/store";
 import type { ComplaintRecord } from "@/complaints/workflow";
 import {
   applyRetention,
@@ -33,15 +37,30 @@ export interface ConsoleExport extends PatientExport {
   suppressed: boolean;
   /** W51: complaints live in their own store; an access request covers them too. */
   complaints: ComplaintRecord[];
+  /**
+   * W266: the GP-to-GP rail, for the same reason and three years later.
+   *
+   * W137 composed this store into `deletePatientEverywhere` and added no reader — so the rail was
+   * ERASED on request and never DISCLOSED on request. The patient asking what is held about them
+   * was not told about their referrals; the same patient asking for deletion had them deleted.
+   */
+  referrals: PatientReferrals;
 }
 
 export function exportForPatient(patientId: string, nowIso: string): ConsoleExport {
   const railExport = exportPatientData(railDataset(), patientId, nowIso);
   const complaints = complaintsForPatient(patientId);
+  const referrals = referralsForPatient(patientId);
+  const heldReferrals =
+    referrals.documents.length + referrals.acts.length + referrals.events.length + referrals.returns.length;
   return {
     ...railExport,
-    held: railExport.held || complaints.length > 0,
+    // `held` answers "does this practice hold anything about you", so every store the export
+    // covers has to be able to make it true. A store added to the payload and left out of this
+    // would return records under a heading saying nothing is held.
+    held: railExport.held || complaints.length > 0 || heldReferrals > 0,
     complaints,
+    referrals,
     suppressed: isSuppressed(getPrivacy().suppressions, patientId),
   };
 }

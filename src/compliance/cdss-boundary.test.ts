@@ -119,6 +119,7 @@ const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/verticals/consistency.ts": () => import("@/verticals/consistency"),
   "src/verticals/dermatology.ts": () => import("@/verticals/dermatology"),
   "src/privacy/adm-y5.ts": () => import("@/privacy/adm-y5"),
+  "src/privacy/access-y5.ts": () => import("@/privacy/access-y5"),
   "src/privacy/erasure-y5.ts": () => import("@/privacy/erasure-y5"),
   "src/verticals/model.ts": () => import("@/verticals/model"),
   "src/verticals/scale.ts": () => import("@/verticals/scale"),

@@ -367,6 +367,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W267's register of registers is reviewer-facing throughout: it enumerates the twenty-seven files that derive something from the tree, says what each derives and what it checks that against, and records whether its WALK has ever been shown to notice a file arriving. Nobody but a developer reads it. Its longest strings are the remedy sentences attached to each unproven walk — instructions to whoever fixes one, about a `root` parameter — and its `derives` fields name modules and registries. No patient, condition or appointment reason appears anywhere in it, and it computes nothing about anybody: its only input is the file tree and its only output is a list of file paths.",
   },
   {
+    module: "src/privacy/access-y5.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W266's access register is reviewer-facing: for each record class W106 marks held or derived, whether the access export carries it and under which field, or the argument for why it does not. Nobody but a developer or an auditor reads it. Its longest strings are those arguments — including one sentence, shared by all seven derived classes, about why a reading recomputed at read time is not a record the practice holds. It names no patient, condition or appointment reason, and its functions return module names rather than records.",
+  },
+  {
     module: "src/privacy/erasure-y5.ts",
     operatorCopy: [],
     notCopy:

@@ -440,6 +440,20 @@ export const STORE_READS: readonly StoreRead[] = [
   { module: "src/referrals/store.ts", fn: "sentTo", kind: "practice_scoped" },
   {
     module: "src/referrals/store.ts",
+    fn: "referralIdsForPatient",
+    kind: "patient_keyed",
+    reason:
+      "W266's shared derivation. Same argument as the scrub below, and now literally the same code: a referral spans two practices, so both access and erasure have to reach both sides of every one the patient touched.",
+  },
+  {
+    module: "src/referrals/store.ts",
+    fn: "referralsForPatient",
+    kind: "patient_keyed",
+    reason:
+      "W266's access reader. Deliberately not practice-scoped for the reason this scope kind exists: an access request must reach every practice a patient has touched, and a practice filter would disclose half a handover while erasure removed all of it.",
+  },
+  {
+    module: "src/referrals/store.ts",
     fn: "scrubPatientFromReferrals",
     kind: "patient_keyed",
     reason:

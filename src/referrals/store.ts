@@ -154,12 +154,17 @@ export function sentTo(practiceId: PracticeId): ReferralDocument[] {
  *
  * Returns what it removed, so the deletion record can say so rather than claiming completeness.
  */
-export function scrubPatientFromReferrals(patientId: string): {
-  documents: number;
-  acts: number;
-  events: number;
-  returns: number;
-} {
+/**
+ * Which referrals on this rail are one patient's — the one answer, for both verbs.
+ *
+ * W266 EXTRACTED THIS FROM THE SCRUB, and the extraction is the point rather than the tidying.
+ * The rail links a patient through four different rows, so "which referrals are theirs" is a
+ * real derivation with four chances to differ. Two copies of it would let ACCESS and ERASURE
+ * disagree about what the practice holds — and the two directions of that disagreement are
+ * "we deleted more than we ever told you about" and "we told you about records we would not
+ * delete". Neither is a bug somebody would notice from inside one of the two functions.
+ */
+export function referralIdsForPatient(patientId: string): Set<string> {
   const rail = state();
   const mine = new Set(
     rail.documents.filter((d) => d.patientId === patientId).map((d) => d.referralId),
@@ -173,6 +178,45 @@ export function scrubPatientFromReferrals(patientId: string): {
   for (const report of rail.returns) {
     if (report.patientId === patientId) mine.add(report.referralId);
   }
+  return mine;
+}
+
+export interface PatientReferrals {
+  documents: ReferralDocument[];
+  acts: AcceptanceAct[];
+  events: ReferralEvent[];
+  returns: ReturnReport[];
+}
+
+/**
+ * Everything this rail holds about one patient, for an access request.
+ *
+ * W266 ADDED THIS, AND ITS ABSENCE WAS THE UNIT'S FINDING. W137 composed the referral rail into
+ * `deletePatientEverywhere` because a store erasure does not reach is a store the console reports
+ * as clean — and added no reader, so the rail was erased on request and never disclosed on
+ * request. A patient asking "what do you hold about me?" was not told about their referrals; the
+ * same patient asking "delete everything" had them deleted. Erasure reached a store access did
+ * not, which is W51's finding on the other verb, three years later, on the same store.
+ */
+export function referralsForPatient(patientId: string): PatientReferrals {
+  const rail = state();
+  const mine = referralIdsForPatient(patientId);
+  return {
+    documents: rail.documents.filter((d) => mine.has(d.referralId)),
+    acts: rail.acts.filter((a) => mine.has(a.referralId)),
+    events: rail.events.filter((e) => mine.has(e.referralId)),
+    returns: rail.returns.filter((r) => mine.has(r.referralId)),
+  };
+}
+
+export function scrubPatientFromReferrals(patientId: string): {
+  documents: number;
+  acts: number;
+  events: number;
+  returns: number;
+} {
+  const rail = state();
+  const mine = referralIdsForPatient(patientId);
 
   const removed = {
     documents: rail.documents.filter((d) => mine.has(d.referralId)).length,

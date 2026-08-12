@@ -341,6 +341,8 @@ export const HUMAN_CONTROLS: readonly string[] = [
  * module here is a module somebody looked at and ruled out.
  */
 export const NOT_A_DECISION: Readonly<Record<string, string>> = {
+  "src/privacy/access-y5.ts":
+    "W266's access register: for each record class W106 marks held or derived, whether the access export carries it and under which field, or the argument for why it does not. It decides nothing about anybody — it takes no patient as input and returns module names. It is reached by this register because it names patient identifiers throughout, which is the detector working: a module whose subject is what a patient is told the practice holds about them should be visible to the register enumerating what the software does about a person. Worth recording beside it is the unit's finding: **erasure reached a store access did not.** W137 composed the GP-to-GP referral rail into `deletePatientEverywhere` and wrote no reader, so for three years a patient asking what was held about them was not told about their referrals, while the same patient asking for deletion had them deleted. W51's finding on the other verb, on the same store, three years later — and the symmetry between the two verbs is a standing check now rather than something for the next unit to notice.",
   "src/privacy/erasure-y5.ts":
     "W265's erasure register: for each record class W106 marks `stored`, how `deletePatientEverywhere` reaches it, or why it is deliberately kept or keyed on a different subject. It decides nothing about anybody — it takes no patient as input and its functions return store NAMES, never contents. It is reached by this register because it names patient identifiers throughout, which is the detector working as intended: a module whose subject is what survives an erasure should be visible to the register that enumerates what the software does about a person. Worth recording beside that is what it found — the store W137 added to erasure was the one store a whole-surface sweep could not read, because its resetter returned nothing. Erasure was not broken; it was unverifiable from outside, which is the condition under which both previous erasure defects survived.",
   "src/privacy/state.ts":
@@ -479,9 +481,16 @@ export const NOTICE_REVISION: NoticeRevision = {
   // ruled-out half grew the classified set to 98. Re-read rather than bumped — that module takes
   // no patient as input and returns store names, so the published text is unchanged at fifteen.
   // Twice in three units is the control earning its place rather than the register churning.
-  reviewedAt: "W265",
+  //
+  // W266 moved it a third time, and three in four units is worth a note of its own rather than a
+  // third repetition. Each was a module joining the RULED-OUT half — a rehearsal, an erasure
+  // register, an access register — so the published text has not changed at fifteen decisions
+  // through any of them. The control is doing what it was built to do: making somebody look at
+  // the notice every time the classified set moves, and the answer being "nothing published
+  // changed" three times running is the answer, not a reason to loosen the pin.
+  reviewedAt: "W266",
   decisionsAtReview: 15,
-  modulesAtReview: 98,
+  modulesAtReview: 99,
 };
 
 /** The line the page renders. Composed, so the page cannot state a date the register disagrees with. */

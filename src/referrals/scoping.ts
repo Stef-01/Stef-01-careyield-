@@ -57,6 +57,14 @@ export const REFERRAL_SCOPING: readonly ScopingEntry[] = [
     rationale: "Keyed by referral id alone. Every caller obtains that id from sentBy/sentTo, so it is already this practice's referral. Deliberately not re-scoped: a return report belongs to the referral, and both practices are entitled to it.",
   },
   {
+    module: "src/referrals/store.ts", fn: "referralIdsForPatient", answer: "no_practice_data",
+    rationale: "W266 extracted this from the scrub so ACCESS and ERASURE share one answer to 'which referrals are this patient's'. Deliberately not practice-scoped, for the same reason the scrub is not: a patient's records span both sides of every handover, and scoping it would make the export omit exactly the copies the erasure removes.",
+  },
+  {
+    module: "src/referrals/store.ts", fn: "referralsForPatient", answer: "no_practice_data",
+    rationale: "W266's access reader, the counterpart W137 never wrote. Unscoped on the same argument as the scrub it shares a derivation with: an access request must disclose every side of a handover the patient touched, and a practice filter here would tell a patient about half their referrals while erasure removed all of them.",
+  },
+  {
     module: "src/referrals/store.ts", fn: "scrubPatientFromReferrals", answer: "no_practice_data",
     rationale: "Erasure is deliberately NOT practice-scoped: a patient's erasure must reach both sides of every handover, and scoping it would leave the receiving practice's copy behind — which is the W51 failure in a new place.",
   },
