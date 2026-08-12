@@ -343,6 +343,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports are the ledger's types, the shipped (empty) list, the payload-mode switch and the consequences derived from it. `DISCLOSURE_REJECTION_COPY` is read by whoever wrote an incomplete disclosure row — why a row with no author, no period or figures disagreeing with the declared mode is refused. It describes a record of what left a practice, never a patient or a clinical step. `OPEN_QUESTION` and `MODE_CONSEQUENCES` are addressed to the founder deciding W204's question and `REFUSED_LEDGER_BEHAVIOURS` quotes the behaviours it forbids, so all three are reviewer-facing in W200's split.",
   },
   {
+    module: "src/interop/credentials.ts",
+    operatorCopy: ["CREDENTIAL_REFUSAL_COPY"],
+    notCopy:
+      "The remaining exports are the declared connection slots, the (empty) credential list, the loader that always refuses, the live-connection constant and the literal scanner. `CREDENTIAL_REFUSAL_COPY` is read by whoever tried to connect this product to a real practice system — that no credential can be loaded, that the refusal is the loader's rather than a consequence of an empty list, and that G1 is a founder decision nobody has taken. It describes a gate, never a patient or a clinical step. `REFUSED_CREDENTIAL_POSTURES` is reviewer-facing in W200's split, since it exists to quote the mistakes it forbids.",
+  },
+  {
     module: "src/interop/conformance.ts",
     operatorCopy: [],
     notCopy:
