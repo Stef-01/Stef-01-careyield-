@@ -385,6 +385,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification. W254 models what a MACHINE caller would be permitted to read, and nobody in the product reads any of it: each scope's `grants` sentence is addressed to whoever is granting a token, and `TOKEN_REFUSAL_COPY` is one line a developer gets instead of a credential. `REFUSED_SCOPE_SHAPES` is reviewer-facing in W200's split for the usual reason — its prose QUOTES the wildcard, the write scope and the retroactive widening it exists to forbid, and that collision already moved one of this unit's own source scans. The remaining exports are the scope union, the register, the pure permission check and a token issuer that always refuses.",
   },
   {
+    module: "src/compliance/rail-y5.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification — this is the fourth register in this tree whose subject matter is the thing it forbids. W259 re-derives the five rail properties against Y5 for a reviewer deciding whether the boundary still holds, and no clinician or practice manager sees any of it in the product. `Y5_REDERIVATIONS` names, per property, the Y5 surface that could have broken it; `PATIENT_FIELD_CLASSIFICATION` says of every field on `Patient` whether the matcher may see it AND what ordering by it would amount to, which necessarily describes clinical markers in order to withhold them; and `REFUSED_REDERIVATION_SHORTCUTS` quotes the 'still holds' line it exists to prevent. Linting any of it as operator copy would be W200's own category error on the file that re-derives W200.",
+  },
+  {
     module: "src/api/refusals.ts",
     operatorCopy: [],
     notCopy:
