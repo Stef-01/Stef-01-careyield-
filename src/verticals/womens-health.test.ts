@@ -5,7 +5,7 @@
 // it is a claim about the SET of verticals. One bespoke assembly is a file; two are a pattern
 // nobody declared. So the check is a census over `src/verticals/`, in both directions.
 
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import * as mod from "./womens-health";
@@ -25,14 +25,6 @@ import { lintMessageText } from "@/messaging/templates";
 const DIR = path.join(process.cwd(), "src/verticals");
 const SOURCE = readFileSync(path.join(DIR, "womens-health.ts"), "utf8");
 
-/** Every vertical DECLARATION module — the files that describe a bundle, not the machinery. */
-function verticalModules(): string[] {
-  const machinery = new Set(["assembly.ts", "model.ts", "completeness.ts", "consistency.ts", "binding.ts", "store.ts"]);
-  return readdirSync(DIR).filter(
-    (f) => f.endsWith(".ts") && !f.endsWith(".test.ts") && !f.endsWith(".types.ts") && !machinery.has(f),
-  );
-}
-
 describe("W248 W157's model is reused, and the machinery is not re-implemented", () => {
   it("assembles through the shared door, with no assembly of its own", () => {
     expect(SOURCE).not.toContain("usableVertical(");
@@ -51,19 +43,9 @@ describe("W248 W157's model is reused, and the machinery is not re-implemented",
     expect(SOURCE).toContain("shippedEvidence");
   });
 
-  it("is a rule about EVERY vertical, checked over the directory", () => {
-    // The census, and the reason this is not just a claim about this file. The third vertical
-    // gets written by copying whichever of the first two its author found; this fails it.
-    const modules = verticalModules();
-    expect(modules.length, "the vertical census found nothing").toBeGreaterThan(1);
-    expect(modules).toContain("dermatology.ts");
-    expect(modules).toContain("womens-health.ts");
-    for (const file of modules) {
-      const text = readFileSync(path.join(DIR, file), "utf8");
-      expect(text, `${file} calls W157's model directly`).not.toContain("usableVertical(");
-      expect(text, `${file} calls W158's report directly`).not.toContain("assessCompleteness(");
-    }
-  });
+  // The census that was here moved to `assembly.test.ts` at W250. A rule about EVERY vertical,
+  // asserted in the test file of ONE of them, disappears the day that one is renamed — and the
+  // author writing the third vertical's test has no reason to read this file.
 
   it("still produces the same evidence both verticals are assessed against", () => {
     // Non-vacuity for the extraction: a shared reader that returned something different from what
@@ -115,12 +97,13 @@ describe("W248 the vertical is refused, with every missing member named", () => 
     }
   });
 
-  it("names the gates, deduplicated, so the founder sees decisions and not members", () => {
-    const gates = womensHealthGates();
-    expect(gates.length).toBeLessThan(WOMENS_HEALTH_MEMBERS.length);
-    expect(gates.some((g) => g.includes("G5"))).toBe(true);
-    // Both pathways wait on the same ruling, which is why the list is shorter than the members.
-    expect(new Set(WOMENS_HEALTH_MEMBERS.filter((m) => m.kind === "pathway").map((m) => m.waitsOn)).size).toBe(1);
+  it("names the gates, deduplicated by VALUE, so the founder sees decisions not members", () => {
+    // W248 asserted `gates.length < members.length` here and it passed — because this vertical
+    // happened to word two members identically. Dermatology, with one gate and five members,
+    // returned five. The assertion was certifying a deduplication on the single fixture where it
+    // coincidentally occurred; W250 made the gate a declared value and this checks the grouping.
+    expect(womensHealthGates()).toEqual(["G5"]);
+    expect(WOMENS_HEALTH_MEMBERS.filter((m) => m.gate === "G5").length).toBeGreaterThan(1);
   });
 
   it("declares two pathways separately, because they are signed off separately", () => {
@@ -142,7 +125,8 @@ describe("W248 zero clinical content is present", () => {
 
   it("carries no field that could hold what a member says", () => {
     for (const declared of WOMENS_HEALTH_MEMBERS) {
-      expect(Object.keys(declared).sort()).toEqual(["kind", "ref", "waitsOn"]);
+      // W250 added `gate` — a declared value, not a description of what the member says.
+      expect(Object.keys(declared).sort()).toEqual(["gate", "kind", "ref", "waitsOn"]);
     }
   });
 

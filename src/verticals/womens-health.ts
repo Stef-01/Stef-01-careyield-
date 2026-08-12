@@ -49,26 +49,31 @@ export const WOMENS_HEALTH_MEMBERS: readonly DeclaredMember[] = [
   {
     kind: "pathway",
     ref: "wh-pathway-1",
+    gate: "G5",
     waitsOn: "G5 — clinical content Meherr publishes. Needs two-person sign-off per W119 (W249).",
   },
   {
     kind: "pathway",
     ref: "wh-pathway-2",
+    gate: "G5",
     waitsOn: "G5 — clinical content Meherr publishes. Needs two-person sign-off per W119 (W249).",
   },
   {
     kind: "content",
     ref: "wh-content-1",
+    gate: "none",
     waitsOn: "A named reviewer and a signatory. W127's registry holds neither yet.",
   },
   {
     kind: "education_item",
     ref: "wh-education-1",
+    gate: "none",
     waitsOn: "An author. No founder gate applies to material that makes no clinical claim (W151).",
   },
   {
     kind: "interval",
     ref: "wh-interval-1",
+    gate: "G5",
     waitsOn: "G5 — the values ruling on cadence. Nobody can act until it lands (W56).",
   },
 ];

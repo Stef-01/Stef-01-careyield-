@@ -141,14 +141,20 @@ describe("W191 the outstanding work is decomposed by who has to act", () => {
   });
 
   it("names the gate each member waits on, which is what a founder is pricing", () => {
-    const gates = dermatologyGates();
-    expect(gates.join(" ")).toContain("G5");
-    expect(gates.join(" ")).toContain("W119");
+    // W250 SPLIT THIS IN TWO, because it was asserting both halves against prose. `gatesFor` now
+    // returns declared VALUES — dermatology's five members are blocked by ONE gate, and the prose
+    // version returned five because the three G5 sentences were worded differently. The sentences
+    // are still checked, at the member where they live.
+    expect(dermatologyGates()).toEqual(["G5"]);
+
+    const sentences = DERMATOLOGY_MEMBERS.map((m) => m.waitsOn);
+    expect(sentences.join(" ")).toContain("W119");
     // The protected title appears nowhere, including in internal governance copy (W114).
-    expect(gates.join(" ")).not.toMatch(/\bspecialist\b/i);
+    expect(sentences.join(" ")).not.toMatch(/\bspecialist\b/i);
     // Not everything is a founder gate, and saying so is the useful half: one member needs an
-    // author and no signature at all.
-    expect(gates.some((gate) => gate.includes("No founder gate"))).toBe(true);
+    // author and no signature at all — now a `none` value rather than a phrase to search for.
+    expect(DERMATOLOGY_MEMBERS.some((m) => m.gate === "none")).toBe(true);
+    expect(sentences.some((s2) => s2.includes("No founder gate"))).toBe(true);
   });
 });
 
@@ -181,7 +187,9 @@ describe("W191 the G5 line — governance is declared, content is not", () => {
     // The obvious addition is a one-line description per member. It does not exist, because for
     // a clinical pathway that line is the gated content.
     for (const declared of DERMATOLOGY_MEMBERS) {
-      expect(Object.keys(declared).sort()).toEqual(["kind", "ref", "waitsOn"]);
+      // W250 added `gate`: a declared value naming WHICH founder gate blocks the member. It is
+      // not a description of what the member says, which is the field that still does not exist.
+      expect(Object.keys(declared).sort()).toEqual(["gate", "kind", "ref", "waitsOn"]);
     }
   });
 

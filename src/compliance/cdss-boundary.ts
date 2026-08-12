@@ -361,6 +361,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W248's shared vertical machinery exports an evidence reader, a spec builder, two assembly calls and a gate list — no strings a clinician or practice manager reads. The one descriptive field it defines, `DeclaredMember.waitsOn`, holds text supplied by each vertical and is linted there, at the declaration, which is where the text actually exists.",
   },
   {
+    module: "src/verticals/respiratory.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, on the same argument as the other two verticals. W250 declares which members a respiratory vertical would need and which founder gate blocks each — as a declared VALUE alongside the sentence, which is the defect this unit found in the prose-only version. The `waitsOn` notes are governance addressed to a founder rather than copy in the product, and every one is run through `lintLandingCopy` and `lintMessageText` by this vertical's own test. Nothing here says what a member is FOR; the type has no field to hold it. The condition word scan is this vertical's own, because a respiratory scope's tempting vocabulary is neither dermatology's nor women's health's — which is the third reason a shared word list would have been the wrong shape.",
+  },
+  {
     module: "src/verticals/womens-health.ts",
     operatorCopy: [],
     notCopy:

@@ -50,10 +50,53 @@ import {
  * vertical; the type carries it for all of them, so the rule survives an author who read the
  * other file.
  */
+/**
+ * The founder gates plan §4 defines, plus `none`.
+ *
+ * THE UNION IS THE PLAN'S OWN LIST, not the gates that happen to block a member today — and a
+ * test asserts every member of it is defined in §4, W242's rule. Narrowing it to `"G5" | "none"`
+ * was the first version and W250's own order-independence test was VACUOUS against it: with one
+ * reachable gate, `blockedCountByGate` can only ever return zero or one row, so the sort was dead
+ * code and reversing the input could not change an answer. A property tested over a set of one is
+ * a property nobody tested.
+ */
+export type BlockingGate =
+  | "G1"
+  | "G2"
+  | "G3"
+  | "G4"
+  | "G5"
+  | "G6"
+  | "G7"
+  | "G8"
+  | "G9"
+  | "G10"
+  /** No founder gate applies — the member waits on an authoring or sign-off act. */
+  | "none";
+
+/** Every gate the union names, so a test can check them against plan §4 without a second list. */
+export const ALL_BLOCKING_GATES: readonly BlockingGate[] = [
+  "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10", "none",
+];
+
 export interface DeclaredMember {
   kind: VerticalMemberKind;
   ref: string;
-  /** The gate or person this member is waiting on. Never what the member says. */
+  /**
+   * WHICH founder gate blocks this member, as a declared value.
+   *
+   * W250 added this, and the reason is a defect in `gatesFor`. It deduplicated `waitsOn` STRINGS
+   * and called the result "the gates this vertical is waiting on" — so dermatology, whose five
+   * members are blocked by one gate and two authoring acts, got FIVE "gates": three differently
+   * worded sentences about G5, plus two others. The dedup did nothing, and the function's name
+   * was the only thing claiming otherwise.
+   *
+   * It matters more at three verticals than at one. The question a founder actually asks is
+   * "which single ruling unblocks the most?", and prose cannot be grouped — G5 appears as seven
+   * distinct strings across the tree's verticals for what is one decision.
+   */
+  gate: BlockingGate;
+  /** The sentence a reader gets: which act, whose signature. Never what the member says. */
   waitsOn: string;
 }
 
@@ -107,7 +150,34 @@ export function verticalOutstanding(
   return assessCompleteness(spec, evidence, known);
 }
 
-/** The gates a vertical is waiting on, deduplicated, in declaration order. */
-export function gatesFor(members: readonly DeclaredMember[]): string[] {
-  return [...new Set(members.map((member) => member.waitsOn))];
+/**
+ * The founder gates a vertical is waiting on, genuinely deduplicated.
+ *
+ * Grouped by the declared `gate` value rather than by `waitsOn` prose — see `DeclaredMember.gate`
+ * for what the prose version returned. `none` is excluded: a member waiting on an author is
+ * waiting on somebody, but not on a founder, and a gate list that included it would tell a
+ * founder they had a decision to take where they do not.
+ */
+export function gatesFor(members: readonly DeclaredMember[]): BlockingGate[] {
+  return [...new Set(members.map((member) => member.gate))].filter((gate) => gate !== "none");
+}
+
+/**
+ * How many members each gate blocks, across any set of verticals, worst first.
+ *
+ * The answer to "which single ruling unblocks the most", which is the question three verticals
+ * make worth asking and which prose could not be grouped to answer. Ties break on the gate name
+ * so the order is a value rather than a rendering of whatever order the caller passed.
+ */
+export function blockedCountByGate(
+  members: readonly DeclaredMember[],
+): Array<{ gate: BlockingGate; count: number }> {
+  const counts = new Map<BlockingGate, number>();
+  for (const member of members) {
+    if (member.gate === "none") continue;
+    counts.set(member.gate, (counts.get(member.gate) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([gate, count]) => ({ gate, count }))
+    .sort((a, b) => b.count - a.count || a.gate.localeCompare(b.gate));
 }

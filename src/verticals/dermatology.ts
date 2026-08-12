@@ -53,26 +53,31 @@ export const DERMATOLOGY_MEMBERS: readonly DeclaredMember[] = [
   {
     kind: "pathway",
     ref: "derm-pathway-1",
+    gate: "G5",
     waitsOn: "G5 — clinical content sign-off. W119's chain, in order: a reviewer, then a signatory who is not the reviewer.",
   },
   {
     kind: "pathway",
     ref: "derm-pathway-2",
+    gate: "G5",
     waitsOn: "G5 — clinical content sign-off, same reviewer-then-signatory chain as the first.",
   },
   {
     kind: "content",
     ref: "derm-content-1",
+    gate: "G5",
     waitsOn: "G5 — the founder signature on reviewed material (W69's ApprovedContent brand).",
   },
   {
     kind: "education_item",
     ref: "derm-education-1",
+    gate: "none",
     waitsOn: "An author. No founder gate applies to material that makes no clinical claim (W151).",
   },
   {
     kind: "interval",
     ref: "derm-interval-1",
+    gate: "G5",
     waitsOn: "G5 — the values ruling on cadence. Nobody can act until it lands (W56).",
   },
 ];
