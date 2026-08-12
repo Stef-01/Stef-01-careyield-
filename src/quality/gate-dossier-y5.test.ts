@@ -91,9 +91,24 @@ describe("W257 the ledger is the source, and it has something to say", () => {
   it("is bounded to Year 5, so a later year's rows cannot rewrite this document", () => {
     // DOSSIER-1, W210's register, caught the unbounded version of this file. W207 went red when
     // W208 planned Year 5; without the bound, W260 would do it again to this one.
+    //
+    // W260 CORRECTED THE ASSERTION, AND THE CORRECTION IS THE SAME FINDING ONE LAYER UP. The first
+    // version asserted `max(all) <= Y5_LAST_UNIT` — that the ledger never grows past W260 — and it
+    // went red the moment W260 planned Q21, which is the event the bound exists FOR. Bounding this
+    // document's SCOPE to Year 5 is right, and `ledgerRows()` above does it. Asserting that the
+    // tree stops growing is the moving-target defect this comment describes, committed against the
+    // world instead of against the document.
+    //
+    // So the direction is inverted and it is now the bound's own non-vacuity guard: while the
+    // ledger ended at W260 the filter could not be shown to exclude anything, and every figure in
+    // this file would have been just as green with no bound at all. It excludes thirteen rows now.
     const all = [...LEDGER.matchAll(/^\| (W\d+) \|/gm)].map((m) => Number(m[1]!.slice(1)));
-    expect(Math.max(...all), "the ledger has passed Year 5").toBeLessThanOrEqual(Y5_LAST_UNIT);
+    expect(Math.max(...all), "the ledger has not grown, so the bound excludes nothing").toBeGreaterThan(
+      Y5_LAST_UNIT,
+    );
     expect(ledgerRows().every((r) => Number(r.id.slice(1)) <= Y5_LAST_UNIT)).toBe(true);
+    expect(ledgerRows().length, "the bound excluded the whole ledger").toBeGreaterThan(250);
+    expect(ledgerRows().length, "the bound excluded nothing").toBeLessThan(all.length);
   });
 
   it("finds blocked rows to count, so the tables are not over nothing", () => {

@@ -548,9 +548,82 @@ expansion unit proposes the gate for the year it is expanding.
 - **W259** The G7 boundary at five years → verify: W200's five rail properties re-derived; Q17's matching optimisation tested against them explicitly, since it is the first Y5 work that could have moved the line.
 - **W260** **YEAR 5 CLOSE.** Y6 horizon plan + expansion-rule renewal → verify: next-horizon plan written from the W256 audit and the W257 dossier; §6's expansion rule states what succeeds it now the five-year arc is spent; `plan-ledger` green over the whole ledger.
 
-## 6. Years 2–5 — quarterly themes + expansion rule
+## 5f. Year 6 horizon — Q21 (W261–W273)
 
-**Expansion rule:** the last week of each year (W52/W104/W156/W208) — and the first firing of each quarter if the ledger runs dry — expands the next quarter's theme into 13 concrete week-units with verify gates, appended to this plan (§5 extension) with matching rows in `BUILD-STATE.md`. Plans stay accurate because detail is derived just-in-time, informed by everything already built. Founder gates are inherited, never expanded away.
+Expanded by W260 on 2026-08-13 under the §6 horizon rule, from `docs/AUDIT-Y5.md` and
+`docs/GATE-DOSSIER-Y5.md`. **One quarter, not a year** — see `docs/HORIZON-Y6.md` for why, and for
+the gate position recorded at this expansion. Same contract: each unit states its own verify gate,
+founder gates are inherited, and no unit here needs a ruling to start.
+
+**Q21 — cut the cost of yes.** The dossier's finding decides the theme. Sixteen ledger rows are
+blocked; G1, G2, G4 and G7 block *none* of them and are the four that stand between this tree and
+a single real patient being helped. The loop cannot answer any of them. What it can do is make each
+answer cheap to act on and stop the blocked pile growing — so every unit below either shortens the
+day a ruling lands or re-derives a control that made Year 5 quiet. **No unit in Q21 may add a
+blocked row**, which is W263's job to enforce rather than this paragraph's to promise.
+
+- **W261** Gate-readiness register: for each outstanding gate, what this tree does on the day it is answered → verify: every step resolves to a module, registry or test that exists in the tree; a gate with no readiness path fails; counts derived from `BUILD-STATE.md` and pinned row-by-row.
+- **W262** G1 first-connection rehearsal: credential slot to first practice-scoped read, driven end to end while every credential is still refused → verify: the rehearsal drives W242's loader, W253's dispatcher and W209's scoped reads; `liveConnectionsPermitted()` stays false and the test fails if any step was skipped rather than exercised.
+- **W263** [P] The blocked-surface budget → verify: the blocked-row count is derived from the ledger and pinned; a new blocked row fails the suite until it names the ruling that would release it and the units released with it.
+- **W264** G5 sign-off rehearsal over synthetic pathway content → verify: W119's two-person workflow driven end to end on synthetic content, including the refusals; `SHIPPED_PATHWAYS` stays empty and a test asserts it.
+- **W265** Erasure at five years: W137's scrub re-derived against every record class Y5 added → verify: every `stored` class in W106 is reached by the scrub, checked in both directions; a class added without a scrub path fails.
+- **W266** [P] What an access request returns, assembled from W106 rather than from a list → verify: every `stored` and `derived` class is either represented in the export or refused with a written reason; both directions against the register.
+- **W267** The register census: every self-checking register in the tree, enumerated → verify: each named register is proved to notice, by a mutation in this unit's own test that moves the tree under it and asserts the register fails.
+- **W268** [P] Latent findings at five years: W210's register re-derived → verify: every recorded finding's live-condition re-evaluated from source rather than from its own record; a condition that became true without firing is a failure.
+- **W269** The synthetic fleet at five years: W48's budgets re-derived over the Y5 surfaces → verify: the run exercises capacity, interop and the API; budgets stated in the test body, W48's shape, with the checker exercised on a violating fake first.
+- **W270** [P] Operator copy at the Y6 boundary: W200's declared surface re-derived → verify: membership read from each module's own header against a Y6 constant; nothing carried from the Y4 register, and the both-directions census still green.
+- **W271** Page reachability at five years: every route and what it can reach → verify: W107's transitive walk over `app/` checked against a declared surface in both directions; a page reaching a dormant module fails.
+- **W272** Q21 hardening → verify: code-review, security-review and simplify run over the quarter's diff; every finding recorded with a disposition and a date, and the accepted ones carry a review date.
+- **W273** **QUARTER CLOSE.** Q22 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
+## 6. Horizon rule (supersedes the five-year expansion rule, W260)
+
+**The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,
+have nothing left in them. The obvious move — write four more years of themes and keep expanding —
+is the one the tree has the receipts against, so it is not the rule.
+
+**Why the old rule cannot simply continue.** It expanded *the next quarter's theme* into thirteen
+units, and the themes were written five years ahead. W208 recorded what that cost: §6 wrote Y5 Q17
+in Year 1 as "matching optimisation … learned ranking second", and by the time the quarter arrived
+a learned ranker over patients collided head-on with a legal notice W201 had published in Year 4 —
+so W217 shipped `blocked` from day one and has never moved. The rule's own justification was that
+"detail is derived just-in-time"; the *themes* never were. Writing Y6–Y9 themes now would repeat
+that at four years' range, with five years of evidence that it does not hold.
+
+**And the rule has a second defect, which five years made visible and no single quarter could.**
+It cannot notice that the product is not being used. It reads a theme, produces thirteen units, and
+the loop verifies them — and there is no state in which it says *this is now the founder's move*.
+`GATE-DOSSIER-Y5.md` states the position: sixteen rows are blocked, **G1, G2, G4 and G7 block none
+of them**, and those four are what stand between this tree and a patient. The loop will therefore
+never be blocked by the decisions that matter most. Five years of this rule produced 260 verified
+units, ~223 modules, 3,000-odd tests, and nothing sent to anybody. That is not a failure of the
+loop's output; it is the rule failing to have an opinion about it.
+
+**The horizon rule, which succeeds it:**
+
+1. **One quarter at a time, never a year.** The last week of each quarter — and the first firing
+   after the ledger runs dry — expands **thirteen** units into a new §5 extension with matching
+   rows in `BUILD-STATE.md`. No theme is written for a quarter that is not being expanded now.
+2. **Derived from the last audit and the last gate dossier, never from a theme written earlier.**
+   The expansion cites both documents by path, and the quarter's shape has to follow from what they
+   say. This is the old rule's stated justification, applied to the theme as well as the detail.
+3. **The gate position is re-read and RECORDED at every expansion**, in the horizon document: which
+   gates are outstanding, how long each has waited, how many units each releases, and — stated
+   plainly — how many of them the loop may answer. That number has been zero for five years and
+   the plan should say so every quarter rather than once a year in a dossier nobody asked for.
+4. **An expansion may not grow the blocked surface without saying so.** A new blocked row must name
+   the ruling that would release it and the units released with it. W263 makes this a check.
+5. **Founder gates are inherited, never expanded away** — unchanged from the old rule, and already
+   enforced by `src/quality/plan-ledger.test.ts` rather than promised.
+6. **The loop keeps building whatever needs no ruling, and says what it cannot do.** The rule is
+   not a halt. It is the requirement that every expansion state the position, so that "nobody has
+   ruled" is visible in the plan itself and not only to whoever reads the dossier.
+
+The five-year themes below are kept as the record of what was planned and what it cost — §5's
+ledger rows are the record of what was actually built, and the two disagree in the places worth
+remembering.
+
+### The five-year themes as written in Year 1 (historical)
 
 - **Y2 Q5** Care-gap registers: guideline interval tables as data (diabetes annual cycle, KHA CKD monitoring, GPCCMP quarterly reviews); register-driven eligibility. **Q6** Condition-targeted invitation modules + clinical-safety rails (never diagnostic language; G3 templates per condition). **Q7** Capability graph v1: per-GP case-mix + usefulness telemetry → interest/experience profiles; in-panel routing (right GP for the condition inside the practice). **Q8** Referral-leakage detection + group/multisite reporting + Y2 hardening.
 - **Y3 Q9** Credential registry: evidence vault, verification workflow, Ahpra register checks, expiry tracking. **Q10** Pathway definition engine: inclusion/exclusion/escalation as versioned data + authoring UI for specialist reviewers (content itself = G5). **Q11** GP-to-GP referral rails: structured referral + return-report documents, escalation tracking. **Q12** Education engine v1: case-triggered curation (Claude API), CPD trail, pre-consult pathway updates — informs the GP, never replaces judgement (G7 boundary).
