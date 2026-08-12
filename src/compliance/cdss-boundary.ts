@@ -361,6 +361,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W248's shared vertical machinery exports an evidence reader, a spec builder, two assembly calls and a gate list — no strings a clinician or practice manager reads. The one descriptive field it defines, `DeclaredMember.waitsOn`, holds text supplied by each vertical and is linted there, at the declaration, which is where the text actually exists.",
   },
   {
+    module: "src/quality/register-census.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W267's register of registers is reviewer-facing throughout: it enumerates the twenty-seven files that derive something from the tree, says what each derives and what it checks that against, and records whether its WALK has ever been shown to notice a file arriving. Nobody but a developer reads it. Its longest strings are the remedy sentences attached to each unproven walk — instructions to whoever fixes one, about a `root` parameter — and its `derives` fields name modules and registries. No patient, condition or appointment reason appears anywhere in it, and it computes nothing about anybody: its only input is the file tree and its only output is a list of file paths.",
+  },
+  {
     module: "src/privacy/adm-y5.ts",
     operatorCopy: [],
     notCopy:
