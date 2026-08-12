@@ -403,6 +403,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification. W254 models what a MACHINE caller would be permitted to read, and nobody in the product reads any of it: each scope's `grants` sentence is addressed to whoever is granting a token, and `TOKEN_REFUSAL_COPY` is one line a developer gets instead of a credential. `REFUSED_SCOPE_SHAPES` is reviewer-facing in W200's split for the usual reason — its prose QUOTES the wildcard, the write scope and the retroactive widening it exists to forbid, and that collision already moved one of this unit's own source scans. The remaining exports are the scope union, the register, the pure permission check and a token issuer that always refuses.",
   },
   {
+    module: "src/quality/g1-rehearsal.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W262 drives the first-connection path while every credential is still refused, and nobody in the product reads any of it: the stage observations are diagnostic strings a reviewer reads in a trace, and `WHAT_THIS_DOES_NOT_PROVE` is addressed to whoever would otherwise quote a green rehearsal as evidence that an integration works. `REFUSED_REHEARSAL_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the shortened walk, the boolean return and the faked credential it exists to forbid. The remaining exports are the stage union, the walk and the trace reader.",
+  },
+  {
     module: "src/quality/gate-readiness.ts",
     operatorCopy: [],
     notCopy:

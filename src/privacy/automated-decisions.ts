@@ -362,6 +362,8 @@ export const NOT_A_DECISION: Readonly<Record<string, string>> = {
     "W233 asks whether opening extra slots helped, and its whole content is that this product cannot say. It decides nothing about anybody: no patient, condition or appointment reason reaches it, and the only thing it reads is a count of slots filled per session. It decides nothing about a PRACTICE either, because answering the question needs sessions allocated to two groups before anyone chose which to open, no such trial has been run, and `SHIPPED_SESSION_ARMS` is empty. The refusal union it exports is about whether a measurement may be reported, not about a person.",
   "src/compliance/rail-y5.ts":
     "W259's re-derivation of the five rail properties against Y5. It decides nothing about anybody and computes nothing — it is a register of arguments plus a classification of which fields on `Patient` the matcher may see, read by this tree's own tests. It is reached by this register because it names patient fields throughout, which is the detector working as intended: a file whose subject is what the matcher may know about a person should be visible to the register that enumerates what software decides about one. The answer is that every clinical field is WITHHELD, and the classification is checked against the type in both directions so a field added to `Patient` tomorrow fails the suite until somebody says which it is.",
+  "src/quality/g1-rehearsal.ts":
+    "W262's first-connection rehearsal. It decides nothing about anybody: it walks the path a real connection would take — credential slot, loader refusal, session, scope check, scoped read, stamped envelope — over the practice's own synthetic data, and records what each stage observed. It is reached by this register through its `RehearsalRefusal` union, and the answer is that the union is about a walk that could not continue (no session resolved to a practice, no such endpoint) rather than about a person. No patient identifier enters the walk: the endpoints it drives return practice-level aggregates or the practice's own projected record, and the trace holds diagnostic strings naming a practice and an endpoint.",
   "src/api/scopes.ts":
     "W254's API scope model: what a machine caller would be permitted to read. It decides nothing about anybody, and today it decides nothing at all — no token exists, because G1 blocks the credential and `issueToken` refuses before it reads what was asked for. What it WOULD decide is whether a caller may read an endpoint, which is a question about a token rather than about a person: every endpoint behind it returns practice-level aggregates or the practice's own projected record, and no patient identifier reaches this module. It is reached by this register through its `TokenRefusal` union, and the honest answer is worth recording rather than exempting. The property it actually protects is that a scope cannot widen retroactively — adding an endpoint to an existing scope would grant it to every token already issued, which is W243's class-consent finding arriving where the holder is not somebody anybody would think to ask.",
   "src/api/surface.ts":
@@ -465,9 +467,14 @@ export interface NoticeRevision {
 
 export const NOTICE_REVISION: NoticeRevision = {
   reviewedOn: "13 August 2026",
-  reviewedAt: "W258",
+  // W262 added `src/quality/g1-rehearsal.ts` to the ruled-out half and this control fired, which
+  // is it working: a module joined the classified set under a stated review date. The notice was
+  // re-read rather than the number bumped — the addition is a module ruled OUT (a rehearsal that
+  // walks a connection path and decides nothing about anybody), so no published decision changed
+  // and `decisionsAtReview` stays where it was.
+  reviewedAt: "W262",
   decisionsAtReview: 15,
-  modulesAtReview: 96,
+  modulesAtReview: 97,
 };
 
 /** The line the page renders. Composed, so the page cannot state a date the register disagrees with. */

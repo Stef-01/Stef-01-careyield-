@@ -109,7 +109,18 @@ describe("W258 the notice is regenerated from the register", () => {
     expect(reviewedAgainst()).toBe(NOTICE_REVISION);
     expect(NOTICE_REVISION.decisionsAtReview).toBe(AUTOMATED_DECISIONS.length);
     expect(NOTICE_REVISION.modulesAtReview).toBe(declaredModules().length);
-    expect(NOTICE_REVISION.reviewedAt).toBe("W258");
+    // W262: this pinned the literal `"W258"`, and the two controls then contradicted each other.
+    // W201's test says "re-read the notice and MOVE the date" when the classified set changes;
+    // this said the date must still be the one W258 set. The next author's only options were to
+    // leave a stale review record or to edit this pin — and editing a pin to make a stated review
+    // date true again is precisely the bump the control exists to prevent. So it now checks the
+    // record names a REAL unit rather than a fixed one, which keeps the force (the counts beside
+    // it must still match the register) without forbidding the move it demands.
+    expect(NOTICE_REVISION.reviewedAt, "the review record names no unit").toMatch(/^W\d+$/);
+    expect(
+      readFileSync(path.join(process.cwd(), "BUILD-STATE.md"), "utf8"),
+      `${NOTICE_REVISION.reviewedAt} is not a unit the ledger has`,
+    ).toContain(`| ${NOTICE_REVISION.reviewedAt} |`);
   });
 
   it("hands the sweep the WHOLE notice, including the prose the page used to own", () => {
