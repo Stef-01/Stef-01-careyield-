@@ -67,6 +67,9 @@ export default async function ResponsesPage() {
         Covering {PERIOD.fromIso} to {PERIOD.toIso} inclusive. Practice{" "}
         <code>{record.practice.id}</code>.
       </p>
+      <p className="mt-1 text-xs font-medium text-amber-800" data-testid="responses-synthetic">
+        {RESPONSE_CONSOLE_COPY.syntheticBasis}
+      </p>
 
       {view.state === "empty" ? (
         <section

@@ -5,6 +5,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { OPERATOR_COPY_SURFACES } from "@/compliance/cdss-boundary";
+import { reachableFromApp } from "@/security/reachability";
 import { ACCEPTED_FINDINGS, sweepSurface, unaccepted } from "@/compliance/public-surfaces";
 import {
   AUTOMATED_DECISIONS,
@@ -12,6 +13,7 @@ import {
   INFORMATION_USED,
   NEVER_AUTOMATED,
   NOT_A_DECISION,
+  PERSON_REFERENCE_TERMS,
   declaredModules,
   pageCopy,
 } from "./automated-decisions";
@@ -47,7 +49,15 @@ function sourceFiles(): Array<{ module: string; text: string }> {
  * both holes, so the detector keeps both halves.
  */
 function patientTouchingModules(): string[] {
-  const namesAPatient = /\bPatientId\b|\bpatientId\b/;
+  // Built from the declared register rather than written here, so adding a pseudonym for a
+  // person is an edit to `PERSON_REFERENCE_TERMS` and not to a literal buried in a test.
+  // Escaped, because this file invites future editors to add terms: `patient.ref` would
+  // otherwise over-match and a term ending in punctuation would silently never match.
+  const namesAPatient = new RegExp(
+    Object.keys(PERSON_REFERENCE_TERMS)
+      .map((term) => `\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`)
+      .join("|"),
+  );
   const decidesAnOutcome = /^export type [A-Za-z]*(Reason|Refusal|Exclusion|Verdict)\b/m;
   return sourceFiles()
     .filter(({ module, text }) => {
@@ -101,7 +111,25 @@ describe("W201 the status of each decision is read from the tree, not asserted",
     // the thing that makes it true is an empty registry — so the test imports the registry and
     // looks. A gate opening without this page changing fails here.
     for (const decision of AUTOMATED_DECISIONS) {
-      if (!decision.registry) continue;
+      if (!decision.registry) {
+        // W221's gap. A decision claiming to be dormant with NO content registry was skipped
+        // entirely, so "built, not in use" was an unverified sentence in a published notice —
+        // exactly the shape this unit exists to end.
+        //
+        // The first version of this proof asked "does anything import it", matching only
+        // `from "@/x"`. The review skill found it certifying `intervention-response-link` as
+        // dormant while three modules import it RELATIVELY, and found that the scan never left
+        // `src/` — so a route in `app/`, which is precisely where a module becomes in use, was
+        // invisible. Both are fixed by asking the right question instead: **is it REACHABLE FROM
+        // A PAGE?** A module imported only by other dormant modules is still dormant, which is
+        // what "no page in the product shows it yet" actually claims. W107 already walks that
+        // graph transitively over `app/` including `.tsx`, so it is composed rather than restated.
+        if (decision.status !== "built_not_in_use") continue;
+        const reachable = new Set(reachableFromApp(path.join(SRC, "..")).files);
+        const live = decision.decidedBy.filter((m) => reachable.has(m));
+        expect(live, `${decision.id} says it is not in use, but a page reaches it`).toEqual([]);
+        continue;
+      }
       const specifier = `@/${decision.registry.module.replace(/^src\//, "").replace(/\.ts$/, "")}`;
       const namespace = (await import(/* @vite-ignore */ specifier)) as Record<string, unknown>;
       const held = namespace[decision.registry.exportName];

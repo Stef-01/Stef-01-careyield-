@@ -2,6 +2,7 @@
 // fails the suite, and a finding with no stated trigger is refused.
 
 import { describe, expect, it } from "vitest";
+import { getStore, resetStore } from "@/booking/store";
 import {
   HEADERLESS_AT_W210,
   LATENT_FINDINGS,
@@ -102,6 +103,21 @@ describe("W210 the triggers are real predicates over this tree", () => {
     // census unnoticed, which is the failure a both-directions register should be incapable of.
     expect(modulesWithNoUnitHeader().length).toBe(HEADERLESS_AT_W210);
     expect(finding("CENSUS-1").trigger()).toBe(false);
+  });
+
+  it("leaves the synthetic rail seeded, which is a contract and not a surprise", () => {
+    // W221 review finding: TENANCY-1's trigger reads the seeded rail, and the store exposes no
+    // way to read a pristine seed without resetting the global. An exported predicate with an
+    // undocumented effect on shared state is the shape that becomes a defect when somebody
+    // composes it — so the effect is specified here rather than left to be discovered.
+    resetStore();
+    getStore().state.appointments.push({ ...getStore().state.appointments[0]!, id: "apt-mut" as never });
+    expect(getStore().state.appointments.some((a) => a.id === "apt-mut")).toBe(true);
+    fired();
+    expect(
+      getStore().state.appointments.some((a) => a.id === "apt-mut"),
+      "fired() must leave the rail in its seeded state",
+    ).toBe(false);
   });
 
   it("checks DOSSIER-1 against the dossier tests that exist", () => {

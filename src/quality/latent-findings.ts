@@ -39,7 +39,7 @@
 
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
-import { getStore, resetStore } from "@/booking/store";
+import { resetStore } from "@/booking/store";
 
 const ROOT = path.resolve(__dirname, "../..");
 const SRC = path.join(ROOT, "src");
@@ -137,9 +137,19 @@ export const LATENT_FINDINGS: readonly LatentFinding[] = [
     recordedBy: "W209",
     triggerStatement:
       "The seeded rail holds sessions for more than one practice. Until then two practices cannot collide on a clinician id here; after it, this read crosses the boundary exactly as the CPD trail did.",
+    /**
+     * SIDE EFFECT, SPECIFIED RATHER THAN INCIDENTAL (W221 review finding).
+     *
+     * This reads the SEEDED rail, and the only way the store exposes a pristine seed is
+     * `resetStore()`, which clobbers the global. So calling `fired()` leaves the synthetic rail in
+     * its seeded state. That is narrow today — nothing outside this module's own test calls
+     * `fired()` — but an exported predicate with an undocumented effect on shared state is the
+     * shape that becomes a defect when somebody composes it, which is what this whole register is
+     * about. Pinned by a test, so it is a contract instead of a surprise.
+     */
     trigger: () => {
-      resetStore();
-      return new Set(getStore().state.appointments.map((a) => a.practiceId)).size > 1;
+      const seeded = resetStore();
+      return new Set(seeded.state.appointments.map((a) => a.practiceId)).size > 1;
     },
     status: "open",
   }),

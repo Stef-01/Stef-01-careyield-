@@ -35,12 +35,40 @@
 // dormant whose content registry has filled up fails.
 //
 // The detector's bound, stated because a register that hides its bound is worse than no register:
-// "touches a patient" is the union of two scans — modules naming `PatientId`/`patientId`, and
-// modules exporting a decision-outcome union (`*Reason`, `*Refusal`, `*Exclusion`, `*Verdict`).
-// Neither alone is sound. The union scan misses `registers/escalation.ts`, which names its
-// outcomes `EscalationRoute`; the identifier scan misses `engine/eligibility.ts`, which takes ids
-// as plain strings. Together they caught both, and every module either implements a declared
-// decision or is declared as not being one.
+// "touches a patient" is the union of TWO scans — modules naming a declared PERSON-REFERENCE
+// term (of which there are three), and modules exporting a decision-outcome union (`*Reason`,
+// `*Refusal`, `*Exclusion`, `*Verdict`). Neither is sound alone. (W221 first wrote "three scans"
+// here while enumerating two: the wrong count, in the block whose stated job is stating the bound
+// honestly. Caught by the review skill, which is the argument for running it.) The union scan misses `registers/escalation.ts`, which
+// names its outcomes `EscalationRoute`; the identifier scan misses `engine/eligibility.ts`, which
+// takes ids as plain strings.
+//
+// THE THIRD TERM WAS ADDED AT W221 AND THE HOLE IT CLOSED IS WORTH RECORDING, because the two
+// controls involved were pulling in opposite directions. W213 deliberately stopped the matcher
+// seeing a `Patient`: it receives a `MatchCandidate` carrying a `candidateRef`, a lossy projection
+// with nowhere to put a clinical attribute, and that is what makes "position never depends on
+// need" structural. The same decision made `src/matching/match.ts` INVISIBLE HERE — a module that
+// decides which person is offered which appointment, undetected by the register that exists to
+// enumerate exactly that. **A privacy control and a transparency register can hide something from
+// each other**, and the only reason this was found is that W221's gate said RE-DERIVE rather than
+// re-check.
+//
+// So the terms are declared data rather than a literal in a test, and adding a pseudonym for a
+// person means adding it here — which is a visible edit in the file whose job is to notice people.
+
+/**
+ * How a person is referred to in this tree, with the reason each term counts.
+ *
+ * Read by `automated-decisions.test.ts` to decide which modules must be classified. A pseudonym
+ * is still a person: W213's `candidateRef` identifies exactly one patient to whoever holds the
+ * mapping, and the module that consumes it decides whether that patient is offered an appointment.
+ */
+export const PERSON_REFERENCE_TERMS: Readonly<Record<string, string>> = {
+  PatientId: "The branded identifier. The obvious case, and the only one the detector had until W221.",
+  patientId: "The field name, used where the branded type is not in scope.",
+  candidateRef:
+    "W213's pseudonym for a patient inside the matcher. Deliberately not a `Patient` — that is what keeps a clinical attribute out of the matcher — and precisely because of that it hid `src/matching/match.ts` from this register for a full quarter.",
+};
 
 /** Whether the decision is actually being taken about anybody today. */
 export type DecisionStatus =
@@ -183,8 +211,16 @@ export const AUTOMATED_DECISIONS: readonly AutomatedDecision[] = [
   {
     id: "intervention-response-link",
     title: "Whether something in your record counts as an answer to something we did.",
-    what: "Built and not in use. Where your practice sent you an availability message or wrote a referral, the software can link a later recorded fact — a booking, an attendance, a decline, an opt-out — to the thing that came before it, so the practice can see what its own actions led to. It links only facts somebody wrote down, only where the later fact comes after the earlier one, and only kinds it has been told to expect. Where nothing is recorded it says nothing is recorded: that is never read as you having declined, ignored us, or made any choice at all. Nothing in it is a judgement about you or your health, and no page in the product shows it yet.",
+    what: "Where your practice sent you an availability message or wrote a referral, the software links a later recorded fact — a booking, an attendance, a decline, an opt-out — to the thing that came before it, so the practice can see what its own actions led to. It links only facts somebody wrote down, only where the later fact is not recorded before the earlier one, and only kinds it has been told to expect. Where nothing is recorded it says nothing is recorded: that is never read as you having declined, ignored us, or made any choice at all. Your practice can see these counts on a page in its own console; they are counts, never a list of people, and nothing in it is a judgement about you or your health.",
     decidedBy: ["src/outcomes/response.ts"],
+    status: "in_use",
+    registry: null,
+  },
+  {
+    id: "which-appointment-you-are-offered",
+    title: "Which of several appointments you are offered.",
+    what: "Built and not in use. Where a practice offers several appointments at once, the software works out who is offered which one: people who can take fewer of the offered times are matched first, so an appointment only one person can use is not given to somebody with five choices, and within that it takes the earliest time that suits you. It uses only the times your practice has recorded that you can attend and how many offers you already hold. It cannot see anything about your health — the calculation is not given it — and where two people are equally placed the tie is settled arbitrarily rather than by any judgement about either of them. No practice is using this yet.",
+    decidedBy: ["src/matching/match.ts"],
     status: "built_not_in_use",
     registry: null,
   },

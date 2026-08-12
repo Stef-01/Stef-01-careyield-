@@ -53,6 +53,17 @@ export const RESPONSE_CONSOLE_COPY = {
     "What was recorded after each thing Meherr did. Every number here counts facts somebody wrote down; none of it says whether any care was right, and none of it is about one person.",
   notSent:
     "Nothing on this page has been sent to anybody. Meherr does not share these counts with any outside organisation, and there is no control here that would.",
+  /**
+   * W221 hardening finding. The page renders `Practice <id>` beside figures that come from the
+   * SYNTHETIC practice (W12), shared by every signed-in practice — and said so nowhere a reader
+   * could see it. `/console/dashboard` labels its own sim figures "simulated weeks · synthetic
+   * patients"; this page did not, so a practice manager saw numbers attributed to their own
+   * practice by name that were not their practice's numbers. A true count under a false frame is
+   * the failure W196 and W205 both refuse, and attributing it to a named practice makes it worse
+   * rather than better. Kept in this register rather than in the page's JSX so it is linted.
+   */
+  syntheticBasis:
+    "These figures come from Meherr's synthetic practice, not from your own records. Nothing here counts a real patient, and no real message has been sent.",
   neverPerformed:
     "Meherr did not do this at all in this period, so there is nothing to count. This is not a rate of zero.",
   nothingRecorded:
