@@ -34,46 +34,21 @@
 // another — n round trips through a two-person sign-off process, each one discovering a fact that
 // was knowable at the start.
 
-import { SHIPPED_INTERVALS } from "@/registers/intervals";
-import { SHIPPED_WORKSPACE } from "@/registers/authoring";
 import {
-  usableVertical,
-  type VerticalEvidence,
-  type VerticalMemberKind,
-  type VerticalResult,
-  type VerticalSpec,
-} from "./model";
-import { assessCompleteness, type CompletenessReport, type KnownMembers } from "./completeness";
+  assembleVertical,
+  gatesFor,
+  shippedEvidence,
+  specFrom,
+  verticalOutstanding,
+  type DeclaredMember,
+} from "./assembly";
+import type { VerticalEvidence, VerticalResult, VerticalSpec } from "./model";
+import type { CompletenessReport, KnownMembers } from "./completeness";
 
-/**
- * A member of the dermatology bundle, with the gate it is waiting on.
- *
- * `waitsOn` is the only descriptive field, and that is deliberate. The obvious thing to add is a
- * sentence saying what each member does; for a clinical pathway that sentence IS the content G5
- * gates, so the field does not exist rather than existing and being carefully worded.
- */
-export interface DeclaredMember {
-  kind: VerticalMemberKind;
-  ref: string;
-  /**
-   * The founder gate or authoring act this member cannot exist without.
-   *
-   * W191 note: this copy is linted with the tree's own rules, and the first draft failed them.
-   * It described W119's chain as "a specialist, then the founder", which trips `no-specialist` —
-   * W114's blanket refusal of the protected title, which applies everywhere and not only in
-   * patient-facing copy. The fix made the sentence MORE accurate rather than less: the code's own
-   * vocabulary is reviewer and signatory, and those are the roles W119 actually enforces.
-   */
-  waitsOn: string;
-}
+// W248 moved `DeclaredMember` to `assembly.ts`. The rule it carries — three fields, and no
+// sentence saying what a member is FOR, because for a clinical pathway that sentence is the
+// content G5 gates — is now one type rather than a convention two vertical files happen to share.
 
-/**
- * The declared membership.
- *
- * Refs are placeholders because the artefacts do not exist: a real version hash is the hash of
- * signed content, so a spec written before sign-off cannot have one and pretending otherwise
- * would put a fabricated identity into W160's migration path.
- */
 export const DERMATOLOGY_MEMBERS: readonly DeclaredMember[] = [
   {
     kind: "pathway",
@@ -102,35 +77,30 @@ export const DERMATOLOGY_MEMBERS: readonly DeclaredMember[] = [
   },
 ];
 
-export const DERMATOLOGY_SPEC: VerticalSpec = {
-  verticalId: "vert-dermatology",
-  name: "Dermatology",
-  members: DERMATOLOGY_MEMBERS.map(({ kind, ref }) => ({ kind, ref })),
-};
+export const DERMATOLOGY_SPEC: VerticalSpec = specFrom(
+  "vert-dermatology",
+  "Dermatology",
+  DERMATOLOGY_MEMBERS,
+);
 
 /**
  * What is signed off for dermatology today: nothing.
  *
- * Assembled from the tree's own SHIPPED_* registries rather than written as empty literals, so it
- * cannot say "nothing is signed off" while something is. A hand-written empty object would be a
- * second claim about the same fact, and the second claim is the one that goes stale.
+ * DELEGATES to `shippedEvidence`, and W248 moved the body there because it was never about
+ * dermatology — it read the tree's `SHIPPED_*` registries and returned what is signed off for
+ * anything. Keeping a copy here once a second vertical existed would have meant two functions
+ * claiming the same fact about the same registries, which is the objection this function's own
+ * comment used to make about a hand-written empty object, one level up.
  */
 export function dermatologyEvidence(): VerticalEvidence {
-  return {
-    // The registries are typed as their branded members and are pinned empty by their own units.
-    // Casts are the reading of an intentionally-empty list, not a construction of a branded value.
-    pathways: [],
-    content: SHIPPED_WORKSPACE as unknown as VerticalEvidence["content"],
-    educationItems: [],
-    intervals: { intervals: SHIPPED_INTERVALS as VerticalEvidence["intervals"]["intervals"], rejected: [] },
-  };
+  return shippedEvidence();
 }
 
 /** Assemble the vertical against what is signed off. Refuses today, and says exactly why. */
 export function assembleDermatology(
   evidence: VerticalEvidence = dermatologyEvidence(),
 ): VerticalResult {
-  return usableVertical(DERMATOLOGY_SPEC, evidence);
+  return assembleVertical(DERMATOLOGY_SPEC, evidence);
 }
 
 /**
@@ -143,10 +113,10 @@ export function dermatologyOutstanding(
   evidence: VerticalEvidence = dermatologyEvidence(),
   known?: KnownMembers,
 ): CompletenessReport {
-  return assessCompleteness(DERMATOLOGY_SPEC, evidence, known);
+  return verticalOutstanding(DERMATOLOGY_SPEC, evidence, known);
 }
 
 /** The gates this vertical is waiting on, deduplicated, in declaration order. */
 export function dermatologyGates(): string[] {
-  return [...new Set(DERMATOLOGY_MEMBERS.map((member) => member.waitsOn))];
+  return gatesFor(DERMATOLOGY_MEMBERS);
 }

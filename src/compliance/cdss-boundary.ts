@@ -355,6 +355,18 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports are the declared connection slots, the (empty) credential list, the loader that always refuses, the live-connection constant and the literal scanner. `CREDENTIAL_REFUSAL_COPY` is read by whoever tried to connect this product to a real practice system — that no credential can be loaded, that the refusal is the loader's rather than a consequence of an empty list, and that G1 is a founder decision nobody has taken. It describes a gate, never a patient or a clinical step. `REFUSED_CREDENTIAL_POSTURES` is reviewer-facing in W200's split, since it exists to quote the mistakes it forbids.",
   },
   {
+    module: "src/verticals/assembly.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W248's shared vertical machinery exports an evidence reader, a spec builder, two assembly calls and a gate list — no strings a clinician or practice manager reads. The one descriptive field it defines, `DeclaredMember.waitsOn`, holds text supplied by each vertical and is linted there, at the declaration, which is where the text actually exists.",
+  },
+  {
+    module: "src/verticals/womens-health.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness IS the classification. W248 declares which members a women's health vertical would need and which gate each waits on; the `waitsOn` notes are governance addressed to a founder, not copy in the product, and every one is run through `lintLandingCopy` and `lintMessageText` by this vertical's own test. Nothing here says what a member is FOR — that sentence is the clinical content G5 gates, and the type has no field to hold it. A test also scans the module for condition, procedure and cadence vocabulary, tighter than dermatology's list because the tempting words in this scope read like service categories rather than like clinical claims.",
+  },
+  {
     module: "src/interop/conformance.ts",
     operatorCopy: [],
     notCopy:

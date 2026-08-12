@@ -109,8 +109,15 @@ describe("W191 the outstanding work is decomposed by who has to act", () => {
     // "5 members not usable" is not a plan. W158 exists on that argument and this uses it.
     const report = dermatologyOutstanding();
     expect(report.members).toHaveLength(DERMATOLOGY_MEMBERS.length);
+    // W248 moved the call one level up. The scan follows the composition rather than being
+    // deleted: this file must reach W158 THROUGH the shared assembly, and the shared assembly
+    // must be the thing that calls it. Checking only that the call exists somewhere would pass
+    // over a vertical that had quietly grown its own.
     const source = readFileSync(path.join(__dirname, "dermatology.ts"), "utf8");
-    expect(source).toContain("assessCompleteness");
+    expect(source).toContain("verticalOutstanding");
+    expect(source, "this vertical re-implements the assembly").not.toContain("assessCompleteness(");
+    const assembly = readFileSync(path.join(__dirname, "assembly.ts"), "utf8");
+    expect(assembly).toContain("assessCompleteness(");
   });
 
   it("says indeterminate rather than guessing, with no pool of what exists", () => {
