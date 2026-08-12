@@ -138,6 +138,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "REFUSED_OPENING_FIELDS is reviewer-facing — it argues, field by field, why a suggestion about a diary must not carry a person, and necessarily names the fields it refuses. `renderOpening` composes from counts and from the refusal copy.",
   },
   {
+    module: "src/capacity/calendar.ts",
+    operatorCopy: ["CALENDAR_REJECTION_COPY"],
+    notCopy:
+      "REFUSED_SEASONALITY is reviewer-facing — it argues, adjustment by adjustment, why a seasonal factor is not derived here, and necessarily names the ones it refuses. SHIPPED_HOLIDAYS is empty, and a holiday's own name and citation are gazette text rather than copy this product writes.",
+  },
+  {
     module: "src/capacity/forecast.ts",
     operatorCopy: ["FORECAST_REFUSAL_COPY"],
     notCopy:

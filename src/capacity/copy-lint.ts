@@ -131,6 +131,7 @@ export function renderCompliantCapacityCopy(text: string): string {
  */
 export const CAPACITY_COPY_MODULES: readonly string[] = [
   "src/capacity/backtest.ts",
+  "src/capacity/calendar.ts",
   "src/capacity/copy-lint.ts",
   "src/capacity/forecast.ts",
   "src/capacity/model.ts",
