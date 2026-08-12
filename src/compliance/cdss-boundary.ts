@@ -421,6 +421,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification. W262 drives the first-connection path while every credential is still refused, and nobody in the product reads any of it: the stage observations are diagnostic strings a reviewer reads in a trace, and `WHAT_THIS_DOES_NOT_PROVE` is addressed to whoever would otherwise quote a green rehearsal as evidence that an integration works. `REFUSED_REHEARSAL_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the shortened walk, the boolean return and the faked credential it exists to forbid. The remaining exports are the stage union, the walk and the trace reader.",
   },
   {
+    module: "src/security/page-reach.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W271 declares what each kind of route may and must reach, and every string in it is addressed to whoever adds a route or an import — the class explanations say what a public page or a console page is FOR, and each dormant entry says why a module must stay off every request path and what would legitimately bring it back. No clinician or practice manager sees any of it. `REFUSED_REACH_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the per-route matrix, the deny-list and the aggregate walk it exists to forbid.",
+  },
+  {
     module: "src/quality/g5-rehearsal.ts",
     operatorCopy: [],
     notCopy:

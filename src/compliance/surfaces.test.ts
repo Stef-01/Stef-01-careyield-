@@ -66,7 +66,7 @@ describe("W102 the census cannot pass vacuously", () => {
 
   it("a route with no census line is reported", () => {
     const diff = diffCensus(
-      [{ path: "/new-thing", kind: "page" }],
+      [{ path: "/new-thing", kind: "page", file: "" }],
       [{ path: "/console", row: "Practice console" }],
     );
     expect(diff.unmapped).toEqual(["/new-thing"]);
@@ -75,7 +75,7 @@ describe("W102 the census cannot pass vacuously", () => {
 
   it("a census line with no governing row is reported", () => {
     const diff = diffCensus(
-      [{ path: "/a", kind: "page" }],
+      [{ path: "/a", kind: "page", file: "" }],
       [{ path: "/a", row: "" }],
     );
     expect(diff.unattributed).toEqual(["/a"]);

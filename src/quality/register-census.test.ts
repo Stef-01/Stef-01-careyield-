@@ -7,7 +7,7 @@
 // exactly the kind of file these probes are, and a probe left behind would fail four other suites
 // while looking like a real defect.
 //
-// The five below are the five whose detectors take a root. The other twenty-two cannot be given a
+// The six below are the ones whose detectors take a root. The others cannot be given a
 // second tree at all, and `walkUnproven` is where that is recorded with the one-line change that
 // would fix each — see the module note for why that is a structural fact rather than an oversight.
 
@@ -30,6 +30,7 @@ import {
   undeclaredInstructionSinks,
 } from "@/security/instruction-sinks";
 import { reachableFromApp, stripComments } from "@/security/reachability";
+import { DORMANT_MODULES, diffReach } from "@/security/page-reach";
 import { readFileSync } from "node:fs";
 
 const ROOT = process.cwd();
@@ -157,7 +158,7 @@ describe("W267 the finding: a proved content scanner is not a proved walk", () =
     // over a file list missing the new file reports nothing, cleanly, forever.
     const unproven = walkUnproven();
     expect(unproven.length).toBeGreaterThan(15);
-    expect(walkProven().length).toBe(5);
+    expect(walkProven().length).toBe(6);
     expect(unproven.length + walkProven().length).toBe(TREE_DERIVED_REGISTERS.length);
     // And the harsh reading is not the fair one, so the census carries both facts.
     const withContentProof = unproven.filter(
@@ -176,7 +177,7 @@ describe("W267 the finding: a proved content scanner is not a proved walk", () =
   });
 });
 
-describe("W267 the five whose detectors take a root, proved by moving the tree", () => {
+describe("W267 the detectors that take a root, proved by moving the tree", () => {
   it("W102's route census notices a page that was not there", () => {
     const before = discoverSurfaces(path.join(COPY, "app")).map((s) => s.path);
     const after = withPlanted(
@@ -191,6 +192,26 @@ describe("W267 the five whose detectors take a root, proved by moving the tree",
       diffCensus(after.map((p) => ({ path: p, kind: "page" as const, file: "" })), census).unmapped,
       "the diff did not report the new route as unmapped",
     ).toContain("/w267-probe");
+  });
+
+  it("W271's route reach notices a page that reaches a dormant module", () => {
+    // Planted rather than described: the route is new AND it imports something no route may
+    // reach, so one probe drives both halves of W271's diff.
+    const dormant = DORMANT_MODULES[0]!.module;
+    const specifier = `@/${dormant.replace(/^src\//, "").replace(/\.ts$/, "")}`;
+    const before = diffReach(COPY);
+    expect(before.unclassified, "the probe route already existed").toEqual([]);
+    expect(before.wokenDormant, "a route already reaches a dormant module").toEqual([]);
+    const after = withPlanted(
+      "app/w271-probe/page.tsx",
+      `import * as dormant from "${specifier}";\n\nexport default function Probe() {\n  void dormant;\n  return null;\n}\n`,
+      () => diffReach(COPY),
+    );
+    expect(after.unclassified, "the reach register did not see a new route").toContain("/w271-probe");
+    expect(
+      after.wokenDormant.map((w) => w.module),
+      "the reach register did not see the dormant module being reached",
+    ).toContain(dormant);
   });
 
   it("W167's fold register notices a module that folds", () => {

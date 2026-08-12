@@ -26,6 +26,15 @@ export interface Surface {
   /** URL path as served, e.g. "/console/outreach" or "/book/[token]". */
   path: string;
   kind: "page" | "route";
+  /**
+   * The file the route is served from, absolute.
+   *
+   * W271 needed the entry point for ONE route in order to walk what that route can reach, and
+   * reconstructing it from `path` would have to re-derive the App Router conventions this
+   * function already knows — including route groups, which vanish from the URL and would make a
+   * reconstructed path wrong the day somebody adds one. Carried rather than recomputed.
+   */
+  file: string;
 }
 
 const ENTRY_FILES: ReadonlyArray<{ file: string; kind: Surface["kind"] }> = [
@@ -54,7 +63,7 @@ export function discoverSurfaces(appDir: string): Surface[] {
         continue;
       }
       const match = ENTRY_FILES.find((e) => e.file === entry);
-      if (match) found.push({ path: `/${segments.join("/")}`, kind: match.kind });
+      if (match) found.push({ path: `/${segments.join("/")}`, kind: match.kind, file: full });
     }
   };
 

@@ -117,9 +117,21 @@ export interface ReachResult {
 
 /** Every first-party module and npm package reachable from a request-serving path. */
 export function reachableFromApp(root: string): ReachResult {
+  return reachableFrom(root, entryPoints(join(root, "app")));
+}
+
+/**
+ * The same walk from a chosen set of entry files.
+ *
+ * W271 needed the closure of ONE route rather than of the whole of `app/`, and the two questions
+ * are different: "can the app reach `docx`" cannot answer "can the public finder page reach the
+ * messaging rail". Extracted rather than copied, so both callers follow the same import rules —
+ * including the two W165 fixes, which a second implementation would have to rediscover.
+ */
+export function reachableFrom(root: string, entryFiles: readonly string[]): ReachResult {
   const seen = new Set<string>();
   const packages = new Set<string>();
-  const queue = entryPoints(join(root, "app"));
+  const queue = [...entryFiles];
   for (const file of queue) seen.add(file);
 
   while (queue.length > 0) {

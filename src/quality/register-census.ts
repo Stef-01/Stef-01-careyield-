@@ -281,6 +281,16 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
   },
   {
+    file: "src/security/page-reach.ts",
+    derives: "What each route under `app/` can reach, per route, from its own file and its layout chain.",
+    checkedAgainst:
+      "W271's route classes — a closed area allowance and a positive requirement per class — and its dormant-module register.",
+    proof: {
+      kind: "mutated_tree",
+      mutation: "a route is planted under `app/` that imports a declared-dormant module, and `diffReach` must report it both unclassified and waking the module",
+    },
+  },
+  {
     file: "src/quality/g5-rehearsal.test.ts",
     derives: "Every non-test module under `src/` and `app/`, looking for an import of the G5 rehearsal.",
     checkedAgainst:
