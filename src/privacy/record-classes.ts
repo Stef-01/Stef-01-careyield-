@@ -231,6 +231,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W227's calendar is data with a source, about dates rather than about anybody. Nothing seasonal is inferred from a practice's own history, so no patient record is read to produce it.",
   },
   {
+    module: "src/capacity/console.ts",
+    what: "The capacity console's view-model",
+    handling: "no_patient_identity",
+    rationale:
+      "W229's view-model, declared by W230's directory census the firing it landed. It composes W222's sessions, W223's ranges, W224's scores and W228's drift verdicts for a page, and adds no field of its own that a patient could occupy — every input is already a count. Same erasure posture as the rest of the directory: invariant rather than composed, because W33 keeps the slot and drops the link, and a capacity figure that moved when somebody was erased would disclose that the erasure happened.",
+  },
+  {
     module: "src/capacity/copy-lint.ts",
     what: "The sentences a capacity surface may say",
     handling: "no_patient_identity",
