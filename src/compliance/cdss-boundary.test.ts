@@ -49,6 +49,7 @@ function y4Modules(): string[] {
  * checked against `y4Modules()` below and a Y4 module added tomorrow fails here until it is added.
  */
 const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
+  "src/capacity/opening.ts": () => import("@/capacity/opening"),
   "src/capacity/forecast.ts": () => import("@/capacity/forecast"),
   "src/compliance/cdss-boundary.ts": () => import("./cdss-boundary"),
   "src/compliance/public-surfaces.ts": () => import("@/compliance/public-surfaces"),

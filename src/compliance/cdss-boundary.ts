@@ -132,6 +132,12 @@ export interface CopySurface {
 
 export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
   {
+    module: "src/capacity/opening.ts",
+    operatorCopy: ["OPENING_REFUSAL_COPY"],
+    notCopy:
+      "REFUSED_OPENING_FIELDS is reviewer-facing — it argues, field by field, why a suggestion about a diary must not carry a person, and necessarily names the fields it refuses. `renderOpening` composes from counts and from the refusal copy.",
+  },
+  {
     module: "src/capacity/forecast.ts",
     operatorCopy: ["FORECAST_REFUSAL_COPY"],
     notCopy:
