@@ -331,6 +331,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports compute the verdict and render it. Both copy maps are read by a practice manager: what it means that a session's range has stopped fitting, which direction it moved, and — stated rather than implied — that nothing has been adjusted. None of it names a patient, a condition or a clinical step, and every string passes W226's capacity linter.",
   },
   {
+    module: "src/capacity/console.ts",
+    operatorCopy: ["CAPACITY_CONSOLE_COPY", "NO_DIARY_WOULD_SETTLE_IT"],
+    notCopy:
+      "The remaining exports build the capacity console's rows and render one of them. Both copy exports are read by a practice manager on `/console/capacity`: which of the two emptinesses they are looking at — a session that filled every slot it offered, or a session the record cannot answer for — and, when there is no diary at all, what would settle it. The distinction is the whole surface, because merged into one blank cell a reader takes the reassuring reading. Nothing here names a patient, a condition or a clinical step; every string passes W226's capacity linter, including the rendered rows rather than only the constants.",
+  },
+  {
     module: "src/capacity/copy-lint.ts",
     operatorCopy: ["CAPACITY_SURFACE_COPY"],
     notCopy:
