@@ -132,6 +132,12 @@ export interface CopySurface {
 
 export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
   {
+    module: "src/capacity/forecast.ts",
+    operatorCopy: ["FORECAST_REFUSAL_COPY"],
+    notCopy:
+      "`renderForecast` composes its sentence from counts, the recorded period and FORECAST_REFUSAL_COPY. MIN_RECORDED_WEEKS is a number. The joining prose is the known bound in W200's note, and it is checked instead by this unit's own test, which refuses any verb claiming to know the future.",
+  },
+  {
     module: "src/compliance/cdss-boundary.ts",
     operatorCopy: [],
     notCopy:

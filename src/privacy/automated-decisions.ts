@@ -275,6 +275,7 @@ export const HUMAN_CONTROLS: readonly string[] = [
 export const NOT_A_DECISION: Readonly<Record<string, string>> = {
   "src/booking/store.ts": "The store behind the booking pages. It records the transitions the rail decides; it decides nothing.",
   "src/capacity/model.ts": "W222's capacity model. Groups a practice's own appointment slots into sessions and counts what the record says happened to them — filled, still open, or taken and released. It reads no patient, no condition and no appointment reason; the counts are about a diary. It takes no decision at all, and refuses to produce a number where there is no recorded history rather than defaulting one.",
+  "src/capacity/forecast.ts": "W223 turns W222's recorded weeks into a range for a session — how many of the slots a practice opens on a Thursday filled, in the weeks on record. It is about a SESSION, not a person: no patient or candidate reaches it, and its `ForecastRefusal` union is about whether a range may be given at all.",
   "src/complaints/store.ts": "Storage for complaints. The complaint is the practice's record and the store keeps it.",
   "src/complaints/workflow.ts": "Intake and resolution of a complaint by practice staff. Every step is a person acting.",
   "src/credentials/verification.ts": "A clinician's credential and who verified it. Nothing about a patient.",
