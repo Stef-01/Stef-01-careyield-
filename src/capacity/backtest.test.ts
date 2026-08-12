@@ -221,7 +221,12 @@ describe("W224 back-test over the synthetic practice", () => {
       expect(score.weeksScored + score.weeksSkipped).toBeGreaterThan(MIN_RECORDED_WEEKS);
       expect(score.coverageRate).toBeGreaterThanOrEqual(0);
       expect(score.coverageRate).toBeLessThanOrEqual(1);
+      // W256: `>= 0` alone CANNOT FAIL — the field is a mean of non-negative widths — so it read
+      // as coverage while checking nothing. The half that matters is the upper one: the width is
+      // a FRACTION of the slots offered, and `renderScore` multiplies it by 100, so a value above
+      // 1 would print a range wider than the whole session as a percentage over 100.
       expect(score.meanWidthOfSlots).toBeGreaterThanOrEqual(0);
+      expect(score.meanWidthOfSlots, "a range wider than the session it describes").toBeLessThanOrEqual(1);
     }
     expect(scored, "the synthetic schedule produced no scorable pattern").toBeGreaterThan(0);
   });
