@@ -34,8 +34,21 @@ function state(): RailState {
   return globalStore.__meherrReferralRail;
 }
 
-export function resetReferralRail(): void {
+/**
+ * Reset the rail, and RETURN the state installed.
+ *
+ * W265 changed the return type from `void`, and the reason is the finding rather than a
+ * convenience. W51's registry is the tree's enumeration of stores, and nine of its sixteen
+ * resetters hand back the state they install — which is what lets an erasure sweep read a store
+ * from outside. Seven return nothing, and six of those hold no patient identity, so it costs
+ * nothing. **The seventh was this one**: the store W137 added to `deletePatientEverywhere`
+ * precisely because a store erasure does not reach is a store the console reports as clean, and
+ * the one store the whole-surface sweep could not see. Erasure was not broken; it was unverifiable
+ * from outside, which is the condition under which the last two erasure defects survived.
+ */
+export function resetReferralRail(): RailState {
   globalStore.__meherrReferralRail = { documents: [], acts: [], events: [], returns: [] };
+  return globalStore.__meherrReferralRail;
 }
 
 export function addReferralDocuments(documents: readonly ReferralDocument[]): void {

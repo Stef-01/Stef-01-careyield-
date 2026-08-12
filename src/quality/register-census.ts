@@ -237,6 +237,16 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/privacy/erasure-y5.test.ts",
+    derives: "Every exported `reset*` function in the tree, to prove the erasure sweep reads W51's registry rather than a second list.",
+    checkedAgainst: "W51's `STORE_RESETTERS`, so the sweep and the demo launcher cannot drift apart.",
+    proof: {
+      kind: "walk_unproven",
+      contentProof: "src/privacy/erasure-y5.test.ts :: finds the patient in every store the scrub must clear, BEFORE erasing",
+      remedy: EXPORT_THE_WALK,
+    },
+  },
+  {
     file: "src/privacy/capacity-privacy.test.ts",
     derives: "Every capacity module, to check each is classified.",
     checkedAgainst: "W106's record classes.",

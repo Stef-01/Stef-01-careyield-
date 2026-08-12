@@ -367,6 +367,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W267's register of registers is reviewer-facing throughout: it enumerates the twenty-seven files that derive something from the tree, says what each derives and what it checks that against, and records whether its WALK has ever been shown to notice a file arriving. Nobody but a developer reads it. Its longest strings are the remedy sentences attached to each unproven walk — instructions to whoever fixes one, about a `root` parameter — and its `derives` fields name modules and registries. No patient, condition or appointment reason appears anywhere in it, and it computes nothing about anybody: its only input is the file tree and its only output is a list of file paths.",
   },
   {
+    module: "src/privacy/erasure-y5.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W265's erasure register is reviewer-facing: for each record class W106 marks `stored`, it says how `deletePatientEverywhere` reaches it, or argues why it is deliberately kept (the deletion records and the suppression list, which must outlive the data they are about) or keyed on a different subject (community signups, whose people are not patients). Nobody but a developer or an auditor reads it. Its longest strings are those two arguments; they describe erasure machinery and name no patient, condition or appointment reason. `residualHits` and `captureStores` return store names, never contents.",
+  },
+  {
     module: "src/privacy/adm-y5.ts",
     operatorCopy: [],
     notCopy:

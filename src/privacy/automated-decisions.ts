@@ -341,6 +341,8 @@ export const HUMAN_CONTROLS: readonly string[] = [
  * module here is a module somebody looked at and ruled out.
  */
 export const NOT_A_DECISION: Readonly<Record<string, string>> = {
+  "src/privacy/erasure-y5.ts":
+    "W265's erasure register: for each record class W106 marks `stored`, how `deletePatientEverywhere` reaches it, or why it is deliberately kept or keyed on a different subject. It decides nothing about anybody — it takes no patient as input and its functions return store NAMES, never contents. It is reached by this register because it names patient identifiers throughout, which is the detector working as intended: a module whose subject is what survives an erasure should be visible to the register that enumerates what the software does about a person. Worth recording beside that is what it found — the store W137 added to erasure was the one store a whole-surface sweep could not read, because its resetter returned nothing. Erasure was not broken; it was unverifiable from outside, which is the condition under which both previous erasure defects survived.",
   "src/privacy/state.ts":
     "W33's privacy state: the deletion records and the suppression list, held in a process-global store. It decides nothing — it is where `src/privacy/privacy.ts` puts what a person asked for, and every row in it exists because somebody made a request. **It is declared here because W258's third scan found it, and the finding is worth more than the classification.** The suppression list is what makes \"opt-out is permanent\" true, and that sentence is published on this very page under NEVER_AUTOMATED — so the module enforcing one of the notice's own never-claims was invisible to the register that publishes the notice, four files away from it, for three years. It was invisible because it names no patient identifier of its own: the identity lives inside a `SuppressionEntry` declared next door and imported. No term list closes that; only a scan that asks a register which modules hold patient records does, which is why the third scan reads W106 rather than the source.",
   "src/interest/store.ts":
@@ -472,9 +474,14 @@ export const NOTICE_REVISION: NoticeRevision = {
   // re-read rather than the number bumped — the addition is a module ruled OUT (a rehearsal that
   // walks a connection path and decides nothing about anybody), so no published decision changed
   // and `decisionsAtReview` stays where it was.
-  reviewedAt: "W262",
+  //
+  // W265 moved it again, same shape and worth the second note: adding `erasure-y5.ts` to the
+  // ruled-out half grew the classified set to 98. Re-read rather than bumped — that module takes
+  // no patient as input and returns store names, so the published text is unchanged at fifteen.
+  // Twice in three units is the control earning its place rather than the register churning.
+  reviewedAt: "W265",
   decisionsAtReview: 15,
-  modulesAtReview: 97,
+  modulesAtReview: 98,
 };
 
 /** The line the page renders. Composed, so the page cannot state a date the register disagrees with. */
