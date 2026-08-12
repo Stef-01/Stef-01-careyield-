@@ -144,3 +144,50 @@ test("an unknown endpoint is refused without saying what exists", async ({ page 
   expect(body.refusal).toBe("unknown_endpoint");
   expect(JSON.stringify(body)).not.toContain("prac-");
 });
+
+test("W255 every refusal branch, driven over HTTP, carries no patient marker", async ({
+  page,
+  request,
+}) => {
+  // ASSERTED OVER EVERY BRANCH RATHER THAN SAMPLED. Three of the four are reachable from outside;
+  // `read_failed` cannot be provoked over HTTP without a broken endpoint, so it is driven in the
+  // unit suite against a throwing fixture whose exception message carries an identifier — and the
+  // both-directions census is what ties the two halves together.
+  const seen: string[] = [];
+
+  const unauth = await request.get("/api/v1/practice");
+  expect(unauth.status()).toBe(401);
+  seen.push((await unauth.json()).refusal);
+
+  await signIn(page);
+  const noPractice = await page.request.get("/api/v1/practice");
+  expect(noPractice.status()).toBe(404);
+  seen.push((await noPractice.json()).refusal);
+
+  await createPractice(page, "Alpha Family Practice");
+  const unknown = await page.request.get("/api/v1/pat-9");
+  expect(unknown.status()).toBe(404);
+  seen.push((await unknown.json()).refusal);
+
+  expect(seen.sort()).toEqual(["no_practice", "no_session", "unknown_endpoint"]);
+
+  // Nothing that looks like a patient comes back from any of them — including the one whose
+  // REQUEST carried a patient-shaped segment, which is where a reflection would show up.
+  for (const response of [unauth, noPractice, unknown]) {
+    const body = await response.text();
+    expect(body, `${response.url()} echoed a patient marker`).not.toMatch(/pat-\d|patientId|candidateRef/i);
+    expect(body).not.toMatch(/at .*\.ts:\d+|Error:|stack/i);
+  }
+});
+
+test("W255 a refusal never says whether the thing asked for exists", async ({ page }) => {
+  // A 404 that reads differently depending on whether a practice exists is how an id becomes
+  // enumerable. Both unknown-endpoint answers must be byte-identical.
+  await signIn(page);
+  await createPractice(page, "Alpha Family Practice");
+
+  const real = await (await page.request.get("/api/v1/nope-one")).text();
+  const other = await (await page.request.get("/api/v1/nope-two")).text();
+  expect(real).toBe(other);
+  expect(real).not.toContain("nope-one");
+});

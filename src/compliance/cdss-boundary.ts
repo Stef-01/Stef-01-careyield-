@@ -373,6 +373,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification rather than an omission. W237 is a test harness: `FIXTURE_REJECTION_COPY` is read by whoever wrote a bad fixture, and `WHAT_THIS_PROVES` / `WHAT_THIS_DOES_NOT_PROVE` are addressed to a reviewer deciding how much a green run is worth. No clinician or practice manager sees any of it in the product, so linting it as operator copy would be W200's own category error — and these strings QUOTE what they warn about ('no receiving system has ever seen any of this'), which is the collision that split this register in the first place. The remaining exports are pure detectors and the contract itself.",
   },
   {
+    module: "src/api/refusals.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W255 governs what the platform API says instead of data, which is read by a practice's own developer over HTTP rather than by a clinician or practice manager in the product — and the copy itself lives in `API_REFUSAL_COPY` on `src/api/surface.ts`, which this module looks up rather than restates. `REFUSAL_BRANCHES` and `REFUSED_ERROR_BEHAVIOURS` are reviewer-facing in W200's split: their `saysNoMore` and reason columns exist to QUOTE the exception forwarding, the detail field and the stack trace they forbid, including the `Patient ${id} not found` shape that is the whole reason the unit exists. The remaining exports are the single refusal producer, the wrapped read and the patient-marker scan.",
+  },
+  {
     module: "src/api/surface.ts",
     operatorCopy: [],
     notCopy:

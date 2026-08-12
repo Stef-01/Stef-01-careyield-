@@ -13,24 +13,18 @@
 // change of posture.
 
 import { cookies } from "next/headers";
-import {
-  API_REFUSAL_COPY,
-  API_REFUSAL_STATUS,
-  apiResponse,
-  endpointFor,
-  type ApiRefusal,
-} from "@/api/surface";
+import { endpointFor, type ApiRefusal } from "@/api/surface";
+import { readSafely, refusalResponse } from "@/api/refusals";
 import { SESSION_COOKIE, verifySession } from "@/console/session";
 import { activePracticeFor } from "@/console/store";
 import { PRACTICE_COOKIE } from "../../../console/guard";
 
 export const dynamic = "force-dynamic";
 
+// W255: one producer, so no branch can assemble its own body. The dispatcher decides WHICH
+// refusal; it never decides what a refusal says.
 function refuse(refusal: ApiRefusal): Response {
-  return Response.json(
-    { refusal, message: API_REFUSAL_COPY[refusal] },
-    { status: API_REFUSAL_STATUS[refusal] },
-  );
+  return refusalResponse(refusal);
 }
 
 export async function GET(
@@ -52,6 +46,10 @@ export async function GET(
   const endpoint = endpointFor(id);
   if (!endpoint) return refuse("unknown_endpoint");
 
-  // The envelope is built in `surface.ts`, so the route decides WHO and the surface decides WHAT.
-  return Response.json(apiResponse(endpoint, { practiceId: record.practice.id }));
+  // W255: the read is wrapped. W253 called it bare, so a throwing endpoint produced a response
+  // this product never wrote — and an exception message is written for a developer.
+  // The envelope is still built in `surface.ts` — `readSafely` wraps that call rather than
+  // replacing it, so the route decides WHO and never what an answer or a refusal looks like.
+  const outcome = readSafely(endpoint, { practiceId: record.practice.id });
+  return outcome.ok ? Response.json(outcome.body) : refuse(outcome.refusal);
 }

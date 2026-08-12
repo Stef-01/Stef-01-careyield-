@@ -145,7 +145,14 @@ export type ApiRefusal =
   /** A session, but it belongs to no practice. */
   | "no_practice"
   /** No endpoint by that name. */
-  | "unknown_endpoint";
+  | "unknown_endpoint"
+  /**
+   * An endpoint's read threw.
+   *
+   * W255's branch. W253 called `read` bare, so a throwing endpoint produced a response this
+   * product never wrote — see `readSafely`, which catches it and forwards nothing.
+   */
+  | "read_failed";
 
 /**
  * What each refusal says.
@@ -160,12 +167,15 @@ export const API_REFUSAL_COPY: Record<ApiRefusal, string> = {
   no_practice:
     "This session does not act for a practice. Nothing was read.",
   unknown_endpoint: "There is no such endpoint in this version of the API.",
+  read_failed:
+    "This call could not be completed. Nothing is being said about why: the reason was written for a developer rather than for a caller, and forwarding it is how an error path discloses something nobody reviewed.",
 };
 
 export const API_REFUSAL_STATUS: Record<ApiRefusal, number> = {
   no_session: 401,
   no_practice: 404,
   unknown_endpoint: 404,
+  read_failed: 500,
 };
 
 /**

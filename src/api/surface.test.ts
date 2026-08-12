@@ -210,9 +210,12 @@ describe("W253 the register and its refusals", () => {
 
   it("gives every refusal a sentence and a status, in both directions", () => {
     expect(Object.keys(API_REFUSAL_COPY).sort()).toEqual(Object.keys(API_REFUSAL_STATUS).sort());
+    // W255 added `read_failed` and this pin fired, which is the register working: a refusal
+    // arriving without a sentence, a status and a driven test is what the census exists to catch.
     expect(Object.keys(API_REFUSAL_COPY).sort()).toEqual([
       "no_practice",
       "no_session",
+      "read_failed",
       "unknown_endpoint",
     ]);
     for (const [refusal, copy] of Object.entries(API_REFUSAL_COPY)) {
