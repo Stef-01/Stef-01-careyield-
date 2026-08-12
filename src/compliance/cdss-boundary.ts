@@ -349,6 +349,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and the emptiness is the classification rather than an omission. W237 is a test harness: `FIXTURE_REJECTION_COPY` is read by whoever wrote a bad fixture, and `WHAT_THIS_PROVES` / `WHAT_THIS_DOES_NOT_PROVE` are addressed to a reviewer deciding how much a green run is worth. No clinician or practice manager sees any of it in the product, so linting it as operator copy would be W200's own category error — and these strings QUOTE what they warn about ('no receiving system has ever seen any of this'), which is the collision that split this register in the first place. The remaining exports are pure detectors and the contract itself.",
   },
   {
+    module: "src/interop/consent-to-disclose.ts",
+    operatorCopy: ["CONSENT_VERDICT_COPY", "SCOPE_MISMATCH_COPY"],
+    notCopy:
+      "The remaining exports are the act union, the scope matcher and the single branded producer. `CONSENT_VERDICT_COPY` and `SCOPE_MISMATCH_COPY` are the sentences practice staff read when W243 declines to send: this patient recorded nothing, this patient withdrew, this patient's agreement has an end date, or — the one this unit exists for — this patient agreed to something else. Every string is about what a patient recorded and what a disclosure covers, never about their condition, their care or a next clinical step. `REFUSED_CONSENT_SOURCES` and `OUT_OF_SCOPE_HERE` are reviewer-facing in W200's split for the usual reason: their whole content is QUOTING the manufactured consents they forbid, starting with reusing this tree's own `smsConsent`.",
+  },
+  {
     module: "src/interop/terminology.ts",
     operatorCopy: [],
     notCopy:

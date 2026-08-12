@@ -129,6 +129,21 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    // W243, and THE REGISTER FOUND IT RATHER THAN THE AUTHOR. `atIso` is day-granular, so a
+    // consent and a withdrawal recorded on the same day tie, the sort is stable, and the answer
+    // would have fallen back to the caller's array order — a store deciding whether a record is
+    // disclosed. The tie decides between `given` and `withdrawn`, the most consequential pair
+    // there. The break puts the withdrawal last, which is that module's own stated rule — a
+    // consent is read narrowly and a withdrawal broadly — and is the same resolution
+    // src/directory/membership.ts makes further up, for the same reason.
+    module: "src/interop/consent-to-disclose.ts",
+    folds: 1,
+    disposition: {
+      kind: "tie_break_test",
+      test: "src/interop/consent-to-disclose.test.ts :: W167 a consent and a withdrawal on the same day resolve to withdrawn, either way round",
+    },
+  },
+  {
     module: "src/messaging/approval.ts",
     folds: 1,
     disposition: {

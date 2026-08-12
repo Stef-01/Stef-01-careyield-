@@ -192,6 +192,13 @@ describe("W178 the corpus and W167's register agree", () => {
       // unresolvable day), so nothing shipped wrong and there is no pre-fix behaviour to
       // reproduce.
       "src/directory/membership.ts",
+      // W243, and honestly this one is a shade weaker than W188's: the tie was NOT resolved at
+      // design time — the module was written with a plain date sort, and this control failed the
+      // build before it was committed. Nothing shipped, so there is still no pre-fix behaviour to
+      // reproduce and the corpus is still the wrong home; but the distinction is worth writing
+      // down, because "caught by the register" and "thought about in advance" are different
+      // levels of assurance and only one of them is transferable to the next module.
+      "src/interop/consent-to-disclose.ts",
     ]);
     const inCorpus = new Set(
       [...ORDER_REGRESSIONS.map((r) => r.site), Q11_2.site].map((s) => s.split(" :: ")[0]!),
