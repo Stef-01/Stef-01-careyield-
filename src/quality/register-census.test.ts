@@ -30,6 +30,7 @@ import {
   undeclaredInstructionSinks,
 } from "@/security/instruction-sinks";
 import { reachableFromApp, stripComments } from "@/security/reachability";
+import { copySurfaceMembers } from "@/compliance/copy-y6";
 import { DORMANT_MODULES, diffReach } from "@/security/page-reach";
 import { readFileSync } from "node:fs";
 
@@ -158,7 +159,7 @@ describe("W267 the finding: a proved content scanner is not a proved walk", () =
     // over a file list missing the new file reports nothing, cleanly, forever.
     const unproven = walkUnproven();
     expect(unproven.length).toBeGreaterThan(15);
-    expect(walkProven().length).toBe(6);
+    expect(walkProven().length).toBe(7);
     expect(unproven.length + walkProven().length).toBe(TREE_DERIVED_REGISTERS.length);
     // And the harsh reading is not the fair one, so the census carries both facts.
     const withContentProof = unproven.filter(
@@ -257,6 +258,19 @@ describe("W267 the detectors that take a root, proved by moving the tree", () =>
       ),
     );
     expect(after, "reachability did not follow the new page's import").toContain(target);
+  });
+
+  it("W200's copy surface notices a module the register must cover", () => {
+    // W270 moved this walk out of a test file and into a module with a root, which is the remedy
+    // this census recorded for it — so it is provable now, and proved here rather than promised.
+    const planted = "src/w267-probe-y6-module.ts";
+    const members = withPlanted(
+      planted,
+      "// W999: a probe module with a unit header the copy surface must cover.\nexport const value = 1;\n",
+      () => copySurfaceMembers(COPY),
+    );
+    expect(members, "the copy surface did not see a new module above the floor").toContain(planted);
+    expect(copySurfaceMembers(COPY), "the probe survived the probe").not.toContain(planted);
   });
 
   it("this census notices a new tree-walking file", () => {

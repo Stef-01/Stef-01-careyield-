@@ -15,6 +15,7 @@ import {
   lintOperatorCopy,
   unacceptedCopy,
 } from "./cdss-boundary";
+import { copySurfaceMembers } from "./copy-y6";
 
 const SRC = path.join(__dirname, "..");
 
@@ -25,21 +26,12 @@ const SRC = path.join(__dirname, "..");
  * cannot agree with the register by construction — which is the failure W102 exists against.
  */
 function y4Modules(): string[] {
-  const out: string[] = [];
-  const walk = (dir: string) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (entry.name.endsWith(".ts") && !entry.name.endsWith(".test.ts")) {
-        const unit = readFileSync(full, "utf8").split("\n")[0]?.match(/^\/\/ W(\d+)/);
-        if (unit && Number(unit[1]) >= Y4_FIRST_UNIT) {
-          out.push(`src/${path.relative(SRC, full).split(path.sep).join("/")}`);
-        }
-      }
-    }
-  };
-  walk(SRC);
-  return out.sort();
+  // W270 REPLACED THE BODY AND KEPT THE NAME'S JOB. Membership was `unit >= Y4_FIRST_UNIT`, which
+  // is a starting point for future modules AND a ceiling on the past: a pre-floor module could not
+  // be added to this register even deliberately, because this function would then report it as a
+  // module that is not one. A control that cannot be extended to where the copy is, is a wall
+  // rather than a floor. `copySurfaceMembers` is the same rule plus a declared door.
+  return copySurfaceMembers(path.join(SRC, ".."));
 }
 
 /**
@@ -71,6 +63,11 @@ const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/capacity/forecast.ts": () => import("@/capacity/forecast"),
   "src/compliance/cdss-boundary.ts": () => import("./cdss-boundary"),
   "src/compliance/rail-y5.ts": () => import("./rail-y5"),
+  "src/compliance/copy-y6.ts": () => import("./copy-y6"),
+  "src/console/results-copy.ts": () => import("@/console/results-copy"),
+  "src/pathways/approval.ts": () => import("@/pathways/approval"),
+  "src/registers/escalation.ts": () => import("@/registers/escalation"),
+  "src/audit/usefulness.ts": () => import("@/audit/usefulness"),
   "src/quality/gate-readiness.ts": () => import("@/quality/gate-readiness"),
   "src/quality/g1-rehearsal.ts": () => import("@/quality/g1-rehearsal"),
   "src/quality/g5-rehearsal.ts": () => import("@/quality/g5-rehearsal"),

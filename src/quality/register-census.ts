@@ -86,6 +86,16 @@ const EXPORT_THE_WALK =
 
 export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
   {
+    file: "src/compliance/copy-y6.ts",
+    derives: "Every module under `src/` with the unit its own header claims, and which of them the copy surface must cover.",
+    checkedAgainst: "W200's `OPERATOR_COPY_SURFACES`, both directions — the membership rule this module now owns.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "a module with a Y6 header is added under `src/` and `copySurfaceMembers` must report it as a member the register has to cover",
+    },
+  },
+  {
     file: "src/compliance/surfaces.ts",
     derives: "Every route the App Router serves, from the file conventions under `app/`.",
     checkedAgainst: "W102's surface census in the compliance dossier.",
@@ -156,16 +166,12 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     checkedAgainst: "W231's `ENABLED_COUPLINGS`, pinned empty.",
     proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
   },
-  {
-    file: "src/compliance/cdss-boundary.test.ts",
-    derives: "Every Y4-or-later module, from each module's own `// W<n>` header.",
-    checkedAgainst: "W200's `OPERATOR_COPY_SURFACES` and the `NAMESPACES` loader, both directions.",
-    proof: {
-      kind: "walk_unproven",
-      contentProof: "src/compliance/cdss-boundary.test.ts :: still fires on advice, so the clean result means something",
-      remedy: EXPORT_THE_WALK,
-    },
-  },
+  // `src/compliance/cdss-boundary.test.ts` WAS HERE, and its removal is the census working in the
+  // direction that usually goes unnoticed. W267 recorded its walk as `walk_unproven` with the
+  // remedy "export the walk from a module with a `root` parameter"; W270 needed exactly that to
+  // give the floor a door, so the walk moved into `copy-y6.ts` and the entry went stale. A
+  // register describing code that has moved reads as coverage, so the stale half fired and this
+  // comment is what the next reader finds instead of a silent deletion.
   {
     file: "src/credentials/vault.test.ts",
     derives: "Every route under `app/`, to prove none serves an evidence document.",

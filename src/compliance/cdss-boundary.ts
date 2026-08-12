@@ -361,6 +361,36 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W248's shared vertical machinery exports an evidence reader, a spec builder, two assembly calls and a gate list — no strings a clinician or practice manager reads. The one descriptive field it defines, `DeclaredMember.waitsOn`, holds text supplied by each vertical and is linted there, at the declaration, which is where the text actually exists.",
   },
   {
+    module: "src/compliance/copy-y6.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W270's re-derivation of this register at the Y6 boundary: the year bands, the declared floor and the argument for where it sits, and the door for bringing a pre-floor surface in. Nobody but a developer reads it, and FLOOR_RATIONALE is the one long string — an argument about a scan's false-positive ratio, addressed to whoever next proposes sweeping backwards.",
+  },
+  {
+    module: "src/console/results-copy.ts",
+    operatorCopy: ["RESULTS_COPY"],
+    notCopy:
+      "W42's practice-facing results page, brought into this register by W270's door — it is the clearest case of copy an operator reads that no register reached in four years. Every string in the module is that copy, so nothing here is excluded.",
+  },
+  {
+    module: "src/pathways/approval.ts",
+    operatorCopy: ["PATHWAY_REFUSAL_COPY"],
+    notCopy:
+      "SHIPPED_ATTESTATIONS is pinned empty behind G5 and holds no text a reader sees; the remaining exports run W119's two-person sign-off and produce branded values rather than sentences.",
+  },
+  {
+    module: "src/registers/escalation.ts",
+    operatorCopy: ["SHIPPED_TRIGGERS"],
+    notCopy:
+      "The remaining exports route a patient to their usual GP and return a declared EscalationRoute; the copy is the text of the four shipped triggers, which practice staff read on the escalation queue.",
+  },
+  {
+    module: "src/audit/usefulness.ts",
+    operatorCopy: ["USEFULNESS_OPTIONS"],
+    notCopy:
+      "The remaining exports record and aggregate what a clinician answered; the copy is the option labels the clinician picks from.",
+  },
+  {
     module: "src/quality/latent-y5.ts",
     operatorCopy: [],
     notCopy:
@@ -613,6 +643,51 @@ export interface AcceptedCopyFinding {
 }
 
 export const ACCEPTED_COPY_FINDINGS: readonly AcceptedCopyFinding[] = [
+  // W270's five, all from the four pre-floor surfaces its door brought in. Each is the same shape
+  // as the acceptance directly below for `SILENCE_COPY`: the same words mean different things on
+  // different surfaces, so the rule stays sharp and the acceptance is per module, export, rule and
+  // matched string, with a date. None of them is a rule being loosened; all four modules had gone
+  // four years or more without any register reaching them, which is the finding.
+  {
+    module: "src/console/results-copy.ts",
+    exportName: "RESULTS_COPY",
+    rule: "no-diagnosis-or-condition",
+    match: "Your results",
+    why: "The heading of W42's PRACTICE-facing results page: the practice's own performance figures against its own held-back group. The rule bundles 'results' because in a patient message 'your results' means test results, which is a clinical disclosure this product never makes. Nobody reading this page is a patient, and the alternative headings all describe the page worse. Same words, opposite meaning, and the difference is the surface — W192's finding, which is also the argument for the acceptance below.",
+    reviewBy: "2027-02-14",
+  },
+  {
+    module: "src/console/results-copy.ts",
+    exportName: "RESULTS_COPY",
+    rule: "no-overdue-framing",
+    match: "missed",
+    why: "'A booking that is cancelled or missed never counts.' A methodology sentence about which appointments enter the practice's own figures. The rule bans overdue framing because telling a patient they missed something is pressure applied to a person; there is no person addressed here, and removing the word would make the counting rule less clear about the thing a practice manager most needs to know it excludes.",
+    reviewBy: "2027-02-14",
+  },
+  {
+    module: "src/pathways/approval.ts",
+    exportName: "PATHWAY_REFUSAL_COPY",
+    rule: "no-benefit-claims",
+    match: "specialist",
+    why: "'a specialist reviewer' names a role in Meherr's own two-person sign-off (W119) — who has to look at pathway content before it can be used. The rule bundles 'specialist' because a clinician claiming the title is a prohibited claim (W6, W184); a specialist reviewing our content is the opposite direction of the same word, which is exactly the acceptance this register already carries for `REMAINING_CHAIN`.",
+    reviewBy: "2027-02-14",
+  },
+  {
+    module: "src/registers/escalation.ts",
+    exportName: "SHIPPED_TRIGGERS",
+    rule: "no-urgency",
+    match: "immediately",
+    why: "'The opt-out is honoured immediately and permanently either way.' The urgency rule bans pressing a patient toward care; this is a promise about how fast a patient's own request takes effect, and softening it would weaken the one sentence that makes W73's opt-out trustworthy.",
+    reviewBy: "2027-02-14",
+  },
+  {
+    module: "src/audit/usefulness.ts",
+    exportName: "USEFULNESS_OPTIONS",
+    rule: "no-action-framing",
+    match: "action needed",
+    why: "The same string and the same argument as `SILENCE_COPY` below, on a different surface: a clinician picking from W22's usefulness options is recording what a visit was for, not being handed a task somebody decided was warranted. Accepted separately rather than by widening the existing entry, because an acceptance that covered two modules would stop naming which surface it was reasoned about.",
+    reviewBy: "2027-02-14",
+  },
   {
     module: "src/ops/silence.ts",
     exportName: "SILENCE_COPY",
