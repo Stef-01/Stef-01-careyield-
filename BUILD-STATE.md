@@ -357,7 +357,7 @@ Session logs still go to Stefan-Brain `wiki/_log/` (non-fatal if unavailable).
 | W250 | available | — | — | — | [P] Respiratory vertical assembly, machinery only → verify: same machinery; W158's completeness report states exactly which members are missing and who must act. |
 | W251 | blocked | — | — | — | Respiratory pathway content → verify: two-person sign-off recorded per W119. **Blocked. FOUNDER GATE G5.** |
 | W252 | available | — | — | — | [P] Vertical scaling: the registers at N verticals → verify: order-independence and a stated time budget over 20 synthetic verticals; the budget is asserted in the test body, W48's shape. |
-| W253 | available | — | — | — | Platform API surface, read-only and practice-scoped → verify: every endpoint takes a practice as the QUERY (W123's rule); no endpoint can return cross-practice data, asserted the way Y4-1 should have been. |
+| W253 | claimed | builder-A | 2026-08-13T12:00Z | — | Platform API surface, read-only and practice-scoped → verify: every endpoint takes a practice as the QUERY (W123's rule); no endpoint can return cross-practice data, asserted the way Y4-1 should have been. |
 | W254 | available | — | — | — | [P] API scope model → verify: scopes are declared data checked against the endpoint census in both directions; no production credential enters the tree. |
 | W255 | available | — | — | — | API refusal semantics → verify: no patient data on any error path, asserted over every refusal branch rather than sampled. |
 | W256 | available | — | — | — | [P] Five-year full-system audit (W51 method: the whole tree, not a diff) → verify: every sweep re-run from source rather than carried from AUDIT-Y4; independence of the reviewer stated plainly. |
