@@ -51,6 +51,7 @@ function y4Modules(): string[] {
 const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/capacity/opening.ts": () => import("@/capacity/opening"),
   "src/capacity/calendar.ts": () => import("@/capacity/calendar"),
+  "src/capacity/attribution.ts": () => import("@/capacity/attribution"),
   "src/capacity/console.ts": () => import("@/capacity/console"),
   "src/capacity/coupling.ts": () => import("@/capacity/coupling"),
   "src/capacity/forecast.ts": () => import("@/capacity/forecast"),

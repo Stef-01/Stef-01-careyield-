@@ -130,6 +130,7 @@ export function renderCompliantCapacityCopy(text: string): string {
  * that phrase rather than that it is clean of it.
  */
 export const CAPACITY_COPY_MODULES: readonly string[] = [
+  "src/capacity/attribution.ts",
   "src/capacity/backtest.ts",
   "src/capacity/calendar.ts",
   "src/capacity/console.ts",

@@ -231,6 +231,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W227's calendar is data with a source, about dates rather than about anybody. Nothing seasonal is inferred from a practice's own history, so no patient record is read to produce it.",
   },
   {
+    module: "src/capacity/attribution.ts",
+    what: "Session arms for a capacity trial, and the effect measured over them",
+    handling: "no_patient_identity",
+    rationale:
+      "W233 holds ARM ASSIGNMENTS — a clinician, a date, which group, and when the group was decided — plus counts of slots filled. No patient reaches it and the types have nowhere to put one; an assignment is about a session, not about who attended it. `SHIPPED_SESSION_ARMS` is empty, so today it holds nothing at all. Erasure invariance is the same as the rest of Q18 and for W230's reason: the outcome is a count of filled slots read off the appointment rail, and W33 keeps the slot while dropping the patient link, so an erasure does not move the figure — a capacity number that changed when somebody was erased would disclose that the erasure happened.",
+  },
+  {
     module: "src/capacity/console.ts",
     what: "The capacity console's view-model",
     handling: "no_patient_identity",

@@ -331,6 +331,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports compute the verdict and render it. Both copy maps are read by a practice manager: what it means that a session's range has stopped fitting, which direction it moved, and — stated rather than implied — that nothing has been adjusted. None of it names a patient, a condition or a clinical step, and every string passes W226's capacity linter.",
   },
   {
+    module: "src/capacity/attribution.ts",
+    operatorCopy: ["CAPACITY_EFFECT_WITHHELD_COPY"],
+    notCopy:
+      "The remaining exports are the arm types, the shipped (empty) trial list, the session floor and the effect calculation. `CAPACITY_EFFECT_WITHHELD_COPY` is the sentence a practice reads when this product declines to say whether opening slots helped — no trial run, a split recorded after the sessions, an arm too thin, or a session with nothing recorded against it. Every one is a statement about what can be measured, never about a patient or a clinical step. `REFUSED_CAPACITY_COMPARATORS` is reviewer-facing in W200's split, since its whole content is naming the confounded comparisons it exists to forbid.",
+  },
+  {
     module: "src/capacity/console.ts",
     operatorCopy: ["CAPACITY_CONSOLE_COPY", "NO_DIARY_WOULD_SETTLE_IT"],
     notCopy:
