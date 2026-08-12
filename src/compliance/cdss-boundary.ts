@@ -391,6 +391,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports record and aggregate what a clinician answered; the copy is the option labels the clinician picks from.",
   },
   {
+    module: "src/quality/blocked-surface.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W263's blocked-surface budget is reviewer-facing and, above that, founder-facing: for each founder gate or named decision the ledger blocks a row on, whose ruling it is and which units it would release. Nobody in a practice reads it. Its longest strings are the `whoDecides` sentences, which describe rulings and their double-blocking and name no patient, condition or appointment reason. `blockedSurfaceViolations` returns unit ids and blocker names, never a record about anybody.",
+  },
+  {
     module: "src/quality/latent-y5.ts",
     operatorCopy: [],
     notCopy:
