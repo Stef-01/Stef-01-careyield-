@@ -297,7 +297,10 @@ describe("W233 no patient reaches it, and the copy is safe", () => {
 
   it("passes W226's capacity linter, and every refusal explains itself", () => {
     const texts = Object.values(CAPACITY_EFFECT_WITHHELD_COPY);
-    expect(texts.length).toBe(4);
+    // W234 added `session_assigned_more_than_once`. The count is pinned so a refusal cannot be
+    // added or removed without somebody editing this line — which is the pin working, not an
+    // obstacle: it is how a fifth refusal gets read rather than merged.
+    expect(texts.length).toBe(5);
     for (const text of texts) {
       expect(text.length).toBeGreaterThan(80);
       expect(lintCapacityCopy(text), `failed the capacity lint: ${text}`).toEqual([]);

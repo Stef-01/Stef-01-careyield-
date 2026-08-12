@@ -141,6 +141,13 @@ export function holidayOn(
 ): HolidayReading {
   const forJurisdiction = calendar.filter((h) => h.jurisdiction === jurisdiction);
   if (forJurisdiction.length === 0) return { known: false };
+  // W234: COVERAGE, not just jurisdiction. A calendar is published a year at a time, so a
+  // jurisdiction with no entry in the queried year holds nothing about it — and answering
+  // `{ known: true, holiday: null }` there is a confident "not a public holiday" for a year this
+  // calendar has never seen. That collapses the two facts the three-valued type exists to keep
+  // apart, which is the whole reason W227 made it three-valued.
+  const year = dateIso.slice(0, 4);
+  if (!forJurisdiction.some((h) => h.dateIso.startsWith(year))) return { known: false };
   const match = forJurisdiction.find((h) => h.dateIso === dateIso);
   return { known: true, holiday: match ?? null };
 }

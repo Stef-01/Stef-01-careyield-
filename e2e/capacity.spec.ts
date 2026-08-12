@@ -140,7 +140,15 @@ test("the page makes no demand claim and offers no control", async ({ page }) =>
 
   await expect(page.getByTestId("capacity-not-demand")).toContainText("turned people away");
   await expect(page.getByTestId("capacity-your-diary")).toContainText("your decision");
-  await expect(page.getByTestId("capacity-not-wired")).toContainText("not connected to how many");
+  // W234 rewrote this sentence. W232 established that the old wording — "not connected to how
+  // many invitations go out" — was reassuring and wrong: the batch is sized from the diary, so
+  // acting on this page raises how many people are messaged. The page must now keep the
+  // distinction between what the SOFTWARE does and what the PRACTICE does, so the e2e asserts
+  // both halves rather than the comfortable half.
+  const notWired = page.getByTestId("capacity-not-wired");
+  await expect(notWired).toContainText("Meherr does not act on these figures");
+  await expect(notWired).toContainText("more people are messaged");
+  await expect(notWired).not.toContainText("not connected to how many");
 
   const body = ((await page.locator("main").textContent()) ?? "").toLowerCase();
   expect(body, "the page makes a claim about demand").not.toMatch(

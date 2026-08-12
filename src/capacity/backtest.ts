@@ -148,7 +148,11 @@ export function backtest(pattern: SessionPattern): BacktestResult {
       meanWidthOfSlots: scored === 0 ? 0 : widthTotal / scored,
       misses,
       basis: {
-        fromIso: scorable[0]!.dateIso,
+        // W234: the first SCORED week, not the first scorable one. Scoring starts at the floor —
+        // the weeks before it were never given a range to be right or wrong about — so stamping
+        // the whole history made `renderScore` claim a period four weeks longer than it covered.
+        // W205's failure exactly: a true number under a false period, and invisible.
+        fromIso: (scorable[MIN_RECORDED_WEEKS] ?? scorable[0]!).dateIso,
         toIso: scorable[scorable.length - 1]!.dateIso,
         floor: MIN_RECORDED_WEEKS,
       },

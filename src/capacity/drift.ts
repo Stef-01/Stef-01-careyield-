@@ -156,7 +156,16 @@ export function driftReport(pattern: SessionPattern): DriftReport {
     return {
       verdict: "cannot_determine",
       direction: null,
-      recent: { weeks: recentWeeks.length, covered: 0, dateIsos: recentWeeks.map((w) => w.dateIso) },
+      // W234: COMPUTED, not hard-coded. The first version returned `covered: 0` here and
+      // `renderDrift` printed it unconditionally, so a session whose recent weeks were all inside
+      // the range read "0 inside the range" — a fabricated alarming number, in the module whose
+      // whole point is not manufacturing verdicts. Walk-forward coverage is the honest figure
+      // when there is no full window to freeze a range against.
+      recent: {
+        weeks: recentWeeks.length,
+        covered: recentWeeks.filter((week) => !walkForwardMiss.has(week.dateIso)).length,
+        dateIsos: recentWeeks.map((week) => week.dateIso),
+      },
       earlier,
       recentMisses: [],
       wouldSettleIt: [

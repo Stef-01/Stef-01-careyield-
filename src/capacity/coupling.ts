@@ -159,6 +159,16 @@ export function enablementFor(
 }
 
 export type CouplingRefusal =
+  /**
+   * More slots than any recorded week of this session ever offered.
+   *
+   * W234: the read-only `recommendOpening` has refused this since W225, and the module that ACTS
+   * did not — so the one that only informs was stricter than the one that withholds invitations.
+   * With a ten-slot record and twelve slots opened, the coupling sized a batch from a fill rate
+   * the record never observed and halved the messages on it. Refusing here is W196's rule
+   * ("a figure over no records") in the place where it costs somebody an appointment offer.
+   */
+  | "beyond_any_recorded_offering"
   /** The shipped state, and the ordinary answer. Not an error — see the module note. */
   | "not_enabled_for_this_practice"
   /** W223 refused the range; its reasons are carried rather than restated. */
@@ -171,6 +181,8 @@ export type CouplingRefusal =
   | "drift_cannot_be_determined";
 
 export const COUPLING_REFUSAL_COPY: Record<CouplingRefusal, string> = {
+  beyond_any_recorded_offering:
+    "No recorded week of this session ever offered this many slots, so the record has nothing to say about one that size. Sizing the message count from the smaller weeks would send fewer invitations on the strength of a rate that was never observed here.",
   not_enabled_for_this_practice:
     "This practice has not switched this on, so the number of messages is the one your own settings produce and the record has had no part in it.",
   no_range_for_this_session:
@@ -237,6 +249,12 @@ export function coupledInvitationVolume(
 
   const range = forecast(pattern, openSlots);
   if (!range.ok) errors.push("no_range_for_this_session");
+
+  // W234. Same guard W225 has always had, in the module that acts rather than only the one that
+  // informs — see the refusal's own note.
+  const offerings = pattern.weeks.filter((w) => w.offerable > 0).map((w) => w.offerable);
+  const largestRecordedOffering = offerings.length > 0 ? Math.max(...offerings) : 0;
+  if (openSlots > largestRecordedOffering) errors.push("beyond_any_recorded_offering");
 
   // W228, composed rather than re-derived. A range that has stopped describing the session must
   // not size anything, and neither must one nobody can vouch for yet.

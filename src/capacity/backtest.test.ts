@@ -181,12 +181,18 @@ describe("W224 the misses are listed, not counted", () => {
 
   it("carries the period it was scored over, so a score cannot be read against another one", () => {
     const result = backtest(STEADY);
+    // W234 CORRECTED THIS, and the original assertion is why it survived W224: I pinned the
+    // period I had written rather than the period scoring covered. Scoring starts at the floor,
+    // so the first four weeks were never given a range — stamping them made the rendered line
+    // claim four weeks more than it checked. W205's failure, locked in by its own test.
     expect(result.ok && result.score.basis).toEqual({
-      fromIso: "2026-01-01",
+      fromIso: "2026-01-29",
       toIso: "2026-02-05",
       floor: MIN_RECORDED_WEEKS,
     });
-    expect(renderScore(result)).toContain("Scored over 2026-01-01 to 2026-02-05");
+    expect(renderScore(result)).toContain("Scored over 2026-01-29 to 2026-02-05");
+    expect(result.ok && result.score.weeksScored, "the stamped period must span the scored weeks")
+      .toBe(2);
   });
 });
 

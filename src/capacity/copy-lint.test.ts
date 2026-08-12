@@ -178,7 +178,13 @@ describe("W226 every string Q18 ships passes the linter", () => {
     expect(CAPACITY_SURFACE_COPY.whatThisIsNot).toContain("not a measure of how many appointments");
     expect(CAPACITY_SURFACE_COPY.whatThisIsNot).toContain("turned people away");
     expect(CAPACITY_SURFACE_COPY.itIsYourDiary).toContain("your decision");
-    expect(CAPACITY_SURFACE_COPY.notWiredToAnything).toContain("not connected to how many invitations");
+    // W234 rewrote this sentence: W232 established that acting on the page DOES change how many
+    // people are messaged, so the old wording ("not connected to how many invitations go out")
+    // was reassuring and wrong. The distinction the copy now has to keep is between what the
+    // software does and what the practice does.
+    expect(CAPACITY_SURFACE_COPY.notWiredToAnything).toContain("Meherr does not act on these figures");
+    expect(CAPACITY_SURFACE_COPY.notWiredToAnything).toContain("Acting on them yourself does");
+    expect(CAPACITY_SURFACE_COPY.notWiredToAnything).not.toMatch(/not connected to how many/);
   });
 });
 

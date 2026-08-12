@@ -129,7 +129,17 @@ export type CapacityEffectRefusal =
   /** An arm has too few sessions for a difference between means to carry anything. */
   | "arm_below_floor"
   /** Assignments exist for sessions the record does not hold, so there is no outcome to read. */
-  | "assigned_session_not_recorded";
+  | "assigned_session_not_recorded"
+  /**
+   * The same session is assigned more than once.
+   *
+   * W234. A duplicated `(clinician, date)` row adds one recorded session's `filled` to an arm
+   * twice and increments its count twice, so an arm can clear `MIN_SESSIONS_PER_ARM` without
+   * four distinct sessions behind it — a floor cleared by copying a row rather than by running
+   * a trial. Dormant today because `SHIPPED_SESSION_ARMS` is empty and the arm is required, and
+   * fixed anyway: a correctness gap left because it is currently unreachable is PRIV-3's shape.
+   */
+  | "session_assigned_more_than_once";
 
 export const CAPACITY_EFFECT_WITHHELD_COPY: Record<CapacityEffectRefusal, string> = {
   no_session_arm:
@@ -138,6 +148,8 @@ export const CAPACITY_EFFECT_WITHHELD_COPY: Record<CapacityEffectRefusal, string
     "The groups were recorded after those sessions had already run, so they describe what happened rather than deciding it in advance. A split made afterwards carries the whole problem it was supposed to remove.",
   arm_below_floor:
     "One of the groups holds too few sessions for a difference between them to mean anything. The counts are still what was recorded; a difference of averages over a handful of sessions is noise with a decimal point.",
+  session_assigned_more_than_once:
+    "The same session appears more than once in the trial. Counting it twice would let a group reach the minimum number of sessions without that many sessions actually having been run, so the comparison is refused rather than made over a doubled row.",
   assigned_session_not_recorded:
     "Some sessions in the trial have nothing recorded against them, so there is no result to read for those. Filling the gap by leaving them out would quietly choose which sessions count.",
 };
@@ -199,6 +211,10 @@ export function capacityEffect(
   if (arm.assignments.length === 0) {
     return { claimed: false, withheld: ["no_session_arm"], basis: EMPTY_BASIS };
   }
+
+  // W234: one row per session, checked before anything is summed — see the refusal's own note.
+  const keys = arm.assignments.map((a) => `${a.clinicianId}::${a.dateIso}`);
+  if (new Set(keys).size !== keys.length) withheld.push("session_assigned_more_than_once");
 
   const filledFor = (assignment: ArmAssignment): number | null => {
     const found = recorded.find(

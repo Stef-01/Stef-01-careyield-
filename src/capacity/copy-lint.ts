@@ -155,6 +155,16 @@ export const CAPACITY_SURFACE_COPY = {
     "This is not a measure of how many appointments anybody needs. It counts what was taken out of what was offered, so a session that filled every week may still have turned people away, and one that never filled may have been offered at a time nobody could come.",
   itIsYourDiary:
     "Opening a session is your decision. This says what the record shows and nothing about any patient.",
+  /**
+   * W234 REWROTE THIS, because W232 disproved it.
+   *
+   * The old wording said these figures "are not connected to how many invitations go out". That
+   * is true of the code — no capacity module changes what Meherr sends — and false of the
+   * practice: the invitation batch is sized from the diary, so opening slots after reading this
+   * page raises how many people are messaged, with no capacity code path involved. A surface
+   * telling a practice the opposite of what its own dossier established is the worst kind of
+   * inaccuracy, because it is reassuring.
+   */
   notWiredToAnything:
-    "Nothing here changes what Meherr sends. These figures are read by you and are not connected to how many invitations go out.",
+    "Meherr does not act on these figures: nothing here changes what is sent, and no setting turns that on. Acting on them yourself does — the number of invitations is worked out from how many slots are open, so opening more slots means more people are messaged.",
 } as const;
