@@ -189,6 +189,55 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W220 takes W218's already-disclosable graph — aggregate counts with small cells withheld — plus one integer, the number of recorded events, and returns either that graph or a named empty reading. There is no patient in any signature and no field on the view a patient identifier could occupy. Erasure is composed twice over: the counts derive from the synthetic loop's log, and the disclosable form has already dropped every chain id before this module sees it.",
   },
   {
+    module: "src/capacity/model.ts",
+    what: "Sessions and what the record says happened to their slots",
+    handling: "no_patient_identity",
+    rationale:
+      "W222 groups a practice's own appointment rail into (clinician, date) sessions and counts filled, open and released slots. `Session` and `RecordedUtilisation` have no field a patient identifier could occupy — the projection reads status and clinician and nothing else — and W230 checks that over a real synthetic practice rather than by reading the type. ERASURE IS INVARIANT HERE, not composed: W33 keeps an attended slot and drops its patient link, so a capacity count is the same before and after an erasure. That is the property this class needs, and the stronger one: a figure that CHANGED when somebody was erased would disclose that an erasure had happened.",
+  },
+  {
+    module: "src/capacity/forecast.ts",
+    what: "A range for how many of a session's slots fill",
+    handling: "no_patient_identity",
+    rationale:
+      "W223 turns W222's recorded weeks into a low and a high with a basis. Every input is a count; there is no patient in any signature and no field on a `Forecast` one could reach. RESIDUAL, NAMED RATHER THAN ASSUMED AWAY: a session with one offerable slot is a fact about one identifiable encounter, and this class is safe because these figures are read by the practice that already knows who was in that slot. If a capacity figure ever leaves the practice, W218's floor is the mechanism it needs and G9 is the ruling that would allow it.",
+  },
+  {
+    module: "src/capacity/backtest.ts",
+    what: "How often a session's range covered what happened",
+    handling: "no_patient_identity",
+    rationale:
+      "W224 walks a session's recorded weeks forward and compares each range with what filled. The score holds counts, dates and the weeks that fell outside; the misses name a DATE, never a person. Same invariance as W222 — erasure keeps the slot and drops the link, so no score moves when somebody is erased.",
+  },
+  {
+    module: "src/capacity/drift.ts",
+    what: "Whether a session's range has stopped describing it",
+    handling: "no_patient_identity",
+    rationale:
+      "W228 compares recent weeks with the range as it stood before them. It holds a verdict, two coverage windows and the dates that fell outside. No patient reaches it, and the report deliberately carries no corrected pattern — which is a control against recalibration rather than against identity, but is the reason there is nothing here for erasure to reach either.",
+  },
+  {
+    module: "src/capacity/opening.ts",
+    what: "How many slots the record supports opening on a weekday",
+    handling: "no_patient_identity",
+    rationale:
+      "W225's suggestion. The strongest claim in this directory and the one W225 built its type for: `SessionOpening` has no `patients`, no `candidates`, no `candidateRef` and no `who`, and `REFUSED_OPENING_FIELDS` states why each is refused rather than leaving the absence to be read as an oversight. W230 re-derives that on the signatures and over real data.",
+  },
+  {
+    module: "src/capacity/calendar.ts",
+    what: "Declared public holidays and seasonal periods",
+    handling: "no_patient_identity",
+    rationale:
+      "W227's calendar is data with a source, about dates rather than about anybody. Nothing seasonal is inferred from a practice's own history, so no patient record is read to produce it.",
+  },
+  {
+    module: "src/capacity/copy-lint.ts",
+    what: "The sentences a capacity surface may say",
+    handling: "no_patient_identity",
+    rationale:
+      "W226's linter and the surface copy it guards. It reads strings this product wants to show and holds nothing about anybody. Declared because W230's directory census runs in both directions, and a module left out of a completeness register is a module nobody re-derives.",
+  },
+  {
     module: "src/outcomes/graph-privacy.ts",
     what: "The disclosable form of a response graph, with small cells withheld",
     handling: "no_patient_identity",
