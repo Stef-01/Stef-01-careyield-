@@ -231,6 +231,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W227's calendar is data with a source, about dates rather than about anybody. Nothing seasonal is inferred from a practice's own history, so no patient record is read to produce it.",
   },
   {
+    module: "src/interop/fhir.ts",
+    what: "FHIR R4 resources built from this tree's records",
+    handling: "derived",
+    rationale:
+      "W235 builds a FHIR `Patient`, `Practitioner`, `Organization` or `Appointment` from a domain record at read time and persists nothing, so erasing the source erases these — scrubbing them separately would be scrubbing a projection. Declared even though the register's detector only compels stores, because this is the boundary patient identity leaves through and a register of identity that could not see the exporter would be the wrong shape. What it emits is narrower than what it reads: consent state, the opt-out, the recall marker, the chronic-care flag and the holdout arm have no FHIR home here and are named in `RESOURCE_MAPPINGS` rather than dropped, so an access request answered from an exported resource is answering over less than the record holds — which is itself the reason the unmapped list is data a reviewer can read.",
+  },
+  {
     module: "src/capacity/attribution.ts",
     what: "Session arms for a capacity trial, and the effect measured over them",
     handling: "no_patient_identity",

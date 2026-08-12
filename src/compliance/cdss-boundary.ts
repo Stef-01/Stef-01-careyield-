@@ -331,6 +331,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports compute the verdict and render it. Both copy maps are read by a practice manager: what it means that a session's range has stopped fitting, which direction it moved, and — stated rather than implied — that nothing has been adjusted. None of it names a patient, a condition or a clinical step, and every string passes W226's capacity linter.",
   },
   {
+    module: "src/interop/fhir.ts",
+    operatorCopy: ["STATUS_REFUSAL_COPY"],
+    notCopy:
+      "The remaining exports are the mapping tables, the resource builders and the round-trip readers. `STATUS_REFUSAL_COPY` is the one sentence a person reads here: why an unfilled bookable slot cannot be exported as a FHIR Appointment. It describes a resource model, not a patient or a clinical step. `RESOURCE_MAPPINGS` and `REFUSED_MAPPINGS` are reviewer-facing in W200's split — their `why` and `wouldBecome` columns exist to QUOTE the mistakes they forbid, including the Condition mapping that would be a clinical assertion, so linting them as operator copy would flag the register for naming the thing it exists to prevent.",
+  },
+  {
     module: "src/capacity/attribution.ts",
     operatorCopy: ["CAPACITY_EFFECT_WITHHELD_COPY"],
     notCopy:
