@@ -337,6 +337,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports build the capacity console's rows and render one of them. Both copy exports are read by a practice manager on `/console/capacity`: which of the two emptinesses they are looking at — a session that filled every slot it offered, or a session the record cannot answer for — and, when there is no diary at all, what would settle it. The distinction is the whole surface, because merged into one blank cell a reader takes the reassuring reading. Nothing here names a patient, a condition or a clinical step; every string passes W226's capacity linter, including the rendered rows rather than only the constants.",
   },
   {
+    module: "src/capacity/coupling.ts",
+    operatorCopy: ["COUPLING_REFUSAL_COPY", "ENABLEMENT_REJECTION_COPY"],
+    notCopy:
+      "The remaining exports are the enablement record, its validator, the shipped (empty) registry and the volume calculation. Both copy maps are read by a practice manager: why a session's message count was left to their own settings — not enabled, no range, an unscored forecaster, or a range W228 says has stopped fitting — and why an enablement record was refused. None of it names a patient, a condition or a clinical step; the subject throughout is a count of appointment slots and a count of messages. `REFUSED_COUPLINGS` is reviewer-facing in W200's split, since it quotes the mistakes it exists to forbid.",
+  },
+  {
     module: "src/capacity/copy-lint.ts",
     operatorCopy: ["CAPACITY_SURFACE_COPY"],
     notCopy:

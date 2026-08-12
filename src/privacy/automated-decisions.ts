@@ -225,6 +225,14 @@ export const AUTOMATED_DECISIONS: readonly AutomatedDecision[] = [
     registry: null,
   },
   {
+    id: "forecast-invitation-volume",
+    title: "Whether you are sent a message about a spare appointment, when your practice's own diary says the session usually fills.",
+    what: "Built and not in use. Where a practice switches this on, the software looks at how full that clinician's sessions on that day of the week have been in the practice's own records, and sends messages for the slots the record suggests would still be free rather than for every slot open on the day. It can only ever send FEWER messages, never more, which means somebody who would have been told about a spare appointment is not told about it. It uses the least full week on record rather than the fullest, so it never assumes a session will do better than its worst week; it will not run at all where the pattern has recently stopped matching the records, or where there is not yet enough history to tell. Nothing about you is used — the calculation sees a count of appointment slots and no patient at all — and who is contacted, once the number is decided, is unchanged. Switching this on is a decision the practice takes and records with a reason. No practice has switched it on.",
+    decidedBy: ["src/capacity/coupling.ts"],
+    status: "built_not_in_use",
+    registry: { module: "src/capacity/coupling.ts", exportName: "ENABLED_COUPLINGS" },
+  },
+  {
     id: "pathway-criteria",
     title: "Whether the facts on your file match a pathway your practice signed off.",
     what: "Built and not in use. Where a practice adopts a care pathway, the software compares facts already recorded on your file against the criteria in that pathway and flags the pathway for the practice to look at, including criteria that ask a clinician to look sooner. It reaches no conclusion about your health, it reads nothing but facts somebody recorded, and where a fact is missing it says so rather than assuming. No pathway has been signed off for use, so this decision is not currently being taken about anybody.",

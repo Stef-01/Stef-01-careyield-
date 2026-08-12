@@ -238,6 +238,13 @@ export const RECORD_CLASSES: readonly RecordClass[] = [
       "W229's view-model, declared by W230's directory census the firing it landed. It composes W222's sessions, W223's ranges, W224's scores and W228's drift verdicts for a page, and adds no field of its own that a patient could occupy — every input is already a count. Same erasure posture as the rest of the directory: invariant rather than composed, because W33 keeps the slot and drops the link, and a capacity figure that moved when somebody was erased would disclose that the erasure happened.",
   },
   {
+    module: "src/capacity/coupling.ts",
+    what: "The forecast-to-invitation-volume coupling and its enablement records",
+    handling: "no_patient_identity",
+    rationale:
+      "W231 turns a session's recorded range into a COUNT of messages. No patient reaches it: the inputs are a session pattern, a slot count and a pool config, and the output is two integers and a direction. The records it does hold are about a PRACTICE STAFF MEMBER — who switched the coupling on, when, why, and the forecaster's score at that moment — which is the same class as W11's audit events and is retained deliberately, because the record of why some patients stopped being contacted is the one thing that must survive to answer for it. `ENABLED_COUPLINGS` is empty and pinned empty, so today it holds nothing at all. Erasure needs nothing here for the same reason as the rest of Q18: the counts derive from the appointment rail, and scrubbing the rail removes them.",
+  },
+  {
     module: "src/capacity/copy-lint.ts",
     what: "The sentences a capacity surface may say",
     handling: "no_patient_identity",

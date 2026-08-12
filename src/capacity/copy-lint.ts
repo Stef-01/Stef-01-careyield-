@@ -134,6 +134,7 @@ export const CAPACITY_COPY_MODULES: readonly string[] = [
   "src/capacity/calendar.ts",
   "src/capacity/console.ts",
   "src/capacity/copy-lint.ts",
+  "src/capacity/coupling.ts",
   "src/capacity/drift.ts",
   "src/capacity/forecast.ts",
   "src/capacity/model.ts",
