@@ -150,9 +150,17 @@ describe("W273 the six preconditions are evaluated against the thing each claims
   });
 
   it("(4) adds no blocked row, which is checkable rather than promised", () => {
-    const added = rows().filter((r) => r.n > 273);
+    // W274 FIXED THIS TEST, AND THE DEFECT WAS MINE FROM W273. It asserted every added row was
+    // still `available` or `claimed` — which is not the requirement and is not even a property of
+    // the quarter: builder-B finished W282 an hour later and the check went red on a unit being
+    // BUILT. Precondition 4 is about the blocked surface, so that is all this asserts now. It is
+    // the same pin-a-transient-value failure W273 fixed in `horizon-y6.test.ts`, committed in the
+    // same unit, one file over.
+    //
+    // Bounded by the constant too, for the reason the constant exists: after Q23 expands, "rows
+    // above 273" is twenty-six rows and this quarter's count would read as wrong.
+    const added = rows().filter((r) => r.n > 273 && r.n <= Q22_HORIZON_LAST_UNIT);
     expect(added).toHaveLength(13);
-    expect(added.every((r) => r.status === "available" || r.status === "claimed")).toBe(true);
     expect(added.filter((r) => r.status === "blocked")).toEqual([]);
     expect(DOC).toContain("adds no blocked row");
   });

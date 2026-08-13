@@ -28,7 +28,15 @@ test("every public surface serves copy its audience's rules allow", async ({ pag
     await page.waitForLoadState("networkidle");
     const text = await page.locator("body").innerText();
     // Vacuity guard per page: a blank render would satisfy every rule.
-    expect(text.length, `${surface.path} rendered nothing`).toBeGreaterThan(200);
+    //
+    // W274 REPLACED `text.length > 200` WITH THE PAGE'S OWN MARKER. The threshold was a round
+    // number over pages rendering 162 to 9,881 characters, it was failing `/finder` — which
+    // renders a complete and deliberately spare landing screen — and `/demo` sat at 217, one copy
+    // edit away from joining it. A marker is also the better guard: one floor is at once too high
+    // for the smallest page and far too low for the largest — at 200 characters the ADM notice
+    // could render three per cent of itself and pass. The decision, and the three options it was
+    // taken over, are in `RENDER_GUARD_DECISION`.
+    expect(text, `${surface.path} did not render its own content`).toContain(surface.mustRender);
 
     const findings = sweepSurface(surface.path, surface.audience, text);
     expect(
@@ -59,7 +67,11 @@ test("the patient booking page serves no clinical claim either", async ({ page, 
   await page.goto(`/book/${token}`);
   await page.waitForLoadState("networkidle");
   const text = await page.locator("body").innerText();
-  expect(text.length).toBeGreaterThan(100);
+  // The same guard as the sweep above, from the same register — a second round number here would
+  // have been the first one's sibling.
+  expect(text, "the booking page did not render its own content").toContain(
+    PUBLIC_SURFACES.find((s) => s.path === "/book/[token]")!.mustRender,
+  );
 
   // The most patient-facing surface in the product, and the only one reached by somebody who was
   // contacted rather than somebody who went looking — so it gets the full patient rule set.

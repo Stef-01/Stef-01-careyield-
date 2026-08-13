@@ -2,6 +2,8 @@
 // rendered-copy sweep and the axe scan are the e2e half — e2e/public-sweep.spec.ts and
 // e2e/a11y.spec.ts.
 
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { LANDING_RULES, lintLandingCopy } from "./landing";
 import { MESSAGE_BANNED_RULES } from "@/messaging/templates";
@@ -9,6 +11,8 @@ import { discoverSurfaces } from "./surfaces";
 import {
   PROFESSIONAL_EXEMPT_RULES,
   PUBLIC_SURFACES,
+  RENDERED_LENGTHS,
+  RENDER_GUARD_DECISION,
   STANDING_FLAGS,
   ACCEPTED_FINDINGS,
   VOCABULARY_BOUND,
@@ -27,6 +31,82 @@ function publicRoutes(): string[] {
     .filter((p) => !p.startsWith("/console") && !p.startsWith("/api"))
     .sort();
 }
+
+const ROOT = path.resolve(__dirname, "../..");
+
+describe("W274 the vacuity guard is derived from what each page renders", () => {
+  it("gives every public surface a marker from its own body", () => {
+    for (const surface of PUBLIC_SURFACES) {
+      expect(surface.mustRender, `${surface.path} has no marker`).toBeTruthy();
+      expect(surface.mustRender.length, `${surface.path}'s marker is too short to mean anything`).toBeGreaterThan(8);
+    }
+    expect(PUBLIC_SURFACES.length).toBeGreaterThan(5);
+  });
+
+  it("gives each page a DIFFERENT marker, so one page cannot vouch for another", () => {
+    // The failure a shared marker would hide: a layout string would be present on every page and
+    // the guard would pass for a page that rendered nothing of its own.
+    const markers = PUBLIC_SURFACES.map((s) => s.mustRender);
+    expect(new Set(markers).size).toBe(markers.length);
+  });
+
+  it("names no marker that the app's shared layout renders", () => {
+    // A marker has to come from the page's own body. `app/layout.tsx` is the one file every
+    // surface shares, so a marker found there would be satisfied by a broken page.
+    const layout = readFileSync(path.join(ROOT, "app", "layout.tsx"), "utf8");
+    for (const surface of PUBLIC_SURFACES) {
+      expect(layout, `${surface.path}'s marker comes from the shared layout`).not.toContain(
+        surface.mustRender,
+      );
+    }
+  });
+
+  it("records what it measured, and the reading that made the decision", () => {
+    // The gate: the threshold is derived from what the page actually renders rather than from a
+    // round number. The measurements are the derivation, kept where they can be argued with.
+    const measured = new Map(RENDERED_LENGTHS.map((m) => [m.path, m]));
+    // Every static surface the sweep visits was measured.
+    for (const surface of PUBLIC_SURFACES.filter((s) => !s.path.includes("["))) {
+      expect(measured.has(surface.path), `${surface.path} was never measured`).toBe(true);
+    }
+    for (const m of RENDERED_LENGTHS) {
+      expect(m.measured, `${m.path} has an implausible measurement`).toBeGreaterThan(0);
+      expect(m.reading.length, `${m.path} was measured without a reading`).toBeGreaterThan(20);
+    }
+    // The two facts that decided it, pinned so the argument cannot be read without them.
+    expect(measured.get("/finder")!.measured).toBe(162);
+    expect(measured.get("/demo")!.measured).toBe(217);
+  });
+
+  it("shows the old guard could not have worked, from the measurements alone", () => {
+    // Not asserted in prose: the range is computed, so the argument stays true or fails.
+    const lengths = RENDERED_LENGTHS.map((m) => m.measured);
+    const smallest = Math.min(...lengths);
+    const largest = Math.max(...lengths);
+    expect(smallest).toBeLessThan(200);
+    expect(largest / smallest).toBeGreaterThan(50);
+    // And a second page was inside one short paragraph of the same failure.
+    expect(lengths.filter((n) => n < 300).length).toBeGreaterThan(1);
+  });
+
+  it("records the decision, the options refused, and exactly one taken", () => {
+    expect(RENDER_GUARD_DECISION.length).toBeGreaterThanOrEqual(4);
+    const taken = RENDER_GUARD_DECISION.filter((d) => d.taken);
+    expect(taken, "the decision records no choice, or more than one").toHaveLength(1);
+    expect(taken[0]!.option).toContain("phrase from each page's own body");
+    for (const decision of RENDER_GUARD_DECISION) {
+      expect(decision.why.length, `${decision.option} is decided without an argument`).toBeGreaterThan(120);
+    }
+  });
+
+  it("refuses padding a public page to satisfy a test, in writing", () => {
+    // The option most likely to be re-proposed, and the one this tree has the most reason to
+    // refuse — writing copy onto a patient-facing surface for a test's benefit.
+    const padding = RENDER_GUARD_DECISION.find((d) => d.option.includes("Add copy"))!;
+    expect(padding.taken).toBe(false);
+    expect(padding.why).toContain("writing copy for a test");
+  });
+});
 
 describe("W192 every public surface is classified", () => {
   it("classifies exactly the routes the tree serves, both directions", () => {

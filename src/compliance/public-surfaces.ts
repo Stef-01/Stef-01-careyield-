@@ -60,6 +60,21 @@ export interface PublicSurface {
   audience: Audience;
   /** Why this audience, in a sentence somebody can disagree with. */
   why: string;
+  /**
+   * A phrase this page's OWN BODY renders, used as the sweep's vacuity guard.
+   *
+   * W274 replaced a single `text.length > 200` with this. The threshold was a round number over
+   * pages whose legitimate rendered lengths span 162 to 9,881 characters — a sixty-fold range —
+   * and it was already failing `/finder`, which renders a complete and deliberately spare landing
+   * screen, while `/demo` sat at 217 and was one copy edit from joining it.
+   *
+   * A MARKER IS ALSO A BETTER GUARD THAN ANY SINGLE LENGTH, which is why this is a replacement
+   * rather than a per-page number. One floor is at once too high for the smallest page and far too
+   * low for the largest: at 200 characters, `/privacy/automated-decisions` could render three per
+   * cent of a legal notice and pass. A marker is per-page, so it means the same thing on both.
+   * Every marker below is chosen from the page's own content and none appears in the layout.
+   */
+  mustRender: string;
 }
 
 /**
@@ -73,41 +88,112 @@ export const PUBLIC_SURFACES: readonly PublicSurface[] = [
     path: "/",
     audience: "patient",
     why: "The community landing page. Anybody can arrive here from a search engine, so it is read by patients whether or not it is addressed to them.",
+    mustRender: "WHY I FOUNDED MEHERR",
   },
   {
     path: "/book/[token]",
     audience: "patient",
     why: "A patient following a link from an invitation. The most patient-facing surface in the product, and the only one reached by somebody who was contacted rather than somebody who went looking.",
+    mustRender: "An appointment is available",
   },
   {
     path: "/clinicians",
     audience: "professional",
     why: "A walkthrough addressed to GPs, describing what the software does with a worked clinical example. Clinical content between clinicians is professional communication rather than therapeutic advertising — see STANDING_FLAGS, because whether to publish it at all is a separate and open question.",
+    mustRender: "Choose your direction",
   },
   {
     path: "/demo",
     audience: "professional",
     why: "A presenter view for showing the product to a practice. Not linked from anywhere a patient would be, but public, so it is swept.",
+    mustRender: "A scripted synthetic practice",
   },
   {
     path: "/finder",
     audience: "patient",
     why: "A synthetic clinician finder. Its whole shape is a patient looking for care, so it answers to the patient rules regardless of the data being synthetic.",
+    mustRender: "PMOS care",
   },
   {
     path: "/practices",
     audience: "professional",
     why: "The B2B landing page, addressed to practice owners and managers. W23's linter was written for this page specifically.",
+    mustRender: "FOR GENERAL PRACTICES",
   },
   {
     path: "/privacy",
     audience: "patient_notice",
     why: "A privacy notice is read by the people whose data it concerns, and APP 1 requires it to state the kinds of information held — which for this product means naming diagnoses and test results. Marketing rules apply; the data-category rules cannot, or the notice cannot be written.",
+    mustRender: "Privacy policy",
   },
   {
     path: "/privacy/automated-decisions",
     audience: "patient_notice",
     why: "Same reason as /privacy. An ADM transparency notice exists for the person the decision is about, and describing what the software decides means naming what it decides it from.",
+    mustRender: "How Meherr uses automated decision-making",
+  },
+];
+
+/**
+ * What each public surface actually rendered when W274 measured it, and the decision that
+ * followed.
+ *
+ * THE UNIT'S GATE REQUIRES THE CHOICE WRITTEN DOWN AS DATA rather than settled in a commit
+ * message, because the two options are not obviously different from outside: `/finder` failing a
+ * vacuity guard reads exactly like a broken page until somebody looks at what it serves.
+ */
+export interface RenderedMeasurement {
+  path: string;
+  /** Characters of `body.innerText` at the moment of measuring. */
+  measured: number;
+  /** What the page was doing at that length. */
+  reading: string;
+}
+
+/** Measured on 2026-08-13, in the order the sweep visits them. */
+export const RENDERED_LENGTHS: readonly RenderedMeasurement[] = [
+  { path: "/", measured: 3672, reading: "The founder story, in full." },
+  { path: "/clinicians", measured: 994, reading: "Step one of a four-step walkthrough; the rest is behind interaction." },
+  { path: "/demo", measured: 217, reading: "A presenter's launch card and nothing else, by design — and 17 characters above the old guard." },
+  { path: "/finder", measured: 162, reading: "A complete voice-first landing screen: headline, two calls to action, and the synthetic-data disclaimer. Nothing is missing." },
+  { path: "/practices", measured: 4758, reading: "The B2B landing page, in full." },
+  { path: "/privacy", measured: 2243, reading: "The draft privacy notice, in full." },
+  { path: "/privacy/automated-decisions", measured: 9881, reading: "The ADM transparency notice, in full." },
+];
+
+export interface GuardDecision {
+  /** The option, as somebody would propose it. */
+  option: string;
+  taken: boolean;
+  why: string;
+}
+
+/**
+ * The decision between changing the page and changing the guard.
+ *
+ * Recorded because it was a real choice with a defensible answer on each side, and because the
+ * losing options are the ones a later unit will re-propose.
+ */
+export const RENDER_GUARD_DECISION: readonly GuardDecision[] = [
+  {
+    option: "Add copy to `/finder` until it clears 200 characters.",
+    taken: false,
+    why: "It would be writing copy for a test. `/finder` is a voice-first entry screen and its spareness is the design — a headline, two calls to action and the synthetic-data disclaimer. Padding a PUBLIC patient-facing surface to satisfy a threshold is also the one class of change W192's sweep and G6 exist to slow down, and this would be doing it for no reader's benefit.",
+  },
+  {
+    option: "Lower the global threshold to 150.",
+    taken: false,
+    why: "It moves the round number rather than removing it, and it was already close to failing twice: `/demo` renders 217 characters, so a single trimmed sentence would have put a second page under the old guard and a third under this one. A threshold over pages spanning 162 to 9,881 characters cannot express what it is for.",
+  },
+  {
+    option: "Give each surface its own measured floor.",
+    taken: false,
+    why: "Better, and still the wrong shape. A floor derived from today's measurement fails on every ordinary copy edit, which is the pin-whose-signal-is-noise failure this tree has recorded twice — and it still passes a page that served its nav and footer over a broken body, because the shell alone clears a low floor.",
+  },
+  {
+    option: "Require a phrase from each page's own body.",
+    taken: true,
+    why: "It is what a vacuity guard is actually for: proof that THIS page's content rendered, not that some bytes arrived. It is derived from what each page serves rather than from a number chosen to be safe, and it means the same thing on a 162-character page and a 9,881-character one — where a single floor is simultaneously too high for the first and low enough that the second could render three per cent of a legal notice and pass. The cost is that rewording a marker line fails the sweep until the register is updated, and that cost is the control working.",
   },
 ];
 
