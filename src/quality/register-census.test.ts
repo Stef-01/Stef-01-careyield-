@@ -33,6 +33,7 @@ import { reachableFromApp, stripComments } from "@/security/reachability";
 import { copySurfaceMembers } from "@/compliance/copy-y6";
 import * as walks from "./tree-walks";
 import { DORMANT_MODULES, diffReach } from "@/security/page-reach";
+import { coverageDiff } from "@/quality/route-coverage";
 import { readFileSync } from "node:fs";
 
 const ROOT = process.cwd();
@@ -44,6 +45,9 @@ beforeAll(() => {
   COPY = mkdtempSync(path.join(tmpdir(), "w267-"));
   cpSync(path.join(ROOT, "src"), path.join(COPY, "src"), { recursive: true });
   cpSync(path.join(ROOT, "app"), path.join(COPY, "app"), { recursive: true });
+  // W284 added `e2e/`: its register reads the page suite as well as the routes, so a copy without
+  // it is not a copy of the tree the detectors walk.
+  cpSync(path.join(ROOT, "e2e"), path.join(COPY, "e2e"), { recursive: true });
   cpSync(path.join(ROOT, "supabase"), path.join(COPY, "supabase"), { recursive: true });
 });
 
@@ -169,7 +173,7 @@ describe("W267 the finding: a proved content scanner is not a proved walk", () =
     // Eighteen since W281, and that one IS an addition rather than a conversion — a new walk that
     // arrived already proved, which is what W282 said moving the walks into `tree-walks.ts` would
     // make the default. The unproven list is unchanged by it, which is the check that says so.
-    expect(walkProven().length).toBe(18);
+    expect(walkProven().length).toBe(19);
     expect(unproven.length + walkProven().length).toBe(TREE_DERIVED_REGISTERS.length);
     // And the harsh reading is not the fair one, so the census carries both facts.
     const withContentProof = unproven.filter(
@@ -203,6 +207,21 @@ describe("W267 the detectors that take a root, proved by moving the tree", () =>
       diffCensus(after.map((p) => ({ path: p, kind: "page" as const, file: "" })), census).unmapped,
       "the diff did not report the new route as unmapped",
     ).toContain("/w267-probe");
+  });
+
+  it("W284's route coverage notices a route no spec opens", () => {
+    // Planted rather than described: a new page in the copied tree is a route the register does
+    // not classify, and the diff has to say so.
+    const before = coverageDiff(COPY);
+    expect(before.undeclared, "the probe route already existed").toEqual([]);
+    const after = withPlanted(
+      "app/w284-probe/page.tsx",
+      "export default function Probe() {\n  return null;\n}\n",
+      () => coverageDiff(COPY),
+    );
+    expect(after.undeclared, "the coverage register did not see a new route").toContain(
+      "/w284-probe",
+    );
   });
 
   it("W271's route reach notices a page that reaches a dormant module", () => {

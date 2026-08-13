@@ -457,6 +457,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W268's re-derivation of W210's latent-finding register is reviewer-facing: for each open finding, the claim about the tree that must hold for its predicate to be ABLE to fire, and what a dead anchor would cost. Nobody but a developer reads it. Its longest strings are those `ifDead` arguments, which describe predicates and file layouts and name no patient, condition or appointment reason. Its functions return finding ids and anchors, never a record about anybody.",
   },
   {
+    module: "src/quality/route-coverage.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W284 records which spec opens each of the fifty routes this app serves, and every string in it is a file name, a route path or an argument addressed to whoever adds a route — nothing here is rendered and no practice sees it. `REFUSED_COVERAGE_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the call-shaped scan, the prefix match and the unresolved citation it exists to forbid, including the one this unit's own first draft got wrong.",
+  },
+  {
     module: "src/quality/register-census.ts",
     operatorCopy: [],
     notCopy:

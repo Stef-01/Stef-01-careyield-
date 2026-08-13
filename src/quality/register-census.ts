@@ -132,6 +132,16 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/route-coverage.ts",
+    derives: "Every spec file under `e2e/`, and which of the app's routes each one's text opens.",
+    checkedAgainst:
+      "W284's route-coverage register, resolved rather than trusted — every citation is checked against the spec it names.",
+    proof: {
+      kind: "mutated_tree",
+      mutation: "a citation is moved to a spec that does not open its route, and `coverageDiff` must report it unresolved",
+    },
+  },
+  {
     file: "src/quality/register-census.ts",
     derives: "Every file that walks the tree, by `readdirSync(` in code with comments subtracted.",
     checkedAgainst: "This register. It is subject to itself; see the module note.",
