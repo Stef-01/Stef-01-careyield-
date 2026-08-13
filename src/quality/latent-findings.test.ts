@@ -105,19 +105,27 @@ describe("W210 the triggers are real predicates over this tree", () => {
     expect(finding("CENSUS-1").trigger()).toBe(false);
   });
 
-  it("leaves the synthetic rail seeded, which is a contract and not a surprise", () => {
-    // W221 review finding: TENANCY-1's trigger reads the seeded rail, and the store exposes no
-    // way to read a pristine seed without resetting the global. An exported predicate with an
-    // undocumented effect on shared state is the shape that becomes a defect when somebody
-    // composes it — so the effect is specified here rather than left to be discovered.
+  it("no longer touches the synthetic rail, because the trigger that did is closed", () => {
+    // W221 recorded this as a CONTRACT: TENANCY-1's trigger had to reset the global rail to read a
+    // pristine seed, and an exported predicate with an undocumented effect on shared state is the
+    // shape that becomes a defect when somebody composes it — so the effect was specified rather
+    // than left to be discovered.
+    //
+    // W280 CLOSED TENANCY-1, AND `fired()` ONLY EVALUATES OPEN FINDINGS, so the side effect is
+    // gone. The assertion inverts rather than being deleted: "the effect stopped happening" and
+    // "somebody removed the test" are indistinguishable otherwise, and the trigger itself is
+    // still in the register — it is the condition the finding was recorded against, and only its
+    // STATUS changed.
     resetStore();
     getStore().state.appointments.push({ ...getStore().state.appointments[0]!, id: "apt-mut" as never });
-    expect(getStore().state.appointments.some((a) => a.id === "apt-mut")).toBe(true);
     fired();
     expect(
       getStore().state.appointments.some((a) => a.id === "apt-mut"),
-      "fired() must leave the rail in its seeded state",
-    ).toBe(false);
+      "fired() reset the rail, so an open finding is reading it again",
+    ).toBe(true);
+    // And the trigger it belonged to is still there, still doing what it did.
+    expect(finding("TENANCY-1").status).toBe("closed");
+    expect(typeof finding("TENANCY-1").trigger).toBe("function");
   });
 
   it("checks DOSSIER-1 against the dossier tests that exist", () => {

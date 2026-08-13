@@ -149,14 +149,20 @@ describe("W209 the findings this sweep closed stay closed", () => {
     }
   });
 
-  it("records that PRIV-3's remaining risk is named rather than assumed away", () => {
-    // The honest half. `sessionAppointmentType` matches on a clinician id with no practice, and
-    // it is safe today only because the seeded rail holds one practice's sessions — a property
-    // of the fixture, not of the code. Naming it is the point: W145's rule, that the thing you
-    // cannot yet fix is stated, not omitted.
-    const residual = STORE_READS.find(
-      (read) => read.module === "src/booking/store.ts" && read.fn === "sessionAppointmentType",
+  it("records that PRIV-3's remaining risk was closed rather than re-worded", () => {
+    // W280 CLOSED IT. This asserted the residual was NAMED — W145's rule, that the thing you
+    // cannot yet fix is stated rather than omitted — and naming it was right for seventy units.
+    // What made it fixable was never difficulty: nothing had shown the read a second practice.
+    // So the assertion inverts rather than disappearing, because "the residual is gone" and
+    // "somebody deleted the sentence" look identical from here otherwise.
+    const read = STORE_READS.find(
+      (r) => r.module === "src/booking/store.ts" && r.fn === "sessionAppointmentType",
     );
-    expect(residual?.reason).toContain("NAMED RESIDUAL");
+    expect(read?.kind).toBe("practice_scoped");
+    expect(read?.reason, "a practice-scoped read needs no excuse").toBeUndefined();
+    expect(
+      STORE_READS.filter((r) => r.reason?.includes("NAMED RESIDUAL")),
+      "a new named residual arrived without a unit closing it",
+    ).toEqual([]);
   });
 });

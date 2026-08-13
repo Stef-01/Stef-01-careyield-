@@ -112,13 +112,7 @@ export const STORE_READS: readonly StoreRead[] = [
     reason: "Reseeds the synthetic rail; no live read.",
     scopedAlternatives: [],
   },
-  {
-    module: "src/booking/store.ts",
-    fn: "sessionAppointmentType",
-    kind: "record_keyed",
-    reason:
-      "Keyed by the invitation's clinician and session date. NAMED RESIDUAL: clinician ids are minted per practice (W166), so this match is only sound while one rail seeds one practice's sessions. The CPD trail had the same shape and was a live cross-practice read — this one is not yet, because the seeded rail holds one practice's sessions, and that is a property of the fixture rather than of the code.",
-  },
+  { module: "src/booking/store.ts", fn: "sessionAppointmentType", kind: "practice_scoped" },
   { module: "src/booking/store.ts", fn: "saveContactPreferences", kind: "practice_scoped" },
   { module: "src/booking/store.ts", fn: "contactPreferencesFor", kind: "practice_scoped" },
   {

@@ -104,10 +104,31 @@ export function resetStore(scenario: RailScenario = "standard"): RailStore {
   return globalStore.__careyieldRail;
 }
 
-/** The appointment type offered in an invitation's session (telehealth vs in-person). */
-export function sessionAppointmentType(store: RailStore, invitation: { clinicianId: string; sessionDate: string }): AppointmentType | undefined {
+/**
+ * The appointment type offered in an invitation's session (telehealth vs in-person).
+ *
+ * W280 CLOSED TENANCY-1 HERE. This matched on clinician id and session date with **no practice in
+ * the query**. Clinician ids are minted per practice (W166), so two practices can hold the same
+ * id — and the match was sound only while the seeded rail held one practice's sessions, which is a
+ * property of the FIXTURE and not of the code. W209 recorded it as a named residual and W210 made
+ * the residual executable; the trigger was "the seeded rail holds sessions for more than one
+ * practice", and nothing but the seed was stopping it.
+ *
+ * The practice is now part of the query rather than a filter after it — W209's rule, and the
+ * distinction that matters: a `.find()` returns the FIRST match, so filtering afterwards would
+ * have had the wrong appointment already chosen. A telehealth session at one practice and an
+ * in-person one at another, same clinician id, same date, and the patient is told the wrong thing
+ * about their own appointment.
+ */
+export function sessionAppointmentType(
+  store: RailStore,
+  invitation: { practiceId: string; clinicianId: string; sessionDate: string },
+): AppointmentType | undefined {
   const inSession = store.state.appointments.find(
-    (a) => a.clinicianId === invitation.clinicianId && a.startsAt.slice(0, 10) === invitation.sessionDate,
+    (a) =>
+      a.practiceId === invitation.practiceId &&
+      a.clinicianId === invitation.clinicianId &&
+      a.startsAt.slice(0, 10) === invitation.sessionDate,
   );
   return inSession?.appointmentType;
 }

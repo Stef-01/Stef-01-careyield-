@@ -27,7 +27,12 @@ const ROOT = path.resolve(__dirname, "../..");
 describe("W268 no open finding has gone live, and each could still notice", () => {
   it("keeps the fired list empty", () => {
     expect(fired().map((f) => f.id)).toEqual([]);
-    expect(LATENT_FINDINGS.filter((f) => f.status === "open").length, "no open finding to check").toBeGreaterThan(3);
+    // A VACUITY GUARD, NOT A COUNT. `> 3` was the number of open findings on the day this was
+    // written, and W280 closed one — so a unit CLOSING a finding turned this red, which is the
+    // pin-a-transient-value failure the tree has now recorded three times in three units. What
+    // the guard is for is that `fired()` has something to iterate: closing findings is the
+    // direction this register wants to move in, and the check should survive it.
+    expect(LATENT_FINDINGS.filter((f) => f.status === "open").length, "no open finding to check").toBeGreaterThan(0);
   });
 
   it("anchors every open finding, and anchors nothing that is not one", () => {

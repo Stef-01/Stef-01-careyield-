@@ -152,7 +152,13 @@ export const LATENT_FINDINGS: readonly LatentFinding[] = [
       const seeded = resetStore();
       return new Set(seeded.state.appointments.map((a) => a.practiceId)).size > 1;
     },
-    status: "open",
+    // W280 PUT THE PRACTICE IN THE QUERY, so the trigger no longer describes a defect: a rail
+    // holding two practices' sessions is now an ordinary rail rather than the day this read
+    // starts crossing a boundary. The trigger is KEPT rather than deleted — it is the condition
+    // the finding was recorded against, and a closed finding whose condition was removed is
+    // indistinguishable from one that was never real.
+    status: "closed",
+    closedBy: "W280",
   }),
   declareFinding({
     id: "DOSSIER-1",
