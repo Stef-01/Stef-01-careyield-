@@ -58,6 +58,15 @@ describe("W285 the reviewed range is data, and the gap is named", () => {
     expect(REVIEWED_UNITS.length).toBeGreaterThan(8);
   });
 
+  it("pins the range it read, so another builder's push cannot enlarge the claim", () => {
+    // The correction this unit ended on. W279 landed mid-unit and W285 rebased onto it to push, so
+    // `6b244f1..HEAD` grew to cover a unit nobody read. A range ending at HEAD is a claim that gets
+    // larger every time somebody else commits.
+    expect(QUARTER.diffHead).toMatch(/^[0-9a-f]{7,40}$/);
+    expect(QUARTER.diffHead).not.toBe("HEAD");
+    expect(NOT_REVIEWED.W279, "W279 is inside the pinned range after all").toContain("3dcaf6b");
+  });
+
   it("declares the gap rather than leaving it to be noticed", () => {
     expect(Object.keys(NOT_REVIEWED).sort()).toEqual(["W279", "W285", "W286"]);
     for (const [unit, why] of Object.entries(NOT_REVIEWED)) {

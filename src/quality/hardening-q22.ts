@@ -1,7 +1,7 @@
 // W285: Q22 hardening — the quarter's diff read through three lenses, with every finding disposed.
 //
-// The quarter is W274–W286 and the diff is `6b244f1..HEAD`: 51 files, 4,334 insertions, ten units
-// landed by two builders. Read for correctness, for security, and for what could be simpler.
+// The quarter is W274–W286 and the diff read is `6b244f1..3dcaf6b`: 51 files, 4,334 insertions, ten
+// units landed by two builders. Read for correctness, for security, and for what could be simpler.
 //
 // THREE FINDINGS AND ONE CLEAN RESULT, and the clean result is stated with its evidence rather
 // than as an absence, because "we looked and found nothing" and "we did not look" produce the same
@@ -49,9 +49,9 @@
 // of them is reachable from `app/`, checked with W201's own `reachableFromApp` rather than by
 // reading imports. No new route, no new credential, no new deserialisation.
 //
-// THE REVIEWED RANGE IS DATA, NOT A CLAIM ABOUT THE QUARTER. W279 was claimed by builder-A while
-// this unit was being written and is not in the diff, so it is NOT reviewed and this register says
-// so by name. It deliberately does NOT assert "every Q22 unit is reviewed": that would go red the
+// THE REVIEWED RANGE IS DATA, NOT A CLAIM ABOUT THE QUARTER. W279 landed while this unit was
+// being written, after the reviewed range ended, so it is NOT reviewed and this register says so
+// by name. It deliberately does NOT assert "every Q22 unit is reviewed": that would go red the
 // moment W279 lands, which is the pin-a-transient-value failure this tree has recorded five times.
 // A register that reports the gap is useful; one that fails on a planned event gets edited.
 //
@@ -79,8 +79,16 @@ export interface HardeningFinding {
   disposition: Disposition;
 }
 
-/** The quarter this hardening covers, and the commit its diff was taken from. */
-export const QUARTER = { first: 274, last: 286, diffBase: "6b244f1" } as const;
+/**
+ * The quarter, and the EXACT range of diff that was read.
+ *
+ * `diffHead` is pinned rather than left as HEAD, and finding out why is the last thing this unit
+ * learned. The review was taken over `6b244f1..3dcaf6b`. While it was being written builder-A
+ * landed W279, and this unit's push rebased on top of it — so `6b244f1..HEAD` silently GREW to
+ * include a unit nobody here read. A range ending at HEAD is a claim that gets larger every time
+ * somebody else commits, which is the opposite of what a review record is for.
+ */
+export const QUARTER = { first: 274, last: 286, diffBase: "6b244f1", diffHead: "3dcaf6b" } as const;
 
 /**
  * The units whose diffs were actually read.
@@ -103,7 +111,7 @@ export const REVIEWED_UNITS: readonly string[] = [
 
 /** Q22 units this pass did not read, each with the reason. Kept honest rather than kept empty. */
 export const NOT_REVIEWED: Readonly<Record<string, string>> = {
-  W279: "Claimed by builder-A while this unit was being written; its diff is not in `6b244f1..HEAD`. The quarter close (W286) is where it gets read, and this register names it so that is a decision rather than an oversight.",
+  W279: "Landed by builder-A while this unit was being written, AFTER the reviewed range ended at `3dcaf6b`. Its diff was never read here. It is named because the alternative is silence: this unit rebased onto W279 to push, so an unpinned `6b244f1..HEAD` would now cover it and the register would be claiming a review that did not happen. The quarter close (W286) is where it gets read.",
   W285: "This unit. A hardening pass reviewing its own diff would be the register answering its own question, which is the exemption W282 refused for the census.",
   W286: "The quarter close, not yet written. It inherits W279 as well as itself, which is stated here so the next unit does not have to rediscover the gap.",
 };
