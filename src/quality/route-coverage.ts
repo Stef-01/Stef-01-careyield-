@@ -71,13 +71,30 @@ export function literalProbe(route: string): string {
   return cut === -1 ? route : `${route.slice(0, cut)}/`;
 }
 
-/** Does this spec's text open that route, taking dynamic segments into account? */
+/**
+ * Does this spec's text open that route, taking dynamic segments into account?
+ *
+ * W285 FIXED THE BRANCH CONDITION, and the bug it hid is the one this register exists to prevent.
+ * The branch used to be `probe.endsWith("/")` — a property of the STRING rather than of how it was
+ * derived. `/` is static and ends in a slash, so the root route took the prefix branch and became
+ * `text.includes("/")`: **true of every spec ever written.** The register's whole claim over a
+ * hand-kept list is that "spec X opens route Y" is RESOLVED against spec X, and for the root route
+ * it resolved nothing. It was excusing a false citation — `landing.spec.ts`, which opens
+ * `/practices` and never opens `/`, its own header saying so. `public-sweep.spec.ts` is the spec
+ * that opens the root. The branch now asks whether the ROUTE has a dynamic segment.
+ */
 export function specOpens(text: string, route: string): boolean {
   const probe = literalProbe(route);
-  if (probe.endsWith("/")) return text.includes(probe);
+  // W285 also subtracts comments, W173's rule and W275's precedent one register over. A spec's
+  // header talks about the routes it does and does not open — `landing.spec.ts` says "the B2B
+  // landing moved from `/` to `/practices`" — and a resolution check that reads prose as
+  // navigation is resolving nothing. Measured before adding: no citation in the register today
+  // depends on a comment, so this changes no answer and closes the way one could.
+  const code = text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  if (route.includes("/[")) return code.includes(probe);
   // A static route matches only when nothing routable follows it — `"/console"` and `"/console?"`
   // count, `"/console/capacity"` does not.
-  return new RegExp(`["'\`]${probe.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=["'\`?])`).test(text);
+  return new RegExp(`["'\`]${probe.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=["'\`?])`).test(code);
 }
 
 export interface CoverageDiff {

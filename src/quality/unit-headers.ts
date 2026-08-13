@@ -69,6 +69,7 @@
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { parseLedgerRows } from "./blocked-surface";
 import { sourceModules } from "./tree-walks";
 
 /** The shape, in one sentence, so the rule is quotable rather than only enforced. */
@@ -104,9 +105,12 @@ export function misplacedUnit(text: string): number | null {
  * range check would accept a gap. The ledger is the list of units that exist, so it is the list.
  */
 export function knownUnits(ledger: string): Set<number> {
-  return new Set(
-    [...ledger.matchAll(/^\| W(\d+) \|/gm)].map((m) => Number(m[1])),
-  );
+  // W285 SIMPLIFY: this had its own `/^\| W(\d+) \|/gm`, a second ledger-row regex in a tree that
+  // already had one — W263's `blocked-surface.ts` has parsed rows since Q20. Two spellings of the
+  // same parse is the duplication W282's header names: "one bespoke copy is a file, two are a
+  // pattern nobody declared, and the third gets written by copying whichever of the two its author
+  // found first." Composed now, and the row shape lives in one place.
+  return new Set(parseLedgerRows(ledger).map((row) => Number(row.id.slice(1))));
 }
 
 export interface HeaderCensus {

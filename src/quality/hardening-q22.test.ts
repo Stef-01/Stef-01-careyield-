@@ -1,0 +1,131 @@
+// W285 verify gate: "code-review, security-review and simplify run over the quarter's diff; every
+// finding recorded with a disposition and a date, and the accepted ones carry a review date."
+//
+// The register is checked for shape, and the two `fixed` findings are checked against the tree —
+// a disposition of "fixed" that nothing resolves is the citation-nobody-followed failure W207
+// found and W258 made a rule.
+
+import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import {
+  FINDINGS,
+  NOT_REVIEWED,
+  QUARTER,
+  REVIEWED_UNITS,
+  unaccountedUnits,
+  undisposed,
+  type Lens,
+} from "./hardening-q22";
+import { ROUTE_COVERAGE, coverageDiff, coverageIsClean, specOpens } from "./route-coverage";
+import { knownUnits } from "./unit-headers";
+import { parseLedgerRows } from "./blocked-surface";
+
+const ROOT = path.resolve(__dirname, "../..");
+const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
+
+describe("W285 every finding carries a disposition and a date", () => {
+  it("disposes all of them, with review dates on the accepted ones", () => {
+    expect(undisposed()).toEqual([]);
+    for (const finding of FINDINGS) {
+      expect(finding.raisedOn, `${finding.id} has no date`).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(finding.what.length, `${finding.id} says too little to act on`).toBeGreaterThan(80);
+      expect(finding.unit, `${finding.id} blames no unit`).toMatch(/^W\d+$/);
+    }
+  });
+
+  it("runs all three lenses, and each one produced something", () => {
+    // The gate names three. A hardening pass reporting findings from one lens has not run three,
+    // and a register that only listed the lens that found something would not show that.
+    const lenses = new Set<Lens>(FINDINGS.map((f) => f.lens));
+    expect([...lenses].sort()).toEqual(["code-review", "security-review", "simplify"]);
+  });
+
+  it("blames only units the ledger has", () => {
+    const units = knownUnits(LEDGER);
+    for (const finding of FINDINGS) {
+      expect(units.has(Number(finding.unit.slice(1))), `${finding.id} blames ${finding.unit}`).toBe(true);
+    }
+  });
+});
+
+describe("W285 the reviewed range is data, and the gap is named", () => {
+  it("names every done Q22 unit as either reviewed or explicitly not", () => {
+    // NOT an assertion that the quarter is fully reviewed — see the module note. W279 is in flight
+    // and named in `NOT_REVIEWED`; a check demanding it be reviewed would go red on a planned
+    // event, which is the pin this tree has had to remove five times.
+    expect(unaccountedUnits(LEDGER)).toEqual([]);
+    expect(REVIEWED_UNITS.length).toBeGreaterThan(8);
+  });
+
+  it("declares the gap rather than leaving it to be noticed", () => {
+    expect(Object.keys(NOT_REVIEWED).sort()).toEqual(["W279", "W285", "W286"]);
+    for (const [unit, why] of Object.entries(NOT_REVIEWED)) {
+      expect(why.length, `${unit} is unreviewed without a reason`).toBeGreaterThan(40);
+    }
+  });
+
+  it("reads the quarter's own rows, so the accounting is over something", () => {
+    // Non-vacuity for the empty list above: `unaccountedUnits` over a ledger with no Q22 rows is
+    // also empty, and that is the answer a broken parse gives.
+    const q22Done = parseLedgerRows(LEDGER).filter((r) => {
+      const n = Number(r.id.slice(1));
+      return n >= QUARTER.first && n <= QUARTER.last && r.status === "done";
+    });
+    expect(q22Done.length, "no Q22 row is done, so the accounting checked nothing").toBeGreaterThan(8);
+  });
+});
+
+describe("W285 CR-1: the root route's citation is resolved now, not excused", () => {
+  it("no longer calls every spec an opener of the root", () => {
+    // The defect, stated as the test that would have caught it. `text.includes("/")` is true of
+    // any spec; the branch is chosen by the route's shape now.
+    expect(specOpens('await page.goto("/practices");', "/"), "a spec that opens /practices opens /").toBe(
+      false,
+    );
+    expect(specOpens('await page.goto("/");', "/")).toBe(true);
+    // And the dynamic-segment branch still works, which is what the old condition was for.
+    expect(specOpens("await page.goto(`/book/${token}`);", "/book/[token]")).toBe(true);
+    expect(specOpens('await page.goto("/console/capacity");', "/console")).toBe(false);
+  });
+
+  it("resolves the root's citation against the spec, which is what was missing", () => {
+    // The citation was always right — `landing.spec.ts` sets `STORY = "/"` and sweeps `["/", ...]`.
+    // What was missing is that anything checked. It resolves now, and it resolves from CODE.
+    const root = ROUTE_COVERAGE.find((r) => r.route === "/")!;
+    expect(root.exercise.kind === "literal" && root.exercise.spec).toBe("landing.spec.ts");
+    const landing = readFileSync(path.join(ROOT, "e2e/landing.spec.ts"), "utf8");
+    expect(specOpens(landing, "/")).toBe(true);
+    // CR-2: and not from the header comment that says the landing MOVED off the root.
+    const commentOnly = '// the B2B landing moved from "/" to "/practices"\nawait page.goto("/practices");';
+    expect(specOpens(commentOnly, "/"), "a route named only in a comment resolves").toBe(false);
+    expect(specOpens('await page.goto("/");', "/"), "the subtraction removed the code too").toBe(true);
+  });
+
+  it("leaves W284's register clean after the repointing", () => {
+    expect(coverageIsClean(coverageDiff(ROOT))).toBe(true);
+  });
+});
+
+describe("W285 SIMP-1 and HYG-1 are resolved against the tree", () => {
+  it("parses ledger rows in one place", () => {
+    const headers = readFileSync(path.join(ROOT, "src/quality/unit-headers.ts"), "utf8");
+    expect(headers, "unit-headers grew a second ledger regex again").not.toMatch(/matchAll\(\/\^\\\|/);
+    expect(headers).toContain("parseLedgerRows");
+    // The shared parser is the stricter one, and that is the behaviour worth pinning.
+    expect(knownUnits("| W7 | done |\n")).toEqual(new Set());
+  });
+
+  it("declares the tree's line endings, so the conversion cannot recur silently", () => {
+    const attrs = readFileSync(path.join(ROOT, ".gitattributes"), "utf8");
+    expect(attrs).toMatch(/text=auto/);
+    expect(attrs).toMatch(/eol=lf/);
+    expect(attrs, "the file records no reason").toMatch(/clinicians\.ts/);
+  });
+
+  it("finds no CRLF left in the tracked source", () => {
+    // The finding's own subject, asserted rather than remembered.
+    const clinicians = readFileSync(path.join(ROOT, "src/demo/clinicians.ts"), "utf8");
+    expect(clinicians.includes("\r\n"), "the CRLF outlier is back").toBe(false);
+  });
+});

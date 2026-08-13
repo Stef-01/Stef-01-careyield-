@@ -1,0 +1,12 @@
+# W285 (Q22 hardening): the tree's line endings, declared rather than accidental.
+#
+# `src/demo/clinicians.ts` was the only CRLF file in the repository — written outside the unit loop
+# in 2026, in a different editor. W281 gave it a header with a script that read and rewrote the
+# file in text mode, and Python's universal newlines silently converted all 526 lines to LF. The
+# OUTCOME was right (it was the sole outlier and the tree is LF); the way it happened was not, and
+# it reflowed `git blame` across the largest body of patient-facing prose here.
+#
+# Reverting would reintroduce the tree's only CRLF file, which is worse. So the invariant is
+# declared instead: git normalises on the way in, and the next accidental conversion is a no-op
+# rather than a 526-line diff hidden inside a comment change.
+* text=auto eol=lf

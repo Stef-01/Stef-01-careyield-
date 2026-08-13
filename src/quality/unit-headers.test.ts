@@ -125,7 +125,12 @@ describe("W281 the parts, driven directly", () => {
     expect(units.has(1)).toBe(true);
     expect(units.has(281)).toBe(true);
     expect(units.has(999), "the ledger cannot have a unit it never planned").toBe(false);
-    expect(knownUnits("| W7 | done |\n| not a row |\n")).toEqual(new Set([7]));
+    // W285 composed this onto W263's row parser, which is STRICTER than the regex it replaced: a
+    // full six-column row, not any line starting `| W<n> |`. Asserted rather than assumed, because
+    // that is a behaviour change and the looser version would have counted a half-written row.
+    const row = "| W7 | done | builder-B | 2026-01-01T00:00Z | abc1234 | a note. |";
+    expect(knownUnits(`${row}\n| not a row |\n`)).toEqual(new Set([7]));
+    expect(knownUnits("| W7 | done |\n"), "a malformed row is not a unit").toEqual(new Set());
   });
 });
 

@@ -47,13 +47,18 @@ export interface LedgerRow {
   note: string;
 }
 
-export function ledgerRows(root: string): LedgerRow[] {
-  return readFileSync(path.join(root, "BUILD-STATE.md"), "utf8")
+/** The same parse, over ledger TEXT — so a caller with the text in hand does not write a second regex. */
+export function parseLedgerRows(ledger: string): LedgerRow[] {
+  return ledger
     .split("\n")
     .flatMap((line) => {
       const m = LEDGER_ROW.exec(line);
       return m ? [{ id: m[1]!, status: m[2]!, note: m[6]! }] : [];
     });
+}
+
+export function ledgerRows(root: string): LedgerRow[] {
+  return parseLedgerRows(readFileSync(path.join(root, "BUILD-STATE.md"), "utf8"));
 }
 
 export function blockedRows(root: string): LedgerRow[] {
