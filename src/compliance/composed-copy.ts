@@ -127,6 +127,7 @@ export const COMPOSED_COPY_SITES: readonly ComposedSite[] = [
   { module: "src/outcomes/dashboard.ts", fn: "describeAsk", composes: "What a settlement is waiting on, in words rather than an event code." },
   { module: "src/outcomes/response-graph.ts", fn: "renderResponseGraph", composes: "The response graph as prose, over a rail on which nothing has ever been sent." },
   { module: "src/outcomes/time-to-escalation.ts", fn: "renderTimeToEscalation", composes: "Time-to-escalation figures with their basis, or the refusal to give one." },
+  { module: "src/quality/unit-headers.ts", fn: "headerViolations", composes: "One line per module the header door refuses, naming the module and the unit it claims. Developer-facing throughout; it is here because W278's detector finds composing functions rather than being told about them, and a register that exempted the ones nobody renders would be back to a hand-kept list." },
   { module: "src/reporting/report.ts", fn: "renderPracticeReport", composes: "The practice report — the surface a PHN would read if G9 were ever ratified." },
   { module: "src/verticals/completeness.ts", fn: "renderCompletenessReport", composes: "What stands between a vertical and shipping, decomposed by the act outstanding and who must do it." },
   { module: "src/verticals/scale.ts", fn: "orderDependence", composes: "Whether a vertical's assembly depends on the order its members arrived in." },

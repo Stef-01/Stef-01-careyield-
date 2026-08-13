@@ -1,4 +1,5 @@
-// Deterministic seeded RNG (mulberry32) — the loop must be reproducible; Math.random is banned.
+// W3: deterministic seeded RNG (mulberry32) — the loop must be reproducible; Math.random is
+// banned. Same unit as `synthetic/generate.ts`, which is the only thing that seeds it.
 
 export type Rng = () => number;
 

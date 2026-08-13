@@ -1,3 +1,19 @@
+// W281: the synthetic clinician directory the finder and demo surfaces render.
+//
+// The largest body of patient-facing prose in this tree — 731 strings across every card, and no
+// copy control had ever read one of them. That is CENSUS-1's harm, measured: the finding said the
+// header-less modules were "all Year-1 infrastructure that holds no operator copy", and this is
+// the module that makes that sentence false.
+//
+// Every clinician here is SYNTHETIC. No real practitioner is described, named or pictured
+// (founder gate, plan §4 — and the same gate is why this stays a demo rather than a directory).
+//
+// WRITTEN OUTSIDE THE UNIT LOOP, which is why it had no header to move. Its creating commit
+// carries no unit number at all — the four modules in this class arrived on 2026-08-09 between
+// W51 and W65, from founder-side work rather than from a firing. W281 adopts them: a module the
+// loop did not write is still a module the copy census has to see, and for a year it did not.
+// Declared in W200's operator copy surface as of W281; its three advice findings are recorded
+// with arguments in `ACCEPTED_COPY_FINDINGS` rather than exempted.
 import type { CareArchetype } from "./care-archetypes";
 
 export type Clinician = {

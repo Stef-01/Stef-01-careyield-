@@ -1,3 +1,15 @@
+// W281: append-only store for community interest signups.
+//
+// Machinery, not copy — it holds no rendered string. It is headered for the same reason as the
+// other three: the census decides what it must cover by reading headers, so a module without one
+// is not "clean", it is INVISIBLE, and an absence of evidence was being read as evidence of
+// absence. Signups are real contact details from a public form, which is why the store writes to
+// a path outside the repo and no fixture in this tree contains one.
+//
+// WRITTEN OUTSIDE THE UNIT LOOP, which is why it had no header to move. Its creating commit
+// carries no unit number at all — the four modules in this class arrived on 2026-08-09 between
+// W51 and W65, from founder-side work rather than from a firing. W281 adopts them: a module the
+// loop did not write is still a module the copy census has to see, and for a year it did not.
 import { randomUUID } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";

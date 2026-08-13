@@ -4,7 +4,6 @@
 import { describe, expect, it } from "vitest";
 import { getStore, resetStore } from "@/booking/store";
 import {
-  HEADERLESS_AT_W210,
   LATENT_FINDINGS,
   type LatentFinding,
   declareFinding,
@@ -98,11 +97,15 @@ describe("W210 the triggers are real predicates over this tree", () => {
     expect(finding("TENANCY-1").recordedBy).toBe("W209");
   });
 
-  it("counts header-less modules for CENSUS-1 against a pinned floor", () => {
-    // The eleven are Year-1 infrastructure. A twelfth is a module that has slipped out of W200's
-    // census unnoticed, which is the failure a both-directions register should be incapable of.
-    expect(modulesWithNoUnitHeader().length).toBe(HEADERLESS_AT_W210);
+  it("finds no header-less module at all, because W281 closed CENSUS-1", () => {
+    // Was `toBe(HEADERLESS_AT_W210)` — eleven, tolerated forever. W281 headered all eleven and
+    // retired the pin, so the floor is zero and needs no constant. The trigger is kept and
+    // re-shaped to `> 0`: W280's rule, that a closed finding whose condition was deleted is
+    // indistinguishable from one that was never real.
+    expect(modulesWithNoUnitHeader()).toEqual([]);
     expect(finding("CENSUS-1").trigger()).toBe(false);
+    expect(finding("CENSUS-1").status).toBe("closed");
+    expect(finding("CENSUS-1").closedBy).toBe("W281");
   });
 
   it("no longer touches the synthetic rail, because the trigger that did is closed", () => {

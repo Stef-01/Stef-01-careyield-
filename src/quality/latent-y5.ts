@@ -59,7 +59,7 @@ import path from "node:path";
 import { resetStore } from "@/booking/store";
 import { LATENT_FINDINGS, modulesWithNoUnitHeader, type LatentFinding } from "./latent-findings";
 import { probeDiscriminates } from "./ranker-behaviour";
-import { dossierTestFiles } from "./tree-walks";
+import { dossierTestFiles, sourceModules } from "./tree-walks";
 
 const ROOT = path.resolve(__dirname, "../..");
 const SRC = path.join(ROOT, "src");
@@ -114,10 +114,16 @@ export const FINDING_ANCHORS: readonly FindingAnchor[] = [
   },
   {
     id: "CENSUS-1",
-    claim: "The header-less walk returns modules, so a count greater than the pin is reachable.",
-    holds: () => modulesWithNoUnitHeader().length > 0,
+    // W281 CLOSED THE FINDING AND HAD TO RE-POINT THIS ANCHOR, which is worth recording because
+    // the old one went false at the moment of the fix. It claimed "the header-less walk returns
+    // modules, so a count greater than the pin is reachable" — true while eleven modules lacked
+    // headers, and FALSE the instant they all had one. An anchor that dies when its finding is
+    // resolved is an anchor pointed at the symptom. This one is pointed at the walk's ability to
+    // see: as long as the module walk returns modules, a header-less one arriving is observable.
+    claim: "The module walk returns modules, so a header-less one arriving is observable at the door.",
+    holds: () => sourceModules(ROOT).length > 0,
     ifDead:
-      "The predicate is `count > HEADERLESS_AT_W210`. A walk that returned nothing — a moved directory, a changed extension filter — makes it `0 > 11`, permanently false, and a module could then ship with no header and escape W200's census exactly as the finding describes.",
+      "The predicate is `modulesWithNoUnitHeader().length > 0` and W281's door asserts the same list is empty every run. A walk that returned nothing — a moved directory, a changed extension filter — makes both of them read clean forever, and a module could then ship with no header and escape W200's census exactly as the finding described. Empty is the answer this pair gives when it is working and when it is broken, which is why the anchor asks whether the walk has a subject at all.",
   },
 ];
 

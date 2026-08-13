@@ -1,5 +1,5 @@
-// One home for the ISO date arithmetic the generator, sim, and dashboard windows all
-// share (W26 consolidation) — week-boundary math must be identical everywhere or
+// W26: one home for the ISO date arithmetic the generator, sim, and dashboard windows all
+// share — week-boundary math must be identical everywhere or
 // visits silently drop/double-count at week edges.
 
 export function isoDaysFrom(anchor: string, days: number): string {

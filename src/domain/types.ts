@@ -1,4 +1,8 @@
-// Meherr core domain model (W2).
+// W2: Meherr core domain model.
+//
+// W281 moved the unit to the front of this line. It always said `(W2)` — at the END, where
+// W200's census could not see it, so a module that HAD recorded its unit was counted as one
+// that had not.
 // Storage-agnostic: mirrored 1:1 by supabase/migrations/0001_core.sql (consistency-tested).
 
 export type PracticeId = string & { readonly __brand: "PracticeId" };

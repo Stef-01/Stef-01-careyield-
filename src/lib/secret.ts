@@ -1,3 +1,4 @@
+// W13: signing-secret resolver, from Q1's security pass.
 // Signing-secret resolver shared by booking tokens and console sessions.
 // Fails CLOSED in production: a missing CAREYIELD_TOKEN_SECRET throws at first use
 // rather than silently signing with the committed synthetic-phase fallback.

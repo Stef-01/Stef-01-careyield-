@@ -1,3 +1,12 @@
+// W281: the care archetypes the demo drives — a patient's own words for what they are looking
+// for, and the match the finder is expected to return for it.
+//
+// Patient-voice copy, synthetic throughout: no real person's request is reproduced here.
+//
+// WRITTEN OUTSIDE THE UNIT LOOP, which is why it had no header to move. Its creating commit
+// carries no unit number at all — the four modules in this class arrived on 2026-08-09 between
+// W51 and W65, from founder-side work rather than from a firing. W281 adopts them: a module the
+// loop did not write is still a module the copy census has to see, and for a year it did not.
 export type CareArchetype = {
   id: string;
   title: string;

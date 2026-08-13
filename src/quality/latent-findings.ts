@@ -113,12 +113,15 @@ export function modulesWithNoUnitHeader(): string[] {
 }
 
 /**
- * The eleven header-less modules that exist today, all Year-1 infrastructure.
+ * W281 RETIRED `HEADERLESS_AT_W210`, the pin that used to live here.
  *
- * Pinned as a COUNT rather than a list because the finding is about growth: these eleven are
- * known and harmless, and a twelfth is a module that has slipped out of W200's census.
+ * It was eleven, and it was the wrong shape twice over. A count tolerates eleven forever, says
+ * nothing about WHICH eleven, and cannot notice one leaving as another arrives — the fourth time
+ * this tree has recorded that about a pinned number. And "known and harmless", the sentence that
+ * justified it, was not true: `src/demo/clinicians.ts` is 731 strings of patient-facing prose.
+ *
+ * The floor is zero now and needs no constant. `src/quality/unit-headers.ts` is the door.
  */
-export const HEADERLESS_AT_W210 = 11;
 
 export const LATENT_FINDINGS: readonly LatentFinding[] = [
   declareFinding({
@@ -223,12 +226,17 @@ export const LATENT_FINDINGS: readonly LatentFinding[] = [
   declareFinding({
     id: "CENSUS-1",
     what:
-      "W200's copy surface decides which modules it must cover by reading each module's `// W<n>` header, so a module with NO header is invisible to it — not declared, not linted, and not reported as missing. Eleven such modules exist and all are Year-1 infrastructure that holds no operator copy, which is why this is latent rather than live.",
+      "W200's copy surface decides which modules it must cover by reading each module's `// W<n>` header, so a module with NO header is invisible to it — not declared, not linted, and not reported as missing. Eleven such modules existed. **CLOSED BY W281, and closing it falsified its own second sentence:** this finding said the eleven were \"all Year-1 infrastructure that holds no operator copy, which is why this is latent rather than live\". Four of them were written outside the unit loop entirely, by commits carrying no unit number, and one of those four — `src/demo/clinicians.ts` — is 731 strings of patient-facing prose, the largest body of rendered copy in the tree. It had never been linted. Three of the other seven had recorded their unit in a place the `^// W\\d+` detector could not read it, so they were counted as undocumented when they were merely differently formatted. All eleven carry headers now, the four copy-bearing ones are declared in W200's surface, and the check is a door rather than a count.",
     recordedBy: "W210",
     triggerStatement:
       "A twelfth module ships with no unit header. It escapes the Y4 copy census silently, which is the one failure mode a both-directions register is supposed to be incapable of.",
-    trigger: () => modulesWithNoUnitHeader().length > HEADERLESS_AT_W210,
-    status: "open",
+    // KEPT, and re-shaped from `> 11` to `> 0`. W280's rule: a closed finding whose condition was
+    // deleted is indistinguishable from one that was never real. `fired()` reads only OPEN
+    // findings, so the thing that now guards the tree is the door in `unit-headers.ts`, asserted
+    // every run — this stays so the condition remains legible and re-openable.
+    trigger: () => modulesWithNoUnitHeader().length > 0,
+    status: "closed",
+    closedBy: "W281",
   }),
 ];
 

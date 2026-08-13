@@ -415,6 +415,36 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W282's tree-derivations: seven walks, each taking a root, moved out of the test files that owned them so the registers built on them can be shown a file arriving. It returns file paths and function names and nothing else — no patient, condition or appointment reason appears in it, and it has no strings a clinician or practice manager reads.",
   },
   {
+    module: "src/demo/clinicians.ts",
+    operatorCopy: ["clinicians"],
+    notCopy:
+      "The type is the only other export and it is compile-time. Everything else in this module IS copy, which is the point of declaring it: 731 strings across every card the finder and demo render — names, focus lines, match lines, about paragraphs, experience, practical signals. It is the largest body of patient-facing prose in the tree and no copy control had read one word of it until W281 stamped its header. Every clinician is SYNTHETIC; no real practitioner is described.",
+  },
+  {
+    module: "src/demo/care-archetypes.ts",
+    operatorCopy: ["careArchetypes"],
+    notCopy:
+      "Nothing. Every export here is copy — the archetype titles, eyebrows, the patient's own words for what they are looking for, and the headline the finder shows back. 148 strings, synthetic throughout: no real person's request is reproduced. Declared at W281 with the module it feeds.",
+  },
+  {
+    module: "src/interest/types.ts",
+    operatorCopy: ["INTEREST_REASONS"],
+    notCopy:
+      "The remaining exports are types. `INTEREST_REASONS` is the three options a visitor ticks on the public community form, so it is rendered copy by any reading — and it had been covered by nothing since the form was built outside the unit loop in 2026.",
+  },
+  {
+    module: "src/interest/store.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and checked rather than assumed — the lint found no reachable string in any export. This is the append-only signup store: it reads and writes JSONL, neutralises spreadsheet formulas on the way in, and returns records. It is declared because a module without a header is not clean but INVISIBLE, and W281's rule is that the census sees every module and then says which hold copy.",
+  },
+  {
+    module: "src/quality/unit-headers.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W281's header door: which modules carry a `// W<n>` header, which record their unit somewhere the census cannot read, and which name a unit the ledger does not have. Nobody but a developer reads it. Its strings are the rule itself and violation lines naming a module and a unit number; no patient, condition or appointment reason appears in it.",
+  },
+  {
     module: "src/quality/ranker-behaviour.ts",
     operatorCopy: [],
     notCopy:
@@ -685,6 +715,25 @@ export interface AcceptedCopyFinding {
 }
 
 export const ACCEPTED_COPY_FINDINGS: readonly AcceptedCopyFinding[] = [
+  // W281's three, all from `src/demo/clinicians.ts` — the module CENSUS-1 said held no operator
+  // copy. Reading them is what the adoption was for, and the honest result is the same as W270's:
+  // no rule is being loosened, and the finding is that for a year there was no way to look.
+  {
+    module: "src/demo/clinicians.ts",
+    exportName: "clinicians",
+    rule: "no-benefit-claims",
+    match: "specialist",
+    why: "Two cards say specialist decisions belong to somebody else: \"he coordinates with psychiatrists and perinatal teams; specialist medication decisions remain within shared care\" and \"psychiatrist and perinatal-team coordination for specialist treatment\". The rule bans claiming to BE a specialist; both sentences say the opposite — they mark the boundary of what a GP does and name where the rest happens. Same direction as W270's acceptance for `escalation.ts`, where a promise about honouring an opt-out tripped the urgency rule. Plan §6 is stricter than the linter here — \"specialist\" must never sit next to a niche scope — and it is satisfied for the same reason: the word attaches to treatment held elsewhere, never to the clinician's own scope.",
+    reviewBy: "2027-02-14",
+  },
+  {
+    module: "src/demo/clinicians.ts",
+    exportName: "clinicians",
+    rule: "no-test-results-bait",
+    match: "pathology",
+    why: "\"On-site pathology\" in a card's practical signals, beside \"Mixed billing\" and \"9 min by train\". The rule exists for SMS: \"your pathology results are ready\" used as a reason to book is the disclosure this product never makes. This is a facility fact on a directory card, with no result, no patient and no prompt attached. The same words on a different surface — W192's finding, and the argument W200 accepted for `SILENCE_COPY`.",
+    reviewBy: "2027-02-14",
+  },
   // W270's five, all from the four pre-floor surfaces its door brought in. Each is the same shape
   // as the acceptance directly below for `SILENCE_COPY`: the same words mean different things on
   // different surfaces, so the rule stays sharp and the acceptance is per module, export, rule and

@@ -21,7 +21,7 @@ import {
   anchorCoverage,
   deadAnchors,
 } from "./latent-y5";
-import { HEADERLESS_AT_W210, LATENT_FINDINGS, fired, modulesWithNoUnitHeader } from "./latent-findings";
+import { LATENT_FINDINGS, fired, modulesWithNoUnitHeader } from "./latent-findings";
 import { reachableFromApp } from "@/security/reachability";
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -101,15 +101,14 @@ describe("W268 MATCH-1's liveness half, re-derived", () => {
 });
 
 describe("W268 the predicates are driven, not only anchored", () => {
-  it("fires CENSUS-1 against a tree with one more header-less module", () => {
+  it("fires CENSUS-1 against a tree with one header-less module", () => {
     // An anchor that holds does not prove the predicate reads it, so the condition is constructed.
-    // CENSUS-1 is `count > HEADERLESS_AT_W210`, and the count is real: eleven today, unchanged
-    // after a year and forty new modules, which is W200's header convention holding rather than
-    // nobody looking.
+    // W281 closed the finding and the arithmetic moved with it: the pin was `> 11`, tolerating
+    // eleven forever, and the trigger is `> 0` now — one header-less module fires it.
     const now = modulesWithNoUnitHeader().length;
-    expect(now).toBe(HEADERLESS_AT_W210);
-    expect(now > HEADERLESS_AT_W210).toBe(false);
-    expect(now + 1 > HEADERLESS_AT_W210, "a twelfth header-less module would not fire it").toBe(true);
+    expect(now).toBe(0);
+    expect(now > 0, "the tree has a header-less module and the door did not say so").toBe(false);
+    expect(now + 1 > 0, "one header-less module would not fire it").toBe(true);
   });
 
   it("fires DOSSIER-1 against a dossier test with no bound", () => {

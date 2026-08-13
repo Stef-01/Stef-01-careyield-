@@ -14,6 +14,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
+import { adoptedModuleNames } from "@/quality/unit-headers";
 import {
   ERASURE_PATHS,
   captureStores,
@@ -116,7 +117,16 @@ describe("W265 every stored class has a stated disposition, both directions", ()
   it("finds that Year 5 added no stored class, rather than assuming it", () => {
     // A re-derivation reporting "unchanged" is the one to be suspicious of, so the claim is read
     // off the tree: every Y5-or-later module that W106 classifies, and what it classifies it as.
+    //
+    // W281 SUBTRACTED THE ADOPTED MODULES, and finding out why is worth more than the subtraction.
+    // This derivation reads a header to answer "when did this module ARRIVE". W281 gave headers to
+    // eleven modules that had none, four of which were written outside the unit loop in 2026 and
+    // so carry the unit that ADOPTED them. `src/interest/store.ts` is `stored`, and it turned this
+    // red as a Year-5 arrival — a module four years old, unchanged, that had simply become
+    // legible. A header names the owning unit; it is not a date of birth.
+    const adopted = adoptedModuleNames();
     const y5Classified = RECORD_CLASSES.filter((c) => {
+      if (adopted.has(c.module)) return false;
       const full = path.join(SRC, "..", c.module);
       const header = readFileSync(full, "utf8").split("\n")[0]?.match(/^\/\/ W(\d+)/);
       return header ? Number(header[1]) >= 209 : false;

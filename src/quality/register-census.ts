@@ -339,6 +339,15 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/unit-headers.ts",
+    derives: "Every module under `src/`, to read the unit its header claims — missing, misplaced, or naming a unit the ledger does not have.",
+    checkedAgainst: "The ledger's own unit ids, and the door: all three lists must be empty. It replaced W210's `HEADERLESS_AT_W210` count at W281.",
+    proof: {
+      kind: "mutated_tree",
+      mutation: "three files are planted in a copied tree — one with no header, one recording its unit at the end of the line, one naming W999 — and each must land in its own list while the other two stay empty",
+    },
+  },
+  {
     file: "src/quality/tree-walks.ts",
     derives: "Seven tree-derivations, each taking a root: text files, exported resetters, store modules, migrations, vertical declarations, gate-dossier tests, and modules with no unit header.",
     checkedAgainst: "Nothing of its own — it IS the walking, and each caller checks its own register against what it returns.",
@@ -350,7 +359,7 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
   {
     file: "src/quality/latent-findings.ts",
     derives: "Every module with no `// W<n>` header — one recorded finding's live condition.",
-    checkedAgainst: "W210's `HEADERLESS_AT_W210`, so the count becoming worse fires the finding.",
+    checkedAgainst: "W281's door in `unit-headers.ts` — the list must be EMPTY. It was `> HEADERLESS_AT_W210` until W281 retired that pin; a count tolerated eleven forever and could not notice one leaving as another arrived.",
     proof: {
       kind: "mutated_tree",
       mutation: "a module with no `// W<n>` header is added and `modulesWithNoUnitHeader` must return it",

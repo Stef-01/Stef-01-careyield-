@@ -165,7 +165,11 @@ describe("W267 the finding: a proved content scanner is not a proved walk", () =
     // them in both directions: eight proved before, seventeen after, and the unproven list shorter
     // by the same seven. A count that only went up would mean entries were added rather than
     // registers becoming provable.
-    expect(walkProven().length).toBe(17);
+    //
+    // Eighteen since W281, and that one IS an addition rather than a conversion — a new walk that
+    // arrived already proved, which is what W282 said moving the walks into `tree-walks.ts` would
+    // make the default. The unproven list is unchanged by it, which is the check that says so.
+    expect(walkProven().length).toBe(18);
     expect(unproven.length + walkProven().length).toBe(TREE_DERIVED_REGISTERS.length);
     // And the harsh reading is not the fair one, so the census carries both facts.
     const withContentProof = unproven.filter(

@@ -1,3 +1,4 @@
+// W37: refuses demo routes outside the environments that may serve them (security pass 2).
 import { notFound } from "next/navigation";
 
 // W37: the demo surface signs visitors in as the demo-practice owner and reseeds

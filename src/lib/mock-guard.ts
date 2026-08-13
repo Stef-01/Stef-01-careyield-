@@ -1,3 +1,4 @@
+// W13: refuses mock-only routes outside the environments that may serve them (Q1 security pass).
 import { notFound } from "next/navigation";
 
 // Mock introspection routes disclose signed tokens and reset shared state — they
