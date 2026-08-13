@@ -607,6 +607,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W277's two-tenant coverage register: which practice-scoped reads have been shown a second practice, the detector that decides, and its stated bound. Nobody but a developer reads it. Its strings are module and function names and one paragraph about a literal-counting detector; no patient, condition or appointment reason appears in it.",
   },
   {
+    module: "src/tenancy/fixture-coherence.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W276 checks whether the demo fixture belongs to a practice anybody can sign in as, and every string in it is addressed to whoever adds a store: each entry's `note` says what that store seeds, and each opaque one carries the one-line change that would make it readable. No clinician or practice manager sees any of it, and nothing here renders. `REFUSED_COHERENCE_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the source grep, the constant comparison and the clean-looking opaque store it exists to forbid.",
+  },
+  {
     module: "src/tenancy/store-reads.ts",
     operatorCopy: [],
     notCopy:
