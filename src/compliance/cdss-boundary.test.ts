@@ -112,6 +112,7 @@ const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/quality/blocked-surface.ts": () => import("@/quality/blocked-surface"),
   "src/quality/route-coverage.ts": () => import("@/quality/route-coverage"),
   "src/quality/refusal-branches.ts": () => import("@/quality/refusal-branches"),
+  "src/quality/tautology-sweep.ts": () => import("@/quality/tautology-sweep"),
   "src/quality/register-census.ts": () => import("@/quality/register-census"),
   "src/quality/order-independence.ts": () => import("@/quality/order-independence"),
   "src/quality/order-regressions.ts": () => import("@/quality/order-regressions"),

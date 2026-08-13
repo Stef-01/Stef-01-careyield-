@@ -142,6 +142,18 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/tautology-sweep.ts",
+    derives:
+      "Every assertion in every `*.test.ts` under `src/`, classified against three shapes whose expected value follows from the assertion's own text.",
+    checkedAgainst:
+      "`ACCEPTED_TAUTOLOGIES`, in both directions: a hit with no acceptance fails, and an acceptance whose condition has stopped holding — or whose hit is gone — fails too.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "three files are planted in a constructed root — a test with a tautology, a test with the real assertion it most resembles, and a non-test file carrying the same tautology — and only the first may be reported",
+    },
+  },
+  {
     file: "src/quality/refusal-branches.ts",
     derives:
       "Every exported violation reporter under `src/` — named `*Violations` or `*Diff` and returning something other than prose — so a reporter cannot arrive without its refusal arms being driven.",

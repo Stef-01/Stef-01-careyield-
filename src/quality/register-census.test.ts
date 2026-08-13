@@ -178,8 +178,10 @@ describe("W267 the finding: a proved content scanner is not a proved walk", () =
     //
     // Twenty-two at W291, another arrival rather than a conversion, and the unproven list is again
     // unchanged: `violationReporters` takes a root from its first commit, so the register that
-    // drives refusal branches was never on the unproven list to be moved off it.
-    expect(walkProven().length).toBe(22);
+    // drives refusal branches was never on the unproven list to be moved off it. Twenty-three at
+    // W288, for the same reason and by now the ordinary one: a register written this quarter takes
+    // a root because `tree-walks.ts` is where its walk already lives.
+    expect(walkProven().length).toBe(23);
     expect(unproven.length + walkProven().length).toBe(TREE_DERIVED_REGISTERS.length);
     // And the harsh reading is not the fair one, so the census carries both facts.
     const withContentProof = unproven.filter(

@@ -105,7 +105,10 @@ describe("W272 the review table describes the quarter that happened", () => {
 describe("W272 finding 1's fix is in the tree, not only in the document", () => {
   it("ships the scoped export the document says it ships", () => {
     expect(DOC).toContain("consoleExportFor(patientId, practiceId, now)");
-    expect(typeof consoleExportFor).toBe("function");
+    // W288 removed `expect(typeof consoleExportFor).toBe("function")` from here. The import is
+    // static, so tsc fails before this file runs if the export goes or stops being a function —
+    // the line was a runtime check of something the compiler already refuses to let through, and
+    // it sat next to the assertion that does the work.
     expect(consoleExportFor.length, "the fix does not take a practice").toBe(3);
   });
 

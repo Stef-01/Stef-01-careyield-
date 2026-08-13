@@ -222,6 +222,14 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    module: "src/quality/tautology-sweep.ts",
+    folds: 1,
+    disposition: {
+      kind: "rationale",
+      why: "One last-element read, and the collection cannot be in any other order: `enclosingTest` takes the last `it(` opening that starts before the assertion's offset, and the list comes from `matchAll` over the file's own text, which yields matches in position order by construction rather than from any collection whose order a caller or a store could vary. 'The last opening before this offset' IS the definition of the enclosing test — there is no tie to break, because two openings cannot share a start index. The value read is the test's TITLE, not a record, which is the same argument src/capacity/model.ts makes.",
+    },
+  },
+  {
     module: "src/referrals/store.ts",
     folds: 1,
     disposition: {

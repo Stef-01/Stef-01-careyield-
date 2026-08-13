@@ -22,6 +22,7 @@ import { credentialShapedLiterals } from "@/interop/credentials";
 import { patientMarkersIn } from "@/api/refusals";
 import { API_REFUSAL_COPY } from "@/api/surface";
 import { STORE_READS } from "@/tenancy/store-reads";
+import { blankLiterals } from "./tautology-sweep";
 
 const ROOT = process.cwd();
 /**
@@ -129,9 +130,16 @@ describe("W256 the whole-tree sweeps", () => {
     // Y5-1. A lower bound on a quantity that is non-negative by construction can never fail, so
     // it reads as coverage and checks nothing. Every `toBeGreaterThanOrEqual(0)` in the tree must
     // now be paired with an upper bound in the same test body.
+    //
+    // W288 NARROWED THE SCAN TO CODE. It read raw text, so a quoted assertion counted as one — and
+    // W288's own test quotes `expect(rows.length).toBeGreaterThanOrEqual(0)` as the input its
+    // detector must flag, which made this rule report a probe as a defect. The same collision
+    // W237 hit with an endpoint scan matching the note explaining why no endpoint exists, and the
+    // same fix: narrow the scan rather than contort the copy. `blankLiterals` preserves offsets
+    // and newlines, so the block split below is unaffected.
     const unpaired: string[] = [];
     for (const file of sourceFiles("src", { tests: true }).filter((f) => /\.test\.ts$/.test(f))) {
-      const text = readFileSync(file, "utf8");
+      const text = blankLiterals(readFileSync(file, "utf8"));
       for (const block of text.split(/\n  it\(|\n  test\(/)) {
         const lows = [...block.matchAll(/expect\(([^)]+?)\)[^;]*?\.toBeGreaterThanOrEqual\(0\)/g)];
         for (const low of lows) {

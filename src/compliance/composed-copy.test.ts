@@ -40,7 +40,7 @@ describe("W278 the composing functions are found, not listed", () => {
     const found = composingFunctions(ROOT).map(key).sort();
     const declared = [...COMPOSED_COPY_SITES].map(key).sort();
     expect(found).toEqual(declared);
-    expect(found).toHaveLength(20);
+    expect(found).toHaveLength(21);
   });
 
   it("finds W200's own named example", () => {
@@ -221,12 +221,22 @@ describe("W278 five of them are called, and the output is linted", () => {
     expect(lintEducationCopy(composed).length).toBeGreaterThan(0);
   });
 
-  it("states the bound rather than letting five read as eighteen", () => {
-    // W237's rule. The number is derived, so the sentence cannot drift from the fixture list.
+  it("states the bound, and states it in terms nothing can silently outgrow", () => {
+    // W237's rule, and W288 CAUGHT THE COMMENT THAT USED TO SIT HERE: *"the number is derived, so
+    // the sentence cannot drift from the fixture list."* It was not derived. The assertion pinned
+    // the literal phrase "Five of the eighteen" and nothing compared "eighteen" to the register's
+    // length, so when the register reached twenty the sentence was wrong and the suite was green —
+    // a check that could not catch the drift it existed for, which is Q23's whole subject.
+    //
+    // The fix is not a bigger number. A total written into prose has to be re-typed by whoever
+    // adds a site, and that is the mechanism that failed; the sentence now names the driven FIVE,
+    // which is the bound it exists to state, and leaves the total to the register.
     const covered = new Set(rendered.map((r) => r.site));
     expect(covered.size).toBe(5);
-    expect(COMPOSED_COPY_SITES).toHaveLength(20);
-    expect(FIXTURE_BOUND).toContain("Five of the eighteen");
+    expect(FIXTURE_BOUND).toContain("Five sites are driven");
+    expect(FIXTURE_BOUND, "the bound names a total the register would have to keep in step").not.toMatch(
+      /\b(eighteen|nineteen|twenty|twenty-one)\b/,
+    );
     expect(FIXTURE_BOUND).toContain("remedy");
   });
 });

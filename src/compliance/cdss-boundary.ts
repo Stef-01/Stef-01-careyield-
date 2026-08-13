@@ -724,6 +724,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "An in-memory store of specs, and its strings are ids and criteria keys. What it holds is authored elsewhere and gated by G5; the store renders nothing.",
   },
   {
+    module: "src/quality/tautology-sweep.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W288's sweep for assertions that cannot fail is reviewer-facing throughout: three shape names, the argument for each, and the sentences attached to the five near-misses it deliberately leaves alone. Its longest strings are those arguments and `SWEEP_BOUND`, which are addressed to whoever widens the detector. `NOT_A_TAUTOLOGY` is reviewer-facing in W200's split for the usual reason: its content QUOTES the assertions it refuses to flag, including the determinism idiom this tree uses ten times. Nothing here renders and no practice sees it; its only input is the text of the tree's own test files and its only output is file paths and line numbers.",
+  },
+  {
     module: "src/quality/refusal-branches.ts",
     operatorCopy: [],
     notCopy:

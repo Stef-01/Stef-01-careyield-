@@ -156,6 +156,17 @@ export function pageSpecFiles(root: string): string[] {
     .sort();
 }
 
+/**
+ * W288: every `*.test.ts` under `root/src` — the files the tautology sweep reads.
+ *
+ * The counterpart to `sourceModules`, which excludes exactly these. Rooted for the same reason as
+ * the rest: a sweep for assertions that cannot fail has to be shown a test file ARRIVING, or it
+ * reports a clean tree while a new file's tautologies sit outside its list.
+ */
+export function testModules(root: string): string[] {
+  return filesUnder(path.join(root, "src")).filter((f) => f.endsWith(".test.ts"));
+}
+
 /** W210's live condition: modules whose first line is not a `// W<n>` header. */
 export function modulesWithNoUnitHeader(root: string): string[] {
   return sourceModules(root)
