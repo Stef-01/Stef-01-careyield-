@@ -367,6 +367,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W248's shared vertical machinery exports an evidence reader, a spec builder, two assembly calls and a gate list — no strings a clinician or practice manager reads. The one descriptive field it defines, `DeclaredMember.waitsOn`, holds text supplied by each vertical and is linted there, at the declaration, which is where the text actually exists.",
   },
   {
+    module: "src/compliance/composed-copy.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the emptiness is the classification. W278 closes the bound this very register states about itself — prose composed inside a function body, unreachable by export name — and every string in it is addressed to whoever adds a render function: each site's `composes` says what it composes and for whom, `FIXTURE_BOUND` says which five of the eighteen are driven with real inputs and why the other thirteen are not, and the acceptance carries the argument for one word on one surface. `REFUSED_COMPOSED_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the hand-kept list, the character count and the invented fixture it exists to forbid. NOTE, because it is the interesting property: this module is now inside its OWN sweep's population, and its detector finds no composing function here — nothing in it returns prose.",
+  },
+  {
     module: "src/compliance/copy-y6.ts",
     operatorCopy: [],
     notCopy:
