@@ -11,15 +11,18 @@
 //   THE CLAIMS THAT ARE NOT COUNTS. This dossier's central claim is not arithmetic, it is that a
 //   PUBLISHED NOTICE and the LIVE CODE contradict each other. Pinning that as prose would be
 //   pinning it to itself, so both halves are checked against their sources: the quotation against
-//   W201's register, and the ranker against `src/engine/pool.ts`. Either one changing fails this
+//   W201's register, and the ranker against WHAT IT RETURNS (W283; it used to be against the text
+//   of `src/engine/pool.ts`, which a rewording could silence). Either one changing fails this
 //   file, which is the only way a document that exists to report a contradiction can be trusted
 //   to still be reporting a real one.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { rankCandidates } from "@/engine/pool";
 import { NEVER_AUTOMATED } from "@/privacy/automated-decisions";
 import { LATENT_FINDINGS } from "./latent-findings";
+import { clinicalAttributeOutranksEveryOtherKey, observesClinicalAttribute } from "./ranker-behaviour";
 
 const ROOT = path.resolve(__dirname, "../..");
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
@@ -88,7 +91,21 @@ describe("W216 the contradiction it reports is real, on both sides", () => {
   it("finds the live ranker still ordering on a clinical attribute", () => {
     // The other half. If somebody removes the clinical sort, this fails and the dossier has to be
     // rewritten — which is the outcome the document is asking for.
-    expect(POOL, "rankCandidates no longer sorts on chronicCare").toMatch(/a\.chronicCare !== b\.chronicCare/);
+    //
+    // W283 SPLIT THE THREE ASSERTIONS BELOW BY KIND, because they were doing two different jobs
+    // and only one of them was legitimate. The dossier makes a BEHAVIOURAL claim — the ranker puts
+    // chronic-care patients first — and a QUOTATION: it reproduces the comment in the source. A
+    // quotation is properly pinned to the text it quotes; a behavioural claim pinned to text is
+    // the defect W283 removed from MATCH-1, and it lived here too, spelled with the same regex.
+    expect(
+      observesClinicalAttribute(rankCandidates),
+      "rankCandidates no longer orders on chronicCare",
+    ).toBe(true);
+    expect(
+      clinicalAttributeOutranksEveryOtherKey(rankCandidates),
+      "chronic-care patients are no longer FIRST, which is what the dossier says",
+    ).toBe(true);
+    // Quotations, and pinned as quotations: the dossier reproduces this comment verbatim.
     expect(POOL, "the overdue comment is gone").toMatch(/longer overdue/);
     expect(FLAT).toMatch(/older date = longer overdue = first/);
   });

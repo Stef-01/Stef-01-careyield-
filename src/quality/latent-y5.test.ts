@@ -14,6 +14,8 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { rankCandidates } from "@/engine/pool";
+import { observesClinicalAttribute } from "./ranker-behaviour";
 import {
   FINDING_ANCHORS,
   anchorCoverage,
@@ -82,10 +84,17 @@ describe("W268 MATCH-1's liveness half, re-derived", () => {
     // ranker does order on a clinical attribute while the published notice says nothing does —
     // and only the matcher's dormancy keeps the finding latent. Asserting that here is what stops
     // "not fired" from being read as "not a problem".
-    const pool = readFileSync(path.join(ROOT, "src/engine/pool.ts"), "utf8");
-    expect(pool, "the ranker stopped ordering on the attribute; MATCH-1 may be closable").toMatch(
-      /a\.chronicCare !== b\.chronicCare/,
-    );
+    //
+    // W283 REPLACED THE READ BELOW, and found it by mutation rather than by looking. It used to
+    // match `/a\.chronicCare !== b\.chronicCare/` against `src/engine/pool.ts`, and rewording that
+    // comparison — which changes nothing about who gets invited — turned this red under the
+    // message "the ranker stopped ordering on the attribute; MATCH-1 may be closable". That
+    // message would have been FALSE, and it is the one a future author reads while deciding
+    // whether a contradiction with a published legal notice has gone away.
+    expect(
+      observesClinicalAttribute(rankCandidates),
+      "the ranker stopped ordering on the attribute; MATCH-1 may be closable",
+    ).toBe(true);
     const match = LATENT_FINDINGS.find((f) => f.id === "MATCH-1")!;
     expect(match.status, "MATCH-1 was closed without the notice or the ranker changing").toBe("open");
   });

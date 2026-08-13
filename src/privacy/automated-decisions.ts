@@ -412,6 +412,8 @@ export const NOT_A_DECISION: Readonly<Record<string, string>> = {
   "src/privacy/record-classes.ts": "W106's register of where patient identity can live.",
   "src/privacy/store.ts": "Storage for access, correction and erasure requests and how they were answered. A record of what people asked for.",
   "src/quality/order-regressions.ts": "W178's corpus of past order-dependence defects. Engineering.",
+  "src/quality/ranker-behaviour.ts":
+    "W283's behavioural probe for MATCH-1, and it is reached by this register for the best possible reason: it reads `chronicCare`, which is the exact attribute this notice's *never automated* list says no ordering uses. It decides nothing about anybody. It takes no patient as input — it CONSTRUCTS four synthetic ones, identical in every field, hands them to a sort function, flips the flag on one, and reports whether the returned order moved. Its output is two booleans about a FUNCTION, never a verdict about a person, and the four fixtures have no name, no condition and no appointment. What it exists for is the other side of this notice: MATCH-1 records that the live invitation ranker orders on `chronicCare` while this page publishes that nothing does, and until W283 that finding was anchored to the TEXT of a comparison in one file — three ordinary refactors from going quiet with the contradiction still standing. A probe that watches the ranker's behaviour cannot be silenced by a rename.",
   "src/referrals/acceptance.ts": "The opposite of an automated decision: it requires a receiving practice to record acceptance, and exists so that no handover is ever concluded by software.",
   "src/referrals/barriers.ts": "Records why a referral did not complete, from a reason a person entered.",
   "src/referrals/document.ts": "The referral document a GP writes. The product neither generates nor edits its clinical content.",
@@ -489,9 +491,18 @@ export const NOTICE_REVISION: NoticeRevision = {
   // through any of them. The control is doing what it was built to do: making somebody look at
   // the notice every time the classified set moves, and the answer being "nothing published
   // changed" three times running is the answer, not a reason to loosen the pin.
-  reviewedAt: "W272",
+  //
+  // W283 moved it a fourth time, and this one is the most on-point of the four: the module joining
+  // the ruled-out half is the BEHAVIOURAL PROBE for MATCH-1 — the finding that says the live
+  // invitation ranker orders on `chronicCare` while the *never automated* list above says no
+  // ordering does. Re-read rather than bumped. Nothing published changed, because the probe
+  // decides nothing about anybody: it constructs four synthetic patients, hands them to a sort
+  // function and reports whether flipping a flag moved the order. The published text stays at
+  // fifteen decisions, and the contradiction it watches is unchanged and still the founder's.
+  // Same calendar day as the last review, so the date does not move; the unit does.
+  reviewedAt: "W283",
   decisionsAtReview: 15,
-  modulesAtReview: 100,
+  modulesAtReview: 101,
 };
 
 /** The line the page renders. Composed, so the page cannot state a date the register disagrees with. */

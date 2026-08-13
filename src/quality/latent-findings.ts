@@ -40,7 +40,9 @@
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { resetStore } from "@/booking/store";
+import { rankCandidates } from "@/engine/pool";
 import { reachableFromApp } from "@/security/reachability";
+import { observesClinicalAttribute } from "./ranker-behaviour";
 import { dossierTestFiles, modulesWithNoUnitHeader as walkModulesWithNoUnitHeader } from "./tree-walks";
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -203,10 +205,16 @@ export const LATENT_FINDINGS: readonly LatentFinding[] = [
      *
      * `reachableFromApp` walks the import graph from `app/` transitively, resolving specifiers
      * rather than matching their text. Composed, not restated — which is what W201 does here.
+     *
+     * W283 REPLACED THE ORDERING HALF for the same reason, and W268 named it here first: the
+     * conjunct was `/a\.chronicCare !== b\.chronicCare/.test(poolSource)`, which is a claim about
+     * how a comparison is SPELLED in one file. Extract a helper, destructure the comparands,
+     * rename the field, and it goes false while the ranker orders on the same attribute and the
+     * notice still denies it. `observesClinicalAttribute` flips the attribute on a tied panel and
+     * watches the returned order, so only the ranker changing its behaviour can silence it.
      */
     trigger: () => {
-      const pool = readFileSync(path.join(SRC, "engine", "pool.ts"), "utf8");
-      const stillOrdersOnCondition = /a\.chronicCare !== b\.chronicCare/.test(pool);
+      const stillOrdersOnCondition = observesClinicalAttribute(rankCandidates);
       const live = new Set(reachableFromApp(ROOT).files).has("src/matching/match.ts");
       return stillOrdersOnCondition && live;
     },

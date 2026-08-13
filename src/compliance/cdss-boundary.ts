@@ -409,6 +409,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W282's tree-derivations: seven walks, each taking a root, moved out of the test files that owned them so the registers built on them can be shown a file arriving. It returns file paths and function names and nothing else — no patient, condition or appointment reason appears in it, and it has no strings a clinician or practice manager reads.",
   },
   {
+    module: "src/quality/ranker-behaviour.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty, and the reason is worth stating because this module is CLOSER to a clinical surface than most: it is the behavioural probe MATCH-1 uses to ask whether the invitation ranker orders on `chronicCare`. It reads the flag, so a reader could reasonably wonder. It never renders anything. Its output is two booleans and its strings are refusal messages for a developer holding a fixture that proves nothing — `the panel is not tied`, `did not return a permutation`. The four patients it constructs are synthetic, have no name, no condition and no appointment, and exist only to be handed to a sort function and thrown away. Nothing here describes a patient to anybody or suggests a next clinical step."
+  },
+  {
     module: "src/quality/latent-y5.ts",
     operatorCopy: [],
     notCopy:

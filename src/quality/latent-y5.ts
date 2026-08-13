@@ -58,6 +58,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { resetStore } from "@/booking/store";
 import { LATENT_FINDINGS, modulesWithNoUnitHeader, type LatentFinding } from "./latent-findings";
+import { probeDiscriminates } from "./ranker-behaviour";
 import { dossierTestFiles } from "./tree-walks";
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -100,11 +101,16 @@ export const FINDING_ANCHORS: readonly FindingAnchor[] = [
   },
   {
     id: "MATCH-1",
-    claim: "`src/engine/pool.ts` still contains the comparison the predicate reads, so its first conjunct can be true.",
-    holds: () =>
-      /a\.chronicCare !== b\.chronicCare/.test(readFileSync(path.join(SRC, "engine", "pool.ts"), "utf8")),
+    // W283 REPLACED THIS ANCHOR, AND THE OLD ONE'S `ifDead` IS WHY — it is quoted almost verbatim
+    // in the unit that acted on it. The claim used to be that `src/engine/pool.ts` still contained
+    // the comparison, because the predicate matched that comparison's text. Now the predicate
+    // reads behaviour, so the thing that must hold is not a fact about a file: it is that the
+    // PROBE can still tell a clinical ranker from a blind one. That is a smaller and far more
+    // durable claim, and it is the one that actually guards the notice.
+    claim: "The behavioural probe still discriminates: it fires on a reference clinical ranker and not on a blind one.",
+    holds: () => probeDiscriminates(),
     ifDead:
-      "The predicate is `stillOrdersOnCondition && live`. Reword that comparison — a helper, a destructure, a rename — and the first conjunct goes false while the ranker orders on the same attribute and the published notice still denies it. The finding would go quiet without the contradiction moving at all.",
+      "The predicate is `observesClinicalAttribute(rankCandidates) && live`. If the probe stops discriminating — a degenerate panel, a flip that no longer flips, a guard that throws on everything — the first conjunct answers the same way for every ranker, and MATCH-1 goes quiet while a published legal notice and the live ranker still contradict each other.",
   },
   {
     id: "CENSUS-1",
