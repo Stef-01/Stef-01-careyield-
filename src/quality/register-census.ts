@@ -382,6 +382,15 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/pins.ts",
+    derives: "Every pin-named exported constant under `src/`, tests included — `*_AT_W<n>`, `*_LAST_UNIT`, `*_FIRST_UNIT`, `*_SURFACE_FLOOR`.",
+    checkedAgainst: "`PINS`, which classifies each by what event moves it; both directions, plus the argument a `live_by_design` pin owes for interrupting somebody.",
+    proof: {
+      kind: "mutated_tree",
+      mutation: "a pin-named constant is planted in a copied tree — in a source file and again in a test file — and must be reported undeclared, while a plain SCREAMING_CASE constant planted beside it must not",
+    },
+  },
+  {
     file: "src/quality/page-suite.ts",
     derives: "Every `*.spec.ts` under `e2e/`, to ask which of them the verify gate runs.",
     checkedAgainst: "`EXCLUDED_SPECS` — empty today — plus the verify script, the e2e script and the Playwright config, each of which can drop a spec without touching the others.",
@@ -516,6 +525,40 @@ export function censusDiff(
 }
 
 /** The registers whose walk has never been shown to notice a file arriving. The finding. */
+/**
+ * The registers whose walk has never been shown a file arriving, BY NAME.
+ *
+ * W290 replaced a count here — `walkProven().length` — and the reason is written in the thing it
+ * replaced: that assertion's comment had been amended by FIVE consecutive units (W275, W281, W282,
+ * W288, W291), each explaining why the number had moved, none of them reading it. A pin five
+ * authors edit in a row is a pin whose signal is noise.
+ *
+ * The property those units actually wanted is that this list only SHRINKS, and only by deliberate
+ * work. A register arriving already proved — which W282 made the default by putting the rooted
+ * walks in one module — does not touch it, which is why the count moved five times and this would
+ * not have moved once. A register arriving UNPROVEN does move it, and should: that is the event
+ * W267 exists to catch. A register losing its proof moves it too.
+ */
+export const UNPROVEN_AT_W290: readonly string[] = [
+  "src/api/surface.test.ts",
+  "src/capacity/copy-lint.test.ts",
+  "src/capacity/coupling.test.ts",
+  "src/credentials/vault.test.ts",
+  "src/directory/dossier-claims.test.ts",
+  "src/education/advice-lint.test.ts",
+  "src/interop/credentials.test.ts",
+  "src/messaging/send-path.test.ts",
+  "src/privacy/automated-decisions.test.ts",
+  "src/privacy/capacity-privacy.test.ts",
+  "src/privacy/erasure-y5.test.ts",
+  "src/privacy/outcomes-privacy.test.ts",
+  "src/quality/audit-y5.test.ts",
+  "src/quality/dossier-q18.test.ts",
+  "src/quality/g5-rehearsal.test.ts",
+  "src/referrals/scoping.test.ts",
+  "src/reporting/retention.test.ts",
+];
+
 export function walkUnproven(
   declared: readonly TreeDerivedRegister[] = TREE_DERIVED_REGISTERS,
 ): TreeDerivedRegister[] {

@@ -34,6 +34,7 @@ import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, wr
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fallibleDiff } from "./review-w279";
+import { duplicateDiff, pinDiff } from "./pins";
 import { coverageDiff } from "./route-coverage";
 import { censusDiff } from "./register-census";
 import { headerViolations } from "./unit-headers";
@@ -126,6 +127,46 @@ const LEDGER_ROW = (n: number) => `| W${n} | done | builder-A | 2026-08-14T00:00
  * undriven long enough to be worth a unit.
  */
 export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
+  // ── W290's pin sweep ──────────────────────────────────────────────────────────────────────
+  {
+    module: "src/quality/pins.ts",
+    fn: "pinDiff",
+    branch: "undeclared",
+    reach: { kind: "driven", drive: () => pinDiff(process.cwd(), []).undeclared.length > 0 },
+  },
+  {
+    module: "src/quality/pins.ts",
+    fn: "pinDiff",
+    branch: "stale",
+    reach: { kind: "driven", drive: () => pinDiff(process.cwd(), [{ module: "src/gone.ts", name: "GONE_AT_W1", classification: { kind: "floor" as const, why: "x".repeat(70) } }]).stale.length > 0 },
+  },
+  {
+    module: "src/quality/pins.ts",
+    fn: "pinDiff",
+    branch: "liveWithoutArgument",
+    reach: { kind: "driven", drive: () => pinDiff(process.cwd(), [{ module: "x", name: "A_AT_W1", classification: { kind: "live_by_design" as const, movedBy: "s", whyStopping: "b" } }]).liveWithoutArgument.length > 0 },
+  },
+  {
+    module: "src/quality/pins.ts",
+    fn: "pinDiff",
+    branch: "unargued",
+    reach: { kind: "driven", drive: () => pinDiff(process.cwd(), [{ module: "x", name: "B_AT_W1", classification: { kind: "floor" as const, why: "short" } }]).unargued.length > 0 },
+  },
+  {
+    module: "src/quality/pins.ts",
+    fn: "duplicateDiff",
+    branch: "unreconciled",
+    reach: { kind: "driven", drive: () => duplicateDiff(process.cwd(), {}).unreconciled.length > 0 },
+  },
+  {
+    module: "src/quality/pins.ts",
+    fn: "duplicateDiff",
+    branch: "unresolved",
+    reach: {
+      kind: "driven",
+      drive: () => duplicateDiff(process.cwd(), { Y5_FIRST_UNIT: "src/does-not-exist.ts" }).unresolved.length > 0,
+    },
+  },
   // ── W287's fallible console reads ─────────────────────────────────────────────────────────
   {
     module: "src/quality/review-w279.ts",

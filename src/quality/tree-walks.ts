@@ -73,6 +73,17 @@ export function sourceModules(root: string): string[] {
 }
 
 /**
+ * W290: every TypeScript file under `src/`, tests INCLUDED.
+ *
+ * Separate from `sourceModules` rather than a flag on it, because the difference is the finding:
+ * four of the tree's ten pinned constants live in `.test.ts` files, so a sweep for pins built on
+ * the source-only walk would have reported six and called itself complete.
+ */
+export function typescriptFiles(root: string): string[] {
+  return filesUnder(path.join(root, "src")).filter((f) => f.endsWith(".ts"));
+}
+
+/**
  * W116: every file tooling has to be able to read as text.
  *
  * Walks the whole repository rather than `src/`, which is why it keeps its own extension list.

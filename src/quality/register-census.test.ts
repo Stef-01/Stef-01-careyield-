@@ -16,6 +16,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  UNPROVEN_AT_W290,
   TREE_DERIVED_REGISTERS,
   censusDiff,
   treeWalkingFiles,
@@ -176,12 +177,14 @@ describe("W267 the finding: a proved content scanner is not a proved walk", () =
     // Twenty-one at W275, which added a walk and the file that proves it — the shape W282
     // predicted would become the default once the rooted walks lived in one module.
     //
-    // Twenty-two at W291, another arrival rather than a conversion, and the unproven list is again
-    // unchanged: `violationReporters` takes a root from its first commit, so the register that
-    // drives refusal branches was never on the unproven list to be moved off it. Twenty-three at
-    // W288, for the same reason and by now the ordinary one: a register written this quarter takes
-    // a root because `tree-walks.ts` is where its walk already lives.
-    expect(walkProven().length).toBe(23);
+    // W290 REPLACED THE COUNT THAT USED TO SIT HERE, and the paragraphs above are why: five
+    // consecutive units (W275, W281, W282, W288, W291) amended this comment to explain why the
+    // number had moved, and every one of those movements was a register ARRIVING already proved —
+    // the outcome W282 was aiming for, reported as a failure each time. A pin five authors edit in
+    // a row is a pin whose signal is noise. The property they wanted is that the UNPROVEN list
+    // only shrinks, so it is pinned by name: an arrival that is already proved does not touch it,
+    // and an arrival that is not does.
+    expect(walkUnproven().map((r) => r.file).sort()).toEqual([...UNPROVEN_AT_W290].sort());
     expect(unproven.length + walkProven().length).toBe(TREE_DERIVED_REGISTERS.length);
     // And the harsh reading is not the fair one, so the census carries both facts.
     const withContentProof = unproven.filter(

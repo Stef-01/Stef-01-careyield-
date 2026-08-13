@@ -445,6 +445,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and checked rather than assumed — the lint found no reachable string in any export. This is the append-only signup store: it reads and writes JSONL, neutralises spreadsheet formulas on the way in, and returns records. It is declared because a module without a header is not clean but INVISIBLE, and W281's rule is that the census sees every module and then says which hold copy.",
   },
   {
+    module: "src/quality/pins.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W290's pin register: every constant whose name follows the tree's pin conventions, what event moves it, and whether that event deserves to stop a build. Nobody but a developer reads it. Its longest strings are the arguments attached to each classification and a six-entry history of pins that went red on planned events; no patient, condition or appointment reason appears in it.",
+  },
+  {
     module: "src/quality/review-w279.ts",
     operatorCopy: [],
     notCopy:
