@@ -105,11 +105,21 @@ describe("W279 every console route is declared, both directions", () => {
   });
 
   it("declares could_not_load nowhere, and says why", () => {
-    // The honest reading rather than an oversight: no console read can fail, so the state has
-    // nowhere to arise and declaring it would be a control that does not exist.
+    // The honest reading rather than an oversight: the state has nowhere to arise, so declaring it
+    // would be a control that does not exist.
+    //
+    // W287 NARROWED THE REASON. This comment said "no console read can fail", and that is true of
+    // twenty-six of the twenty-seven — `/console/interest` reads a file on disk. The conclusion
+    // survives and its argument changes: the state stays declared nowhere because the one route
+    // that can reach it has a store that cannot tell the page which zero it is holding. The
+    // refusal is required to carry the exception, so nobody can quote the universal again.
     const declaring = CONSOLE_ZERO_STATES.filter((r) => r.states.includes("could_not_load"));
     expect(declaring).toEqual([]);
     expect(REFUSED_ZERO_SHAPES.declaring_could_not_load_everywhere).toContain("cannot throw");
+    expect(
+      REFUSED_ZERO_SHAPES.declaring_could_not_load_everywhere,
+      "the refusal states the universal W287 disproved",
+    ).toContain("/console/interest");
     // And the state still exists with copy, so the day a read CAN fail there is a sentence for it.
     expect(ZERO_STATE_COPY.could_not_load.headline.length).toBeGreaterThan(10);
   });

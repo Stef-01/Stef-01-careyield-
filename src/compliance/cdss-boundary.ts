@@ -445,6 +445,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty, and checked rather than assumed — the lint found no reachable string in any export. This is the append-only signup store: it reads and writes JSONL, neutralises spreadsheet formulas on the way in, and returns records. It is declared because a module without a header is not clean but INVISIBLE, and W281's rule is that the census sees every module and then says which hold copy.",
   },
   {
+    module: "src/quality/review-w279.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W287's review record for W279: the findings, their dispositions, and the register of console routes whose read can fail. Nobody but a developer reads it. Its longest strings are the finding about `/console/interest` reading a JSONL file and the remedy for it; no patient, condition or appointment reason appears in any of them, and it computes nothing about anybody — its input is an import graph.",
+  },
+  {
     module: "src/quality/hardening-q22.ts",
     operatorCopy: [],
     notCopy:

@@ -50,8 +50,9 @@
 // reading imports. No new route, no new credential, no new deserialisation.
 //
 // THE REVIEWED RANGE IS DATA, NOT A CLAIM ABOUT THE QUARTER. W279 landed while this unit was
-// being written, after the reviewed range ended, so it is NOT reviewed and this register says so
-// by name. It deliberately does NOT assert "every Q22 unit is reviewed": that would go red the
+// being written, after the reviewed range ended, so it was NOT reviewed here and this register
+// said so by name — W287 has since read it, recorded in `REVIEWED_BY_LATER_UNIT` rather than
+// back-dated into this pass's list, because the pin is what stops that list growing on its own. It deliberately does NOT assert "every Q22 unit is reviewed": that would go red the
 // moment W279 lands, which is the pin-a-transient-value failure this tree has recorded five times.
 // A register that reports the gap is useful; one that fails on a planned event gets edited.
 //
@@ -111,9 +112,21 @@ export const REVIEWED_UNITS: readonly string[] = [
 
 /** Q22 units this pass did not read, each with the reason. Kept honest rather than kept empty. */
 export const NOT_REVIEWED: Readonly<Record<string, string>> = {
-  W279: "Landed by builder-A while this unit was being written, AFTER the reviewed range ended at `3dcaf6b`. Its diff was never read here. It is named because the alternative is silence: this unit rebased onto W279 to push, so an unpinned `6b244f1..HEAD` would now cover it and the register would be claiming a review that did not happen. The quarter close (W286) is where it gets read.",
   W285: "This unit. A hardening pass reviewing its own diff would be the register answering its own question, which is the exemption W282 refused for the census.",
-  W286: "The quarter close, not yet written. It inherits W279 as well as itself, which is stated here so the next unit does not have to rediscover the gap.",
+  W286: "The quarter close. Its own diff is not read by this pass for the same reason W285's is not — it landed after the pinned range.",
+};
+
+/**
+ * Units this pass could not read, read LATER, and by whom.
+ *
+ * W287 read W279 and the obvious move was to add it to `REVIEWED_UNITS`. That would have been
+ * false in a specific way worth keeping out of the register: `REVIEWED_UNITS` is what the W285
+ * PASS read, bounded by `diffHead`, and the pin exists precisely so this list cannot grow when
+ * somebody else commits. A unit reviewed by a later unit is a different fact, so it gets a
+ * different field and carries the name of the unit that did it.
+ */
+export const REVIEWED_BY_LATER_UNIT: Readonly<Record<string, string>> = {
+  W279: "W287",
 };
 
 export const FINDINGS: readonly HardeningFinding[] = [
@@ -210,6 +223,6 @@ export function unaccountedUnits(ledger: string): string[] {
       return n >= QUARTER.first && n <= QUARTER.last && row.status === "done";
     })
     .map((row) => row.id)
-    .filter((id) => !reviewed.has(id) && !(id in NOT_REVIEWED))
+    .filter((id) => !reviewed.has(id) && !(id in NOT_REVIEWED) && !(id in REVIEWED_BY_LATER_UNIT))
     .sort();
 }

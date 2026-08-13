@@ -32,7 +32,10 @@ describe("W291 the register covers the tree's violation reporters, both directio
     const declared = new Set(REFUSAL_BRANCHES.map((b) => `${b.module}::${b.fn}`));
     expect([...found].filter((f) => !declared.has(f)), "a reporter with no branch declared").toEqual([]);
     expect([...declared].filter((d) => !found.has(d)), "a branch for a reporter that is gone").toEqual([]);
-    expect(found.size).toBe(6);
+    // W287 moved this from 6 to 7 by adding a reporter. The number is not the property — the two
+    // `toEqual([])` above are — so it is kept only as a non-vacuity floor: a scan finding nothing
+    // satisfies both of them. Read as "the census sees reporters", not as "the tree has seven".
+    expect(found.size).toBeGreaterThanOrEqual(7);
   });
 
   it("separates a reporter from a renderer on the return type", () => {
@@ -67,7 +70,7 @@ describe("W291 the register covers the tree's violation reporters, both directio
 
   it("declares every branch once, with a module, a function and an arm", () => {
     expect(new Set(REFUSAL_BRANCHES.map(id)).size).toBe(REFUSAL_BRANCHES.length);
-    expect(REFUSAL_BRANCHES.length).toBe(21);
+    expect(REFUSAL_BRANCHES.length).toBeGreaterThanOrEqual(24); // W287 added three; the property above is uniqueness
     for (const branch of REFUSAL_BRANCHES) {
       expect(branch.module).toMatch(/^src\/.*\.ts$/);
       expect(branch.branch.length, `${id(branch)} names no arm`).toBeGreaterThan(2);
@@ -84,9 +87,15 @@ describe("W291 every drivable branch is driven, and fires", () => {
     expect(report.didNotFire).toEqual([]);
   });
 
-  it("drives nineteen of the twenty-one", () => {
+  it("drives all but the two it cannot", () => {
+    // Was `toHaveLength(19)` against a total of 21. Both moved when W287 added three drivable
+    // branches, which is an ordinary event — so the property is stated as the RATIO the unit
+    // actually cares about: everything is driven except the branches declared undrivable.
     const driven = REFUSAL_BRANCHES.filter((b) => b.reach.kind === "driven");
-    expect(driven).toHaveLength(19);
+    const undrivable = REFUSAL_BRANCHES.filter((b) => b.reach.kind !== "driven");
+    expect(driven.length + undrivable.length).toBe(REFUSAL_BRANCHES.length);
+    expect(undrivable).toHaveLength(2);
+    expect(driven.length).toBeGreaterThanOrEqual(22);
     // Non-vacuity: if none were drivable, "nothing failed to fire" would be trivially true.
     expect(report.didNotFire.length + driven.length).toBeGreaterThan(15);
   });

@@ -29,7 +29,9 @@
 //
 // WHAT THIS UNIT DOES NOT DO, stated rather than left to be discovered: it does not prove a page
 // renders the RIGHT state at runtime, and it does not prove a page has a branch to put one in.
-// The first needs a read that can be made to fail on demand and no console read can throw. The
+// The first needs a read that can be made to fail on demand, and W287 found that one console read
+// CAN — `/console/interest` reads a file on disk, and the claim that used to stand here was that
+// none could. The
 // second was ATTEMPTED AND ABANDONED, which is worth recording rather than quietly dropping — see
 // `a_detector_tuned_until_it_agrees` below. `RUNTIME_BOUND` says what is left unproved.
 //
@@ -52,7 +54,7 @@ export const ALL_ZERO_STATES: readonly ZeroState[] = [
  * Typed `Record<ZeroState, …>` so a fourth state added to the union fails the build until its copy
  * exists — W179's device, and the reason its seven causes have never drifted.
  */
-export const ZERO_STATE_COPY: Record<ZeroState, CauseCopy> = {
+export const ZERO_STATE_COPY: Readonly<Record<ZeroState, CauseCopy>> = {
   nothing_yet: {
     headline: "Nothing here yet",
     detail:
@@ -103,7 +105,7 @@ export const CONSOLE_ZERO_STATES: readonly RouteZeroStates[] = [
   { route: "/console/credentials", states: ["nothing_yet"], why: "Credentials are recorded here by the practice. Nothing arrives from elsewhere, so the only zero is the one the practice can act on." },
   { route: "/console/dashboard", states: ["nothing_yet", "nothing_arrived"], why: "The dashboard reads the rail, which is W179's own subject. Its silence causes are the sharper version of these two and the page defers to them." },
   { route: "/console/education", states: ["nothing_yet"], why: "Education items are curated content. Empty means none has been curated for this practice; there is no external source to have failed." },
-  { route: "/console/interest", states: ["nothing_yet"], why: "Interest signups arrive from the public form. Empty means nobody has signed up, which is a fact about the form rather than a connection." },
+  { route: "/console/interest", states: ["nothing_yet"], why: "W287 CORRECTED THIS ARGUMENT. It read 'signups arrive from the public form, so empty means nobody has signed up' — a sentence about where the DATA comes from, when the zero is about where the READ goes. This is the ONE console route whose read reaches disk: `.data/interest-signups.jsonl`, absent-file-returns-empty and unparseable-lines-dropped-silently. `could_not_load` is genuinely reachable here and is still not declared, because `listInterestSignups` cannot yet tell the page which zero it is holding. Declared instead in W287's `FALLIBLE_READS`, with the remedy." },
   { route: "/console/interop", states: ["nothing_yet"], why: "Nothing has ever been disclosed, because G1 is unratified. The zero is a gate holding rather than a missing feed, and W246 makes the page say so." },
   { route: "/console/onboarding", states: [], why: "A form. It collects rather than lists, so it has no empty state to misread." },
   { route: "/console/ops", states: ["nothing_yet", "nothing_arrived"], why: "The ops page is where W179's feed silence is read, so it is the one route where all of this was already true." },
@@ -132,7 +134,7 @@ export const CONSOLE_ZERO_STATES: readonly RouteZeroStates[] = [
  * not look for the sentence saying otherwise.
  */
 export const RUNTIME_BOUND =
-  "This proves the vocabulary and the classification, not the rendering. It does not prove a page shows the RIGHT state when a read fails — that needs a read that can be made to fail on demand, and every console read is an in-memory store call that cannot throw, which is also why `could_not_load` is declared on no route. It does not prove a page has a branch to put a declared state in either: a source detector for that was written, measured, and found to disagree with the hand classification in BOTH directions, because this tree writes emptiness as `length === 0`, as a ternary over an array, as a `??`, and as a delegated component. What IS proved: the three vocabularies differ pairwise on every field, all twenty-seven console routes are classified with an argument each, and the route list is checked against W271's register in both directions. The remedy for both gaps is the same — a store that can be made to fail and a rendered page to read — and it arrives with W275's gate and a real database rather than with a sharper regex.";
+  "This proves the vocabulary and the classification, not the rendering. It does not prove a page shows the RIGHT state when a read fails — that needs a read that can be made to fail on demand. W287 CORRECTED THE CLAIM THAT USED TO STAND HERE: this said every console read is an in-memory store call that cannot throw, and that is true of twenty-six of the twenty-seven. `/console/interest` reads a JSONL file on disk, so `could_not_load` IS reachable on one route — it is still declared on none, because the store cannot tell the page which zero it is holding, and W287's `FALLIBLE_READS` carries the route and the remedy. It does not prove a page has a branch to put a declared state in either: a source detector for that was written, measured, and found to disagree with the hand classification in BOTH directions, because this tree writes emptiness as `length === 0`, as a ternary over an array, as a `??`, and as a delegated component. What IS proved: the three vocabularies differ pairwise on every field, all twenty-seven console routes are classified with an argument each, and the route list is checked against W271's register in both directions. The remedy for both gaps is the same — a store that can be made to fail and a rendered page to read — and it arrives with W275's gate and a real database rather than with a sharper regex.";
 
 /**
  * Ways of writing this that would prove less than they appear to, each refused.
@@ -144,7 +146,7 @@ export const REFUSED_ZERO_SHAPES: Readonly<Record<string, string>> = {
   three_names_one_sentence:
     "Declaring three states and giving them near-identical copy. They would have collapsed back into one however the register is spelled, which is the exact defect W179 split the feed's zero to fix. Headline, detail AND action must differ pairwise, and it is checked rather than promised.",
   declaring_could_not_load_everywhere:
-    "Giving all eighteen listing pages a `could_not_load` state because a read might fail one day. Every console read is an in-memory store call that cannot throw, so the state has nowhere to arise — and a control declared on eighteen pages that cannot reach it is the paper trail of a control that does not exist. It is declared nowhere and the reason is written down.",
+    "Giving all eighteen listing pages a `could_not_load` state because a read might fail one day. Twenty-six of the twenty-seven console reads are in-memory store calls that cannot throw, so the state has nowhere to arise on them — and a control declared on eighteen pages that cannot reach it is the paper trail of a control that does not exist. W287 FOUND THE TWENTY-SEVENTH: `/console/interest` reads a file on disk. The refusal still holds and its reason narrows rather than breaks — the state stays declared nowhere, because the one route that could reach it has a store that cannot report the difference, which is a remedy in W287's `FALLIBLE_READS` rather than a declaration here.",
   omitting_routes_with_no_zero:
     "Listing only the eighteen routes that render an empty state. A route absent from the register and a route with nothing to declare are indistinguishable from outside, which is W51's finding and the reason all twenty-seven are here — including sign-in, which is the clearest case.",
   claiming_the_runtime_is_checked:

@@ -33,6 +33,7 @@
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { fallibleDiff } from "./review-w279";
 import { coverageDiff } from "./route-coverage";
 import { censusDiff } from "./register-census";
 import { headerViolations } from "./unit-headers";
@@ -125,6 +126,34 @@ const LEDGER_ROW = (n: number) => `| W${n} | done | builder-A | 2026-08-14T00:00
  * undriven long enough to be worth a unit.
  */
 export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
+  // ── W287's fallible console reads ─────────────────────────────────────────────────────────
+  {
+    module: "src/quality/review-w279.ts",
+    fn: "fallibleDiff",
+    branch: "undeclared",
+    reach: {
+      kind: "driven",
+      drive: () => fallibleDiff(process.cwd(), {}).undeclared.length > 0,
+    },
+  },
+  {
+    module: "src/quality/review-w279.ts",
+    fn: "fallibleDiff",
+    branch: "stale",
+    reach: {
+      kind: "driven",
+      drive: () => fallibleDiff(process.cwd(), { "/console/in-memory": "REMEDY: none needed" }).stale.length > 0,
+    },
+  },
+  {
+    module: "src/quality/review-w279.ts",
+    fn: "fallibleDiff",
+    branch: "withoutRemedy",
+    reach: {
+      kind: "driven",
+      drive: () => fallibleDiff(process.cwd(), { "/console/interest": "no remedy stated" }).withoutRemedy.length > 0,
+    },
+  },
   // ── W284's route coverage ─────────────────────────────────────────────────────────────────
   {
     module: "src/quality/route-coverage.ts",

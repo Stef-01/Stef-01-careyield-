@@ -12,6 +12,7 @@ import {
   FINDINGS,
   NOT_REVIEWED,
   QUARTER,
+  REVIEWED_BY_LATER_UNIT,
   REVIEWED_UNITS,
   unaccountedUnits,
   undisposed,
@@ -64,11 +65,16 @@ describe("W285 the reviewed range is data, and the gap is named", () => {
     // larger every time somebody else commits.
     expect(QUARTER.diffHead).toMatch(/^[0-9a-f]{7,40}$/);
     expect(QUARTER.diffHead).not.toBe("HEAD");
-    expect(NOT_REVIEWED.W279, "W279 is inside the pinned range after all").toContain("3dcaf6b");
+    // W287 read W279 and moved it out of NOT_REVIEWED. It is recorded as reviewed by a LATER unit
+    // rather than added to this pass's list, because the pin is what stops that list growing on
+    // its own — back-dating it here would undo exactly what the pin was for.
+    expect(NOT_REVIEWED.W279, "W279 is back in this pass's not-reviewed list").toBeUndefined();
+    expect(REVIEWED_BY_LATER_UNIT.W279).toBe("W287");
+    expect(REVIEWED_UNITS, "W279 was back-dated into the pinned pass").not.toContain("W279");
   });
 
   it("declares the gap rather than leaving it to be noticed", () => {
-    expect(Object.keys(NOT_REVIEWED).sort()).toEqual(["W279", "W285", "W286"]);
+    expect(Object.keys(NOT_REVIEWED).sort()).toEqual(["W285", "W286"]);
     for (const [unit, why] of Object.entries(NOT_REVIEWED)) {
       expect(why.length, `${unit} is unreviewed without a reason`).toBeGreaterThan(40);
     }
