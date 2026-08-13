@@ -609,6 +609,39 @@ paragraph's to promise.
 - **W285** [P] Q22 hardening → verify: code-review, security-review and simplify run over the quarter's diff; every finding recorded with a disposition and a date, and the accepted ones carry a review date.
 - **W286** **QUARTER CLOSE.** Q23 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
 
+## 5h. Year 6 — Q23 (W287–W299)
+
+Expanded by W286 on 2026-08-14 under the §6 horizon rule, from `docs/AUDIT-Y5.md` and
+`docs/GATE-DOSSIER-Y5.md` — and from `src/quality/hardening-q22.ts`, which is newer than both and
+is where the theme comes from. **One quarter, not a year.** See `docs/HORIZON-Q23.md` for the
+rule's six preconditions evaluated one at a time, and for the gate position recorded at this
+expansion.
+
+**Q23 — the checks that cannot fail.** Q22 set out to check the rendered surface and did: the page
+suite is in the gate, every route is opened by a named spec, the copy W200 could not see is linted,
+and two cross-tenant defects are closed. But what the quarter DEMONSTRATED, in six places found six
+different ways, is that **a check that cannot fail is indistinguishable from a check that passes** —
+a route register whose central claim was vacuous for one route, a pin that went red on a unit being
+built, a comment-subtraction test guarding a load-bearing line it could not have caught, a finding
+whose own pinning assertion refuted it, a detector tuned toward its author's answer, and a share
+budget satisfied with the branch it guards never executed. Every one was found by DRIVING the
+check; none by reading it. W267 proved each register would notice a file arriving; nothing has
+checked that a register's ASSERTIONS would notice anything. **Q23 adds no blocked row.**
+
+- **W287** W279 reviewed: the unit Q22's hardening declared out of range → verify: `src/console/zero-states.ts` and its test read through the three lenses; every finding disposed with a date, and the hardening register's own "not reviewed" list is shortened by exactly this unit.
+- **W288** [P] The tautology sweep: assertions whose subject cannot make them fail → verify: a detector over `src/**/*.test.ts` for assertions whose expected value is entailed by their expression, proved on a planted tautology and on a planted real assertion; every hit fixed or accepted with a reason.
+- **W289** Every register proves one ASSERTION can fail, not just its walk → verify: W267's census extended — each declared register names one assertion and the mutation that makes it fail, driven in this unit's own test; a register naming none fails.
+- **W290** [P] Pinned constants that move on a planned event, swept and bounded → verify: every `*_AT_W<n>` and `*_LAST_UNIT` constant found from the tree and checked to be bounded rather than live; a pin that would go red on an ordinary expansion fails, and the sweep is proved on a planted live pin.
+- **W291** The branch nobody executed: registers whose refusal path never runs → verify: for each register with a refusal or violation branch, a test that reaches it; a branch with no reaching test is listed with the fixture that would reach it.
+- **W292** [P] Detectors checked against a planted NEGATIVE, not only a planted positive → verify: every `mutated_tree` proof in W267's census gains a case where the planted file must NOT be reported; a detector that reports everything passes today and fails here.
+- **W293** `toEqual([])` over a list nothing could have put anything into → verify: every empty-list assertion in the suite paired with evidence its source is non-empty, or accepted with a reason; the check is proved on a list that is empty by construction.
+- **W294** [P] The acceptance registers, re-derived: every acceptance still live → verify: W200's, W278's and W285's accepted findings each re-checked against the sweep that produced them, both directions; a stale acceptance fails and every live one carries a review date in the future.
+- **W295** What a green suite does not prove, declared per register → verify: every tree-checked register carries a stated bound, checked to name something the register genuinely cannot see; a bound that restates the register's job fails.
+- **W296** [P] Mutation sampling: an assertion deleted, and the suite must fail → verify: a sampled set of assertions removed one at a time in a copied tree, each required to turn its own suite red; survivors are reported by name rather than counted.
+- **W297** The bounds register: every stated `*_BOUND` checked against its unit → verify: each declared bound resolved to the unit that stated it and the remedy it names; a bound whose remedy has since been built fails as stale.
+- **W298** [P] Q23 hardening → verify: code-review, security-review and simplify run over the quarter's diff; every finding recorded with a disposition and a date, and the accepted ones carry a review date.
+- **W299** **QUARTER CLOSE.** Q24 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
 ## 6. Horizon rule (supersedes the five-year expansion rule, W260)
 
 **The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,

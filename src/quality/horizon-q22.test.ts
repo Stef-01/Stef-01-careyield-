@@ -113,8 +113,18 @@ describe("W273 the six preconditions are evaluated against the thing each claims
     }
     expect(PLAN).toContain("## 5g. Year 6 — Q22 (W274–W286)");
     // The direction that matters: nothing beyond the quarter being expanded.
-    expect(PLAN).not.toContain("W287");
-    expect(rows().every((r) => r.n <= Q22_HORIZON_LAST_UNIT)).toBe(true);
+    // W286 BOUNDED THESE TWO, AND THEY ARE THE THIRD INSTANCE OF THE CLASS Q23 IS ABOUT.
+    // Both asserted over the WHOLE plan and the WHOLE ledger: "the plan does not mention W287"
+    // and "no row is above 286". Each was true when W273 wrote it and each became false the
+    // moment the next quarter expanded — a PLANNED event, reported as a defect in the document
+    // that planned it. W273 fixed exactly this in W260's horizon and W274 fixed it again in this
+    // file's precondition 4; this is the same failure a third time, in the same family.
+    //
+    // The requirement is that THIS expansion wrote one quarter, so both now read §5g rather than
+    // the whole plan and the ledger as at Q22's own moment.
+    const q22Section = PLAN.slice(PLAN.indexOf("## 5g."), PLAN.indexOf("## 5h."));
+    expect(q22Section).not.toContain("W287");
+    expect(asAtHorizon().every((r) => r.n <= Q22_HORIZON_LAST_UNIT)).toBe(true);
   });
 
   it("(2) cites the two documents the rule names, by path", () => {
@@ -189,12 +199,16 @@ describe("W273 the quarter table describes the units that were laid down", () =>
       expect(PLAN, `${id} is in the horizon and not in the plan`).toContain(`- **${id}** `);
     }
     // The other direction: the plan's Q22 section holds exactly these.
-    const section = PLAN.slice(PLAN.indexOf("## 5g."), PLAN.indexOf("## 6. Horizon rule"));
+    // Ends at the NEXT §5 extension, not at §6: once Q23 was laid down, slicing to §6 swept its
+    // thirteen units into this quarter's section and the both-directions check reported them.
+    const section = PLAN.slice(PLAN.indexOf("## 5g."), PLAN.indexOf("## 5h."));
     expect([...section.matchAll(/^- \*\*(W\d+)\*\*/gm)].map((m) => m[1]!)).toEqual(Q22);
   });
 
   it("gives every planned unit a verify gate, in the plan's own words", () => {
-    const section = PLAN.slice(PLAN.indexOf("## 5g."), PLAN.indexOf("## 6. Horizon rule"));
+    // Ends at the NEXT §5 extension, not at §6: once Q23 was laid down, slicing to §6 swept its
+    // thirteen units into this quarter's section and the both-directions check reported them.
+    const section = PLAN.slice(PLAN.indexOf("## 5g."), PLAN.indexOf("## 5h."));
     for (const id of Q22) {
       const line = section.split("\n").find((l) => l.startsWith(`- **${id}**`))!;
       expect(line, `${id} states no verify gate`).toContain("→ verify:");
@@ -211,7 +225,9 @@ describe("W273 the quarter table describes the units that were laid down", () =>
 describe("W273 the document refuses what the rule refuses", () => {
   it("plans no quarter beyond the one being expanded", () => {
     expect(DOC).toContain("It does not plan Q23 or Year 7");
-    expect(PLAN).not.toContain("Q23 —");
+    // Scoped to §5g for the same reason: the requirement is that THIS expansion planned no
+    // quarter beyond its own, not that the plan never grows one.
+    expect(PLAN.slice(PLAN.indexOf("## 5g."), PLAN.indexOf("## 5h."))).not.toContain("Q23 —");
   });
 
   it("neither ranks the outstanding decisions nor proposes an eleventh gate", () => {
