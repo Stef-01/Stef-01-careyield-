@@ -15,7 +15,7 @@
 // happened. The gate is a declared value now, and the assertions below are about grouping rather
 // than about being shorter than something.
 
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -28,6 +28,7 @@ import {
 import { DERMATOLOGY_MEMBERS, DERMATOLOGY_SPEC } from "./dermatology";
 import { RESPIRATORY_MEMBERS, RESPIRATORY_SPEC } from "./respiratory";
 import { WOMENS_HEALTH_MEMBERS, WOMENS_HEALTH_SPEC } from "./womens-health";
+import { verticalModules as walkVerticalModules } from "@/quality/tree-walks";
 
 const DIR = path.join(process.cwd(), "src/verticals");
 
@@ -44,10 +45,11 @@ const MACHINERY = new Set([
   "scale.ts",
 ]);
 
+// W282: the walk moved to `@/quality/tree-walks` and took a root, so the census can be shown a
+// vertical arriving. MACHINERY stays here — which modules are machinery is this file's judgement,
+// and the walk is the part that had no way of being pointed at another tree.
 function verticalModules(): string[] {
-  return readdirSync(DIR).filter(
-    (f) => f.endsWith(".ts") && !f.endsWith(".test.ts") && !f.endsWith(".types.ts") && !MACHINERY.has(f),
-  );
+  return walkVerticalModules(path.resolve(__dirname, "../.."), MACHINERY);
 }
 
 const ALL_MEMBERS: readonly DeclaredMember[] = [

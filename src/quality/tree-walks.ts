@@ -1,0 +1,152 @@
+// W282: the tree-derivations, given roots — so the registers built on them can be shown to notice.
+//
+// W267 enumerated the twenty-seven files that derive something from the tree and found that almost
+// none had ever been shown a file arriving, which is the one event they all exist to catch. The
+// reason was structural rather than careless: **a walk can only be tested by pointing it at a
+// different tree, and only a detector that takes a root can be pointed anywhere.** Every unproven
+// entry in that census carries the same one-line remedy — *export the walk from a module with a
+// `root` parameter, the way `discoverFoldSites(root)` and `reachableFromApp(root)` already do.*
+// This is that remedy, applied in a batch.
+//
+// SEVEN WALKS MOVED, AND THEY MOVED HERE RATHER THAN INTO SEVEN MODULES. Each was a private
+// function inside the test file that owned it, and each is the same shape: walk the tree, keep the
+// files matching some rule, return paths. Seven near-identical `readdirSync` recursions is the
+// duplication W51 wrote its store registry against and W248 wrote the vertical assembly against —
+// *one bespoke copy is a file, two are a pattern nobody declared, and the third gets written by
+// copying whichever of the two its author found first.* Four of these seven were already
+// character-for-character the same function under two names.
+//
+// AND THE POINT IS NOT TIDINESS. It is that the next author writing a register gets a ROOTED walk
+// by default. A fresh `readdirSync` inside a new test file is how every one of these became
+// unprovable, and it is the cheapest thing in the world to write; the fix that lasts is making the
+// rooted version the one that is already there.
+//
+// WHAT THIS DOES NOT CLAIM. Moving a walk does not make its register correct — it makes the
+// register's walk OBSERVABLE, which is a smaller and different thing. `register-census.test.ts`
+// plants a file in a copied tree per walk and requires each to report it; that is the proof, and
+// it lives with the census rather than here, because a module that proved itself would be
+// answering its own question.
+//
+// FOUNDER GATE (plan §4): nothing crossed. These read file names and file text.
+
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import path from "node:path";
+
+const SKIP_DIRS = new Set([
+  "node_modules",
+  ".git",
+  ".next",
+  "test-results",
+  "playwright-report",
+  "reports",
+]);
+
+/** Every file under `dir`, recursively, skipping the directories no walk here wants. */
+function filesUnder(dir: string): string[] {
+  let entries: string[];
+  try {
+    entries = readdirSync(dir).sort();
+  } catch {
+    return [];
+  }
+  return entries.flatMap((entry) => {
+    if (SKIP_DIRS.has(entry)) return [];
+    const full = path.join(dir, entry);
+    return statSync(full).isDirectory() ? filesUnder(full) : [full];
+  });
+}
+
+/** Repo-relative, posix separators on every platform. */
+function rel(root: string, file: string): string {
+  return path.relative(root, file).split(path.sep).join("/");
+}
+
+/**
+ * Every non-test TypeScript module under `root/src`, as absolute paths.
+ *
+ * The shared recursion four of the seven walks below were each holding their own copy of.
+ */
+export function sourceModules(root: string): string[] {
+  return filesUnder(path.join(root, "src")).filter(
+    (f) => f.endsWith(".ts") && !f.endsWith(".test.ts"),
+  );
+}
+
+/**
+ * W116: every file tooling has to be able to read as text.
+ *
+ * Walks the whole repository rather than `src/`, which is why it keeps its own extension list.
+ */
+export function textFiles(root: string): string[] {
+  return filesUnder(root).filter((f) => /\.(ts|tsx|md|json|css|mjs|mts|sql|yml|yaml)$/.test(f));
+}
+
+/**
+ * W51: every `export function resetX()` in the tree, by name.
+ *
+ * `resetAllStores` is excluded: it is the registry's own front door rather than a store, which is
+ * the exclusion `stores.test.ts` already made and W265's sweep had to make again from outside.
+ */
+export function exportedResetters(root: string): string[] {
+  const found = new Set<string>();
+  for (const file of sourceModules(root)) {
+    for (const m of readFileSync(file, "utf8").matchAll(/^export function (reset[A-Za-z0-9_]*)\s*\(/gm)) {
+      if (m[1] !== "resetAllStores") found.add(m[1]!);
+    }
+  }
+  return [...found].sort();
+}
+
+/**
+ * W106: every module holding a `globalThis`-backed store — one that can retain data across
+ * requests, and therefore one erasure has to reach.
+ */
+export function storeModules(root: string): string[] {
+  return sourceModules(root)
+    .filter((file) => /globalThis as \{/.test(readFileSync(file, "utf8")))
+    .map((file) => rel(root, file))
+    .sort();
+}
+
+/** W2/W18/W55: every SQL migration, in order, joined — the schema the domain types answer to. */
+export function migrationFiles(root: string): string[] {
+  return filesUnder(path.join(root, "supabase", "migrations"))
+    .filter((f) => f.endsWith(".sql"))
+    .sort();
+}
+
+export function migrationSql(root: string): string {
+  return migrationFiles(root)
+    .map((f) => readFileSync(f, "utf8"))
+    .join("\n");
+}
+
+/** W250: the vertical DECLARATIONS — everything under `src/verticals/` that is not machinery. */
+export function verticalModules(root: string, machinery: ReadonlySet<string>): string[] {
+  const dir = path.join(root, "src", "verticals");
+  return readdirSync(dir)
+    .filter(
+      (f) =>
+        f.endsWith(".ts") &&
+        !f.endsWith(".test.ts") &&
+        !f.endsWith(".types.ts") &&
+        !machinery.has(f),
+    )
+    .sort();
+}
+
+/** W208/W268: the gate-dossier tests, which DOSSIER-1's predicate scans for an unbounded read. */
+export function dossierTestFiles(root: string): string[] {
+  const dir = path.join(root, "src", "quality");
+  return readdirSync(dir)
+    .filter((f) => /^gate-dossier-.*\.test\.ts$/.test(f))
+    .sort();
+}
+
+/** W210's live condition: modules whose first line is not a `// W<n>` header. */
+export function modulesWithNoUnitHeader(root: string): string[] {
+  return sourceModules(root)
+    .filter((file) => !/^\/\/ W\d+/.test(readFileSync(file, "utf8").split("\n")[0] ?? ""))
+    .map((file) => rel(root, file))
+    .sort();
+}

@@ -97,6 +97,7 @@ const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/privacy/automated-decisions.ts": () => import("@/privacy/automated-decisions"),
   "src/quality/latent-findings.ts": () => import("@/quality/latent-findings"),
   "src/quality/latent-y5.ts": () => import("@/quality/latent-y5"),
+  "src/quality/tree-walks.ts": () => import("@/quality/tree-walks"),
   "src/quality/blocked-surface.ts": () => import("@/quality/blocked-surface"),
   "src/quality/register-census.ts": () => import("@/quality/register-census"),
   "src/quality/order-independence.ts": () => import("@/quality/order-independence"),

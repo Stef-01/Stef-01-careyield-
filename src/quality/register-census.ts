@@ -188,7 +188,10 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     file: "src/domain/schema-consistency.test.ts",
     derives: "Every SQL migration, to check the domain types against the schema.",
     checkedAgainst: "`src/domain/types.ts`.",
-    proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    proof: {
+      kind: "mutated_tree",
+      mutation: "a migration is added under `supabase/migrations` and `migrationSql` must contain its text",
+    },
   },
   {
     file: "src/education/advice-lint.test.ts",
@@ -214,13 +217,19 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     file: "src/lib/source-hygiene.test.ts",
     derives: "Every source file, to require it be text tooling can read as text.",
     checkedAgainst: "W116's hygiene rules.",
-    proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    proof: {
+      kind: "mutated_tree",
+      mutation: "a file with an extension the hygiene rules cover is added and `textFiles` must return it",
+    },
   },
   {
     file: "src/lib/stores.test.ts",
     derives: "Every store module in the tree.",
     checkedAgainst: "W51's store registry, which had already drifted four stores when it was written.",
-    proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    proof: {
+      kind: "mutated_tree",
+      mutation: "a module exporting a new `reset*` function is added and `exportedResetters` must return its name",
+    },
   },
   {
     file: "src/messaging/send-path.test.ts",
@@ -272,7 +281,10 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     file: "src/privacy/record-classes.test.ts",
     derives: "Every store in the tree, so a NEW class fails the suite until it is handled.",
     checkedAgainst: "W106's `RECORD_CLASSES`.",
-    proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    proof: {
+      kind: "mutated_tree",
+      mutation: "a module holding a `globalThis`-backed store is added and `storeModules` must return it",
+    },
   },
   {
     file: "src/quality/audit-y5.test.ts",
@@ -313,9 +325,26 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     derives: "Gate-dossier test files under `src/quality/`, to check that DOSSIER-1's scan still has a subject to scan.",
     checkedAgainst: "W268's `FINDING_ANCHORS` — the claim that must hold for each open finding's predicate to be able to fire.",
     proof: {
-      kind: "walk_unproven",
-      contentProof: "src/quality/latent-y5.test.ts :: fires DOSSIER-1 against a dossier test with no bound",
-      remedy: EXPORT_THE_WALK,
+      kind: "mutated_tree",
+      mutation: "a `gate-dossier-*.test.ts` file is added and `dossierTestFiles` must return it, so DOSSIER-1's anchor can be shown its subject arriving",
+    },
+  },
+  {
+    file: "src/quality/register-census.test.ts",
+    derives: "Nothing of its own — it imports the shared rooted walks to PLANT files in front of them, which is how W282's batch is proved.",
+    checkedAgainst: "Each walk's own probe. It is a member because the widened detector counts deriving through `tree-walks`, and exempting the file that does the proving would be the register answering its own question.",
+    proof: {
+      kind: "mutated_tree",
+      mutation: "it is the file that does the planting; every probe in it is a mutation of a copied tree",
+    },
+  },
+  {
+    file: "src/quality/tree-walks.ts",
+    derives: "Seven tree-derivations, each taking a root: text files, exported resetters, store modules, migrations, vertical declarations, gate-dossier tests, and modules with no unit header.",
+    checkedAgainst: "Nothing of its own — it IS the walking, and each caller checks its own register against what it returns.",
+    proof: {
+      kind: "mutated_tree",
+      mutation: "every walk it exports is planted against in a copied tree, which is what moving them here was for",
     },
   },
   {
@@ -323,10 +352,8 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     derives: "Every module with no `// W<n>` header — one recorded finding's live condition.",
     checkedAgainst: "W210's `HEADERLESS_AT_W210`, so the count becoming worse fires the finding.",
     proof: {
-      kind: "walk_unproven",
-      contentProof: null,
-      remedy:
-        "`modulesWithNoUnitHeader()` is already exported and already a module rather than a test — it takes no root. Give it one, and this becomes provable without moving anything.",
+      kind: "mutated_tree",
+      mutation: "a module with no `// W<n>` header is added and `modulesWithNoUnitHeader` must return it",
     },
   },
   {
@@ -350,9 +377,8 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     derives: "Every module under `src/verticals/` that is not declared machinery.",
     checkedAgainst: "W250's census — no vertical may re-implement the shared assembly.",
     proof: {
-      kind: "walk_unproven",
-      contentProof: "src/verticals/assembly.test.ts :: finds all three declarations, and no machinery among them",
-      remedy: EXPORT_THE_WALK,
+      kind: "mutated_tree",
+      mutation: "a module is added under `src/verticals/` and `verticalModules` must report it as a declaration",
     },
   },
 ];
@@ -384,7 +410,14 @@ export function treeWalkingFiles(root: string, roots: readonly string[] = ["src"
         continue;
       }
       if (!/\.(ts|tsx|mts)$/.test(entry)) continue;
-      if (stripComments(readFileSync(full, "utf8")).includes("readdirSync(")) {
+      const code = stripComments(readFileSync(full, "utf8"));
+      // W282 ADDED THE SECOND SCAN, and the module note's own bound said this was the remedy: when
+      // a walker arrives that the first scan cannot see, the detector grows a scan and says so
+      // rather than the register growing an exemption. Seven walks moved into `tree-walks.ts` to
+      // be given roots, and a file that derives from the tree THROUGH a shared rooted walk still
+      // derives from the tree — a census that lost them the moment they became provable would be
+      // measuring how the walking is spelled rather than which registers do it.
+      if (code.includes("readdirSync(") || code.includes('from "@/quality/tree-walks"') || code.includes('from "./tree-walks"')) {
         found.push(relative(root, full).split(sep).join("/"));
       }
     }

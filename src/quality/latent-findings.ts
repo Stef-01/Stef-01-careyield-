@@ -41,6 +41,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { resetStore } from "@/booking/store";
 import { reachableFromApp } from "@/security/reachability";
+import { dossierTestFiles, modulesWithNoUnitHeader as walkModulesWithNoUnitHeader } from "./tree-walks";
 
 const ROOT = path.resolve(__dirname, "../..");
 const SRC = path.join(ROOT, "src");
@@ -104,10 +105,9 @@ function sourceFiles(): Array<{ module: string; text: string }> {
 
 /** Modules with no `// W<n>` header. W200's Y4 census cannot see them. */
 export function modulesWithNoUnitHeader(): string[] {
-  return sourceFiles()
-    .filter(({ text }) => !/^\/\/ W\d+/.test(text.split("\n")[0] ?? ""))
-    .map((f) => f.module)
-    .sort();
+  // W282: the walk takes a root in `tree-walks.ts` now, so CENSUS-1's predicate can be shown a
+  // header-less module arriving instead of being trusted to notice one.
+  return walkModulesWithNoUnitHeader(ROOT);
 }
 
 /**
@@ -161,9 +161,10 @@ export const LATENT_FINDINGS: readonly LatentFinding[] = [
     recordedBy: "W208",
     triggerStatement:
       "A gate-dossier test reads BUILD-STATE without bounding itself to the units that existed when its dossier was written. The bound is recognised BY NAME — a constant ending `_LAST_UNIT` or `_LAST` — because a grep cannot detect the semantics, and saying which names count is honest where 'or equivalent' was not.",
+    // W282 gave this walk a root: `dossierTestFiles(root)` in `tree-walks.ts`, so a dossier test
+    // arriving can be put in front of the predicate rather than assumed to be seen by it.
     trigger: () =>
-      readdirSync(path.join(SRC, "quality"))
-        .filter((name) => /^gate-dossier-.*\.test\.ts$/.test(name))
+      dossierTestFiles(ROOT)
         .some((name) => {
           const text = readFileSync(path.join(SRC, "quality", name), "utf8");
           // W216 widened this from `_LAST_UNIT` alone, and it is a drift finding rather than a

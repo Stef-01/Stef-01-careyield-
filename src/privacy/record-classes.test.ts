@@ -6,29 +6,18 @@
 // next store joined the tree without joining the erasure path. Enumerating by hand would
 // reproduce the trap. So the registry is checked against the source tree.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { RECORD_CLASSES, storedClasses } from "./record-classes";
+// W282: the store walk moved to `@/quality/tree-walks` with a root, so W106's register can be
+// shown a store arriving instead of being trusted to have seen one.
+import { sourceModules, storeModules as walkStoreModules } from "@/quality/tree-walks";
 
-const SRC = path.resolve(__dirname, "..");
-
-function sourceFiles(dir: string): string[] {
-  return readdirSync(dir).flatMap((entry) => {
-    const full = path.join(dir, entry);
-    if (statSync(full).isDirectory()) return sourceFiles(full);
-    return full.endsWith(".ts") && !full.endsWith(".test.ts") ? [full] : [];
-  });
-}
-
-const rel = (file: string) => `src/${path.relative(SRC, file).split(path.sep).join("/")}`;
+const ROOT = path.resolve(__dirname, "../..");
 
 /** Every module that holds a globalThis-backed store — i.e. can retain data across requests. */
 function storeModules(): string[] {
-  return sourceFiles(SRC)
-    .filter((f) => /globalThis as \{/.test(readFileSync(f, "utf8")))
-    .map(rel)
-    .sort();
+  return walkStoreModules(ROOT);
 }
 
 describe("W106 the registry cannot fall behind the tree", () => {
@@ -42,7 +31,7 @@ describe("W106 the registry cannot fall behind the tree", () => {
   });
 
   it("declares nothing that no longer exists", () => {
-    const files = new Set(sourceFiles(SRC).map(rel));
+    const files = new Set(sourceModules(ROOT).map((f) => `src/${path.relative(path.join(ROOT, "src"), f).split(path.sep).join("/")}`));
     const stale = RECORD_CLASSES.map((c) => c.module).filter((m) => !files.has(m));
     expect(stale, `registry names modules the tree no longer has: ${stale.join(", ")}`).toEqual([]);
   });

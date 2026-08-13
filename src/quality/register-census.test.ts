@@ -31,6 +31,7 @@ import {
 } from "@/security/instruction-sinks";
 import { reachableFromApp, stripComments } from "@/security/reachability";
 import { copySurfaceMembers } from "@/compliance/copy-y6";
+import * as walks from "./tree-walks";
 import { DORMANT_MODULES, diffReach } from "@/security/page-reach";
 import { readFileSync } from "node:fs";
 
@@ -43,6 +44,7 @@ beforeAll(() => {
   COPY = mkdtempSync(path.join(tmpdir(), "w267-"));
   cpSync(path.join(ROOT, "src"), path.join(COPY, "src"), { recursive: true });
   cpSync(path.join(ROOT, "app"), path.join(COPY, "app"), { recursive: true });
+  cpSync(path.join(ROOT, "supabase"), path.join(COPY, "supabase"), { recursive: true });
 });
 
 afterAll(() => {
@@ -159,7 +161,11 @@ describe("W267 the finding: a proved content scanner is not a proved walk", () =
     // over a file list missing the new file reports nothing, cleanly, forever.
     const unproven = walkUnproven();
     expect(unproven.length).toBeGreaterThan(15);
-    expect(walkProven().length).toBe(7);
+    // W282 moved seven walks into `tree-walks.ts` to give them roots, and the count moved with
+    // them in both directions: eight proved before, sixteen after, and the unproven list shorter
+    // by the same seven. A count that only went up would mean entries were added rather than
+    // registers becoming provable.
+    expect(walkProven().length).toBe(16);
     expect(unproven.length + walkProven().length).toBe(TREE_DERIVED_REGISTERS.length);
     // And the harsh reading is not the fair one, so the census carries both facts.
     const withContentProof = unproven.filter(
@@ -271,6 +277,67 @@ describe("W267 the detectors that take a root, proved by moving the tree", () =>
     );
     expect(members, "the copy surface did not see a new module above the floor").toContain(planted);
     expect(copySurfaceMembers(COPY), "the probe survived the probe").not.toContain(planted);
+  });
+
+  it("proves each of W282's seven walks by planting the file it looks for", () => {
+    // THE BATCH. Each of these was a private function inside the test file that owned it, so it
+    // could not be pointed at a tree that differed from this one — the structural reason W267
+    // found almost nothing proved. Each now takes a root, and each is shown the file it exists to
+    // notice. Non-vacuity is built in: every probe asserts the absence first, so a walk that
+    // returned everything would fail rather than pass.
+    const probes: Array<{ file: string; body: string; token: string; sees: (root: string) => string[] }> = [
+      {
+        file: "src/w282-probe.md",
+        token: "w282-probe.md",
+        body: "# probe\n",
+        sees: (r) => walks.textFiles(r).map((f) => f.replace(/\\/g, "/")),
+      },
+      {
+        file: "src/w282-probe-store.ts",
+        token: "resetW282Probe",
+        body: "// W999: probe.\nexport function resetW282Probe() {}\nconst g = globalThis as { x?: number };\nvoid g;\n",
+        sees: (r) => walks.exportedResetters(r),
+      },
+      {
+        file: "supabase/migrations/9999_w282_probe.sql",
+        token: "w282_probe",
+        body: "create table w282_probe (id text primary key);\n",
+        sees: (r) => [walks.migrationSql(r)],
+      },
+      {
+        file: "src/w282-probe-globals.ts",
+        token: "w282-probe-globals.ts",
+        body: "// W999: probe.\nconst store = globalThis as { __w282?: number };\nexport const read = () => store.__w282;\n",
+        sees: (r) => walks.storeModules(r),
+      },
+      {
+        file: "src/verticals/w282-probe-vertical.ts",
+        token: "w282-probe-vertical.ts",
+        body: "// W999: probe.\nexport const value = 1;\n",
+        sees: (r) => walks.verticalModules(r, new Set<string>()),
+      },
+      {
+        file: "src/quality/gate-dossier-w282-probe.test.ts",
+        token: "gate-dossier-w282-probe.test.ts",
+        body: "// W999: probe.\nexport const value = 1;\n",
+        sees: (r) => walks.dossierTestFiles(r),
+      },
+      {
+        file: "src/w282-probe-headerless.ts",
+        token: "w282-probe-headerless.ts",
+        body: "export const value = 1;\n",
+        sees: (r) => walks.modulesWithNoUnitHeader(r),
+      },
+    ];
+    expect(probes).toHaveLength(7);
+    for (const probe of probes) {
+      // The token rather than the filename, because two of these walks return NAMES — an exported
+      // resetter and a SQL body — and asserting on a path would have quietly passed over them.
+      const before = probe.sees(COPY).join("\n");
+      expect(before, `${probe.file} was already there, so the probe proves nothing`).not.toContain(probe.token);
+      const after = withPlanted(probe.file, probe.body, () => probe.sees(COPY)).join("\n");
+      expect(after, `${probe.file} was planted and the walk did not report it`).toContain(probe.token);
+    }
   });
 
   it("this census notices a new tree-walking file", () => {

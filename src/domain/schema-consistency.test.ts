@@ -1,15 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { DOMAIN_TABLES, PRACTICE_SCOPED_TABLES, REFERENCE_TABLES } from "./types";
+// W282: the migration walk moved to `@/quality/tree-walks` with a root, so a migration arriving
+// can be put in front of it rather than assumed to be seen.
+import { migrationSql } from "@/quality/tree-walks";
 
 // W2 (extended in W18, W55): the TS registry and the FULL migration chain stay consistent.
-const dir = path.resolve(__dirname, "../../supabase/migrations");
-const sql = readdirSync(dir)
-  .filter((f) => f.endsWith(".sql"))
-  .sort()
-  .map((f) => readFileSync(path.join(dir, f), "utf8"))
-  .join("\n");
+const sql = migrationSql(path.resolve(__dirname, "../.."));
 
 /** Every `create policy … on <table> …;` statement for one table. */
 function policiesFor(table: string): string[] {

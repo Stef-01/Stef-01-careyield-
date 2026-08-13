@@ -101,8 +101,15 @@ describe("W273 the six preconditions are evaluated against the thing each claims
   });
 
   it("(1) expands one quarter of thirteen, and no theme beyond it", () => {
+    // W282 CORRECTED THE ASSERTION AND KEPT THE PROPERTY. It pinned each row as `| id | available |`,
+    // which asserts a STATUS rather than membership — so the first firing to claim a Q22 unit turned
+    // this red on a planned event. It is the third instance of that shape in this tree: W260 pinned
+    // a `done` count and had to drop it, and DOSSIER-1 is the same finding recorded against a
+    // dossier. The property the expansion actually has to hold is that every planned unit EXISTS in
+    // the ledger, which is what a session needs in order to claim one.
+    const laid = new Set(rows().map((r) => r.id));
     for (const id of Q22) {
-      expect(LEDGER, `${id} is planned and not in the ledger`).toContain(`| ${id} | available |`);
+      expect(laid, `${id} is planned and not in the ledger`).toContain(id);
     }
     expect(PLAN).toContain("## 5g. Year 6 — Q22 (W274–W286)");
     // The direction that matters: nothing beyond the quarter being expanded.

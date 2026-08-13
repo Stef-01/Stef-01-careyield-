@@ -403,6 +403,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W263's blocked-surface budget is reviewer-facing and, above that, founder-facing: for each founder gate or named decision the ledger blocks a row on, whose ruling it is and which units it would release. Nobody in a practice reads it. Its longest strings are the `whoDecides` sentences, which describe rulings and their double-blocking and name no patient, condition or appointment reason. `blockedSurfaceViolations` returns unit ids and blocker names, never a record about anybody.",
   },
   {
+    module: "src/quality/tree-walks.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W282's tree-derivations: seven walks, each taking a root, moved out of the test files that owned them so the registers built on them can be shown a file arriving. It returns file paths and function names and nothing else — no patient, condition or appointment reason appears in it, and it has no strings a clinician or practice manager reads.",
+  },
+  {
     module: "src/quality/latent-y5.ts",
     operatorCopy: [],
     notCopy:

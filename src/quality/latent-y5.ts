@@ -54,10 +54,11 @@
 // FOUNDER GATE (plan §4): nothing crossed. This reads source files and evaluates predicates that
 // were already being evaluated.
 
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { resetStore } from "@/booking/store";
 import { LATENT_FINDINGS, modulesWithNoUnitHeader, type LatentFinding } from "./latent-findings";
+import { dossierTestFiles } from "./tree-walks";
 
 const ROOT = path.resolve(__dirname, "../..");
 const SRC = path.join(ROOT, "src");
@@ -85,9 +86,10 @@ export const FINDING_ANCHORS: readonly FindingAnchor[] = [
     id: "DOSSIER-1",
     claim: "Gate-dossier test files exist and at least one reads the live ledger, so the scan has a subject.",
     holds: () => {
-      const files = readdirSync(path.join(SRC, "quality")).filter((n) =>
-        /^gate-dossier-.*\.test\.ts$/.test(n),
-      );
+      // W282 gave this walk a root. It was `readdirSync(path.join(SRC, "quality"))` closed over
+      // the repository, so the anchor could not be shown a dossier test arriving — an anchor that
+      // cannot be pointed at another tree has the defect it exists to detect.
+      const files = dossierTestFiles(ROOT);
       return (
         files.length > 0 &&
         files.some((n) => readFileSync(path.join(SRC, "quality", n), "utf8").includes("BUILD-STATE.md"))

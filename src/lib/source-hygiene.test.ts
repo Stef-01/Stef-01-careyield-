@@ -15,22 +15,14 @@
 // Nothing caught it for two units. So it becomes a test, in the W107 spirit: noticing a
 // tendency does not stop it recurring, and a lint does.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+// W282: the walk moved to `@/quality/tree-walks` and took a root with it, which is what makes it
+// provable — `register-census.test.ts` plants a file in a copied tree and requires it to appear.
+import { textFiles } from "@/quality/tree-walks";
 
 const ROOT = path.resolve(__dirname, "../..");
-const SKIP = new Set(["node_modules", ".git", ".next", "test-results", "playwright-report", "reports"]);
-const TEXT = /\.(ts|tsx|md|json|css|mjs|mts|sql|yml|yaml)$/;
-
-function textFiles(dir: string): string[] {
-  return readdirSync(dir).flatMap((entry) => {
-    if (SKIP.has(entry)) return [];
-    const full = path.join(dir, entry);
-    if (statSync(full).isDirectory()) return textFiles(full);
-    return TEXT.test(entry) ? [full] : [];
-  });
-}
 
 describe("W116 source files are readable as text", () => {
   const files = textFiles(ROOT);

@@ -6,34 +6,25 @@
 // So the registry is checked against the source tree. Adding a store without registering it
 // fails here, at the point the store is added, rather than silently in a demo months later.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { resetAllStores, STORE_RESETTERS } from "./stores";
+// W282: the walk moved to `@/quality/tree-walks` with a root, so it can be shown a store arriving.
+import { exportedResetters as walkExportedResetters } from "@/quality/tree-walks";
 
-const SRC = path.resolve(__dirname, "..");
-
-function sourceFiles(dir: string): string[] {
-  return readdirSync(dir).flatMap((entry) => {
-    const full = path.join(dir, entry);
-    if (statSync(full).isDirectory()) return sourceFiles(full);
-    return full.endsWith(".ts") && !full.endsWith(".test.ts") ? [full] : [];
-  });
-}
+const ROOT = path.resolve(__dirname, "../..");
 
 /**
  * Every `export function resetX()` in src/, by name — excluding this module's own aggregate,
  * which resets stores rather than being one.
+ *
+ * W282 moved the walk itself out and kept the exclusion where it was argued. The aggregate is
+ * skipped by NAME there now rather than by file path here, which is the same rule stated once:
+ * W265's erasure sweep had to make the identical exclusion from outside, and two copies of it
+ * would have been two places to forget.
  */
 function exportedResetters(): string[] {
-  const found = new Set<string>();
-  for (const file of sourceFiles(SRC)) {
-    if (file.endsWith(path.join("lib", "stores.ts"))) continue;
-    for (const m of readFileSync(file, "utf8").matchAll(/^export function (reset[A-Za-z0-9_]*)\s*\(/gm)) {
-      found.add(m[1]!);
-    }
-  }
-  return [...found].sort();
+  return walkExportedResetters(ROOT);
 }
 
 describe("W51 audit fix: the store registry cannot drift", () => {
