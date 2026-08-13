@@ -173,7 +173,9 @@ describe("W267 the finding: a proved content scanner is not a proved walk", () =
     // Eighteen since W281, and that one IS an addition rather than a conversion — a new walk that
     // arrived already proved, which is what W282 said moving the walks into `tree-walks.ts` would
     // make the default. The unproven list is unchanged by it, which is the check that says so.
-    expect(walkProven().length).toBe(19);
+    // Twenty-one at W275, which added a walk and the file that proves it — the shape W282
+    // predicted would become the default once the rooted walks lived in one module.
+    expect(walkProven().length).toBe(21);
     expect(unproven.length + walkProven().length).toBe(TREE_DERIVED_REGISTERS.length);
     // And the harsh reading is not the fair one, so the census carries both facts.
     const withContentProof = unproven.filter(

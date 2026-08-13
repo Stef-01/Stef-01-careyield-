@@ -143,6 +143,19 @@ export function dossierTestFiles(root: string): string[] {
     .sort();
 }
 
+/**
+ * W275: the page suite's spec files — every rendered surface the gate can run.
+ *
+ * Rooted like the rest, because the register built on it has to be shown a spec ARRIVING: a spec
+ * added and never run is exactly the silent exclusion W275 exists to make impossible.
+ */
+export function pageSpecFiles(root: string): string[] {
+  return filesUnder(path.join(root, "e2e"))
+    .filter((f) => f.endsWith(".spec.ts"))
+    .map((file) => rel(root, file))
+    .sort();
+}
+
 /** W210's live condition: modules whose first line is not a `// W<n>` header. */
 export function modulesWithNoUnitHeader(root: string): string[] {
   return sourceModules(root)

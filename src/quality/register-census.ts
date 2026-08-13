@@ -349,6 +349,24 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/page-suite.test.ts",
+    derives: "The same spec walk, pointed at a tree with no `e2e/` directory — which is how the walk is proved rather than trusted.",
+    checkedAgainst: "Nothing of its own. It is a member because W282's widened detector counts deriving through `tree-walks`, and exempting the file that does the proving would be the register answering its own question.",
+    proof: {
+      kind: "mutated_tree",
+      mutation: "it IS the proof: `pageSpecFiles` must return every spec for this root and none for a root with no `e2e/`",
+    },
+  },
+  {
+    file: "src/quality/page-suite.ts",
+    derives: "Every `*.spec.ts` under `e2e/`, to ask which of them the verify gate runs.",
+    checkedAgainst: "`EXCLUDED_SPECS` — empty today — plus the verify script, the e2e script and the Playwright config, each of which can drop a spec without touching the others.",
+    proof: {
+      kind: "mutated_tree",
+      mutation: "`pageSpecFiles` is pointed at a tree with no `e2e/` directory and must report no specs, and at this tree and must report all of them",
+    },
+  },
+  {
     file: "src/quality/unit-headers.ts",
     derives: "Every module under `src/`, to read the unit its header claims — missing, misplaced, or naming a unit the ledger does not have.",
     checkedAgainst: "The ledger's own unit ids, and the door: all three lists must be empty. It replaced W210's `HEADERLESS_AT_W210` count at W281.",

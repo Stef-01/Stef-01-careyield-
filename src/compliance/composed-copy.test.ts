@@ -40,7 +40,7 @@ describe("W278 the composing functions are found, not listed", () => {
     const found = composingFunctions(ROOT).map(key).sort();
     const declared = [...COMPOSED_COPY_SITES].map(key).sort();
     expect(found).toEqual(declared);
-    expect(found).toHaveLength(19);
+    expect(found).toHaveLength(20);
   });
 
   it("finds W200's own named example", () => {
@@ -225,7 +225,7 @@ describe("W278 five of them are called, and the output is linted", () => {
     // W237's rule. The number is derived, so the sentence cannot drift from the fixture list.
     const covered = new Set(rendered.map((r) => r.site));
     expect(covered.size).toBe(5);
-    expect(COMPOSED_COPY_SITES).toHaveLength(19);
+    expect(COMPOSED_COPY_SITES).toHaveLength(20);
     expect(FIXTURE_BOUND).toContain("Five of the eighteen");
     expect(FIXTURE_BOUND).toContain("remedy");
   });
