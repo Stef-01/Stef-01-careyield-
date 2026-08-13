@@ -142,6 +142,18 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/refusal-branches.ts",
+    derives:
+      "Every exported violation reporter under `src/` — named `*Violations` or `*Diff` and returning something other than prose — so a reporter cannot arrive without its refusal arms being driven.",
+    checkedAgainst:
+      "W291's `REFUSAL_BRANCHES`, both directions: a reporter with no branch declared and a branch for a reporter that is gone both fail.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "a reporter and a renderer are planted together in a constructed root, and `violationReporters` must report the reporter and refuse the renderer — the negative planted alongside the positive, because a walk that matched everything would pass the positive on its own",
+    },
+  },
+  {
     file: "src/quality/register-census.ts",
     derives: "Every file that walks the tree, by `readdirSync(` in code with comments subtracted.",
     checkedAgainst: "This register. It is subject to itself; see the module note.",

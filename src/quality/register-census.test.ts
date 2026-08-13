@@ -175,7 +175,11 @@ describe("W267 the finding: a proved content scanner is not a proved walk", () =
     // make the default. The unproven list is unchanged by it, which is the check that says so.
     // Twenty-one at W275, which added a walk and the file that proves it — the shape W282
     // predicted would become the default once the rooted walks lived in one module.
-    expect(walkProven().length).toBe(21);
+    //
+    // Twenty-two at W291, another arrival rather than a conversion, and the unproven list is again
+    // unchanged: `violationReporters` takes a root from its first commit, so the register that
+    // drives refusal branches was never on the unproven list to be moved off it.
+    expect(walkProven().length).toBe(22);
     expect(unproven.length + walkProven().length).toBe(TREE_DERIVED_REGISTERS.length);
     // And the harsh reading is not the fair one, so the census carries both facts.
     const withContentProof = unproven.filter(

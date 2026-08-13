@@ -101,8 +101,18 @@ describe("W286 the six preconditions are evaluated against the thing each claims
   });
 
   it("(1) expands one quarter of thirteen, and no theme beyond it", () => {
+    // THE ROW EXISTS AND IS NOT BLOCKED. It does NOT pin the status, because `available` is the
+    // status of a unit nobody has started, and the loop starting one is what this quarter was
+    // written to cause: the row moves to `claimed` and then to `done` on schedule. Pinning it made
+    // this test go red on W291 the moment it was claimed — the FOURTH instance of a planned event
+    // reported as a defect by the document that planned it (W273, W274, W286, this), and the third
+    // in a row that was mine. What the precondition actually claims is that the thirteen planned
+    // units are IN the ledger and that none of them needs a ruling; both survive the loop building
+    // them.
     for (const id of Q23) {
-      expect(LEDGER, `${id} is planned and not in the ledger`).toContain(`| ${id} | available |`);
+      const row = rows().find((r) => r.id === id);
+      expect(row, `${id} is planned and not in the ledger`).toBeDefined();
+      expect(row!.status, `${id} was planned as buildable and is now blocked`).not.toBe("blocked");
     }
     expect(PLAN).toContain("## 5h. Year 6 — Q23 (W287–W299)");
     expect(PLAN).not.toContain("W300");
