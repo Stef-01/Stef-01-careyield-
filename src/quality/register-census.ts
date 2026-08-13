@@ -373,6 +373,15 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/tenancy/two-tenant.test.ts",
+    derives: "Every test file in the tree, to ask which of them drives a practice-scoped read across two practices.",
+    checkedAgainst: "W209's `practice_scoped` reads — every one must have a test that constructs at least two tenants.",
+    proof: {
+      kind: "mutated_tree",
+      mutation: "the detector is pointed at a one-practice fixture and must report it single-tenant, which is the gate's own words",
+    },
+  },
+  {
     file: "src/verticals/assembly.test.ts",
     derives: "Every module under `src/verticals/` that is not declared machinery.",
     checkedAgainst: "W250's census — no vertical may re-implement the shared assembly.",

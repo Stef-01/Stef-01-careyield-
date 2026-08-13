@@ -601,6 +601,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "The remaining exports are the model and its declared kind table. `RESPONSE_STATE_COPY` is W170's own wording re-exported rather than rewritten, `RESPONSE_ABSENCE_COPY` is the sentence a surface uses instead of \"no response\", and the rejection copy tells an operator why an event was not linked. None of it describes a patient, a condition or a next clinical step.",
   },
   {
+    module: "src/tenancy/two-tenant.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W277's two-tenant coverage register: which practice-scoped reads have been shown a second practice, the detector that decides, and its stated bound. Nobody but a developer reads it. Its strings are module and function names and one paragraph about a literal-counting detector; no patient, condition or appointment reason appears in it.",
+  },
+  {
     module: "src/tenancy/store-reads.ts",
     operatorCopy: [],
     notCopy:
