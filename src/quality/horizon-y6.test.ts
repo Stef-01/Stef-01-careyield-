@@ -75,6 +75,15 @@ function outstandingGates(): string[] {
     .sort();
 }
 
+/**
+ * The last unit that existed when W260 wrote this horizon.
+ *
+ * The document is a SNAPSHOT of the position at its own moment. A test that reads the live ledger
+ * without this bound reports every later expansion as a change to what W260 recorded, which is
+ * DOSSIER-1's finding and the reason it is named in W210's register.
+ */
+export const Y6_HORIZON_LAST_UNIT = 273;
+
 const Q21 = Array.from({ length: 13 }, (_, i) => `W${261 + i}`);
 
 describe("W260 the horizon is derived from the ledger, row by row", () => {
@@ -91,9 +100,16 @@ describe("W260 the horizon is derived from the ledger, row by row", () => {
     // moves on every firing, so the document would have gone red once an hour and said nothing
     // about the position. A pin whose signal is noise gets edited rather than read, which is the
     // failure mode of every stale document this tree has replaced with a register.
-    const all = rows();
+    //
+    // W273 BOUNDED THE UNIT COUNT AND LEFT THE BLOCKED COUNT LIVE, which is the same argument one
+    // row over. This document priced the position at W273; the next expansion adds thirteen rows,
+    // so an unbounded total goes red on a PLANNED event and says nothing about the position — the
+    // noise-pin failure the paragraph above describes for `done`. The blocked count stays live on
+    // purpose: the document says its own going red is the signal to re-derive it, and the gate
+    // position changing is exactly that signal. DOSSIER-1's shape, in a second file.
+    const all = rows().filter((r) => r.n <= Y6_HORIZON_LAST_UNIT);
     expect(HORIZON).toContain(`The ledger holds **${all.length} units**`);
-    const blocked = all.filter((r) => r.status === "blocked");
+    const blocked = rows().filter((r) => r.status === "blocked");
     expect(HORIZON).toContain(`**${blocked.length} are blocked**`);
   });
 

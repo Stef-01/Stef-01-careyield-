@@ -576,6 +576,39 @@ blocked row**, which is W263's job to enforce rather than this paragraph's to pr
 - **W272** Q21 hardening → verify: code-review, security-review and simplify run over the quarter's diff; every finding recorded with a disposition and a date, and the accepted ones carry a review date.
 - **W273** **QUARTER CLOSE.** Q22 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
 
+## 5g. Year 6 — Q22 (W274–W286)
+
+Expanded by W273 on 2026-08-13 under the §6 horizon rule, from `docs/AUDIT-Y5.md` and
+`docs/GATE-DOSSIER-Y5.md` — and from `docs/HARDENING-Q21.md`, which is newer than both and is where
+the theme actually comes from. **One quarter, not a year.** See `docs/HORIZON-Q22.md` for the
+rule's six preconditions evaluated one at a time, and for the gate position recorded at this
+expansion. Same contract: each unit states its own verify gate, founder gates are inherited, and no
+unit here needs a ruling to start.
+
+**Q22 — the rendered surface.** Q21 built eleven units, nine of them registers, rehearsals or
+sweeps, and those nine reviewed clean. **The one unit that touched a surface an operator actually
+sees carried the high-severity finding**, and two of the other four are at the same boundary: a
+demo rail belonging to a practice nobody could sign in as, and a verify gate that does not run the
+only suite exercising a rendered page. The registers are healthy; **the rendered surface is not
+checked the way the modules are** — W200 says so about itself, and the unit it defers to has never
+been written. So every unit below checks what a person actually sees, or wires an existing control
+to reach it. **Q22 adds no blocked row**, which is W263's job to enforce rather than this
+paragraph's to promise.
+
+- **W274** `/finder`'s vacuity guard, decided and recorded → verify: the guard's threshold is derived from what the page actually renders rather than from a round number, the decision between changing the page and changing the guard is written down as data, and `public-sweep` is green.
+- **W275** [P] The rendered surface enters the verify gate → verify: `pnpm verify` runs the page suite or states in a checked register exactly which specs it excludes and why; a deliberately broken page fails the gate, proved by breaking one.
+- **W276** Fixture coherence: every seeded store against a practice a session can act for → verify: both directions over W51's store registry; a store seeded under a practice no session can ever act for fails, and the check is proved on a deliberately incoherent seed.
+- **W277** [P] Two tenants, or it is not a scoping test → verify: every `practice_scoped` read in W209's register has a test that constructs at least two practices; the check is proved by pointing it at a one-practice fixture and watching it fail.
+- **W278** Copy composed inside a render function — W200's stated known bound, closed → verify: rendered output linted against fixtures rather than by export name, checked in both directions against a declared surface; a string added to a render function and to no export fails.
+- **W279** [P] Every console route's zero state, declared and distinguished → verify: for each route, "nothing yet", "nothing arrived" and "could not load" are separate states with separate copy, both directions against a declared register; a route rendering one where another is true fails.
+- **W280** TENANCY-1 closed: the read that matches a clinician with no practice in the query → verify: the read is practice-scoped as the query rather than filtered after, W209's rule; the finding is closed in W210's register with the mutation that would have caught it.
+- **W281** [P] CENSUS-1 closed: every module carries its unit header, checked at the door → verify: a module with no `// W<n>` header fails the suite rather than being counted; `HEADERLESS_AT_W210` retired or re-derived, and the finding closed in W210's register.
+- **W282** W267's unproven walks: a batch given roots and proved by mutation → verify: at least six registers move from `walk_unproven` to `mutated_tree`, each with its own planted-file proof; the census's own counts move with them in both directions.
+- **W283** [P] MATCH-1 re-anchored: the ranker's ordering read from behaviour, not from source → verify: the predicate observes what the ranker returns for constructed inputs rather than matching a comparison in its source; rewording the comparison no longer silences the finding.
+- **W284** Route coverage: every declared route exercised by the page suite, or refused in writing → verify: W271's route classes checked against the page suite's own coverage in both directions; a route with neither an exercise nor a written reason fails.
+- **W285** [P] Q22 hardening → verify: code-review, security-review and simplify run over the quarter's diff; every finding recorded with a disposition and a date, and the accepted ones carry a review date.
+- **W286** **QUARTER CLOSE.** Q23 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
 ## 6. Horizon rule (supersedes the five-year expansion rule, W260)
 
 **The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,
