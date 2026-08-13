@@ -379,6 +379,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W270's re-derivation of this register at the Y6 boundary: the year bands, the declared floor and the argument for where it sits, and the door for bringing a pre-floor surface in. Nobody but a developer reads it, and FLOOR_RATIONALE is the one long string — an argument about a scan's false-positive ratio, addressed to whoever next proposes sweeping backwards.",
   },
   {
+    module: "src/console/zero-states.ts",
+    operatorCopy: ["ZERO_STATE_COPY"],
+    notCopy:
+      "`ZERO_STATE_COPY` IS operator copy — three headlines, details and actions a practice manager reads on an empty console page — and it is declared here so the advice rules reach it, which is the whole reason W179's `SILENCE_COPY` is in this register too. The rest is the per-route classification and its arguments, addressed to whoever adds a console route: each entry says which zeros that route can show and why, and `RUNTIME_BOUND` says what the unit could not check. `REFUSED_ZERO_SHAPES` is reviewer-facing in W200's split for the usual reason: its content QUOTES the three-names-one-sentence collapse and the detector tuned until it agrees, both of which it exists to forbid.",
+  },
+  {
     module: "src/console/results-copy.ts",
     operatorCopy: ["RESULTS_COPY"],
     notCopy:
