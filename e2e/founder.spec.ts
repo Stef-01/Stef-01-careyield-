@@ -51,18 +51,27 @@ test.describe("signed in", () => {
     }
   });
 
-  test("shows the units a ruling releases, including the two that are not week-units", async ({ page }) => {
-    // W310's finding, rendered: `SUP-1` and `SUP-2` are blocked on G5 and no register had ever
-    // seen them, because the ledger parse matched `W<n>` only.
+  test("shows every blocked row the ledger holds, reachable from this one page", async ({ page }) => {
+    // W319'S GATE, AT THE PAGE. The unit half proves the derivation covers the ledger; only a
+    // browser proves the DERIVATION REACHES THE RENDER. The ids are read from the ledger here so
+    // the spec and the page arrive at the list by different routes — a page rendering a written
+    // list fails this the day a row moves.
+    const ledger = readFileSync("BUILD-STATE.md", "utf8");
+    const blocked = ledger
+      .split("\n")
+      .filter((l) => / \| blocked \| /.test(l))
+      .map((l) => l.split(" | ")[0]!.slice(2).trim());
+    expect(blocked.length).toBeGreaterThan(10);
+
     await page.goto("/console/founder");
-    // `.first()` because G5's decider sentence names these two as well — the strictness is real,
-    // and matching more than once is the page saying the same thing in both places, not a defect.
-    await expect(page.getByText("SUP-1", { exact: false }).first()).toBeVisible();
-    await expect(page.getByText("SUP-2", { exact: false }).first()).toBeVisible();
-    await expect(page.getByText("W161", { exact: false }).first()).toBeVisible();
-    // The rows themselves, not the prose: each release is its own list item.
-    const items = page.locator("li", { hasText: /^SUP-[12] / });
-    await expect(items).toHaveCount(2);
+    const body = await page.locator("main").innerText();
+    for (const id of blocked) {
+      expect(body, `${id} is blocked and the page does not show it`).toContain(id);
+    }
+    // The two that are not week-units, named because they are the reason the check exists: the
+    // ledger parse matched `W<n>` and neither had ever been rendered anywhere.
+    expect(blocked).toContain("SUP-1");
+    expect(blocked).toContain("SUP-2");
   });
 
   test("says how long each ruling has waited, in units built", async ({ page }) => {

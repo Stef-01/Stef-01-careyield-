@@ -1585,6 +1585,17 @@ export const MANIFEST: readonly ModuleEntry[] = [
       },
       {
         fn: "founderDiff",
+        branch: "phantom",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            founderDiff(process.cwd(), [
+              { blocker: "G5", kind: "founder_gate", whoDecides: "The founder.", releases: ["W1"] },
+            ]).phantom.length > 0,
+        },
+      },
+      {
+        fn: "founderDiff",
         branch: "unrendered",
         reach: {
           kind: "driven",

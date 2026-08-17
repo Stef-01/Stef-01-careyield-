@@ -206,6 +206,16 @@ export interface FounderDiff {
   clearedButBlocking: string[];
   /** A blocked row whose blocker no release path names, so the page would not show it at all. */
   unrendered: string[];
+  /**
+   * A unit the page RENDERS that the ledger does not block.
+   *
+   * W319's direction, and the one `unrendered` cannot cover. A release path names the units a
+   * ruling buys; if one is unblocked, renamed or finished and the path still names it, the page
+   * tells the founder that answering a question releases work that is already done. That reads as
+   * a bigger prize than it is — the failure the whole page exists to prevent, pointed the other
+   * way.
+   */
+  phantom: string[];
 }
 
 /**
@@ -217,11 +227,23 @@ export interface FounderDiff {
  * a blocked row no release path names, which this page would silently omit. A founder reading a
  * page that is missing a row cannot know it is missing.
  */
+/**
+ * The unit ids the page renders, derived from the same call the page makes.
+ *
+ * NOT a second list: the page maps `outstandingRulings(root)` into rows, so this reads the same
+ * function rather than re-deriving what the page shows. A check comparing the ledger to a list
+ * somebody kept beside the page would prove the list, not the page.
+ */
+export function renderedUnits(root: string, paths: readonly ReleasePath[] = RELEASE_PATHS): string[] {
+  return [...new Set(outstandingRulings(root, paths).flatMap((r) => r.releases.map((u) => u.id)))].sort();
+}
+
 export function founderDiff(root: string, paths: readonly ReleasePath[] = RELEASE_PATHS): FounderDiff {
   const rows = allLedgerRows(root);
   const gates = parseGates(readFileSync(path.join(root, "docs/FIVE-YEAR-PLAN.md"), "utf8"));
   const gateById = new Map(gates.map((g) => [g.id, g]));
   const named = new Set(paths.map((p) => p.blocker));
+  const blockedIds = new Set(rows.filter((r) => r.status === "blocked").map((r) => r.id));
   const blockedBy = new Map<string, string[]>();
   for (const row of rows.filter((r) => r.status === "blocked")) {
     for (const blocker of blockersIn(row.note)) {
@@ -243,6 +265,7 @@ export function founderDiff(root: string, paths: readonly ReleasePath[] = RELEAS
         [...blockedBy.entries()].filter(([blocker]) => !named.has(blocker)).flatMap(([, ids]) => ids),
       ),
     ].sort(),
+    phantom: renderedUnits(root, paths).filter((id) => !blockedIds.has(id)).sort(),
   };
 }
 

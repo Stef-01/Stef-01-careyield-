@@ -17,6 +17,7 @@ import {
   founderDiff,
   outstandingRulings,
   parseGates,
+  renderedUnits,
   waitedFor,
 } from "./outstanding";
 import { blockedRows, blockersIn, parseLedgerRows } from "@/quality/blocked-surface";
@@ -101,7 +102,12 @@ describe("W310 the page is derived from the two documents, not written", () => {
 
 describe("W310 every outstanding ruling, its units, and its wait", () => {
   it("names every blocker the ledger blocks on, and none it does not", () => {
-    expect(founderDiff(ROOT)).toEqual({ undescribed: [], clearedButBlocking: [], unrendered: [] });
+    expect(founderDiff(ROOT)).toEqual({
+      undescribed: [],
+      clearedButBlocking: [],
+      unrendered: [],
+      phantom: [],
+    });
   });
 
   it("renders every blocked row, including the two that were not week-units", () => {
@@ -195,6 +201,51 @@ describe("W310 the three ways a rendered page goes wrong", () => {
     const unrendered = founderDiff(ROOT, []).unrendered;
     expect(unrendered.length).toBe(blockedRows(ROOT).length);
     expect(unrendered).toContain("SUP-1");
+  });
+
+  it("renders every blocked row the ledger holds, and nothing else — W319's round trip", () => {
+    // BOTH DIRECTIONS OVER THE SAME PAIR OF SETS, which is what makes this a round trip rather
+    // than two half-checks. `renderedUnits` reads the same call the page maps into rows, so a page
+    // that started rendering a list somebody kept beside it would fail here.
+    const rendered = new Set(renderedUnits(ROOT));
+    const blocked = new Set(blockedRows(ROOT).map((r) => r.id));
+    expect([...blocked].filter((id) => !rendered.has(id)), "blocked and not on the page").toEqual([]);
+    expect([...rendered].filter((id) => !blocked.has(id)), "on the page and not blocked").toEqual([]);
+    expect(rendered.size).toBe(blocked.size);
+    expect(rendered.size).toBeGreaterThan(10);
+  });
+
+  it("counts a unit once however many rulings would release it", () => {
+    // W202 IS BLOCKED ON G9 AND G1 BOTH, and the shape generalises: a unit can wait on more than
+    // one ruling, so two release paths can name it. Without the dedup, `renderedUnits` returns it
+    // twice and the round-trip size comparison above passes on a page listing a duplicate. No two
+    // paths share a unit in the tree today, which is exactly why this is constructed — a mutation
+    // removing the dedup survived every other assertion in this file.
+    const paths = [
+      { blocker: "G5", kind: "founder_gate" as const, whoDecides: "The founder.", releases: ["W161"] },
+      { blocker: "G6", kind: "founder_gate" as const, whoDecides: "The founder.", releases: ["W161"] },
+    ];
+    expect(renderedUnits(ROOT, paths)).toEqual(["W161"]);
+  });
+
+  it("reports a unit the page renders that the ledger does not block", () => {
+    // W319'S ARM, and the one `unrendered` cannot reach. A release path naming a unit that is
+    // finished, renamed or unblocked makes the page promise work a ruling would not release —
+    // the page overstating the prize, which is the same defect as omitting a row pointed the
+    // other way. Driven on a constructed path, because the real register has no such row.
+    const paths = [
+      {
+        blocker: "G5",
+        kind: "founder_gate" as const,
+        whoDecides: "The founder.",
+        releases: ["W161", "W1"],
+      },
+    ];
+    const diff = founderDiff(ROOT, paths);
+    expect(diff.phantom, "W1 is done and the page would show it as waiting").toEqual(["W1"]);
+    // And the healthy direction on the same call, so a `phantom` that reported everything passes
+    // neither: W161 really is blocked on G5 and must not be reported.
+    expect(diff.phantom).not.toContain("W161");
   });
 
   it("reports a gate already cleared that still holds blocked rows", () => {
