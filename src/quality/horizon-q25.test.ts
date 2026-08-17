@@ -66,8 +66,14 @@ describe("W312 the document reads the ledger it claims to read", () => {
     expect(rows().filter((r) => r.status === "done").length).toBeGreaterThan(200);
   });
 
-  it("states the done count the ledger actually holds", () => {
-    const done = rows().filter((r) => r.status === "done").length;
+  it("states the done count the ledger held when the horizon was written", () => {
+    // AS AT THE HORIZON, NOT LIVE, and the difference is this quarter's own theme. A live count
+    // moves the moment W313 lands — and it moved once before that, when W312 closed its own row
+    // while the gate ran. A document that prices a position has to be checked against the position
+    // it priced, so the count is over the units that existed BEFORE this expansion; none of them
+    // will change status again.
+    const before = Number(Q25[0]!.slice(1)) - 1;
+    const done = rows().filter((r) => r.status === "done" && r.n <= before).length;
     expect(DOC, `the document does not say ${done} are done`).toContain(`${done} are done`);
   });
 

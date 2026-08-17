@@ -19,8 +19,8 @@ pinned row by row by `src/quality/horizon-q25.test.ts`.
 
 ## The gate position, re-read
 
-The ledger holds **312 week-units** before this expansion and **325 after it**, of which **294 are
-done**. **18 rows are blocked**, which is the count over every row the ledger holds rather than
+The ledger holds **312 week-units** before this expansion and **325 after it**, of which **295 are
+done** once this close lands. **18 rows are blocked**, which is the count over every row the ledger holds rather than
 over the week-units alone — see below.
 
 | Waiting on | Units | Which | Waited |
