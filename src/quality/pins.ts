@@ -159,6 +159,14 @@ export const PINS: readonly DeclaredPin[] = [
   },
   {
     module: "src/quality/declaration-tax.ts",
+    name: "AUTHOR_TAX_AT_W313",
+    classification: {
+      kind: "floor",
+      why: "W313's instrument, frozen the way W300's and W308's are and for the same reason: a later unit that moves it adds a row to `MOVED_SINCE_W313` rather than editing the record, because a record somebody edits to match the tree is not a record. This is the file-count half; the two beside it are the register-count halves.",
+    },
+  },
+  {
+    module: "src/quality/declaration-tax.ts",
     name: "TAX_AT_W300",
     classification: {
       kind: "floor",

@@ -1,0 +1,157 @@
+// W313 verify gate: "the tax measured as the files an AUTHOR must edit to declare a module rather
+// than the registers that report it undeclared, both instruments run over the same planted shapes,
+// and the disagreement between them recorded as the reason W308's gate read the wrong way."
+//
+// W308 HANDED THIS UNIT ITS OWN INSTRUMENT AS A DEFECT. Its note says the gate was the wrong
+// instrument rather than the work wrong, and that naming a better one belongs to the quarter close;
+// W312 named it and this builds it. What makes it a unit rather than an arithmetic change is that
+// the better instrument had to be shown DISAGREEING with the old one, over the same population, in
+// both directions — because an instrument that only ever reads lower is a discount, not a measure.
+
+import { describe, expect, it } from "vitest";
+import {
+  AUTHOR_TAX_AT_W313,
+  DECLARATION_HOMES,
+  INSTRUMENT_NOTES,
+  MOVED_SINCE_W313,
+  SHAPES,
+  SHAPE_BODIES,
+  TAX_AT_W308,
+  bothInstruments,
+  demandingRegisters,
+  editSites,
+  homeDiff,
+} from "./declaration-tax";
+import { copyTree, withPlantedIn, withTree } from "./planting";
+
+const ROOT = process.cwd();
+// One copy for the whole file: every measurement below plants into it and removes what it planted.
+const COPY = copyTree(ROOT);
+const PLANTED = "src/planted/w313-probe.ts";
+const withShape = <T,>(shape: (typeof SHAPES)[number], probe: () => T): T =>
+  withPlantedIn(COPY, { [PLANTED]: SHAPE_BODIES[shape] }, probe);
+
+describe("W313 the instrument measures files, and the register that costs none", () => {
+  it("knows a home for every register that levies a declaration, and none it does not", () => {
+    expect(homeDiff(COPY)).toEqual({ unhomed: [], stale: [], missing: [] });
+  });
+
+  it("counts the files an author opens, not the registers that report", () => {
+    // The unit, at its smallest. `copy-y6` reports once and costs two files; if the instrument were
+    // counting registers under another name, these would be equal.
+    const files = withShape("plain", () => editSites(COPY, PLANTED));
+    const reports = withShape("plain", () => demandingRegisters(COPY, PLANTED));
+    expect(reports).toEqual(["src/compliance/copy-y6.ts"]);
+    expect(files).toEqual(["src/compliance/cdss-boundary.test.ts", "src/compliance/cdss-boundary.ts"]);
+  });
+
+  it("charges one edit for the registers that share a file", () => {
+    // THE CONSOLIDATION, MEASURED. The census, the branches and the manifest's own row all report a
+    // full register and all live in `manifest.ts` — three reports, one edit. This is the property
+    // W300's instrument cannot express and the reason W308 read a successful quarter as a failure.
+    const reports = withShape("a_full_register", () => demandingRegisters(COPY, PLANTED));
+    const files = withShape("a_full_register", () => editSites(COPY, PLANTED));
+    const shared = ["src/quality/register-census.ts", "src/quality/refusal-branches.ts", "src/quality/manifest.ts"];
+    for (const register of shared) expect(reports, `${register} does not report`).toContain(register);
+    expect(files.filter((f) => f === "src/quality/manifest.ts")).toHaveLength(1);
+    expect(files.length).toBeLessThan(reports.length);
+  });
+
+  it("charges nothing for a register that is satisfied by writing the module itself", () => {
+    // `unit-headers` reports a module with no `// W<n>` header and there is no register to add a
+    // line to — the remedy is the module's own first line. A file instrument must report zero for
+    // it, and a register instrument must still report it, which is the disagreement at its purest.
+    const home = DECLARATION_HOMES.find((h) => h.register === "src/quality/unit-headers.ts")!;
+    expect(home.files).toEqual([]);
+    expect(home.why.length).toBeGreaterThan(120);
+  });
+});
+
+describe("W313 both instruments, over the same planted shapes", () => {
+  it("runs them over one population and matches both frozen records", () => {
+    // THE GATE. Same copy, same plants, same run — and each number checked against the record that
+    // owns it. Neither figure is stored twice: `TAX_AT_W308` owns the register count and
+    // `AUTHOR_TAX_AT_W313` owns the file count.
+    const moved = new Map(MOVED_SINCE_W313.map((m) => [m.shape, m.now]));
+    for (const row of bothInstruments(COPY)) {
+      expect(row.reporting, `${row.shape}: the register instrument moved`).toBe(TAX_AT_W308[row.shape]);
+      expect(row.editing, `${row.shape}: the file instrument moved`).toBe(
+        moved.get(row.shape) ?? AUTHOR_TAX_AT_W313[row.shape],
+      );
+    }
+  });
+
+  it("disagrees in BOTH directions, which is what makes it a measure and not a discount", () => {
+    // An instrument that always reads lower than the one it replaces is a rebate somebody chose.
+    // These cross: the cheapest shape costs MORE in files than in registers, and the most expensive
+    // costs less. That cannot be produced by scaling and is the argument for keeping both.
+    const rows = bothInstruments(COPY);
+    expect(rows.some((r) => r.editing > r.reporting), "no shape costs more to edit").toBe(true);
+    expect(rows.some((r) => r.editing < r.reporting), "no shape costs less to edit").toBe(true);
+    expect(rows.some((r) => r.editing === r.reporting), "no shape agrees").toBe(true);
+  });
+
+  it("argues every shape, including the ones where the instruments agree", () => {
+    for (const shape of SHAPES) {
+      expect(INSTRUMENT_NOTES[shape], `${shape} has no argument`).toBeDefined();
+      expect(INSTRUMENT_NOTES[shape].length, `${shape} is argued too thinly`).toBeGreaterThan(150);
+    }
+  });
+
+  it("says plainly why W308's gate read the wrong way", () => {
+    // The gate's last clause. The record has to NAME the misreading rather than quietly replace it.
+    const full = INSTRUMENT_NOTES.a_full_register;
+    expect(full).toMatch(/W305/);
+    expect(full).toMatch(/W308 reported a quarter of consolidation as a failure/);
+    expect(INSTRUMENT_NOTES.plain, "the plain shape's surprise is not recorded").toMatch(/EDITING COSTS MORE/);
+  });
+});
+
+describe("W313 the file instrument is not vacuous", () => {
+  it("reports nothing when nothing is planted", () => {
+    // Silence proves the measurement only if the probes were running — W295's shape.
+    expect(editSites(COPY, PLANTED)).toEqual([]);
+    expect(withShape("a_full_register", () => editSites(COPY, PLANTED)).length).toBeGreaterThan(0);
+  });
+
+  it("reports a register with no home rather than charging zero for it", () => {
+    // Driven from outside on a home register with a row removed. A missing home is indistinguishable
+    // from a free register unless something says so, and "free" is the answer that flatters.
+    const without = DECLARATION_HOMES.filter((h) => h.register !== "src/quality/bounds.ts");
+    expect(homeDiff(COPY, without).unhomed).toContain("src/quality/bounds.ts");
+  });
+
+  it("reports a home naming a file the tree does not hold", () => {
+    const bogus = [
+      ...DECLARATION_HOMES,
+      { register: "src/quality/bounds.ts", files: ["src/quality/gone.ts"], why: "x" },
+    ];
+    expect(homeDiff(COPY, bogus).missing).toEqual(["src/quality/gone.ts"]);
+  });
+
+  it("reports a home for a register the probe population does not have", () => {
+    const bogus = [...DECLARATION_HOMES, { register: "src/quality/not-a-register.ts", files: [], why: "x" }];
+    expect(homeDiff(COPY, bogus).stale).toEqual(["src/quality/not-a-register.ts"]);
+  });
+
+  it("counts a file once however many registers send an author to it", () => {
+    // Constructed rather than measured, because the real tree's sharing is what the unit is FOR and
+    // a property proved only on the case it was written for is a property proved once.
+    const homes = [
+      { register: "src/compliance/copy-y6.ts", files: ["src/x.ts"], why: "x" },
+      { register: "src/quality/bounds.ts", files: ["src/x.ts"], why: "x" },
+    ];
+    const files = new Set(homes.flatMap((h) => h.files));
+    expect([...files]).toEqual(["src/x.ts"]);
+  });
+});
+
+describe("W313 what the better instrument still does not measure", () => {
+  it("is honest that a file is not a unit of work either", () => {
+    const home = DECLARATION_HOMES.find((h) => h.register === "src/quality/register-census.ts")!;
+    expect(home.why).toMatch(/W305/);
+    // A census entry is four sentences and a manifest row for a bare module is three lines, and
+    // both count as one file. The instrument is better, not right, and the tree says so.
+    expect(withTree({ "src/planted/x.ts": "// W1: x\nexport const x = 1;\n" }, () => true)).toBe(true);
+  });
+});

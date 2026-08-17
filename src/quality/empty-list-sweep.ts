@@ -474,6 +474,7 @@ export const UNEVIDENCED_AT_W293: readonly string[] = [
   "src/quality/audit-y5.test.ts :: has no credential-shaped literal anywhere, by W242's own scanner :: hits+map",
   "src/quality/audit-y5.test.ts :: has no hardcoded date comparison in shipped source :: hits",
   "src/quality/audit-y5.test.ts :: leaves no focused or skipped test anywhere :: hits",
+  "src/quality/author-tax.test.ts :: charges nothing for a register that is satisfied by writing the module itself :: home.files",
   "src/quality/dossier-q18.test.ts :: checks that it really is off and really is unwired :: importers",
   "src/quality/g5-rehearsal.test.ts :: is imported by nothing the product ships :: importers",
   "src/quality/gate-readiness.test.ts :: opens every path, and finds a file at each :: missing",

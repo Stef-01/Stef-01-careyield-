@@ -52,7 +52,7 @@ import { stripComments } from "@/security/reachability";
 import { coherenceViolations } from "@/tenancy/fixture-coherence";
 import { censusDiff, treeWalkingFiles } from "./register-census";
 import { boundsInTree } from "./bounds";
-import { TAX_AT_W300, taxDiff } from "./declaration-tax";
+import { DECLARATION_HOMES, TAX_AT_W300, homeDiff, taxDiff } from "./declaration-tax";
 import { BLIND_SPOTS, boundDiff } from "./blind-spots";
 import { discoverFoldSites } from "./order-independence";
 import { headerViolations } from "./unit-headers";
@@ -460,6 +460,42 @@ export const MANIFEST: readonly ModuleEntry[] = [
       },
     },
     branches: [
+      {
+        fn: "homeDiff",
+        branch: "unhomed",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            homeDiff(
+              process.cwd(),
+              DECLARATION_HOMES.filter((h) => h.register !== "src/quality/bounds.ts"),
+            ).unhomed.length > 0,
+        },
+      },
+      {
+        fn: "homeDiff",
+        branch: "stale",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            homeDiff(process.cwd(), [
+              ...DECLARATION_HOMES,
+              { register: "src/quality/not-a-register.ts", files: [], why: "x" },
+            ]).stale.length > 0,
+        },
+      },
+      {
+        fn: "homeDiff",
+        branch: "missing",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            homeDiff(process.cwd(), [
+              ...DECLARATION_HOMES,
+              { register: "src/quality/bounds.ts", files: ["src/quality/gone.ts"], why: "x" },
+            ]).missing.length > 0,
+        },
+      },
       {
         fn: "taxDiff",
         branch: "unaccounted",

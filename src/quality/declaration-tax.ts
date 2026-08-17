@@ -29,10 +29,11 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. Synthetic module bodies planted into a temporary copy.
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { sourceModules, testModules } from "./tree-walks";
 import { fixtureText, prepareForScan } from "./scan-text";
+import { withPlantedIn } from "./planting";
 import { copySurfaceMembers } from "@/compliance/copy-y6";
 import { discoverFoldSites } from "./order-independence";
 import { findInstructionSinks } from "@/security/instruction-sinks";
@@ -348,6 +349,200 @@ export function taxDiff(
     if (moved.has(shape) && live[shape] === baseline) stale.push(shape);
   }
   return { unaccounted: unaccounted.sort(), stale: stale.sort() };
+}
+
+/** Where an author goes to satisfy one register's demand. Several registers share a file. */
+export interface DeclarationHome {
+  /** The register that reports an undeclared module — a `DEMANDS` file. */
+  register: string;
+  /** The files somebody edits to satisfy it. */
+  files: readonly string[];
+  why: string;
+}
+
+/**
+ * W313: THE OTHER INSTRUMENT, and the one W308's note asked the quarter close to name.
+ *
+ * W300 counts the REGISTERS that report a module undeclared. That is the tax with teeth and it is
+ * the wrong unit for the question Q24 was actually asking, which W308 discovered by missing its own
+ * gate: consolidating two registers' declarations into one file leaves both registers reporting, so
+ * the count stays where it was or rises, while the work of declaring genuinely falls. Counting
+ * registers counts CONTROLS. An author does not edit a control; an author edits a FILE.
+ *
+ * So this maps each register to the file somebody opens to satisfy it, and the two instruments are
+ * run over the same planted shapes. Where they disagree is exactly where registers share a home —
+ * which is what W305's manifest did and what W300's instrument cannot see by construction.
+ *
+ * DECLARED RATHER THAN DERIVED, and the reason is the same one W263 gives for its release paths: a
+ * purely derived mapping would absorb a new register silently. `homeDiff` checks it against
+ * `DEMANDS` in both directions, so a register arriving without a home fails and a home naming a
+ * register the census does not have fails.
+ */
+export const DECLARATION_HOMES: readonly DeclarationHome[] = [
+  {
+    register: "src/compliance/copy-y6.ts",
+    files: ["src/compliance/cdss-boundary.ts", "src/compliance/cdss-boundary.test.ts"],
+    why: "W200's copy surface and the namespace loader beside it. TWO files for one register, which is the disagreement pointing the other way: a register can cost more than one edit as easily as several can cost one, and an instrument that assumed a register was a file would be wrong in both directions.",
+  },
+  {
+    register: "src/quality/register-census.ts",
+    files: ["src/quality/manifest.ts"],
+    why: "W267's census entry, which W305 moved into the manifest. Before that it was `register-census.ts` itself.",
+  },
+  {
+    register: "src/quality/refusal-branches.ts",
+    files: ["src/quality/manifest.ts"],
+    why: "W291's branches, moved into the manifest by W305 — the SAME file as the census entry above, which is the whole of what the consolidation bought and the whole of what W300's instrument could not report.",
+  },
+  {
+    register: "src/quality/manifest.ts",
+    files: ["src/quality/manifest.ts"],
+    why: "W305's own row, in the file it declares. A module needs a row here whatever else it needs, so this is the one home that is never shared with a different file.",
+  },
+  {
+    register: "src/quality/blind-spots.ts",
+    files: ["src/quality/blind-spots.ts"],
+    why: "W295's witness and probe, deliberately NOT moved into the manifest — W305 folded them in, the fold moved a walk out of this module, and four rows of its coverage fell over behind it.",
+  },
+  {
+    register: "src/quality/bounds.ts",
+    files: ["src/quality/bounds.ts"],
+    why: "W297's stated bound. Kept out of the manifest because a module states several bounds, each with its own unit and lifting, so it is not a per-module fact.",
+  },
+  {
+    register: "src/quality/pins.ts",
+    files: ["src/quality/pins.ts"],
+    why: "W290's classification, kept out of the manifest for the same reason as the bounds: a module pins several constants and each needs its own argument.",
+  },
+  {
+    register: "src/quality/order-independence.ts",
+    files: ["src/quality/order-independence.ts"],
+    why: "W167's fold site with its tie-break argument.",
+  },
+  {
+    register: "src/security/instruction-sinks.ts",
+    files: ["src/security/instruction-sinks.ts"],
+    why: "W153's sink declaration.",
+  },
+  {
+    register: "src/quality/acceptances.ts",
+    files: ["src/quality/acceptances.ts"],
+    why: "W294's acceptance register, with the review date the clock reads.",
+  },
+  {
+    register: "src/quality/unit-headers.ts",
+    files: [],
+    why: "NO FILE AT ALL, and it is the instrument's most useful row. W281's header check is satisfied by writing the module's own header correctly — there is no register to add a line to. A register that costs no declaration is invisible to an instrument counting files and reported by one counting registers, which is the disagreement in its purest form and the reason both are kept.",
+  },
+];
+
+/** The distinct files an author edits to declare a module planted at `planted`. */
+export function editSites(root: string, planted: string): string[] {
+  const home = new Map(DECLARATION_HOMES.map((h) => [h.register, h.files]));
+  const files = new Set<string>();
+  for (const register of demandingRegisters(root, planted)) {
+    for (const file of home.get(register) ?? []) files.add(file);
+  }
+  return [...files].sort();
+}
+
+export interface HomeDiff {
+  /** A register that can report an undeclared module and has no home declared. */
+  unhomed: string[];
+  /** A home for a register the probe population does not hold. */
+  stale: string[];
+  /** A home naming a file that is not in the tree. */
+  missing: string[];
+}
+
+/** The home register against the probe population, in every direction it can be wrong. */
+export function homeDiff(
+  root: string,
+  homes: readonly DeclarationHome[] = DECLARATION_HOMES,
+  probes: readonly Demand[] = DEMANDS,
+): HomeDiff {
+  const declared = new Set(homes.map((h) => h.register));
+  const population = new Set(probes.map((p) => p.file));
+  // A register that never reports anything needs no home: it levies no declaration.
+  const levying = probes.filter((p) => SHAPES.some((shape) => reportsShape(root, p, shape))).map((p) => p.file);
+  return {
+    unhomed: levying.filter((r) => !declared.has(r)).sort(),
+    stale: [...declared].filter((r) => !population.has(r)).sort(),
+    missing: homes
+      .flatMap((h) => h.files)
+      .filter((f) => !existsSync(path.join(root, f)))
+      .sort(),
+  };
+}
+
+/** Every shape, so both instruments can be run over the same population. */
+export const SHAPES = Object.keys(SHAPE_BODIES) as ModuleShape[];
+
+/** Whether one probe reports a module of this shape, planted into a copy of `root`. */
+function reportsShape(root: string, probe: Demand, shape: ModuleShape): boolean {
+  const planted = "src/planted/w313-probe.ts";
+  return withPlantedIn(root, { [planted]: SHAPE_BODIES[shape] }, () => probe.demands(root, "w313-probe"));
+}
+
+/**
+ * What an author edits, per shape, measured at W313.
+ *
+ * FROZEN THE SAME WAY W300'S AND W308'S ARE, and read beside them rather than instead of them. A
+ * later unit that moves it adds a row to `MOVED_SINCE_W313`.
+ */
+export const AUTHOR_TAX_AT_W313: Readonly<Record<ModuleShape, number>> = {
+  plain: 2,
+  walks_the_tree: 4,
+  states_a_bound: 4,
+  reports_violations: 3,
+  a_full_register: 6,
+};
+
+/** Shapes whose author-cost has moved since W313's record. */
+export const MOVED_SINCE_W313: readonly Movement[] = [];
+
+/**
+ * Why the two instruments give the number they give, per shape.
+ *
+ * THE NUMBERS ARE NOT REPEATED HERE. `TAX_AT_W308` holds what the register instrument reports and
+ * `AUTHOR_TAX_AT_W313` holds what the file instrument reports; a third copy of either would be the
+ * pinned-count class W304 removed and W308 re-introduced. What this holds is the ARGUMENT, which
+ * cannot be derived from anything.
+ */
+export const INSTRUMENT_NOTES: Readonly<Record<ModuleShape, string>> = {
+  plain: "EDITING COSTS MORE THAN REPORTING, which is the direction nobody expected. A module with a header and nothing else is reported by one register — W200's copy surface — and satisfying it takes TWO files, the surface and the namespace loader beside it. So the cheapest possible module already costs more work than the register count says, and every reading of W300's figure has understated the floor.",
+  walks_the_tree: "The instruments agree by coincidence rather than by construction: the copy surface costs two files for one report and the census shares the manifest with the manifest's own row, so a gap of plus-one and a gap of minus-one cancel. A shape where two numbers agree for different reasons is the strongest argument for keeping both.",
+  states_a_bound: "Editing costs more again — the bound lives in its own register and the copy surface still costs two files. W297 keeps `STATED_BOUNDS` out of the manifest deliberately, because a module states several bounds each with its own unit and lifting, so this gap is a decision rather than an omission.",
+  reports_violations: "The instruments agree, and here it IS by construction: the branches live in the manifest with the module's own row, so the only excess is the copy surface's second file, and the only saving is that same manifest sharing.",
+  a_full_register: "THE SHAPE THE QUARTER WAS ABOUT, and the one where the consolidation finally shows. Three registers — the census, the branches and the manifest's own row — share one file, so three reports cost one edit. Before W305 the same module cost the same seven reports and EIGHT edits. W300's instrument could not see the difference, which is exactly why W308 reported a quarter of consolidation as a failure.",
+};
+
+export interface Disagreement {
+  shape: ModuleShape;
+  /** W300's instrument: registers that report the module undeclared. */
+  reporting: number;
+  /** W313's: distinct files somebody opens. */
+  editing: number;
+  why: string;
+}
+
+/**
+ * Both instruments over the same planted shapes, live.
+ *
+ * The whole of W313's gate: run them over one population and let the disagreement be visible
+ * instead of arguing about which is right. A caller comparing these against the two frozen records
+ * is comparing measurements, not re-deriving a number stored twice.
+ */
+export function bothInstruments(root: string): Disagreement[] {
+  return SHAPES.map((shape) => {
+    const planted = "src/planted/w313-shape.ts";
+    return withPlantedIn(root, { [planted]: SHAPE_BODIES[shape] }, () => ({
+      shape,
+      reporting: demandingRegisters(root, "w313-shape").length,
+      editing: editSites(root, "w313-shape").length,
+      why: INSTRUMENT_NOTES[shape],
+    }));
+  });
 }
 
 /** What this measurement does not prove. */
