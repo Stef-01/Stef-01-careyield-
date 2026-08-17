@@ -53,7 +53,9 @@ describe("W287 every finding is disposed, with a date and a lens", () => {
   it("defers the one thing it will not do, naming the remedy rather than the intention", () => {
     const deferred = FINDINGS.find((f) => f.disposition.kind === "deferred")!;
     expect(deferred.id).toBe("W279-CR-2");
-    expect(deferred.disposition.kind === "deferred" && deferred.disposition.unit).toMatch(/^W\d+/);
+    // W318: the unit it is deferred TO, and the type refuses a range — `W288+` is what this said
+    // for thirty-one units, and a range is a unit that never arrives.
+    expect(deferred.disposition.kind === "deferred" && deferred.disposition.by).toMatch(/^W\d+$/);
   });
 });
 

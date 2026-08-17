@@ -21,6 +21,16 @@ import {
 import { ROUTE_COVERAGE, coverageDiff, coverageIsClean, specOpens } from "./route-coverage";
 import { knownUnits } from "./unit-headers";
 import { parseLedgerRows } from "./blocked-surface";
+import {
+  FINDINGS as Q22_FINDINGS,
+  type Disposition,
+  type HardeningFinding,
+  allHardeningFindings,
+  overdueDispositions,
+} from "./hardening-q22";
+import { FINDINGS as Q23_FINDINGS } from "./hardening-q23";
+import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
+import { FINDINGS as W279_FINDINGS } from "./review-w279";
 
 const ROOT = path.resolve(__dirname, "../..");
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
@@ -142,5 +152,83 @@ describe("W285 SIMP-1 and HYG-1 are resolved against the tree", () => {
     // The finding's own subject, asserted rather than remembered.
     const clinicians = readFileSync(path.join(ROOT, "src/demo/clinicians.ts"), "utf8");
     expect(clinicians.includes("\r\n"), "the CRLF outlier is back").toBe(false);
+  });
+});
+
+describe("W318 every disposition carries a clock, and the clock is read", () => {
+  const ALL = allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, W279_FINDINGS]);
+  const TODAY = "2026-08-17";
+
+  it("has nothing overdue across every pass this tree has run", () => {
+    // THE UNIT. Each pass checked its own register and every one of them passed — which is exactly
+    // how three deferred findings pointed at ranges for thirty-one, seventeen and six units without
+    // anybody noticing. A register that only reads itself cannot see that the answer was supposed
+    // to arrive from somewhere else.
+    expect(overdueDispositions(LEDGER, ALL, TODAY), "a promise whose unit landed without it").toEqual([]);
+    expect(ALL.length, "no findings, so nothing is on a clock").toBeGreaterThan(20);
+  });
+
+  it("still holds findings of both kinds that carry one, so the clean run is not an empty set", () => {
+    // W293's rule. `overdueDispositions` over a register with no deferred and no accepted rows is
+    // clean forever, and would stay clean through any breakage of the comparison.
+    expect(ALL.filter((f) => f.disposition.kind === "deferred").length).toBeGreaterThan(0);
+    expect(ALL.filter((f) => f.disposition.kind === "accepted").length).toBeGreaterThan(0);
+  });
+
+  it("reports a deferral whose unit has landed, and an acceptance past its date", () => {
+    // Both arms driven from outside, because a healthy tree produces neither. The first is the
+    // defect this unit was written for; the second is W294's clock, which this register had been
+    // checking the SHAPE of and never the value.
+    const landed: HardeningFinding = {
+      id: "PROBE-1",
+      lens: "code-review",
+      unit: "W1",
+      what: "x".repeat(210),
+      raisedOn: "2026-01-01",
+      disposition: { kind: "deferred", why: "y".repeat(50), by: "W301" },
+    };
+    expect(overdueDispositions(LEDGER, [landed], TODAY)).toEqual([
+      { finding: "PROBE-1", what: "was deferred to W301, which has landed" },
+    ]);
+    // And the same finding pointed at a unit that has NOT landed is silent, which is what makes the
+    // arm above about the ledger rather than about the word "deferred".
+    expect(overdueDispositions(LEDGER, [{ ...landed, disposition: { kind: "deferred", why: "y".repeat(50), by: "W9999" } }], TODAY)).toEqual([]);
+
+    const expired: HardeningFinding = {
+      ...landed,
+      id: "PROBE-2",
+      disposition: { kind: "accepted", why: "y".repeat(50), reviewBy: "2026-01-01" },
+    };
+    expect(overdueDispositions(LEDGER, [expired], TODAY)).toEqual([
+      { finding: "PROBE-2", what: "was accepted until 2026-01-01, which has passed" },
+    ]);
+    expect(overdueDispositions(LEDGER, [expired], "2025-01-01")).toEqual([]);
+  });
+
+  it("refuses a disposition with no clock, and a deferral pointed at a range, at the type level", () => {
+    // THE HALF NO CHECK CAN CATCH LATER. All three deferrals in this tree named a RANGE — `W288+`,
+    // `W299+`, `W312+` — which reads as a plan and behaves as a wish: no unit is ever the one a
+    // range names, so nothing can report it unanswered. The type refuses both shapes now, and these
+    // are compile-time assertions rather than runtime ones.
+    // @ts-expect-error a deferred disposition with no unit does not typecheck
+    const clockless: Disposition = { kind: "deferred", why: "no clock at all" };
+    // @ts-expect-error `W299+` is a range, not a unit id
+    const ranged: Disposition = { kind: "deferred", why: "a range", by: "W299+" };
+    expect([clockless.kind, ranged.kind]).toEqual(["deferred", "deferred"]);
+  });
+
+  it("records that all three deferrals were retargeted, and to units that exist", () => {
+    // The unit's own product, and it is a correction rather than a mechanism: every deferral in the
+    // tree pointed somewhere no unit could arrive. Two now point at the quarter close, which is
+    // where a finding nobody picked up gets read again; one turned out to have been ANSWERED, by
+    // W301, seventeen units before anybody flipped its disposition.
+    for (const finding of ALL) {
+      if (finding.disposition.kind !== "deferred") continue;
+      expect(finding.disposition.by, `${finding.id} is deferred to a range`).toMatch(/^W\d+$/);
+      expect(finding.disposition.why, `${finding.id} does not say why`).toMatch(/W318/);
+    }
+    const simp1 = ALL.find((f) => f.id === "Q23-SIMP-1")!;
+    expect(simp1.disposition.kind, "SIMP-1 is still deferred, and W301 answered it").toBe("fixed");
+    expect(simp1.disposition.kind === "fixed" && simp1.disposition.by).toBe("W301");
   });
 });

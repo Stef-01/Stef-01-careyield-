@@ -159,8 +159,8 @@ export const FINDINGS: readonly HardeningFinding[] = [
     raisedOn: "2026-08-14",
     disposition: {
       kind: "deferred",
-      why: "The remedy is a store that distinguishes 'no file', 'rows dropped' and 'no signups', plus a page branch to render it — product work, and W287 is a review unit. Deferring is the honest call rather than declaring a state the page cannot show. The remedy is written into `FALLIBLE_READS` so the next unit inherits it as a sentence rather than rediscovering the finding.",
-      unit: "W288+",
+      why: "The remedy is a store that distinguishes 'no file', 'rows dropped' and 'no signups', plus a page branch to render it — product work, and W287 is a review unit. Deferring is the honest call rather than declaring a state the page cannot show. The remedy is written into `FALLIBLE_READS` so the next unit inherits it as a sentence rather than rediscovering the finding. W318 RETARGETED THIS FROM `W288+`, which it had pointed at for thirty-one units: a range names no unit, so no unit is ever the one it was deferred to and nothing could ever report it unanswered. W325 is the quarter close, and this register now fails if that lands with this still deferred.",
+      by: "W325",
     },
   },
   {

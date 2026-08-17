@@ -207,8 +207,8 @@ export const FINDINGS: readonly HardeningFinding[] = [
     disposition: {
       kind: "deferred",
       why:
-        "Deferred rather than fixed because the remedy is a decision about `self-reference.ts`'s walk that belongs to whoever owns that unit, and it is builder-A's: the choice between excluding `node_modules` by name (which W168's own note calls a place to hide something) and scoping the walk to the first-party roots the rest of the tree uses. Named with the two consequences separated so the next unit does not have to re-derive which one matters — the symlink is a robustness question and the dependency file is a correctness one.",
-      unit: "W312+",
+        "Deferred rather than fixed because the remedy is a decision about `self-reference.ts`'s walk that belongs to whoever owns that unit, and it is builder-A's: the choice between excluding `node_modules` by name (which W168's own note calls a place to hide something) and scoping the walk to the first-party roots the rest of the tree uses. Named with the two consequences separated so the next unit does not have to re-derive which one matters — the symlink is a robustness question and the dependency file is a correctness one. W318 RETARGETED THIS FROM `W312+` TO A UNIT THAT EXISTS: a range is a wish, because no unit is ever the one a range names and nothing can notice it going unanswered. W325 is the quarter close, which is where a finding nobody has picked up gets read again — and this register now fails the moment W325 lands with this still deferred.",
+      by: "W325",
     },
   },
   {

@@ -64,10 +64,30 @@ import { parseLedgerRows } from "./blocked-surface";
 /** The lens a finding came from. The gate names three; each one produced something. */
 export type Lens = "code-review" | "security-review" | "simplify";
 
+/**
+ * W318: a unit id, as the ledger spells it.
+ *
+ * `W299+` DOES NOT TYPECHECK, and that is the point. Both deferred findings this tree held pointed
+ * at a range — `W299+` and `W312+` — which reads as a plan and behaves as a wish: no unit is ever
+ * "the one it was deferred to", so nothing can ever notice the deferral going unanswered. Q23-SIMP-1
+ * was deferred to `W299+`, fixed by W301, and still read `deferred` seventeen units later with
+ * W298's own test asserting the consolidation it describes.
+ */
+export type UnitId = `W${number}`;
+
+/**
+ * How a finding was answered, and WHEN somebody has to look again.
+ *
+ * EVERY ARM CARRIES A CLOCK, refused at the type level rather than by a check somebody remembers to
+ * run. `fixed` names the unit that did it; `accepted` names the date somebody re-reads it — W294's
+ * rule; `deferred` names the unit by which it is answered, and `overdueDispositions` reports it the
+ * moment that unit lands with the finding still deferred. A disposition with no clock cannot be
+ * written: there is no arm for one.
+ */
 export type Disposition =
   | { kind: "fixed"; by: string; evidence: string }
   | { kind: "accepted"; why: string; reviewBy: string }
-  | { kind: "deferred"; why: string; unit: string };
+  | { kind: "deferred"; why: string; by: UnitId };
 
 export interface HardeningFinding {
   id: string;
@@ -225,4 +245,60 @@ export function unaccountedUnits(ledger: string): string[] {
     .map((row) => row.id)
     .filter((id) => !reviewed.has(id) && !(id in NOT_REVIEWED) && !(id in REVIEWED_BY_LATER_UNIT))
     .sort();
+}
+
+// ---------------------------------------------------------------------------------------------
+// W318: every disposition on a clock, and the clock read against the ledger.
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * Every hardening finding this tree holds, from every pass that recorded one.
+ *
+ * COLLECTED HERE BECAUSE THE CLOCK IS ABOUT ALL OF THEM. Each pass checked its own register and
+ * every one of them passed, which is exactly how three deferred findings pointed at ranges for
+ * thirty-one, seventeen and six units without anybody noticing: a register that only ever reads
+ * itself cannot see that the answer was supposed to arrive from somewhere else.
+ */
+export function allHardeningFindings(
+  registers: ReadonlyArray<readonly HardeningFinding[]>,
+): readonly HardeningFinding[] {
+  return registers.flat();
+}
+
+export interface OverdueDisposition {
+  finding: string;
+  what: string;
+}
+
+/**
+ * A disposition whose clock has run out.
+ *
+ * TWO ARMS, ONE FOR EACH KIND THAT CARRIES A CLOCK. A `deferred` finding names the unit by which it
+ * is answered, and the moment that unit is `done` in the ledger with the finding still deferred,
+ * somebody promised something and shipped without it. An `accepted` one names the date it is
+ * re-read — W294's rule — and a date in the past is an acceptance nobody renewed.
+ *
+ * `fixed` has no arm because it has no future: the clock it carries is the unit that already ran.
+ */
+export function overdueDispositions(
+  ledger: string,
+  findings: readonly HardeningFinding[],
+  today: string,
+): OverdueDisposition[] {
+  const done = new Set(
+    parseLedgerRows(ledger)
+      .filter((r) => r.status === "done")
+      .map((r) => r.id),
+  );
+  const out: OverdueDisposition[] = [];
+  for (const finding of findings) {
+    const d = finding.disposition;
+    if (d.kind === "deferred" && done.has(d.by)) {
+      out.push({ finding: finding.id, what: `was deferred to ${d.by}, which has landed` });
+    }
+    if (d.kind === "accepted" && d.reviewBy < today) {
+      out.push({ finding: finding.id, what: `was accepted until ${d.reviewBy}, which has passed` });
+    }
+  }
+  return out.sort((a, b) => `${a.finding}${a.what}`.localeCompare(`${b.finding}${b.what}`));
 }

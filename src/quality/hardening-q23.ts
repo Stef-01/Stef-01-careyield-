@@ -125,10 +125,10 @@ export const FINDINGS: readonly HardeningFinding[] = [
       "The quarter invented a citation format — `<file> :: <assertion text>` — and then implemented resolving it FOUR times. (W301 CORRECTED THIS FINDING'S COUNT, which said five: `mutation-sampling.test.ts` was included because it splits the separator, and the finding's own next sentence said it splits an id rather than a citation. A hardening finding that overstates by one is a hardening finding somebody stops trusting, so the number is fixed here rather than left standing.) `acceptances.ts` has `resolveCitation`, `negative-probes.ts` has `unresolvedCitations`, `register-census.test.ts` splits and asserts inline, `adm-y5.test.ts` splits and asserts inline, and `mutation-sampling.test.ts` splits the same separator for a different purpose. They disagree about what a failure IS: one reports three distinguishable causes (no such file, no such assertion, malformed citation), one reports two, and two report a bare `toContain` failure naming neither. The format is now load-bearing across seven registers — it is how this tree stops a citation reading as coverage, which is W258's rule — and it has no shared parser, so the next register invents a sixth.",
     raisedOn: "2026-08-17",
     disposition: {
-      kind: "deferred",
-      why:
-        "The remedy is small and obvious — `resolveCitation(root, citation)` already exists in `acceptances.ts` with the best of the five error vocabularies, so the change is to export it from a module the others can import and delete four implementations. It is deferred rather than done because three of the five call sites are in other units' test files and one is in W292's module, and consolidating them touches five units' diffs inside a review week. Named here with the winner already chosen so the next unit does not have to re-hold the comparison.",
-      unit: "W299+",
+      kind: "fixed",
+      by: "W301",
+      evidence:
+        "`resolveCitation` is exported from `citations.ts` and the independent implementations are gone: `separatorDiff(ROOT)` reports neither an undeclared splitter nor a stale declaration, the three distinguishable causes survive as distinct messages, and the two test files that used to split the separator inline no longer contain the call. W298's own re-derivation of this finding was flipped by W301 at the time and has been asserting the consolidation ever since. THE DISPOSITION IS WHAT NOBODY FLIPPED. It read `deferred` to `W299+` for seventeen units while the finding was answered and its evidence was green — which is the defect W318 exists to make impossible, found in the register W318 was extending.",
     },
   },
   {

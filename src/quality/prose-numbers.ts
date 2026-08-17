@@ -308,6 +308,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/empty-list-sweep.ts", text: "one discharged rows", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/empty-list-sweep.ts", text: "three files", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q22.ts", text: "51 files", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/hardening-q22.ts", text: "three deferred findings", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q22.ts", text: "eleven modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q22.ts", text: "Nine modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q22.ts", text: "THREE FINDINGS", resolution: { kind: "at_the_unit" } },
