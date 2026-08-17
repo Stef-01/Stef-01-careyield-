@@ -366,6 +366,16 @@ export const MANIFEST: readonly ModuleEntry[] = [
     ],
   },
   {
+    module: "src/demo/path.ts",
+    // W309's path register reads NAMED page files and one already-proved walk rather than walking
+    // the tree itself, so it carries no census row: `treeWalkingFiles` does not see it and a row
+    // here would be a declaration nothing re-derives. It is in the manifest because it states a
+    // bound, and W305's rule is that a module stating one cannot be a module this file has not
+    // heard of.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/scan-text.ts",
     census: {
       derives:
