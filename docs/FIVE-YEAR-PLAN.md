@@ -642,6 +642,39 @@ checked that a register's ASSERTIONS would notice anything. **Q23 adds no blocke
 - **W298** [P] Q23 hardening → verify: code-review, security-review and simplify run over the quarter's diff; every finding recorded with a disposition and a date, and the accepted ones carry a review date.
 - **W299** **QUARTER CLOSE.** Q24 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
 
+## 5i. Year 6 — Q24 (W300–W312)
+
+Expanded by W299 on 2026-08-17 under the §6 horizon rule, from `docs/AUDIT-Y5.md` and
+`docs/GATE-DOSSIER-Y5.md` — and from `src/quality/hardening-q23.ts`, which is newer than both and
+is where the theme comes from. **One quarter, not a year.** See `docs/HORIZON-Q24.md` for the
+rule's six preconditions evaluated one at a time, and for the gate position recorded at this
+expansion.
+
+**Q24 — the cost of the controls.** Q23 built twelve registers in eleven units and each one caught
+real defects, including in the units writing them. Its own hardening pass then produced the bill:
+**fifteen pinned counts moved in one quarter on ordinary additions**, one citation format was
+**implemented five times**, and adding a single module to `src/` now requires declaring it in
+**six** other registers. W295 produced the sharpest version — narrowing three text scans so they
+would stop matching their own fixtures HID FOUR REAL REGISTERS, and the narrowing had to be
+reverted. The registers stay and the questions they ask stay; what changes is that the tree stops
+paying for them twelve times over. The quarter's gate is measured rather than felt: W300 records
+what one new module costs today and W308 re-derives the same number at the end. **Q24 adds no
+blocked row.**
+
+- **W300** The declaration tax, measured: what one new module costs today → verify: the register-declaration sites derived from the tree rather than listed, a planted module run through every one of them, and the count of places it must be declared recorded as a constant this quarter is measured against.
+- **W301** [P] The citation resolver, written once → verify: one exported `<file> :: <assertion>` resolver, the five independent implementations replaced by it, and every existing citation still resolving; a citation naming a missing file, a missing assertion and a malformed pair each fail. Closes Q23-SIMP-1.
+- **W302** [P] One text-scan discipline: comments, literals, and the order they run in → verify: a single exported scan-preparation with comment stripping and literal blanking, the four copies retired, and W295's reversion recorded as its stated bound — proved on the prose comment whose `/` hid four real registers.
+- **W303** One planting harness for every register that plants → verify: `withRoot`, `withPlanted` and the census tree-copy unified behind one API, every existing plant still planting, and a probe left behind by an interrupted run made impossible rather than cleaned up.
+- **W304** [P] Counts as properties: the pinned-count class removed at its source → verify: every register-size assertion in the tree replaced by the property it stood in for or argued as a ratchet, W290's `PINS` register re-derived, and a planted count that would move on an ordinary addition failing.
+- **W305** The register manifest: one declaration point per module → verify: a single per-module declaration from which the copy surface, the census, the drives and the blind spots are derived; the six registers agree with it in both directions, and a module declared once is watched by all of them.
+- **W306** [P] Bounds provable in their lifted state → verify: `stillOpen` takes a root, both real predicates driven against a constructed tree where the remedy EXISTS and reported stale, and the `stale` arm no longer reachable only with a synthetic bound. Closes Q23-CR-1.
+- **W307** [P] The self-referential scan, solved once → verify: one stated rule for a detector that must not match its own fixtures, applied to every scan in the tree, with the fixture-splitting idiom replaced by the rule; each scan proved to see a planted real instance and refuse its own quoted one.
+- **W308** The declaration tax re-measured → verify: W300's measurement re-run unchanged over the tree Q24 leaves behind, the number recorded beside the baseline, and a quarter that did not move it saying so rather than claiming otherwise.
+- **W309** [P] The demo path end to end on synthetic data → verify: one spec that walks a practice from seeded data to a rendered console answer, with every founder gate held — no real patient, no live send, no production credential — and the path's refusals rendered where a gate stops it.
+- **W310** The founder's page: what exists, what is blocked, what one ruling releases → verify: a rendered page derived from the ledger and §4 rather than written, naming each outstanding gate, the units it releases, and how long it has waited; no clinical claim, and the copy passes the advice linter.
+- **W311** [P] Q24 hardening → verify: code-review, security-review and simplify run over the quarter's diff; every finding recorded with a disposition and a date, and the accepted ones carry a review date.
+- **W312** **QUARTER CLOSE.** Q25 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
 ## 6. Horizon rule (supersedes the five-year expansion rule, W260)
 
 **The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,

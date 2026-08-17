@@ -49,6 +49,21 @@ function rows(): Row[] {
 }
 
 const asAtHorizon = () => rows().filter((r) => r.n <= Q23_HORIZON_LAST_UNIT);
+
+/**
+ * §5h alone, stopping at whatever section follows it.
+ *
+ * It used to run to `## 6. Horizon rule`, which was the next heading on the day it was written and
+ * stopped being one the moment W299 laid §5i between them — so this test read Q24's units as part
+ * of Q23's quarter. The FIFTH instance of a planned event reported as a defect by the document
+ * that planned it, and the third in this file.
+ */
+const q23Section = () => {
+  const from = PLAN.indexOf("## 5h.");
+  const rest = PLAN.slice(from + "## 5h.".length);
+  const to = rest.search(/\n## /);
+  return rest.slice(0, to === -1 ? undefined : to);
+};
 const Q23 = Array.from({ length: 13 }, (_, i) => `W${287 + i}`);
 
 describe("W286 the document reads the ledger it claims to read", () => {
@@ -115,8 +130,14 @@ describe("W286 the six preconditions are evaluated against the thing each claims
       expect(row!.status, `${id} was planned as buildable and is now blocked`).not.toBe("blocked");
     }
     expect(PLAN).toContain("## 5h. Year 6 — Q23 (W287–W299)");
-    expect(PLAN).not.toContain("W300");
-    expect(rows().every((r) => r.n <= Q23_HORIZON_LAST_UNIT)).toBe(true);
+    // Scoped to §5h: the PLAN grows a section per quarter by design, so asserting the whole file
+    // never names W300 is the same defect one line down from the one this test already fixed.
+    expect(q23Section(), "§5h plans a unit beyond the quarter it expands").not.toContain("W300");
+    // What this expansion LAID DOWN ends at the bound; the ledger going past it is Q24 arriving,
+    // which is the event the constant exists to tolerate. Asserting the whole ledger stops at 299
+    // was the sixth instance of the same defect in this file.
+    expect(Q23.map((id) => Number(id.slice(1))).every((n) => n <= Q23_HORIZON_LAST_UNIT)).toBe(true);
+    expect(asAtHorizon()).toHaveLength(Q23_HORIZON_LAST_UNIT);
   });
 
   it("(2) cites the two documents the rule names, by path", () => {
@@ -158,7 +179,9 @@ describe("W286 the six preconditions are evaluated against the thing each claims
   });
 
   it("(5) invents no gate, and every gate a row names is defined in §4", () => {
-    for (const row of rows().filter((r) => r.n > 286)) {
+    // Bounded at W299, like every other assertion here: Q24's rows are Q24's document's business,
+    // and an unbounded scan reports the next expansion as a change to this one.
+    for (const row of rows().filter((r) => r.n > 286 && r.n <= Q23_HORIZON_LAST_UNIT)) {
       for (const gate of row.note.match(/\bG\d+\b/g) ?? []) {
         expect(PLAN, `${row.id} names ${gate}, which §4 does not define`).toContain(`**${gate}`);
       }
@@ -178,14 +201,12 @@ describe("W286 the quarter table describes the units that were laid down", () =>
     for (const id of Q23) {
       expect(PLAN, `${id} is in the horizon and not in the plan`).toContain(`- **${id}** `);
     }
-    const section = PLAN.slice(PLAN.indexOf("## 5h."), PLAN.indexOf("## 6. Horizon rule"));
-    expect([...section.matchAll(/^- \*\*(W\d+)\*\*/gm)].map((m) => m[1]!)).toEqual(Q23);
+    expect([...q23Section().matchAll(/^- \*\*(W\d+)\*\*/gm)].map((m) => m[1]!)).toEqual(Q23);
   });
 
   it("gives every planned unit a verify gate, in the plan's own words", () => {
-    const section = PLAN.slice(PLAN.indexOf("## 5h."), PLAN.indexOf("## 6. Horizon rule"));
     for (const id of Q23) {
-      const line = section.split("\n").find((l) => l.startsWith(`- **${id}**`))!;
+      const line = q23Section().split("\n").find((l) => l.startsWith(`- **${id}**`))!;
       expect(line, `${id} states no verify gate`).toContain("→ verify:");
     }
   });
@@ -226,7 +247,10 @@ describe("W286 the theme is derived from evidence that exists", () => {
 describe("W286 the document refuses what the rule refuses", () => {
   it("plans no quarter beyond the one being expanded", () => {
     expect(DOC).toContain("It does not plan Q24 or Year 7");
-    expect(PLAN).not.toContain("Q24 —");
+    // §5h, not the whole plan: Q24 gets a section of its own when its quarter arrives, and reading
+    // that as a breach of Q23's promise is the planned event again. What the promise binds is what
+    // THIS expansion wrote.
+    expect(q23Section(), "§5h names a quarter it did not expand").not.toContain("Q24 —");
   });
 
   it("neither ranks the outstanding decisions nor proposes an eleventh gate", () => {

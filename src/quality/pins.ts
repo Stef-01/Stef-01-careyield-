@@ -158,6 +158,14 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/horizon-q24.test.ts",
+    name: "Q24_HORIZON_LAST_UNIT",
+    classification: {
+      kind: "range_bound",
+      why: "The same bound for Q24, carried forward by W299 — the fourth horizon to bound itself from its first line rather than after an expansion went red under it.",
+    },
+  },
+  {
     module: "src/quality/horizon-y6.test.ts",
     name: "Y6_HORIZON_LAST_UNIT",
     classification: {
