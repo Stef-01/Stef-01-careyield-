@@ -44,6 +44,8 @@ import { mutantsIn } from "./mutation-sampling";
 import { CITATION_BOUND, separatorDiff } from "./citations";
 import { PLANTING_BOUND, planterDiff } from "./planting";
 import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
+import { fixtureText } from "./scan-text";
+import { splitSites } from "./self-reference";
 
 /** How a register's stated bound has been shown to be true. */
 export type Blindness =
@@ -192,9 +194,11 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
     probe: () =>
       withRoot(
         {
-          "src/planted/split-endpoint.ts":
-            'export const host = ["api.open", "ai.com"].join("");\nexport const call = () => fetch(`https://${host}/v1`);\n',
-          "src/planted/whole-endpoint.ts": `export const host = "${["api.open", "ai.com"].join("")}";\n`,
+          // W307: both bodies come from the fixture file, which no walk reads. Before that they
+          // were split across an array here so W153's scanner would not report THIS module as an
+          // undeclared instruction sink — the idiom `SELF_REFERENCE_RULE` replaced.
+          "src/planted/split-endpoint.ts": fixtureText("split-endpoint-module"),
+          "src/planted/whole-endpoint.ts": fixtureText("whole-endpoint-module"),
         },
         (root) => {
           const hits = findInstructionSinks(root, ["src"]);
@@ -407,12 +411,10 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
     probe: () =>
       withRoot(
         {
-          // The token is split so this fixture is not itself read as a reporter by the very walk it
-          // is a witness for — `register-census.test.ts` splits `readdirSync(` for the same reason.
-          "src/planted/misnamed-reporter.ts":
-            ["export function planted", "Problems(\n  input: readonly string[],\n): string[] {\n  return [...input];\n}\n"].join(""),
-          "src/planted/list-reporter.ts":
-            ["export function planted", "Diff(\n  input: readonly string[],\n): string[] {\n  return [...input];\n}\n"].join(""),
+          // W307: out of the surface rather than split across an array. `violationReporters` reads
+          // RAW source on purpose, so a reporter signature written here would be read as one.
+          "src/planted/misnamed-reporter.ts": fixtureText("misnamed-reporter"),
+          "src/planted/list-reporter.ts": fixtureText("list-reporter"),
         },
         (root) => {
           const found = violationReporters(root).map((r) => `${r.module}::${r.fn}`);
@@ -439,6 +441,28 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
     whyNotPlantable:
       "A witness would be a bound that resolves and is unfair, and unfairness is a judgement about prose rather than a property a plant can carry. Fabricating one would be writing the answer into the fixture, which is the detector W279 refused to tune. Stating it is what can be done from inside, and the quarterly hardening pass is where a reader looks.",
   },
+  "src/quality/self-reference.ts": {
+    kind: "demonstrated",
+    bound:
+      "The split sweep reads two WRITTEN shapes: an array of string literals joined inline, and a table of fragments joined with a map. A literal assembled some third way — concatenated with `+`, built from character codes, read out of a constant one character at a time — is invisible to it, and the register would report the tree clean. That is the class of bound W267 states about `readdirSync`, and the same remedy applies: when a third shape arrives the sweep grows a pattern and says so, rather than the exception register growing a row.",
+    witness: "a module assembling the same literal with `+` instead of an array join",
+    control: "the identical literal assembled with the array join, which the sweep must report",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/plus-split.ts": 'export const token = "one" + "half";\n',
+          "src/planted/array-split.ts": fixtureText("a-split-join"),
+        },
+        (root) => {
+          const found = splitSites(root);
+          return {
+            witnessSeen: found.some((f) => f.includes("plus-split")),
+            controlSeen: found.some((f) => f.includes("array-split")),
+          };
+        },
+      ),
+  },
+
   "src/quality/scan-text.ts": {
     kind: "undemonstrated",
     bound:

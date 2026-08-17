@@ -31,6 +31,7 @@ import {
   undeclaredInstructionSinks,
 } from "@/security/instruction-sinks";
 import { reachableFromApp, stripComments } from "@/security/reachability";
+import { fixtureToken } from "./scan-text";
 import { copySurfaceMembers } from "@/compliance/copy-y6";
 import * as walks from "./tree-walks";
 import { DORMANT_MODULES, diffReach } from "@/security/page-reach";
@@ -83,7 +84,7 @@ describe("W267 the census describes the tree, in both directions", () => {
     //
     // So it is a planted file now. Same distinction the unit exists to draw, found in its own
     // test by the mutation discipline it was written to apply to everything else.
-    const call = ["readdir", "Sync("].join("");
+    const call = `${fixtureToken("tree-walk-call-name")}(`;
     const planted = "src/w267-probe-comment-only.ts";
     const found = withPlanted(
       planted,
@@ -94,7 +95,7 @@ describe("W267 the census describes the tree, in both directions", () => {
     // And the file really did contain the phrase, so the probe is not passing on a typo.
     const withCode = withPlanted(
       planted,
-      `import { ${["readdir", "Sync"].join("")} } from "node:fs";\nexport const value = () => ${call}"src");\n`,
+      `import { ${fixtureToken("tree-walk-call-name")} } from "node:fs";\nexport const value = () => ${call}"src");\n`,
       () => treeWalkingFiles(COPY),
     );
     expect(withCode, "the same file in CODE is not counted either, so the probe proves nothing").toContain(
@@ -109,7 +110,7 @@ describe("W267 the census describes the tree, in both directions", () => {
     const planted = "app/w267-probe-app-walker.ts";
     const found = withPlanted(
       planted,
-      `import { ${["readdir", "Sync"].join("")} } from "node:fs";\nexport const entries = () => ${["readdir", "Sync("].join("")}"app");\n`,
+      `import { ${fixtureToken("tree-walk-call-name")} } from "node:fs";\nexport const entries = () => ${`${fixtureToken("tree-walk-call-name")}(`}"app");\n`,
       () => treeWalkingFiles(COPY),
     );
     expect(found, "a tree walker outside src/ is invisible to the census").toContain(planted);
@@ -377,11 +378,11 @@ describe("W267 the detectors that take a root, proved by moving the tree", () =>
     // sentence: a probe for "a file that walks the tree" has to contain a tree walk, so writing it
     // literally made this test file a hit in its own census. W153's remedy rather than an
     // exemption — the call is assembled from fragments, so the file genuinely does not contain one.
-    const walkCall = ["readdir", "Sync("].join("");
+    const walkCall = `${fixtureToken("tree-walk-call-name")}(`;
     const planted = "src/w267-probe-walker.ts";
     const found = withPlanted(
       planted,
-      `import { ${["readdir", "Sync"].join("")} } from "node:fs";\n\nexport const entries = () => ${walkCall}"src");\n`,
+      `import { ${fixtureToken("tree-walk-call-name")} } from "node:fs";\n\nexport const entries = () => ${walkCall}"src");\n`,
       () => treeWalkingFiles(COPY),
     );
     expect(found, "the census did not see a new walker").toContain(planted);

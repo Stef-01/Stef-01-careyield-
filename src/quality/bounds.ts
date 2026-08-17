@@ -59,7 +59,8 @@ import { VOCABULARY_BOUND, sweepSurface } from "@/compliance/public-surfaces";
 import { RUNTIME_BOUND } from "@/console/zero-states";
 import { HARDENING_BOUND } from "./hardening-q23";
 import { TAX_BOUND } from "./declaration-tax";
-import { SCAN_BOUND } from "./scan-text";
+import { SCAN_BOUND, fixtureText } from "./scan-text";
+import { SELF_REFERENCE_BOUND, fixtureFiles } from "./self-reference";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
 import { CITATION_BOUND } from "./citations";
 import { PLANTING_BOUND } from "./planting";
@@ -218,6 +219,35 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "Three",
         kind: "fixed_by_a_gate",
         why: "The gate names three lenses — code-review, security-review and simplify — so the number is the row's, not a measurement this unit took.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/self-reference.ts",
+    name: "SELF_REFERENCE_BOUND",
+    unit: "W307",
+    text: SELF_REFERENCE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the sweep for a SECOND file with that extension",
+      reads: "the tree, for a second file with the fixture extension beside the one the rule uses",
+      // The bound says one file is invisible to every walk and that the citation check is what
+      // holds it down. It stops being true the day a second such file arrives, because then the
+      // mechanism is a convention rather than a single audited place.
+      stillOpen: (root) => fixtureFiles(root).length < 2,
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/scan-fixtures.fixtures": "=== x ===\ny\n",
+          "src/quality/second.fixtures": "=== z ===\nw\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "two",
+        kind: "rate",
+        why: "'the split sweep sees two written shapes' — the shapes the sweep can decide, named in the register beside it as an inline join and a joined table, so the number is a description of the code rather than a count of the tree.",
       },
     ],
   },
@@ -445,17 +475,11 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         !sourceModules(root).some((file) => /from ["']typescript["']/.test(readFileSync(file, "utf8"))),
       lifted: {
         kind: "constructed_tree",
-        // THE COLLISION, PREDICTED THIS TIME. This predicate walks `src/` of the root it is given,
-        // and this module is under `src/` — so a fixture spelling the import out would make the
-        // real tree match, and the bound would report itself lifted because its own lifting
-        // fixture arrived. It is the same shape W288, W294, W295, W300 and W302 each hit by
-        // shipping it; the split is what a scan's own fixture costs.
-        files: {
-          "src/planted/ast-pass.ts": [
-            'import ts from "type',
-            'script";\n\nexport const parse = ts.createSourceFile;\n',
-          ].join(""),
-        },
+        // THE COLLISION, PREDICTED AT W306 AND SOLVED AT W307. This predicate walks `src/` of the
+        // root it is given, and this module is under `src/` — so a fixture spelling the import out
+        // makes the REAL tree match, and the bound reports itself lifted because its own lifting
+        // fixture arrived. W306 split the token; the fixture now lives outside every walk instead.
+        files: { "src/planted/ast-pass.ts": fixtureText("ast-pass-module") },
       },
     },
     numbers: [

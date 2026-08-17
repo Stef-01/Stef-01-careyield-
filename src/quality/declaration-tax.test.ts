@@ -29,6 +29,7 @@ import {
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { withPlantedIn } from "./planting";
 import { withRoot } from "./refusal-branches";
+import { fixtureToken } from "./scan-text";
 
 const ROOT = process.cwd();
 const PLANTED = "src/planted/w300-probe.ts";
@@ -159,7 +160,7 @@ describe("W300 the sites an author opens are measured beside the ones a plant re
     // site and the assertion failed on its own fixture. Blanking string literals is not available
     // here — a real declaration IS a string literal — so the fixture splits the token, which is the
     // idiom `register-census.test.ts` uses for the same reason.
-    expect(namingSites(ROOT, ["src/no-such", "-module.ts"].join(""))).toEqual([]);
+    expect(namingSites(ROOT, fixtureToken("absent-module-path"))).toEqual([]);
   });
 });
 

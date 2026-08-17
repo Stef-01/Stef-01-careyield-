@@ -730,6 +730,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "An in-memory store of specs, and its strings are ids and criteria keys. What it holds is authored elsewhere and gated by G5; the store renders nothing.",
   },
   {
+    module: "src/quality/self-reference.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W307's register is machinery about machinery: a probe per detector, a sweep for one code idiom, and the argument for each exception. Its strings are synthetic TypeScript source planted into a temporary copy of the tree, module paths, and detector names; everything it returns is a repo-relative path or a defect sentence addressed to whoever writes the next scan. Nothing here renders and no practice sees it.",
+  },
+  {
     module: "src/quality/scan-text.ts",
     operatorCopy: [],
     notCopy:

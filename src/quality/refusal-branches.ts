@@ -35,7 +35,7 @@ import path from "node:path";
 import { fallibleDiff } from "./review-w279";
 import { duplicateDiff, pinDiff } from "./pins";
 import { stripComments } from "@/security/reachability";
-import { SCAN_SITES, blankLiterals, scanSiteDiff } from "./scan-text";
+import { SCAN_SITES, blankLiterals, fixtureDiff, scanSiteDiff } from "./scan-text";
 import { BLIND_SPOTS, boundDiff } from "./blind-spots";
 import { coverageDiff } from "./route-coverage";
 import { censusDiff } from "./register-census";
@@ -48,6 +48,7 @@ import { headerViolations } from "./unit-headers";
 import { pageSuiteViolations } from "./page-suite";
 import { blockedSurfaceViolations } from "./blocked-surface";
 import { coherenceViolations } from "@/tenancy/fixture-coherence";
+import { SELF_SCANNING, SPLIT_EXCEPTIONS, holderDiff, splitDiff } from "./self-reference";
 
 /** A violation-reporting function found in the tree: the file it lives in and its name. */
 export interface ReporterSite {
@@ -225,6 +226,74 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
     reach: {
       kind: "driven",
       drive: () => scanSiteDiff([], SCAN_SITES).stale.length > 0,
+    },
+  },
+
+  // ── W307's fixture citations ──────────────────────────────────────────────────────────────
+  {
+    module: "src/quality/scan-text.ts",
+    fn: "fixtureDiff",
+    branch: "unloaded",
+    reach: {
+      kind: "driven",
+      // The declared side is a parameter, so the arm is reachable without touching the file: a tree
+      // whose fixtures nobody cites has every block unloaded.
+      drive: () => fixtureDiff(process.cwd(), []).unloaded.length > 0,
+    },
+  },
+  {
+    module: "src/quality/scan-text.ts",
+    fn: "fixtureDiff",
+    branch: "missing",
+    reach: {
+      kind: "driven",
+      // The other arm needs a citation the file does not answer, which is the throw `fixtureText`
+      // would produce at the call site — reported here before anybody runs into it.
+      drive: () => fixtureDiff(process.cwd(), ["a-fixture-nobody-wrote"]).missing.length > 0,
+    },
+  },
+
+  // ── W307's split sweep and holder register ────────────────────────────────────────────────
+  {
+    module: "src/quality/self-reference.ts",
+    fn: "splitDiff",
+    branch: "unargued",
+    reach: {
+      kind: "driven",
+      // The argued register is a parameter, so an empty one makes every real split unargued.
+      drive: () => splitDiff(process.cwd(), []).unargued.length > 0,
+    },
+  },
+  {
+    module: "src/quality/self-reference.ts",
+    fn: "splitDiff",
+    branch: "stale",
+    reach: {
+      kind: "driven",
+      drive: () =>
+        splitDiff(process.cwd(), [...SPLIT_EXCEPTIONS, { module: "src/gone.ts", why: "x" }]).stale.length > 0,
+    },
+  },
+  {
+    module: "src/quality/self-reference.ts",
+    fn: "holderDiff",
+    branch: "notLoading",
+    reach: {
+      kind: "driven",
+      drive: () =>
+        holderDiff(process.cwd(), [
+          { ...SELF_SCANNING[0]!, holders: ["src/gone.ts"] },
+        ]).notLoading.length > 0,
+    },
+  },
+  {
+    module: "src/quality/self-reference.ts",
+    fn: "holderDiff",
+    branch: "uncovered",
+    reach: {
+      kind: "driven",
+      // No scan declared means every module that loads a fixture is uncovered.
+      drive: () => holderDiff(process.cwd(), []).uncovered.length > 0,
     },
   },
 

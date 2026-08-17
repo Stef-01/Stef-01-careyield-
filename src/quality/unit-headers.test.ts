@@ -9,6 +9,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { fixtureToken } from "./scan-text";
 import {
   ADOPTED_MODULES,
   HEADER_CITATION_BOUND,
@@ -257,9 +258,10 @@ describe("W298 a header cites no name the tree does not have", () => {
     // default roots. A PAIR now drives it, and the first attempt at this probe failed twice over:
     // `TODO` and `HEAD` appear elsewhere in the tree, so they resolve for the wrong reason, and a
     // token written literally here lands in the copied tree and resolves against this very file.
-    // Both tokens are invented and assembled from fragments.
-    const plain = ["ZORB", "LAT"].join("");
-    const underscored = ["ZORB", "LAT", "_GONE"].join("");
+    // Both tokens are invented, and W307 moved the one that must not appear here out of this file
+    // rather than assembling it from fragments.
+    const plain = fixtureToken("unknown-header-constant");
+    const underscored = `${plain}_GONE`;
     const probe = path.join(COPY, "src/quality/w298-probe-english.ts");
     mkdirSync(path.dirname(probe), { recursive: true });
     writeFileSync(

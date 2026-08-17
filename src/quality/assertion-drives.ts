@@ -50,6 +50,7 @@ import { numberDefects, staleBounds, unresolvedBounds } from "./bounds";
 import { BLIND_SPOTS, boundDiff, falseBounds } from "./blind-spots";
 import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptances";
 import { unacceptedTautologies } from "./tautology-sweep";
+import { fixtureToken } from "./scan-text";
 
 /**
  * A comparison handed an input it must reject, keyed by the register the census names.
@@ -95,14 +96,14 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // constant, but a hit nobody has ruled on is the input the comparison exists to reject, and it
     // can be fabricated. Same assertion, reachable from the other end.
     //
-    // THE MARKER IS SPLIT, and the first draft was not — W153's scanner found the probe's own
-    // literal and reported this module as an undeclared instruction sink. The twelfth instance of
-    // the collision W237 recorded, and the marker is not the input under test here: the comparison
-    // reads `hit.file` and never looks at it, so splitting weakens nothing.
+    // THE MARKER LIVES OUTSIDE THIS FILE, and the first draft wrote it here — W153's scanner found
+    // the probe's own literal and reported this module as an undeclared instruction sink. The
+    // twelfth instance of the collision W237 recorded; W289 split the token, and W307 moved it out
+    // of the surface instead, which is the rule rather than the workaround.
     void root;
     return (
       undeclaredInstructionSinks([
-        { file: "src/w289-probe.ts", marker: ["api.open", "ai.com"].join("") },
+        { file: "src/w289-probe.ts", marker: fixtureToken("openai-endpoint-host") },
       ]).length > 0
     );
   },
@@ -185,7 +186,7 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // Both arms of W300's measurement, each given the input it exists to refuse: an unplanted tree
     // must demand nothing, and a module path the tree does not hold must have no naming sites.
     const quiet = demandingRegisters(root, "src/planted/w289-never-planted.ts").length === 0;
-    const unnamed = namingSites(root, ["src/no-such", "-module-w289.ts"].join("")).length === 0;
+    const unnamed = namingSites(root, fixtureToken("absent-module-path-w289")).length === 0;
     return quiet && unnamed;
   },
 

@@ -23,12 +23,29 @@
 // wants literals intact says so. What is removed is the choice being re-implemented, not the
 // choice.
 //
+// W307: AND THE OTHER HALF OF THE SAME PROBLEM — A DETECTOR THAT MATCHES ITS OWN FIXTURES.
+//
+// A scan looking for a shape has to write that shape down somewhere to prove it can see one, and
+// the moment it writes it down inside a file the scan reads, the scan finds itself. This tree hit
+// that at W237, W256, W288, W294, W295, W300, W302 and W306 — every time discovered by a red run,
+// every time fixed the same way and never once written down: split the token across an array and
+// join it back. That idiom appears in eight first-party modules, is invisible to a reader, and
+// re-breaks silently the day somebody tidies one of them into a single literal.
+//
+// THE RULE IS THAT THE FIXTURE LEAVES THE SURFACE, and `scan-fixtures.fixtures` is where it goes:
+// an extension no walk in this tree matches, so its contents are unreachable to every scan while
+// staying plain text a person can read. That is strictly better than the two alternatives already
+// tried here. Narrowing the scan was tried at W295 and HID FOUR REAL REGISTERS. Splitting the token
+// works but says nothing, so each site re-derives the reason in a comment or does not explain
+// itself at all.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This transforms source text in memory.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { stripComments } from "@/security/reachability";
-import { sourceModules } from "./tree-walks";
+import { sourceModules, typescriptFiles } from "./tree-walks";
 
 /**
  * String, template and regex literals with their CONTENTS blanked, same length, same lines.
@@ -86,7 +103,7 @@ export const SCAN_ORDER_RULE =
  * purpose, and pretending otherwise would be the more comfortable lie.
  */
 export const SCAN_BOUND =
-  "One scan is deliberately outside this. `violationReporters` in W291's register reads RAW source, because both narrowings were tried at W295 and both hid real registers — comments-then-literals lost four, literals-then-comments lost a different three. The cause is understood and the fix is not: the reporter walk matches an `export function` signature, and any transform that can consume a signature can consume that one. So it stays raw and its fixtures split the token instead, which is the idiom `register-census.test.ts` uses for the same reason. What this buys is that the choice is made once and recorded, not that every scan in the tree now shares an implementation. A scan added tomorrow that reads raw text without saying why is invisible here, and the register below only knows about modules that ask for the preparation.";
+  "One scan is deliberately outside this. `violationReporters` in W291's register reads RAW source, because both narrowings were tried at W295 and both hid real registers — comments-then-literals lost four, literals-then-comments lost a different three. The cause is understood and the fix is not: the reporter walk matches an `export function` signature, and any transform that can consume a signature can consume that one. So it stays raw, and W307 took its fixtures OUT of the surface it reads rather than narrowing it — which is the rule `register-census.test.ts` follows now too. What this buys is that the choice is made once and recorded, not that every scan in the tree now shares an implementation. A scan added tomorrow that reads raw text without saying why is invisible here, and the register below only knows about modules that ask for the preparation.";
 
 /** A module that prepares text for scanning, and what it asks for. */
 export interface ScanSite {
@@ -117,6 +134,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     module: "src/quality/tautology-sweep.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "Its parser blanks literals itself, one layer down, so that boundaries are found on blanked text while the PARTS are sliced from the real thing — a hit has to quote what the author wrote. Asking for them blanked here would blank them twice and leave nothing to quote.",
+  },
+  {
+    module: "src/quality/self-reference.ts",
+    prep: { comments: "subtracted", literals: "kept" },
+    why: "W307's sweep looks for a literal assembled from fragments, so the literal IS the subject and blanking it would empty the thing it finds. Comments are subtracted for the reason that register's own third answer names: a split quoted in a note explaining the idiom is not a split, and a register whose prose names its own pattern reports itself — which W167 and W295 both shipped.",
   },
   {
     module: "src/quality/order-independence.ts",
@@ -200,4 +222,110 @@ export function preparationCopies(root: string): { strippers: string[]; blankers
     if (/function blankLiterals\b/.test(code)) blankers.push(module);
   }
   return { strippers: strippers.sort(), blankers: blankers.sort() };
+}
+
+// ---------------------------------------------------------------------------------------------
+// W307: fixtures that live outside the surface their detector reads.
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * The rule, stated once, because it had been solved eight times without ever being written down.
+ *
+ * The alternatives are not hypothetical — both were tried in this tree and both are recorded above.
+ */
+export const SELF_REFERENCE_RULE =
+  "Text a detector must not find in the surface it reads does not belong in that surface. It goes " +
+  "in `src/quality/scan-fixtures.fixtures`, whose extension no walk here matches, and comes back " +
+  "through `fixtureText` or `fixtureToken`. NOT by narrowing the scan: W295 narrowed three of them " +
+  "so they would stop matching their own fixtures and HID FOUR REAL REGISTERS, because a register " +
+  "that drops out of a population reports nothing rather than something. And NOT by splitting the " +
+  "token across an array, which works but explains nothing at the site, has to be re-derived by " +
+  "every reader, and comes apart the day somebody tidies it into one literal — a failure that " +
+  "surfaces as the detector reporting its own module, which reads like a defect in the tree rather " +
+  "than in the fixture. The exception is a detection PATTERN rather than a fixture: a regex that " +
+  "matches secrets has to be readable beside the code that uses it, so those are declared and " +
+  "argued instead of moved. And PROSE that merely quotes a pattern gets neither treatment: a " +
+  "sentence describing what a detector looks for does not have to spell it, which is the answer " +
+  "for the register that reported its own explanation.";
+
+/** Where the fixtures live, repo-relative. Named once so the citation check and the walks agree. */
+export const FIXTURES_FILE = "src/quality/scan-fixtures.fixtures";
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * The fixture file parsed into named blocks.
+ *
+ * Takes a path rather than reading a fixed one, so the parser can be driven over a constructed
+ * file — W267's rule, and this module would otherwise be the register that exempts itself from it.
+ */
+export function fixtureBlocks(file: string): Record<string, string> {
+  const text = readFileSync(file, "utf8");
+  const blocks: Record<string, string> = {};
+  let name: string | null = null;
+  let lines: string[] = [];
+  const flush = () => {
+    if (name !== null) blocks[name] = `${lines.join("\n").replace(/\n+$/, "")}\n`;
+    lines = [];
+  };
+  for (const line of text.split("\n")) {
+    const header = /^=== ([a-z0-9-]+) ===$/.exec(line);
+    if (header) {
+      flush();
+      name = header[1]!;
+      continue;
+    }
+    if (name !== null) lines.push(line);
+  }
+  flush();
+  return blocks;
+}
+
+let cached: Record<string, string> | null = null;
+
+/** A fixture's text, with one trailing newline — a planted file's whole body. */
+export function fixtureText(name: string): string {
+  cached ??= fixtureBlocks(path.join(HERE, path.basename(FIXTURES_FILE)));
+  const block = cached[name];
+  if (block === undefined) throw new Error(`no fixture named ${name} in ${FIXTURES_FILE}`);
+  return block;
+}
+
+/** The same, trimmed — a single token to be composed into a larger string. */
+export function fixtureToken(name: string): string {
+  return fixtureText(name).trim();
+}
+
+/** Every fixture name cited by first-party source, wherever it is loaded from. */
+export function fixtureCitations(root: string): string[] {
+  const cited = new Set<string>();
+  for (const file of typescriptFiles(root)) {
+    const text = stripComments(readFileSync(file, "utf8"));
+    for (const m of text.matchAll(/fixture(?:Text|Token)\(\s*"([a-z0-9-]+)"\s*\)/g)) {
+      cited.add(m[1]!);
+    }
+  }
+  return [...cited].sort();
+}
+
+export interface FixtureDiff {
+  /** A fixture nobody loads. Dead text in a file no test would ever fail over. */
+  unloaded: string[];
+  /** A citation for a fixture the file does not have. The throw, caught before it happens. */
+  missing: string[];
+}
+
+/**
+ * Both directions, W102's shape, and W258's rule applied to a fixture.
+ *
+ * The direction that matters is `unloaded`: this file is outside every walk in the tree, so a block
+ * left here after its last caller went away is text no check would ever read again.
+ */
+export function fixtureDiff(root: string, declared?: readonly string[]): FixtureDiff {
+  const have = Object.keys(fixtureBlocks(path.join(root, FIXTURES_FILE)));
+  const cited = declared ?? fixtureCitations(root);
+  return {
+    unloaded: have.filter((n) => !cited.includes(n)).sort(),
+    missing: cited.filter((n) => !have.includes(n)).sort(),
+  };
 }

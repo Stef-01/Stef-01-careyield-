@@ -32,7 +32,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { sourceModules, testModules } from "./tree-walks";
-import { prepareForScan } from "./scan-text";
+import { fixtureText, prepareForScan } from "./scan-text";
 import { copySurfaceMembers } from "@/compliance/copy-y6";
 import { discoverFoldSites } from "./order-independence";
 import { findInstructionSinks } from "@/security/instruction-sinks";
@@ -59,26 +59,14 @@ export type ModuleShape =
  */
 export const SHAPE_BODIES: Readonly<Record<ModuleShape, string>> = {
   plain: "// W300: a planted plain module.\nexport const VALUE = 1;\n",
-  walks_the_tree: [
-    "// W300: a planted module that walks the tree.\n",
-    'import { readdirSync } from "node:fs";\n',
-    'export const entries = () => readdirSync("src");\n',
-  ].join(""),
+  walks_the_tree:
+    '// W300: a planted module that walks the tree.\nimport { readdirSync } from "node:fs";\nexport const entries = () => readdirSync("src");\n',
   states_a_bound:
     "// W300: a planted module stating a bound.\nexport const PLANTED_BOUND =\n  \"a sentence about what this does not prove\";\n",
-  reports_violations: [
-    "// W300: a planted module reporting violations.\n",
-    "export function planted",
-    "Violations(\n  input: readonly string[],\n): string[] {\n  return [...input];\n}\n",
-  ].join(""),
-  a_full_register: [
-    "// W300: a planted module shaped like one of this tree's registers.\n",
-    'import { readdirSync } from "node:fs";\n',
-    "export const PLANTED_AT_W300 = 3;\n",
-    "export const PLANTED_BOUND =\n  \"a sentence about what this does not prove\";\n",
-    "export function planted",
-    "Diff(\n  root: string,\n): string[] {\n  return readdirSync(root);\n}\n",
-  ].join(""),
+  // W307: the two bodies carrying a reporter signature come from the fixture file. Written here,
+  // `violationReporters` reads THIS module as a reporter — it reads raw source on purpose.
+  reports_violations: fixtureText("shape-reports-violations"),
+  a_full_register: fixtureText("shape-a-full-register"),
 };
 
 /** A register whose walk takes a root, and whether it reports a module planted at `planted`. */
@@ -206,6 +194,12 @@ export const DEMANDS: readonly Demand[] = [
   },
   {
     file: "src/quality/latent-findings.ts",
+    demands: () => false,
+  },
+  {
+    file: "src/quality/self-reference.ts",
+    // Asks about modules that assemble a literal from fragments, which a planted module does not do.
+    // It demands nothing of an arriving module, and is in the population because the census holds it.
     demands: () => false,
   },
   {

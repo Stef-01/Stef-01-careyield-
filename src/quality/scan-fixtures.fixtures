@@ -1,0 +1,82 @@
+# W307: text a detector must NOT find in the surface it reads.
+#
+# This file has an extension no walk in the tree matches — `sourceModules`, `typescriptFiles`,
+# `testModules` and `textFiles` all filter on a list that does not include it — so text kept here
+# is invisible to every scan while staying readable to a person. That is the whole mechanism, and
+# `SELF_REFERENCE_RULE` in `scan-text.ts` is the sentence explaining why it beats the alternatives.
+#
+# Blocks are `=== name ===`; a block's text is everything up to the next header. `fixtureText`
+# returns it with one trailing newline, `fixtureToken` returns it trimmed. Both directions are
+# checked: a block nobody loads fails, and a `fixtureText("name")` for a block that is not here
+# fails too — W258's citation rule, applied to fixtures.
+
+=== openai-endpoint-host ===
+api.openai.com
+
+=== split-endpoint-module ===
+export const host = ["api.open", "ai.com"].join("");
+export const call = () => fetch(`https://${host}/v1`);
+
+=== whole-endpoint-module ===
+export const host = "api.openai.com";
+
+=== misnamed-reporter ===
+export function plantedProblems(
+  input: readonly string[],
+): string[] {
+  return [...input];
+}
+
+=== list-reporter ===
+export function plantedDiff(
+  input: readonly string[],
+): string[] {
+  return [...input];
+}
+
+=== shape-reports-violations ===
+// W300: a planted module reporting violations.
+export function plantedViolations(
+  input: readonly string[],
+): string[] {
+  return [...input];
+}
+
+=== shape-a-full-register ===
+// W300: a planted module shaped like one of this tree's registers.
+import { readdirSync } from "node:fs";
+export const PLANTED_AT_W300 = 3;
+export const PLANTED_BOUND =
+  "a sentence about what this does not prove";
+export function plantedDiff(
+  root: string,
+): string[] {
+  return readdirSync(root);
+}
+
+=== ast-pass-module ===
+import ts from "typescript";
+
+export const parse = ts.createSourceFile;
+
+=== tree-walk-call-name ===
+readdirSync
+
+=== absent-module-path ===
+src/no-such-module.ts
+
+=== absent-module-path-w289 ===
+src/no-such-module-w289.ts
+
+=== unknown-header-constant ===
+ZORBLAT
+
+=== a-split-join ===
+export const token = ["one", "half"].join("");
+
+=== a-reporter-name ===
+plantedDiff
+
+=== a-joined-table ===
+const PARTS = [["one", "half"]];
+export const ALL = PARTS.map((p) => p.join(""));

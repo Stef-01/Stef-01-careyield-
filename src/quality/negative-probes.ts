@@ -286,6 +286,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/self-reference.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/self-reference.test.ts :: leaves a module that joins values rather than literals alone",
+      plants: "export const all = parts.map((p) => p.name).join(\"\");",
+    },
+  },
+  {
     register: "src/quality/scan-text.ts",
     negative: {
       kind: "already_driven",

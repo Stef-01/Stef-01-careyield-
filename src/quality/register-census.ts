@@ -233,6 +233,26 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/self-reference.ts",
+    derives:
+      "Every first-party module that still assembles a literal from fragments, and every module that loads a fixture from the file no walk reads.",
+    checkedAgainst:
+      "W307's `SPLIT_EXCEPTIONS` and `SELF_SCANNING.holders`, both directions: a split nobody argued fails, an argued split the sweep no longer finds fails, a declared holder that stopped loading a fixture fails, and a module loading one that no probe covers fails.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "the sweep is pointed at a constructed root holding a planted split and a module that merely joins an array of values, and only the first may be reported",
+    },
+    assertion: {
+      kind: "driven_by_branch",
+      claim:
+        "Every detector whose fixture left the surface it reads reports a planted instance and does not report its own fixture, and the idiom that used to do this job is gone except where it is argued.",
+      mutation:
+        "An empty exception register must make every real split unargued.",
+      branch: "src/quality/self-reference.ts::splitDiff::unargued",
+    },
+  },
+  {
     file: "src/quality/scan-text.ts",
     derives:
       "Every module under `src/` that asks for the shared scan preparation, and every module that still writes its own comment-stripper or literal-blanker.",
