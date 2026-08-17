@@ -749,6 +749,25 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/mutation-sampling.ts",
+    derives:
+      "Every site in every module under `src/` where one of five character-level operators could flip a decision, paired with the module's own `*.test.ts` — and every module that has such a site and no suite at all.",
+    checkedAgainst:
+      "`SURVIVORS_AT_W296`, the sampled changes no suite noticed, and `UNTESTED_AT_W296`, the modules no sample can reach.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "a module and a suite are constructed in a copied tree — one with a real comparison and one whose `===` appears only in a comment and a string — and only the first may yield a mutation site",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every sampled change to a module is turned red by that module's own suite, or is named here with the test that would catch it.",
+      mutation:
+        "`samplingReport` is handed a survivor no register declares and must report it unexplained.",
+    },
+  },
+  {
     file: "src/quality/empty-list-sweep.ts",
     derives:
       "Every `toEqual([])` and `toHaveLength(0)` in every `*.test.ts` under `src/`, with the `(producer, field)` pair each was read from and whether anything anywhere shows that pair holding something.",

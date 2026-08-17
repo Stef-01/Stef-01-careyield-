@@ -235,6 +235,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/mutation-sampling.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/mutation-sampling.test.ts :: does not find a mutation site in a comment or a string",
+      plants: "a note about === and &&",
+    },
+  },
+  {
     register: "src/quality/empty-list-sweep.ts",
     negative: {
       kind: "already_driven",

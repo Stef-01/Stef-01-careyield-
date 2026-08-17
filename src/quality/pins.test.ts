@@ -23,6 +23,7 @@ import {
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
 import { emptyListDiff } from "./empty-list-sweep";
+import { SURVIVORS_AT_W296, UNTESTED_AT_W296, untestedModules } from "./mutation-sampling";
 import { Y5_FIRST_UNIT as RAIL_Y5 } from "@/compliance/rail-y5";
 import { Y5_FIRST_UNIT as ADM_Y5 } from "@/privacy/adm-y5";
 
@@ -79,8 +80,10 @@ describe("W290 the live pins, and why live is not the defect", () => {
     const live = PINS.filter((p) => p.classification.kind === "live_by_design");
     expect(live.map((p) => p.name).sort()).toEqual([
       "BLOCKED_AT_W263",
+      "SURVIVORS_AT_W296",
       "UNEVIDENCED_AT_W293",
       "UNPROVEN_AT_W290",
+      "UNTESTED_AT_W296",
     ]);
     // Each is asserted against the tree, so "live" is a fact rather than a label.
     expect(blockedRows(ROOT)).toHaveLength(BLOCKED_AT_W263);
@@ -88,6 +91,10 @@ describe("W290 the live pins, and why live is not the defect", () => {
     // W293's is the third, and it fires on the same kind of event: an empty-list assertion
     // arriving with no evidence its source can fill.
     expect(emptyListDiff(ROOT)).toEqual({ newlyUnevidenced: [], nowEvidenced: [] });
+    // W296's two fire on the same kind of event one level further out: a change to a module that
+    // its suite does not notice, and a module with no suite that could.
+    expect(untestedModules(ROOT)).toEqual([...UNTESTED_AT_W296]);
+    expect(SURVIVORS_AT_W296.length).toBeGreaterThan(0);
   });
 
   it("makes each argue for interrupting somebody, not merely declare itself live", () => {

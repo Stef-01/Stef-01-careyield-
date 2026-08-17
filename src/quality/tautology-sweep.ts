@@ -87,7 +87,10 @@ export interface Assertion {
   negated: boolean;
   matcher: string;
   expected: string;
+  /** Offset of the `expect` token. */
   index: number;
+  /** Offset just past the matcher's closing bracket — W293/W296 need the span, not only the start. */
+  end: number;
   text: string;
 }
 
@@ -168,6 +171,7 @@ export function assertionsIn(code: string): Assertion[] {
       matcher: chain[2]!,
       expected: collapse(code.slice(matcherOpen + 1, end - 1)),
       index: match.index,
+      end,
       text: collapse(code.slice(match.index, end)),
     });
   }

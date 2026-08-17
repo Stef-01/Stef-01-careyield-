@@ -341,6 +341,8 @@ export const HUMAN_CONTROLS: readonly string[] = [
  * module here is a module somebody looked at and ruled out.
  */
 export const NOT_A_DECISION: Readonly<Record<string, string>> = {
+  "src/quality/mutation-sampling.ts":
+    "W296's mutation sampler: the sites where five character-level operators could flip a decision the CODE makes, the sample drawn from them by hashing each site's own name, and the sampled changes no suite noticed. It decides nothing about anybody — it takes no patient as input, its inputs are the text of this repository's own modules and its outputs are file paths, operator ids and lines of source. It is reached by this register because the modules it names include ones that do decide things about people, and quoting a line of `src/registers/membership.ts` puts that line's identifiers into this file. That is the detector working rather than a false positive: a module that reproduces fragments of the tree's decision-making code should be visible to the register that enumerates what the software does about a person, and the right answer is to say why it is not a decision rather than to narrow the scan until it stops asking.",
   "src/privacy/access-y5.ts":
     "W266's access register: for each record class W106 marks held or derived, whether the access export carries it and under which field, or the argument for why it does not. It decides nothing about anybody — it takes no patient as input and returns module names. It is reached by this register because it names patient identifiers throughout, which is the detector working: a module whose subject is what a patient is told the practice holds about them should be visible to the register enumerating what the software does about a person. Worth recording beside it is the unit's finding: **erasure reached a store access did not.** W137 composed the GP-to-GP referral rail into `deletePatientEverywhere` and wrote no reader, so for three years a patient asking what was held about them was not told about their referrals, while the same patient asking for deletion had them deleted. W51's finding on the other verb, on the same store, three years later — and the symmetry between the two verbs is a standing check now rather than something for the next unit to notice.",
   "src/privacy/erasure-y5.ts":
@@ -500,9 +502,18 @@ export const NOTICE_REVISION: NoticeRevision = {
   // function and reports whether flipping a flag moved the order. The published text stays at
   // fifteen decisions, and the contradiction it watches is unchanged and still the founder's.
   // Same calendar day as the last review, so the date does not move; the unit does.
-  reviewedAt: "W283",
+  //
+  // W296 moved it a fifth time, and the module joining the ruled-out half is the MUTATION SAMPLER.
+  // Re-read rather than bumped. Nothing published changed: it takes no patient as input, its inputs
+  // are the text of this repository's own modules, and its outputs are file paths, operator ids and
+  // lines of source. It reaches this register because it QUOTES lines from modules that do decide
+  // things about people — the survivor rows carry a fragment of `src/registers/membership.ts` —
+  // which is the detector working rather than a false positive, and the right answer is to say why
+  // that is not a decision rather than to narrow the scan until it stops asking. The published text
+  // stays at fifteen decisions.
+  reviewedAt: "W296",
   decisionsAtReview: 15,
-  modulesAtReview: 101,
+  modulesAtReview: 102,
 };
 
 /** The line the page renders. Composed, so the page cannot state a date the register disagrees with. */

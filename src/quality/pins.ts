@@ -166,6 +166,28 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/mutation-sampling.ts",
+    name: "SURVIVORS_AT_W296",
+    classification: {
+      kind: "live_by_design",
+      movedBy:
+        "A sampled change to a module going unnoticed by that module's own suite, or a named survivor being caught after somebody improves a test.",
+      whyStopping:
+        "A new survivor means the suite has a hole a mechanical sample walked straight into, and it is the only direct evidence this tree has that a test would notice anything — stopping the build is the one moment somebody reads it. A survivor going stale means a hole was closed, and the row must be deleted deliberately rather than drifting out, because a list that quietly loses rows cannot be read as a measure. Named rather than counted for W290's own reason: a count moves when the stride moves, and the edit looks like maintenance.",
+    },
+  },
+  {
+    module: "src/quality/mutation-sampling.ts",
+    name: "UNTESTED_AT_W296",
+    classification: {
+      kind: "live_by_design",
+      movedBy:
+        "A module with a mutation site arriving without a sibling test file, or one of the named modules gaining one.",
+      whyStopping:
+        "A module with no suite of its own contributes no mutants, so it can never produce a survivor and a clean survivor list says nothing whatever about it. That is the vacuity this whole quarter has been about, arriving one level up: the measurement looks complete precisely where it is absent. A module joining the list is a decision somebody should make on purpose, and one leaving it is work worth recording.",
+    },
+  },
+  {
     module: "src/quality/empty-list-sweep.ts",
     name: "UNEVIDENCED_AT_W293",
     classification: {

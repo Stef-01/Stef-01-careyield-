@@ -66,7 +66,11 @@ describe("W289 the drivable assertions are driven, and they report", () => {
       if (!drive(ROOT)) failed.push(file);
     }
     expect(failed, "a register accepted an input its assertion exists to reject").toEqual([]);
-    expect(Object.keys(ASSERTION_DRIVES)).toHaveLength(12);
+    // W293 converted two pinned counts in this file to the bounds they meant; this is the third,
+    // and W295, W296 and W297 each moved it again on an ordinary addition — three bumps in one
+    // afternoon, which is the argument. The property is non-vacuity, that there ARE drives; the
+    // both-directions check against the census above is what reads the whole set.
+    expect(Object.keys(ASSERTION_DRIVES).length).toBeGreaterThanOrEqual(10);
   });
 
   it("agrees with the census in both directions", () => {
