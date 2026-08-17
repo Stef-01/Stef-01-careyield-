@@ -1,6 +1,6 @@
 // W293: `toEqual([])` over a list nothing could have put anything into.
 //
-// This tree asserts an empty list 531 times. Every one of them is a control — no undeclared route,
+// This tree asserts an empty list in hundreds of places. Every one of them is a control — no undeclared route,
 // no unaccepted finding, no reporter without a branch — and every one of them passes for two
 // completely different reasons that look identical from a green suite:
 //
@@ -13,12 +13,26 @@
 // it needs no new machinery to go wrong — an author writes `expect(diff.undeclared).toEqual([])`
 // over a diff whose input was empty, the suite goes green, and nothing anywhere says otherwise.
 //
-// THE EVIDENCE IS A NON-EMPTY SIBLING. An empty-list assertion is evidenced when the same file
-// somewhere drives the SAME SOURCE to a non-empty answer: `expect(found.size).toBeGreaterThanOrEqual(7)`
-// beside `expect([...found].filter(...)).toEqual([])`. That pairing is already this tree's habit —
-// 527 of the 531 have it — which is the finding underneath the finding: the discipline exists and
-// is nearly universal, so the four that lack it are worth reading individually rather than as a
-// backlog.
+// THE EVIDENCE IS A NON-EMPTY SIBLING. An empty-list assertion is evidenced when the same source
+// is driven to a non-empty answer somewhere: `expect(found.size).toBeGreaterThanOrEqual(7)` beside
+// `expect([...found].filter(...)).toEqual([])`. That pairing is already this tree's habit for most
+// of the suite, which is the finding underneath the finding — the discipline exists and is widely
+// followed, so the assertions that lack it are a readable list rather than a rewrite.
+//
+// TWO SCOPES, AND THE SPLIT IS DELIBERATE. A file-local source — `named`, `findings`, `importers` —
+// is one file's variable, and three files each having their own `findings` makes tree-wide matching
+// meaningless, so a local is evidenced in its own file only. An IMPORTED producer is the tree's:
+// `lintCapacityCopy` driven to a violation in the linter's own test is the same function asserted
+// clean over good copy two directories away, and demanding the proof be redone in every caller
+// would be asking for duplication rather than for evidence. Which scope applied is reported per
+// hit, because "proved beside the claim" and "proved somewhere" are different strengths.
+//
+// NO COUNTS APPEAR IN THIS HEADER, and that rule is enforced by a test rather than remembered.
+// The first draft of it quoted the figures the sweep produced WHILE IT WAS BROKEN, and those
+// sentences outlived the fix by two orders of magnitude, because prose is not re-derived when code
+// is. The measurement lives in `describeSweep(root)` now, computed on every call; a reader who
+// wants a number runs it. The rule is checked, not remembered: no run of three or more digits may
+// appear in this header unless a `W` precedes it.
 //
 // THE SOURCE IS A (PRODUCER, FIELD) PAIR, NOT A TOKEN, and getting that wrong is most of the work.
 // The same source is spelled four ways in this tree — `record().clinicians`, a destructured
@@ -34,10 +48,11 @@
 //
 // WHAT THIS CANNOT SEE, measured rather than conceded:
 //
-//   FILE SCOPE. Evidence is looked for in the same file only. A reporter driven non-empty in its
-//   own unit's test and asserted empty in another file reads as unevidenced here — which is why
-//   `cross_file` is an acceptance KIND with a resolved citation rather than a sentence, and why
-//   two of the four hits take it.
+//   NO INPUT-LEVEL PROOF ACROSS FILES. An imported producer is credited tree-wide, so a linter
+//   driven to a violation anywhere evidences every clean-copy assertion about it everywhere. That
+//   is the intended reading — the question is whether the list CAN fill — but it does mean a
+//   caller passing an input that could never produce a hit is not distinguished from one that
+//   could. Nothing here rules that out.
 //
 //   ANY-SOURCE. A subject with several sources is evidenced if ANY of them is shown non-empty.
 //   `[...found].filter((f) => !declared.has(f))` is evidenced by `found` alone, which is right;
@@ -552,5 +567,32 @@ export function emptyListDiff(
   return {
     newlyUnevidenced: [...unevidenced].filter((id) => !pin.has(id)).sort(),
     nowEvidenced: [...pin].filter((id) => !unevidenced.has(id)).sort(),
+  };
+}
+
+export interface SweepCensus {
+  total: number;
+  sameFile: number;
+  importedElsewhere: number;
+  gatePinnedEmpty: number;
+  unevidenced: number;
+}
+
+/**
+ * The sweep's own measurement, computed rather than written down.
+ *
+ * Exists because the alternative failed in this very module: the header quoted the numbers the
+ * sweep reported while it was broken, and the sentences outlived the fix. A count in prose is a
+ * pin nobody re-derives — W290's subject, arriving as documentation rather than as an assertion.
+ */
+export function describeSweep(root: string): SweepCensus {
+  const all = classify(root);
+  const of = (kind: EvidenceKind) => all.filter((c) => c.evidence === kind).length;
+  return {
+    total: all.length,
+    sameFile: of("same_file"),
+    importedElsewhere: of("imported_elsewhere"),
+    gatePinnedEmpty: of("gate_pinned_empty"),
+    unevidenced: of("none"),
   };
 }

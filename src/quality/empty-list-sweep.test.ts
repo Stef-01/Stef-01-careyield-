@@ -11,11 +11,14 @@
 // `empty-list-sweep`'s own exports, so it stays out of W267's census and the register keeps one
 // planting file instead of two.
 
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   GATE_PINNED_EMPTY,
   UNEVIDENCED_AT_W293,
   classify,
+  describeSweep,
   emptyListDiff,
   sourcesOf,
   sweepText,
@@ -228,5 +231,55 @@ describe("W293 the reporter's arms, driven from outside", () => {
     expect(emptyListDiff(ROOT, invented).nowEvidenced).toEqual([
       "src/gone.test.ts :: a test :: nothing",
     ]);
+  });
+});
+
+describe("W293 the header states no number that could go stale", () => {
+  const HEADER = (() => {
+    const source = readFileSync(path.join(__dirname, "empty-list-sweep.ts"), "utf8");
+    return source.slice(0, source.indexOf("import "));
+  })();
+
+  it("carries no bare count at all, which is the rule the first draft broke", () => {
+    // THE DEFECT THIS PINS, and it was shipped in this module for an hour. The header quoted the
+    // sweep's numbers from while it was broken — a near-clean tree and a handful of exceptions —
+    // and those sentences survived the fix that changed the answer by two orders of magnitude.
+    // A green suite says nothing about prose, so the rule is structural: a run of three or more
+    // digits is a measurement, and a measurement belongs in `describeSweep`. Unit ids are the one
+    // exception and they are spelled with a leading `W`.
+    const counts = [...HEADER.matchAll(/(.?)(\d{3,})/g)].filter(([, before]) => before !== "W");
+    expect(counts.map((m) => m[2]), "a count in the header is a pin nobody re-derives").toEqual([]);
+  });
+
+  it("still cites units, so the rule did not simply delete the header's references", () => {
+    // Non-vacuity for the line above: a header with no digits at all would pass it trivially.
+    expect(HEADER).toMatch(/W267/);
+    expect(HEADER).toMatch(/W29\d/);
+  });
+
+  it("does not describe an acceptance kind the code does not have", () => {
+    // The second false claim in the same header: it described a `cross_file` acceptance kind with
+    // resolved citations. No such kind was ever written. Checked against the code rather than by
+    // rereading, because rereading is what missed it.
+    const source = readFileSync(path.join(__dirname, "empty-list-sweep.ts"), "utf8");
+    for (const kind of ["same_file", "imported_elsewhere", "gate_pinned_empty", "none"]) {
+      expect(source, `${kind} is not in the EvidenceKind union`).toContain(`"${kind}"`);
+    }
+    expect(source, "the header names a kind the union does not have").not.toContain("cross_file");
+  });
+
+  it("reports its own measurement instead of asserting one", () => {
+    const census = describeSweep(ROOT);
+    // The census counts ASSERTIONS and the pin holds IDS, and they differ: an id is
+    // `file :: test :: sources` with no line number, so two assertions in one test over the same
+    // sources share a row. Deliberate — a pin that moved when somebody added a blank line is the
+    // shape W290 spent a unit on — and asserted here so the two cannot silently diverge.
+    const ids = new Set(classify(ROOT).filter((c) => c.evidence === "none").map((c) => c.id));
+    expect(ids.size).toBe(UNEVIDENCED_AT_W293.length);
+    expect(census.unevidenced).toBeGreaterThanOrEqual(ids.size);
+    expect(census.sameFile + census.importedElsewhere + census.gatePinnedEmpty + census.unevidenced).toBe(
+      census.total,
+    );
+    expect(census.total).toBeGreaterThan(500);
   });
 });
