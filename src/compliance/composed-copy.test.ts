@@ -35,12 +35,21 @@ const key = (s: { module: string; fn: string }) => `${s.module}::${s.fn}`;
 
 describe("W278 the composing functions are found, not listed", () => {
   it("agrees with the declared surface in both directions", () => {
-    // A nineteenth arrives failing; an entry whose function stopped composing is stale. Neither is
+    // One more arrives failing; an entry whose function stopped composing is stale. Neither is
     // visible from one side.
+    //
+    // W308: THE COUNT BELOW WAS AN EXACT PIN AND IT SURVIVED W304'S SWEEP. It moved on this unit's
+    // ordinary addition of one composing function, which is the fifteenth-instance pattern CR-2
+    // named and W304 was written to remove at its source — a count sitting beside an identity that
+    // already reads the whole set adds nothing except a reason to edit the file, and an edit made
+    // because a register GREW is indistinguishable from one made because a register was deleted.
+    // Restated as the floor its comment described, which is the remedy W304 applied everywhere
+    // else. Found by W308 rather than by W304 because W304 swept `.length` assertions and this one
+    // is a `toHaveLength`.
     const found = composingFunctions(ROOT).map(key).sort();
     const declared = [...COMPOSED_COPY_SITES].map(key).sort();
     expect(found).toEqual(declared);
-    expect(found).toHaveLength(23);
+    expect(found.length, "the sweep found nothing, so the identity above is vacuous").toBeGreaterThan(20);
   });
 
   it("finds W200's own named example", () => {

@@ -59,6 +59,7 @@ import path from "node:path";
 import { resetStore } from "@/booking/store";
 import { LATENT_FINDINGS, modulesWithNoUnitHeader, type LatentFinding } from "./latent-findings";
 import { probeDiscriminates } from "./ranker-behaviour";
+import { REFUSAL_BRANCHES, violationReporters } from "./refusal-branches";
 import { dossierTestFiles, sourceModules } from "./tree-walks";
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -76,6 +77,14 @@ export interface FindingAnchor {
 }
 
 export const FINDING_ANCHORS: readonly FindingAnchor[] = [
+  {
+    id: "REPORTER-1",
+    claim:
+      "W291's register declares branches for reporters, so comparing its declared set against the walk's population is a comparison over something.",
+    holds: () => REFUSAL_BRANCHES.length > 0 && violationReporters(ROOT).length > 0,
+    ifDead:
+      "The predicate asks whether any DECLARED branch names a reporter the walk no longer finds. Over an empty branch register that is a `.some()` over nothing, which is false — the finding reads as not-live forever while the walk quietly stops finding wrapped signatures. Over an empty population it is true for every branch at once and the finding fires for the wrong reason, so both sides are claimed here rather than one.",
+  },
   {
     id: "TENANCY-1",
     claim: "The seeded rail holds appointments, so counting distinct practices across them is a count over something.",

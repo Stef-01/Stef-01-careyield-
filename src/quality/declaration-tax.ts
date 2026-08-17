@@ -323,11 +323,26 @@ export interface TaxDiff {
 }
 
 /** The live measurement against the baseline plus the declared movement, both directions. */
-export function taxDiff(live: Readonly<Record<ModuleShape, number>>): TaxDiff {
-  const moved = new Map(MOVED_SINCE_W300.map((m) => [m.shape, m.now]));
+/**
+ * W308 takes its own pair rather than copying this function. A second `taxDiffW308` would have been
+ * four lines and the quarter's own subject — one mechanism written twice — so the record and the
+ * movement list are parameters and the defaults are W300's.
+ *
+ * THE COMMENT IS HERE RATHER THAN INSIDE THE PARAMETER LIST, and that is not a style choice: with
+ * it between the parameters, W291's reporter walk stopped finding this function at all. It reads a
+ * return type from the next 300 characters after the name, and three lines of prose push `): TaxDiff`
+ * past that. Recorded as `REPORTER-1` in W210's register rather than fixed here — the fix reveals
+ * this walk matching its own quoted fixture, which is a chain rather than a line.
+ */
+export function taxDiff(
+  live: Readonly<Record<ModuleShape, number>>,
+  against: Readonly<Record<ModuleShape, number>> = TAX_AT_W300,
+  movement: readonly Movement[] = MOVED_SINCE_W300,
+): TaxDiff {
+  const moved = new Map(movement.map((m) => [m.shape, m.now]));
   const unaccounted: string[] = [];
   const stale: string[] = [];
-  for (const [shape, baseline] of Object.entries(TAX_AT_W300) as [ModuleShape, number][]) {
+  for (const [shape, baseline] of Object.entries(against) as [ModuleShape, number][]) {
     const expected = moved.get(shape) ?? baseline;
     if (live[shape] !== expected) unaccounted.push(`${shape}: costs ${live[shape]}, declared ${expected}`);
     if (moved.has(shape) && live[shape] === baseline) stale.push(shape);
@@ -338,3 +353,129 @@ export function taxDiff(live: Readonly<Record<ModuleShape, number>>): TaxDiff {
 /** What this measurement does not prove. */
 export const TAX_BOUND =
   "This counts the registers that REPORT a planted module and the files that NAME an existing one. Neither is the same as the work of declaring it: a census entry costs four sentences and a copy-surface entry costs one, and a count treats them alike. Nor does it reach the sites whose comparison lives inside a `.test.ts` — W200's namespace loader fails the build on arrival and no plant from outside can make it say so, which is why `namingSites` is measured beside the plant rather than instead of it. What the number is good for is comparison with itself: the same two derivations over the tree Q24 leaves behind, which is W308's whole job. A quarter that made declaring a module pleasanter without moving either derivation would not show up here, and should not be claimed.";
+
+// ---------------------------------------------------------------------------------------------
+// W308: the same measurement, re-run at the end of the quarter it was written to judge.
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * The live figure at W308, recorded beside W300's baseline.
+ *
+ * THE QUARTER'S OWN GATE, AND IT DID NOT PASS IT. `HORIZON-Q24.md` says: *W300 records what adding
+ * one module costs today, and W308 re-derives the same measurement at the end. A quarter that made
+ * the tree feel tidier without moving that number would have failed.* The number moved. It went UP,
+ * by one, on four of the five shapes — every shape that carries a watched property, because W305's
+ * manifest reports any module it has not heard of and `plain` carries nothing to be heard about.
+ *
+ * That is recorded here rather than argued away. What Q24 actually did to this number is add a
+ * register to it; what it did for an author is measured separately below, because the two are
+ * different facts and W305's note claiming the second must not be read as answering the first.
+ *
+ * FROZEN THE SAME WAY W300'S IS. A later unit that moves the cost adds a row to `MOVED_SINCE_W308`
+ * naming what moved it — it does not edit this record, because a record somebody edits to match the
+ * tree is not a record.
+ */
+export const TAX_AT_W308: Readonly<Record<ModuleShape, number>> = {
+  plain: 1,
+  walks_the_tree: 4,
+  states_a_bound: 3,
+  reports_violations: 3,
+  a_full_register: 7,
+};
+
+/**
+ * Shapes whose cost has moved since W308's record.
+ *
+ * EMPTY AT THE MOMENT IT WAS WRITTEN, and it exists anyway for the reason W305's does: W310 and
+ * W311 were still to land when this was measured, and a record with no way to account for a later
+ * movement gets edited instead of extended. A unit that adds a register adds a row here.
+ */
+export const MOVED_SINCE_W308: readonly Movement[] = [];
+
+/** A module added in Q24, and the files somebody had to edit to declare it. */
+export interface EditSites {
+  module: string;
+  shape: ModuleShape;
+  /** The files that name it, which is where its declarations live. */
+  files: number;
+  why: string;
+}
+
+/**
+ * The OTHER number, which W305 claimed and did not measure.
+ *
+ * Its note says the tax went up while *"the number of files and schemas an author has to find"*
+ * went down, and hands the re-derivation here. Both halves are checkable and both are checked:
+ * `manifest.ts` names a module declared this quarter, and `register-census.ts` and
+ * `refusal-branches.ts` — the two files that used to hold those rows — no longer do. One file where
+ * there were two, so a full register costs ONE FEWER FILE TO EDIT and one more register reporting.
+ *
+ * THE TWO NUMBERS MOVED IN OPPOSITE DIRECTIONS AND ONLY ONE OF THEM WAS THE GATE. Recording that
+ * plainly is the point; a quarter that reported only the second would be answering a question
+ * nobody asked it.
+ *
+ * AND THE RECORD PERTURBS ITS OWN SUBJECT, which is this tree's most familiar shape arriving in a
+ * measurement rather than in a scan. Naming a module here makes this file one of the files that
+ * name it, so one of the two rows below counts a file that exists because the row does. It is
+ * recorded rather than corrected for — see that row.
+ */
+export const EDIT_SITES_AT_W308: readonly EditSites[] = [
+  {
+    module: "src/quality/self-reference.ts",
+    shape: "a_full_register",
+    files: 8,
+    why: "W307's register, declared after the manifest landed. The copy surface and its namespace loader, W295's blind spots, W297's bounds, this measurement's own probe list, W292's negative probes, W302's scan sites, and the manifest — where before W305 the last of those was two files.",
+  },
+  {
+    module: "src/demo/path.ts",
+    shape: "states_a_bound",
+    files: 5,
+    why: "W309's path register: the copy surface, its loader, W297's bounds, the manifest — and THIS RECORD, which is the fifth. Naming a module in order to count the files that name it adds one, and the count moved from four to five the moment the row above was written. It is left in rather than narrowed away: an exclusion for the observer is a scan tuned until it agrees with the answer, which W279 refused and W295 proved costly. The full register beside it does not move, because `declaration-tax.ts` already named it in `DEMANDS` — so the perturbation is visible on one row and absent on the other, which is the clearest evidence of what it is.",
+  },
+];
+
+/** Where a declaration for a module of this shape goes, as the tree spells it. */
+const CONSOLIDATED_INTO = "src/quality/manifest.ts";
+const CONSOLIDATED_FROM = ["src/quality/register-census.ts", "src/quality/refusal-branches.ts"];
+
+/**
+ * The consolidation W305 claimed, re-derived rather than believed.
+ *
+ * Returns what is wrong with the claim, empty when it holds. Both halves: the manifest must hold
+ * the declaration, and the files it replaced must no longer hold one.
+ */
+export function consolidationDefects(root: string, module: string): string[] {
+  const sites = namingSites(root, module);
+  const out: string[] = [];
+  if (!sites.includes(CONSOLIDATED_INTO)) {
+    out.push(`${module} is not declared in ${CONSOLIDATED_INTO}`);
+  }
+  for (const from of CONSOLIDATED_FROM.filter((f) => sites.includes(f))) {
+    out.push(`${module} is still declared in ${from}, so the consolidation did not happen`);
+  }
+  return out.sort();
+}
+
+/**
+ * What Q24 did to the number it was measured by, said plainly.
+ *
+ * W308's gate: *a quarter that did not move it saying so rather than claiming otherwise.* It moved,
+ * and it moved the wrong way, so the sentence says that first.
+ */
+export const QUARTER_VERDICT =
+  "Q24 SET ITSELF A MEASURED GATE AND MISSED IT. `HORIZON-Q24.md` said the quarter would be judged " +
+  "on what adding one module costs, and that a quarter which made the tree feel tidier without " +
+  "moving that number would have failed. The number moved UP: a full register cost six declarations " +
+  "at W300 and costs seven now, and every shape carrying a watched property moved by the same one, " +
+  "because W305's manifest reports a module it has not heard of and is itself a register that " +
+  "reports. The one shape that did not move is the one with nothing to be heard about. " +
+  "WHAT THE QUARTER DID INSTEAD IS REAL AND IS A DIFFERENT NUMBER. An author declaring a full " +
+  "register edits one file fewer than before, because the census row and the refusal branches now " +
+  "share a row in one file — re-derived here rather than taken from the note that claimed it. " +
+  "Twelve mechanisms were consolidated, four classes of duplicated discipline were removed, and " +
+  "none of that is visible in the figure the quarter chose to be judged by. THE HONEST READING IS " +
+  "THAT THE GATE WAS THE WRONG INSTRUMENT rather than that the work did not happen: counting the " +
+  "registers that report an undeclared module counts controls, and consolidating controls without " +
+  "removing any is supposed to leave that count where it was or raise it. Naming a better " +
+  "instrument is a decision for the quarter close, not a repair to make here — a gate rewritten by " +
+  "the unit it judges is not a gate.";

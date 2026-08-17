@@ -13,7 +13,7 @@
 // file a probe is, so a probe left behind by an interrupted run fails four other suites while
 // looking like a real defect.
 
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -21,8 +21,13 @@ import {
   DEMANDS,
   type ModuleShape,
   SHAPE_BODIES,
+  EDIT_SITES_AT_W308,
+  MOVED_SINCE_W308,
+  QUARTER_VERDICT,
   TAX_AT_W300,
+  TAX_AT_W308,
   TAX_BOUND,
+  consolidationDefects,
   demandingRegisters,
   namingSites,
   taxDiff,
@@ -195,5 +200,93 @@ describe("W300 the baseline is frozen, and says what it is for", () => {
     expect(TAX_BOUND).toContain("a count treats them alike");
     expect(TAX_BOUND).toContain("W308");
     expect(TAX_BOUND.length).toBeGreaterThan(400);
+  });
+});
+
+describe("W308 the same measurement, re-run at the end of the quarter it judges", () => {
+  it("records the live figure, and the record cannot drift from it", () => {
+    // THE UNIT. W300's measurement re-run UNCHANGED — same plant, same probes, same function — and
+    // the result recorded. A record that were merely a number somebody typed would be the thing
+    // this quarter kept finding: a check that cannot fail.
+    const live = Object.fromEntries(
+      (Object.keys(TAX_AT_W308) as ModuleShape[]).map((shape) => [
+        shape,
+        withShape(shape, () => demandingRegisters(COPY, PLANTED)).length,
+      ]),
+    ) as Record<ModuleShape, number>;
+    expect(live, "the record and the tree disagree").toEqual(TAX_AT_W308);
+    expect(taxDiff(live, TAX_AT_W308, MOVED_SINCE_W308)).toEqual({ unaccounted: [], stale: [] });
+  });
+
+  it("shows the movement against W300's baseline, which is the comparison the gate asked for", () => {
+    // The point of freezing two records rather than one: the difference IS the quarter's result,
+    // and it is derived here rather than stated in prose somewhere.
+    const risen = (Object.keys(TAX_AT_W300) as ModuleShape[]).filter((s) => TAX_AT_W308[s] > TAX_AT_W300[s]);
+    const fallen = (Object.keys(TAX_AT_W300) as ModuleShape[]).filter((s) => TAX_AT_W308[s] < TAX_AT_W300[s]);
+    expect(fallen, "a shape got cheaper and the verdict does not say so").toEqual([]);
+    expect(risen.length, "nothing moved, and the verdict says it did").toBeGreaterThan(3);
+    // Every risen shape moved by exactly one, which is the evidence for one cause rather than four.
+    for (const shape of risen) {
+      expect(TAX_AT_W308[shape] - TAX_AT_W300[shape], `${shape} moved by more than the manifest`).toBe(1);
+    }
+    // And the unmoved one is the shape carrying nothing a register watches.
+    expect((Object.keys(TAX_AT_W300) as ModuleShape[]).filter((s) => TAX_AT_W308[s] === TAX_AT_W300[s])).toEqual([
+      "plain",
+    ]);
+  });
+
+  it("re-derives the consolidation W305 claimed rather than believing the note", () => {
+    // W305's own sentence hands this over: the tax went up, and what went down is a number "this
+    // measurement does not capture". Both halves checked, on the two modules added since it landed.
+    for (const site of EDIT_SITES_AT_W308) {
+      expect(consolidationDefects(ROOT, site.module), `${site.module} is not consolidated`).toEqual([]);
+      expect(namingSites(ROOT, site.module).length, `${site.module} costs a different number of files`).toBe(
+        site.files,
+      );
+      expect(site.why.length, `${site.module} records a number without saying what it is`).toBeGreaterThan(120);
+    }
+    expect(EDIT_SITES_AT_W308.length).toBeGreaterThan(1);
+  });
+
+  it("reports a module the consolidation would have missed, in both directions", () => {
+    // Driven on constructed trees, because the real one satisfies both arms and silence over it
+    // would prove neither. The first arm is a module the manifest never heard of; the second is one
+    // still declared in a file the manifest replaced, which is the revert this claim rests on.
+    const undeclared = withRoot({ "src/quality/manifest.ts": "export const MANIFEST = [];\n" }, (root) =>
+      consolidationDefects(root, "src/quality/probe.ts"),
+    );
+    expect(undeclared).toEqual(["src/quality/probe.ts is not declared in src/quality/manifest.ts"]);
+    const reverted = withRoot(
+      {
+        "src/quality/manifest.ts": 'export const M = ["src/quality/probe.ts"];\n',
+        "src/quality/register-census.ts": 'export const C = ["src/quality/probe.ts"];\n',
+      },
+      (root) => consolidationDefects(root, "src/quality/probe.ts"),
+    );
+    expect(reverted).toEqual([
+      "src/quality/probe.ts is still declared in src/quality/register-census.ts, so the consolidation did not happen",
+    ]);
+  });
+
+  it("says the quarter missed its own gate, before saying what it did instead", () => {
+    // W308's gate: "a quarter that did not move it saying so rather than claiming otherwise." The
+    // order of the sentences is the honesty — a verdict that opened with the consolidation would be
+    // answering a question nobody asked it.
+    expect(QUARTER_VERDICT).toContain("MISSED IT");
+    expect(QUARTER_VERDICT.indexOf("moved UP")).toBeLessThan(QUARTER_VERDICT.indexOf("WHAT THE QUARTER DID"));
+    expect(QUARTER_VERDICT).toContain("six");
+    expect(QUARTER_VERDICT).toContain("seven");
+    // And it does not repair the gate it failed, which would be the unit rewriting its own exam.
+    expect(QUARTER_VERDICT).toContain("not a repair to make here");
+  });
+
+  it("is recorded where the gate was set, not only in the code that measured it", () => {
+    // The quarter's premise is a paragraph in `HORIZON-Q24.md`; a result recorded only in a module
+    // is a result the next expansion reads past. W299's own rule about the horizon documents.
+    const horizon = readFileSync(path.join(ROOT, "docs/HORIZON-Q24.md"), "utf8");
+    expect(horizon, "the horizon does not record what the measurement said").toContain("W308 measured");
+    for (const shape of Object.keys(TAX_AT_W308) as ModuleShape[]) {
+      expect(horizon, `${shape} is not in the recorded table`).toContain(shape);
+    }
   });
 });

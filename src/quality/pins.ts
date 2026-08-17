@@ -166,6 +166,22 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/declaration-tax.ts",
+    name: "TAX_AT_W308",
+    classification: {
+      kind: "floor",
+      why: "THE SECOND FROZEN MEASUREMENT, and the pair is the point: W300 recorded what a module cost when Q24 opened, this records what it costs at the close, and the difference is the quarter's result. It is checked against the live figure by its own test — so unlike the baseline beside it, this one is supposed to be TRUE today and a shape that moves after it adds a row to `MOVED_SINCE_W308` rather than editing this.",
+    },
+  },
+  {
+    module: "src/quality/declaration-tax.ts",
+    name: "EDIT_SITES_AT_W308",
+    classification: {
+      kind: "floor",
+      why: "The other number W308 recorded — the files an author edits, per module added this quarter — and each entry is re-derived from `namingSites` by its own test rather than trusted. It is a record of a measurement rather than a size somebody pinned, which is the distinction W304 drew: what would be wrong here is a count of registers, and this counts files against a module named beside it.",
+    },
+  },
+  {
     module: "src/quality/horizon-q24.test.ts",
     name: "Q24_HORIZON_LAST_UNIT",
     classification: {

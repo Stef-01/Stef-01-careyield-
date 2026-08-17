@@ -38,6 +38,7 @@
 // better than a scan that would pass over a note nobody read.
 
 import { readFileSync, readdirSync } from "node:fs";
+import { REFUSAL_BRANCHES, violationReporters } from "./refusal-branches";
 import path from "node:path";
 import { resetStore } from "@/booking/store";
 import { rankCandidates } from "@/engine/pool";
@@ -124,6 +125,22 @@ export function modulesWithNoUnitHeader(): string[] {
  */
 
 export const LATENT_FINDINGS: readonly LatentFinding[] = [
+  declareFinding({
+    id: "REPORTER-1",
+    what:
+      "W291's `violationReporters` reads a reporter's return type from the 300 characters after its name, so a signature whose parameter list carries a comment long enough to push the return type past that window is not a reporter as far as the walk is concerned — it vanishes from the population and its declared branches go stale, which is the *register drops out and reports nothing* failure W295 paid for. W308 hit it by writing three lines of prose between two parameters of `taxDiff`. The window is not the whole finding: raising it to 4000 makes the walk find `plantedDiff`, the reporter signature this very module quotes as a fixture, so the honest fix is W307's rule applied to `refusal-branches.ts` itself — its fixture leaves the surface — and only then the window.",
+    recordedBy: "W308",
+    triggerStatement:
+      "Any reporter whose return type sits more than 300 characters after its name. There is none today because W308 moved its comment out of the parameter list rather than leaving the tree red; the next one will be written by somebody who does not know the rule, and nothing here tells them.",
+    // Live the moment a real reporter overruns the window: the walk's own population against the
+    // one a wider window finds. Both are derived, so this cannot pass by being re-read.
+    trigger: () => {
+      const narrow = violationReporters(ROOT).map((r) => `${r.module}::${r.fn}`);
+      const declared = new Set(REFUSAL_BRANCHES.map((b) => `${b.module}::${b.fn}`));
+      return declared.size > 0 && [...declared].some((d) => !narrow.includes(d));
+    },
+    status: "open",
+  }),
   declareFinding({
     id: "PRIV-3",
     what:

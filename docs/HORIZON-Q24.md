@@ -77,6 +77,34 @@ that made the tree feel tidier without moving that number would have failed.
 
 Nothing here needs a ruling; nothing adds a blocked row.
 
+### W308 measured it, and the quarter missed its own gate
+
+Re-run unchanged at the end: same plant, same probes, same function. What one new module costs, in
+registers that report it undeclared —
+
+| Shape | W300 | W308 |
+| --- | --- | --- |
+| plain | 1 | 1 |
+| walks_the_tree | 3 | 4 |
+| states_a_bound | 2 | 3 |
+| reports_violations | 2 | 3 |
+| a_full_register | 6 | 7 |
+
+**It went up.** Every shape carrying a property some register watches moved by exactly one, because
+W305's manifest reports a module it has not heard of and is itself a register that reports; `plain`
+carries nothing to be heard about and did not move. The paragraph above said a quarter that failed
+to move this number would have failed, and the number moved the wrong way.
+
+What the quarter did instead is real and is a **different number**: an author declaring a full
+register now edits one file fewer, because the census row and the refusal branches share a row in
+one file. That is re-derived in `consolidationDefects` rather than taken from the note claiming it —
+the manifest holds the declaration and the two files it replaced no longer do.
+
+The honest reading is that **the gate was the wrong instrument**, not that the work did not happen:
+counting the registers that report an undeclared module counts controls, and consolidating controls
+without removing any leaves that count where it was or raises it. Naming a better instrument belongs
+to the quarter close. A gate rewritten by the unit it judges is not a gate.
+
 The quarter also carries the two findings Q23's hardening deferred rather than hid: **CR-1**,
 where W297's `stillOpen` predicates close over a module-scope `process.cwd()` — W267's structural
 defect, inside the quarter that named it, in its last register — and **SIMP-1** above. W301 and
