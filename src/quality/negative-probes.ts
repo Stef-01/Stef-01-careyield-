@@ -235,6 +235,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/empty-list-sweep.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/empty-list-sweep.test.ts :: stays quiet when the same assertion has a witness one line above",
+      plants: "expect(rows.length).toBeGreaterThan(0);",
+    },
+  },
+  {
     register: "src/quality/tautology-sweep.ts",
     negative: {
       kind: "already_driven",

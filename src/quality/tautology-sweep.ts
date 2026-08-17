@@ -76,7 +76,13 @@ export const SHAPE_ARGUMENTS: Readonly<Record<TautologyShape, string>> = {
 };
 
 /** An assertion lifted out of a test file, with enough context to classify it. */
-interface Assertion {
+/**
+ * One `expect(...)...matcher(...)`, in parts.
+ *
+ * Exported at W293, which sweeps the same files for a different shape and needs the same parse.
+ * A second copy of this parser would be a second set of wrapping bugs to find.
+ */
+export interface Assertion {
   subject: string;
   negated: boolean;
   matcher: string;
@@ -141,7 +147,7 @@ export function blankLiterals(code: string): string {
  * Boundaries are found on the blanked text and the parts are sliced from the real one, so a paren
  * inside a string cannot move a boundary and a hit still quotes what the author wrote.
  */
-function assertionsIn(code: string): Assertion[] {
+export function assertionsIn(code: string): Assertion[] {
   const scan = blankLiterals(code);
   const out: Assertion[] = [];
   for (const match of scan.matchAll(/\bexpect\s*\(/g)) {
@@ -187,8 +193,13 @@ function importedNames(code: string): Set<string> {
 /** A subject that ends in a count. `indexOf(...)` and a bare identifier deliberately do not. */
 const COUNT = /\.(?:length|size)$/;
 
-/** The title of the `it(...)` or `test(...)` the offset sits inside, or the file's own name. */
-function enclosingTest(code: string, index: number): string {
+/**
+ * The title of the `it(...)` or `test(...)` the offset sits inside, or the file's own name.
+ *
+ * Exported at W293, which reports hits by test rather than by line for the same reason W288 does.
+ * A second copy would also be a second declared fold site for one last-element read.
+ */
+export function enclosingTest(code: string, index: number): string {
   const before = code.slice(0, index);
   const opens = [...before.matchAll(/\b(?:it|test)\s*\(\s*(["'`])((?:[^\\]|\\.)*?)\1/g)];
   return opens.length > 0 ? collapse(opens[opens.length - 1]![2]!) : "(outside a test)";

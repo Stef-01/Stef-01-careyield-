@@ -38,6 +38,7 @@ import { duplicateDiff, pinDiff } from "./pins";
 import { coverageDiff } from "./route-coverage";
 import { censusDiff } from "./register-census";
 import { negativeDiff } from "./negative-probes";
+import { UNEVIDENCED_AT_W293, emptyListDiff } from "./empty-list-sweep";
 import { headerViolations } from "./unit-headers";
 import { pageSuiteViolations } from "./page-suite";
 import { blockedSurfaceViolations } from "./blocked-surface";
@@ -471,6 +472,24 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
         "The same shape as the stale arm above and the same one-line remedy: `EXCLUDED_SPECS` is read from module scope, so an exclusion with a short reason cannot be supplied by a caller. Parameterise it and this arm is reachable with a one-entry map.",
     },
   },
+  // ── W293's empty-list sweep ───────────────────────────────────────────────────────────────
+  {
+    module: "src/quality/empty-list-sweep.ts",
+    fn: "emptyListDiff",
+    branch: "newlyUnevidenced",
+    reach: { kind: "driven", drive: () => emptyListDiff(process.cwd(), []).newlyUnevidenced.length > 0 },
+  },
+  {
+    module: "src/quality/empty-list-sweep.ts",
+    fn: "emptyListDiff",
+    branch: "nowEvidenced",
+    reach: {
+      kind: "driven",
+      drive: () =>
+        emptyListDiff(process.cwd(), [...UNEVIDENCED_AT_W293, "src/gone.test.ts :: a test :: nothing"])
+          .nowEvidenced.length > 0,
+    },
+  },
   // ── W292's negative probes ────────────────────────────────────────────────────────────────
   {
     module: "src/quality/negative-probes.ts",
@@ -492,7 +511,7 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
       kind: "driven",
       drive: () =>
         negativeDiff(
-          [{ file: "src/x.ts", derives: "d", checkedAgainst: "c", proof: { kind: "mutated_tree", mutation: "m" } }],
+          [{ file: "src/x.ts", derives: "d", checkedAgainst: "c", proof: { kind: "mutated_tree", mutation: "m" }, assertion: { kind: "carries_no_assertion" as const, claim: "a constructed register", why: "a fixture" }, }],
           [{ register: "src/x.ts", negative: { kind: "no_detector_of_its_own", why: "asserted rather than earned" } }],
         ).unsupportedExemption.length > 0,
     },

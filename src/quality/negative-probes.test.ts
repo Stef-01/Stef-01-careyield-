@@ -378,7 +378,7 @@ describe("W292 every proved walk has a negative, and the register says which kin
       expect(`${entry.derives} ${entry.checkedAgainst}`).toContain(EXEMPT_PHRASE);
     }
     const invented = negativeDiff(
-      [{ file: "src/x.ts", derives: "d", checkedAgainst: "c", proof: { kind: "mutated_tree", mutation: "m" } }],
+      [{ file: "src/x.ts", derives: "d", checkedAgainst: "c", proof: { kind: "mutated_tree", mutation: "m" }, assertion: { kind: "carries_no_assertion" as const, claim: "a constructed register", why: "a fixture" }, }],
       [{ register: "src/x.ts", negative: { kind: "no_detector_of_its_own", why: "because" } }],
     );
     expect(invented.unsupportedExemption).toEqual(["src/x.ts"]);

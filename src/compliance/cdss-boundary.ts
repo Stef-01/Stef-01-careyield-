@@ -748,6 +748,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W291's branch register is reviewer-facing throughout: for each violation reporter in the tree, the arms it can produce and the input that makes each one fire. Its longest strings are the `fixture` sentences attached to the two arms nobody can construct today — instructions to whoever parameterises `EXCLUDED_SPECS` — and `REFUSED_BRANCH_SHAPES`, which is reviewer-facing in W200's split for the usual reason: its content QUOTES the citation-instead-of-execution and the line-coverage number it exists to forbid. The synthetic inputs it builds to drive each arm are file paths, register ids and spec names; no patient, condition or appointment reason appears anywhere in it.",
   },
   {
+    module: "src/quality/empty-list-sweep.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W293's sweep for empty-list assertions whose source nothing shows able to fill. Nobody but a developer reads it. Its longest strings are the argument for the one accepted class, the note recording the self-evidencing bug it shipped with, and 131 debt rows that are file paths and test titles quoted from the tree's own suite; no patient, condition or appointment reason appears in any of them, and its only input is the text of test files.",
+  },
+  {
     module: "src/quality/negative-probes.ts",
     operatorCopy: [],
     notCopy:

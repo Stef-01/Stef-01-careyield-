@@ -31,7 +31,13 @@ import {
 } from "./g5-rehearsal";
 import { PATHWAY_REFUSAL_COPY, SHIPPED_ATTESTATIONS } from "@/pathways/approval";
 import { SHIPPED_PATHWAYS } from "@/pathways/versioning";
-import { getPathwayAttestations, getPathwayEvents, resetPathwayRegistry } from "@/pathways/registry";
+import {
+  addPathwayAttestations,
+  addPathwayEvents,
+  getPathwayAttestations,
+  getPathwayEvents,
+  resetPathwayRegistry,
+} from "@/pathways/registry";
 import { lintEscalationText } from "@/registers/escalation";
 
 const ROOT = process.cwd();
@@ -113,6 +119,35 @@ describe("W264 nothing in the product was signed", () => {
     const stage = rehearsal.stages.find((s) => s.stage === "registry_untouched")!;
     expect(stage.observed).toContain("events 0 to 0");
     expect(stage.observed).toContain("attestations 0 to 0");
+  });
+
+  it("can hold an event and an attestation at all, which is what makes those zeros a fact", () => {
+    // W293 FOUND THE TWO ZEROS ABOVE UNEVIDENCED, and they were the only two in the tree. The
+    // claim they make is that the rehearsal does not reach W127's registry — a control — and
+    // nothing anywhere had ever shown that registry holding anything, so a getter that returned
+    // `[]` under all conditions would have satisfied both of them forever.
+    //
+    // Seeded through the same door setup and the mock seed route use, with the rehearsal's own
+    // synthetic content, and `beforeEach` clears it before the next test. The shipped registers
+    // are not touched: seeding the in-memory registry is not shipping a pathway, which is the
+    // distinction the describe above this one is about.
+    const at = "2026-08-17T00:00Z";
+    const versionHash = "w293-witness-hash";
+    addPathwayEvents([
+      { pathwayId: SYNTHETIC_PATHWAY_ID, kind: "version_drafted", versionHash, at, byEmail: "builder@example.test", criteria: SYNTHETIC_CRITERIA },
+    ]);
+    addPathwayAttestations([
+      {
+        pathwayId: SYNTHETIC_PATHWAY_ID,
+        versionHash,
+        kind: "specialist_review",
+        byEmail: "reviewer@example.test",
+        at,
+        finding: "Synthetic rehearsal content; nothing here was reviewed clinically.",
+      },
+    ]);
+    expect(getPathwayEvents()).toHaveLength(1);
+    expect(getPathwayAttestations()).toHaveLength(1);
   });
 
   it("hands no branded value back to a caller", () => {

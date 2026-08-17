@@ -22,6 +22,7 @@ import {
 } from "./pins";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
+import { emptyListDiff } from "./empty-list-sweep";
 import { Y5_FIRST_UNIT as RAIL_Y5 } from "@/compliance/rail-y5";
 import { Y5_FIRST_UNIT as ADM_Y5 } from "@/privacy/adm-y5";
 
@@ -76,10 +77,17 @@ describe("W290 the live pins, and why live is not the defect", () => {
     // register arriving unproven is W267's own event. Neither is ordinary work, and stopping the
     // build for either is the control rather than the noise.
     const live = PINS.filter((p) => p.classification.kind === "live_by_design");
-    expect(live.map((p) => p.name).sort()).toEqual(["BLOCKED_AT_W263", "UNPROVEN_AT_W290"]);
-    // Both are asserted against the tree, so "live" is a fact rather than a label.
+    expect(live.map((p) => p.name).sort()).toEqual([
+      "BLOCKED_AT_W263",
+      "UNEVIDENCED_AT_W293",
+      "UNPROVEN_AT_W290",
+    ]);
+    // Each is asserted against the tree, so "live" is a fact rather than a label.
     expect(blockedRows(ROOT)).toHaveLength(BLOCKED_AT_W263);
     expect(walkUnproven().map((r) => r.file).sort()).toEqual([...UNPROVEN_AT_W290].sort());
+    // W293's is the third, and it fires on the same kind of event: an empty-list assertion
+    // arriving with no evidence its source can fill.
+    expect(emptyListDiff(ROOT)).toEqual({ newlyUnevidenced: [], nowEvidenced: [] });
   });
 
   it("makes each argue for interrupting somebody, not merely declare itself live", () => {

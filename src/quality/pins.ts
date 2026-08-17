@@ -166,6 +166,17 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/empty-list-sweep.ts",
+    name: "UNEVIDENCED_AT_W293",
+    classification: {
+      kind: "live_by_design",
+      movedBy:
+        "An empty-list assertion arriving with no evidence its source can fill, or one of the 131 named rows gaining a witness and going stale.",
+      whyStopping:
+        "Both events are decisions and neither is ordinary work. An arrival means somebody has written a control that passes over a list nothing could have filled — the defect the whole unit is about — and the build stopping is the only moment anybody will look at it. A row going stale means the debt shrank, and it has to be deleted deliberately rather than drifting out, because a list that quietly loses rows cannot be read as a measure of anything. It is a NAME list rather than a count for W290's own reason: a count here would be edited by whoever next made the suite red, and the edit would look like maintenance.",
+    },
+  },
+  {
     module: "src/quality/register-census.ts",
     name: "UNPROVEN_AT_W290",
     classification: {

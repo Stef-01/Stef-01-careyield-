@@ -692,12 +692,40 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/empty-list-sweep.ts",
+    derives:
+      "Every `toEqual([])` and `toHaveLength(0)` in every `*.test.ts` under `src/`, with the `(producer, field)` pair each was read from and whether anything anywhere shows that pair holding something.",
+    checkedAgainst:
+      "`UNEVIDENCED_AT_W293` — the assertions nothing shows able to fill, by name — plus `GATE_PINNED_EMPTY`, the one class accepted with an argument rather than evidence.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "two constructed test files differing in one line are swept — in the first the filtered list is literally `[]`, in the second the same filter runs over a collection the file first shows holding something — and only the first may be reported",
+    },
+    assertion: {
+      kind: "driven_by_branch",
+      claim:
+        "Every empty-list assertion in the suite has evidence its source can fill, is a register a founder gate pins empty, or is named in the debt list — and the debt list can only shrink deliberately.",
+      mutation:
+        "The pin is emptied and all 131 unevidenced assertions must come back as new.",
+      branch: "src/quality/empty-list-sweep.ts::emptyListDiff::newlyUnevidenced",
+    },
+  },
+  {
     file: "src/quality/negative-probes.test.ts",
     derives: "Nothing of its own — it imports the shared rooted walks in order to plant a NEGATIVE beside each positive, which is what W292's discriminating pairs are made of.",
     checkedAgainst: "Each detector's own pair. It is a member because deriving through `tree-walks` counts, and exempting the file that does the proving would be the register answering its own question — `register-census.test.ts`'s precedent, one unit over.",
     proof: {
       kind: "mutated_tree",
       mutation: "it is the file that does the planting; every pair in it plants two files into a copied tree and asks the detector one question about both",
+    },
+    assertion: {
+      kind: "driven_by_branch",
+      claim:
+        "Every walk W267 records as proved by mutation also has a NEGATIVE — a file it must refuse — and the exemption for a file with no detector of its own is supported by the census's own words rather than by declaring it.",
+      mutation:
+        "The probe register is emptied and every proved walk must come back unprobed.",
+      branch: "src/quality/negative-probes.ts::negativeDiff::unprobed",
     },
   },
   {
