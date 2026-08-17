@@ -28,10 +28,16 @@
 // behaviour), unreached (no test exercises the line), or a real hole. The three are told apart by
 // reading, so each accepted survivor says which it is.
 //
-// WHY A STRIDE AND NOT A CHOSEN SET. A hand-picked set of mutants is a set chosen by the person who
-// believes the tests hold, which is the shape this tree keeps finding behind a green suite. The
-// sample walks every mutation site in a fixed order and takes every Nth, so what gets tested is
-// decided by arithmetic. `SAMPLE_STRIDE` is the whole of the selection policy.
+// WHY THE SAMPLE IS NOT A CHOSEN SET. A hand-picked set of mutants is a set chosen by the person
+// who believes the tests hold, which is the shape this tree keeps finding behind a green suite.
+// Whether a site is sampled is decided by hashing that site's own name, so the selection is
+// arithmetic over something nobody arranged. `SAMPLE_RATE` is the whole of the policy, and the
+// per-site hash is not a detail: the first design took every Nth site in a sorted list, which
+// re-rolled the entire sample whenever a module was added. See `SAMPLE_RATE` for that story.
+//
+// W298 CORRECTED THIS PARAGRAPH, which described the stride for two units after the stride was
+// gone — down to naming a constant the module no longer exports. `headerNamesUnknown` in
+// `unit-headers.ts` is the check that now catches exactly that.
 //
 // THE BASELINE IS CHECKED BEFORE EVERY MUTATION. A suite already red in the copy would make every
 // mutant in its module look caught, and the register would report perfect coverage over a broken

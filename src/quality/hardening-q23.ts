@@ -104,6 +104,20 @@ export const FINDINGS: readonly HardeningFinding[] = [
     },
   },
   {
+    id: "Q23-CR-3",
+    lens: "code-review",
+    unit: "W296",
+    what:
+      "TWO MODULE HEADERS DESCRIBE A DESIGN THEIR MODULE NO LONGER HAS, and both name an identifier the tree does not contain. W296's header explains why the sample is a STRIDE — *walks every mutation site in a fixed order and takes every Nth* — and names the constant that policy lived in, two units after the stride was replaced by a per-site hash BY THAT SAME UNIT, which documented the change in a doc comment forty lines below and left the header standing. W264's names a refusal-drive map that has been a function for a long time. This is the third instance in one quarter of the same defect: W293 shipped a header quoting the figures its own sweep produced while it was broken. Every one passed every gate, because a green suite says nothing about prose. AND THIS PASS MISSED BOTH — W298's own register warned that the thing to distrust about a self-review is the ABSENCE of findings on the reviewer's own units, and W296 is the reviewer's own unit. The warning was right and it did not help; a check did.",
+    raisedOn: "2026-08-17",
+    disposition: {
+      kind: "fixed",
+      by: "W298",
+      evidence:
+        "Both headers corrected, and the cheap half of the problem closed by a door rather than by care: `headerNamesUnknown` in `unit-headers.ts` resolves every backticked `SCREAMING_CASE` name in every module header against the whole tree and must return nothing. Underscored names only, so English in prose is not reported. Proved on a planted header naming a constant nothing exports and on one naming a real export, because a door pinned empty over a healthy tree proves nothing. The detector's own first run returned NOTHING while both findings were live — its doc comment named the two identifiers it was looking for, so it found them in itself; the tokens are assembled from fragments now, which is W153's remedy and the fifteenth instance of that collision. `HEADER_CITATION_BOUND` states the half that stays open: a header describing the wrong algorithm in correct identifiers still passes.",
+    },
+  },
+  {
     id: "Q23-SIMP-1",
     lens: "simplify",
     unit: "W294",

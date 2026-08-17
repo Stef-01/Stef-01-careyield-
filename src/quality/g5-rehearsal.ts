@@ -25,10 +25,10 @@
 // AND THE REFUSALS ARE THE UNIT, NOT AN APPENDIX. The gate says "including the refusals", and
 // the reason is that a workflow is only as good as the cases it turns down: `usablePathway`
 // names nine, they encode nine separate decisions about what a sign-off has to be, and the
-// obvious rehearsal proves ONE of them fires and calls the workflow exercised. `REFUSAL_DRIVES`
+// obvious rehearsal proves ONE of them fires and calls the workflow exercised. `driveEveryRefusal`
 // arranges a scenario for each and records WHAT THE WORKFLOW ACTUALLY SAID, so a scenario that
 // stops arranging what its name claims shows up as a mismatch instead of as a pass. The map is
-// typed `Record<PathwayRefusal, …>`, so a tenth refusal added to the union fails to compile
+// map it returns is typed `Record<PathwayRefusal, …>`, so a tenth refusal added to the union fails to compile
 // until somebody drives it.
 //
 // FOUNDER GATE (plan §4): G5 is unratified. Nothing here fills either shipped register, nothing

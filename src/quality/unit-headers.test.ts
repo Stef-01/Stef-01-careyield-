@@ -11,8 +11,10 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import {
   ADOPTED_MODULES,
+  HEADER_CITATION_BOUND,
   HEADER_RULE,
   adoptedModuleNames,
+  headerNamesUnknown,
   headerCensus,
   headerUnit,
   headerViolations,
@@ -203,5 +205,65 @@ describe("W281 CENSUS-1 is closed, and closing it moved what it said", () => {
     }
     const directory = OPERATOR_COPY_SURFACES.find((s) => s.module === "src/demo/clinicians.ts")!;
     expect(directory.operatorCopy).toEqual(["clinicians"]);
+  });
+});
+
+describe("W298 a header cites no name the tree does not have", () => {
+  it("resolves every backticked identifier in every module header", () => {
+    // THE DOOR. Two headers in this quarter named an export that had been renamed or turned into a
+    // function, and both survived every gate — a green suite says nothing about prose.
+    expect(headerNamesUnknown(ROOT)).toEqual([]);
+  });
+
+  it("reports a header that names a constant nothing exports", () => {
+    // Planted, because a door pinned empty over a healthy tree proves nothing about the door. The
+    // name is assembled from fragments so THIS file does not contain the token — the collision
+    // that hid both real findings on the detector's first run, and W153's remedy for it.
+    const ghost = ["W298", "GHOST", "CONSTANT"].join("_");
+    const planted = path.join(COPY, "src/quality/w298-probe-header.ts");
+    mkdirSync(path.dirname(planted), { recursive: true });
+    writeFileSync(planted, `// W281: a probe whose header names \`${ghost}\`.\nimport path from "node:path";\nexport const value = path;\n`, "utf8");
+    expect(headerNamesUnknown(COPY, [planted])).toEqual([
+      `src/quality/w298-probe-header.ts::${ghost}`,
+    ]);
+    rmSync(planted, { force: true });
+  });
+
+  it("stays quiet when the name it cites really is exported", () => {
+    // The other direction, and it earns its place: a detector reporting every backticked name
+    // would report most of this tree's headers and the door would be deleted within a week.
+    const real = path.join(COPY, "src/quality/w298-probe-real.ts");
+    mkdirSync(path.dirname(real), { recursive: true });
+    writeFileSync(real, '// W281: a probe whose header names `HEADER_RULE`.\nimport path from "node:path";\nexport const value = path;\n', "utf8");
+    expect(headerNamesUnknown(COPY, [real])).toEqual([]);
+    rmSync(real, { force: true });
+  });
+
+  it("does not report an un-underscored word, which is English in this tree's prose", () => {
+    // Found by mutation: dropping the underscore requirement changed no answer over this tree, so
+    // the narrowing was a decision nobody could observe — the shape W267 recorded about its own
+    // default roots. A PAIR now drives it, and the first attempt at this probe failed twice over:
+    // `TODO` and `HEAD` appear elsewhere in the tree, so they resolve for the wrong reason, and a
+    // token written literally here lands in the copied tree and resolves against this very file.
+    // Both tokens are invented and assembled from fragments.
+    const plain = ["ZORB", "LAT"].join("");
+    const underscored = ["ZORB", "LAT", "_GONE"].join("");
+    const probe = path.join(COPY, "src/quality/w298-probe-english.ts");
+    mkdirSync(path.dirname(probe), { recursive: true });
+    writeFileSync(
+      probe,
+      `// W281: a probe whose header says \`${plain}\` and \`${underscored}\`.\nimport path from "node:path";\nexport const value = path;\n`,
+      "utf8",
+    );
+    // The underscored one is reported and the plain one is not, from the same header in one call.
+    expect(headerNamesUnknown(COPY, [probe])).toEqual([
+      `src/quality/w298-probe-english.ts::${underscored}`,
+    ]);
+    rmSync(probe, { force: true });
+  });
+
+  it("says what resolving a name does not prove", () => {
+    expect(HEADER_CITATION_BOUND).toMatch(/not/);
+    expect(HEADER_CITATION_BOUND).toMatch(/W293/);
   });
 });

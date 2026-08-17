@@ -66,7 +66,7 @@ function redAtBaseline(suites: readonly string[]): string[] {
 }
 
 describe("W296 the sample is drawn by arithmetic, not chosen", () => {
-  it("takes every stride-th site over an order nobody arranged", () => {
+  it("takes a hash-selected slice over an order nobody arranged", () => {
     const all = allMutants(ROOT);
     const sample = sampleMutants(all, readModule);
     expect(all.length).toBeGreaterThan(1000);

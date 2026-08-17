@@ -70,7 +70,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parseLedgerRows } from "./blocked-surface";
-import { sourceModules } from "./tree-walks";
+import { sourceModules, typescriptFiles } from "./tree-walks";
 
 /** The shape, in one sentence, so the rule is quotable rather than only enforced. */
 export const HEADER_RULE =
@@ -210,3 +210,51 @@ export const ADOPTED_MODULES: readonly AdoptedModule[] = [
 export function adoptedModuleNames(): Set<string> {
   return new Set(ADOPTED_MODULES.map((m) => m.module));
 }
+
+/**
+ * W298: every backticked `SCREAMING_CASE` name a module's header claims, that the tree does not have.
+ *
+ * THE DEFECT IS A HEADER DESCRIBING A DESIGN THE MODULE NO LONGER HAS, and this quarter shipped it
+ * three times. W293's header quoted the figures its own sweep produced while it was broken; W296's
+ * described the STRIDE it was built with after the selection was replaced by a hash, naming a
+ * sampling constant that no longer exists; W264's names a refusal-drive MAP that became a
+ * function. (Neither name is written here: this doc would then contain the tokens the scan looks
+ * for, and the scan reads the whole tree — the fifteenth instance of that collision, and it hid
+ * both findings on the first run of this very function.) Every one passed every gate, because a green suite says nothing about prose.
+ *
+ * A NAME IS THE CHECKABLE PART OF A SENTENCE. Whether a paragraph still describes the code is not
+ * mechanically decidable, but whether the identifiers it cites EXIST is — and in all three cases
+ * the stale paragraph named something gone. That is the cheap half of the problem and this closes
+ * it; the expensive half stays open and `HEADER_CITATION_BOUND` says so.
+ *
+ * Underscored names only: `HEAD`, `TODO` and `README` are English in this tree's prose, and a
+ * detector that reported them would be a chore rather than a control.
+ */
+export function headerNamesUnknown(root: string, files: readonly string[] = sourceModules(root)): string[] {
+  const whole = typescriptFiles(root)
+    .map((file) => readFileSync(file, "utf8"))
+    .join("\n");
+  const out: string[] = [];
+  for (const file of files) {
+    const source = readFileSync(file, "utf8");
+    const cut = source.indexOf("\nimport ");
+    const header = cut > 0 ? source.slice(0, cut) : "";
+    if (!header) continue;
+    const rest = whole.replace(header, "");
+    for (const match of header.matchAll(/`([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)`/g)) {
+      const name = match[1]!;
+      if (!new RegExp(`\\b${name}\\b`).test(rest)) {
+        out.push(`${path.relative(root, file).split(path.sep).join("/")}::${name}`);
+      }
+    }
+  }
+  return [...new Set(out)].sort();
+}
+
+/** What a green `headerNamesUnknown` does not prove. */
+export const HEADER_CITATION_BOUND =
+  "This resolves the NAMES a header cites, not its claims. A header describing the wrong algorithm " +
+  "in correct identifiers passes, and that is the larger half: W293's stale header named nothing " +
+  "that had gone, it quoted numbers that had changed. Nothing mechanical closes that; what closed " +
+  "it there was a rule against stating counts in a header at all, and rules of that shape have to " +
+  "be found a class at a time.";

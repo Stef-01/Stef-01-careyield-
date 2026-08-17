@@ -43,6 +43,7 @@ import { COMPOSED_COPY_SITES, FIXTURE_BOUND } from "@/compliance/composed-copy";
 import { VOCABULARY_BOUND, sweepSurface } from "@/compliance/public-surfaces";
 import { RUNTIME_BOUND } from "@/console/zero-states";
 import { HARDENING_BOUND } from "./hardening-q23";
+import { HEADER_CITATION_BOUND } from "./unit-headers";
 
 /** How a bound could stop being true. */
 export type Lifting =
@@ -88,6 +89,18 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/unit-headers.ts",
+    name: "HEADER_CITATION_BOUND",
+    unit: "W281",
+    text: HEADER_CITATION_BOUND,
+    lifting: {
+      kind: "inherent",
+      why:
+        "Nothing lifts it, because the limit is in the kind of claim rather than in the tree. Whether a paragraph still describes the code it sits above is not mechanically decidable; whether the identifiers it cites exist is, and that is all the door does. The larger half was closed once, in W293, by banning counts from a header outright — a rule about one CLASS of stale claim, found by shipping one. There is no general version to build.",
+    },
+    numbers: [],
+  },
   {
     module: "src/quality/hardening-q23.ts",
     name: "HARDENING_BOUND",
