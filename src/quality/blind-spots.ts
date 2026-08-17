@@ -44,6 +44,7 @@ import { mutantsIn } from "./mutation-sampling";
 import { CITATION_BOUND, separatorDiff } from "./citations";
 import { PLANTING_BOUND, planterDiff } from "./planting";
 import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
+import { MANIFEST_BOUND, manifestDiff } from "./manifest";
 import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
 
@@ -76,6 +77,29 @@ const LEDGER_ROW = "| W1 | done | builder-A | 2026-08-14T00:00Z | abc1234 | a ro
 
 export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
   // ── Demonstrated: the detector takes a root, so a witness can be put in front of it ─────────
+  "src/quality/manifest.ts": {
+    kind: "demonstrated",
+    bound: MANIFEST_BOUND,
+    witness: "a module with a row here whose row is a LIE — `census: null` on a module that walks the tree",
+    control: "the same module with no row at all, which the diff must report unknown",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/lying.ts": fixtureText("a-walking-module"),
+          "src/planted/absent.ts": fixtureText("a-walking-module"),
+        },
+        (root) => {
+          const unknown = manifestDiff(root, [
+            { module: "src/planted/lying.ts", census: null, branches: [] },
+          ]).unknown;
+          return {
+            witnessSeen: unknown.includes("src/planted/lying.ts"),
+            controlSeen: unknown.includes("src/planted/absent.ts"),
+          };
+        },
+      ),
+  },
+
   "src/quality/register-counts.ts": {
     kind: "demonstrated",
     bound: COUNT_BOUND,

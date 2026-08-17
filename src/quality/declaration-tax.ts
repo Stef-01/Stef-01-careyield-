@@ -42,6 +42,7 @@ import { acceptanceCarryingModules } from "./acceptances";
 import { boundsInTree } from "./bounds";
 import { pinsInTree } from "./pins";
 import { headerViolations } from "./unit-headers";
+import { manifestDiff } from "./manifest";
 
 /** A planted module's shape, named by what it contains rather than by what it is for. */
 export type ModuleShape =
@@ -158,6 +159,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/manifest.ts",
+    // W305's row register. A planted module IS watched — it walks, or states a bound — and the
+    // manifest has no row for it, so this is the seventh place a module must be declared. Which is
+    // the honest accounting: the manifest did not remove a declaration site, it replaced three
+    // with one and added itself.
+    demands: (root, planted) => names(manifestDiff(root).unknown, planted),
+  },
+  {
     file: "src/quality/register-counts.ts",
     // A planted MODULE carries no assertions, so the size sweep asks nothing of it.
     demands: () => false,
@@ -259,6 +268,72 @@ export const TAX_AT_W300: Readonly<Record<ModuleShape, number>> = {
   reports_violations: 2,
   a_full_register: 6,
 };
+
+/** A shape whose cost has moved since the baseline, and what moved it. */
+export interface Movement {
+  shape: ModuleShape;
+  /** The live cost now. */
+  now: number;
+  /** The register that arrived or departed, and why it changed the figure. */
+  why: string;
+}
+
+/**
+ * Every shape costing something other than `TAX_AT_W300`, argued.
+ *
+ * THE BASELINE IS NOT BUMPED AND THAT IS THE WHOLE POINT of freezing it: W308 re-derives the live
+ * figure and compares, so a baseline that moved with the tree would destroy the comparison it
+ * exists for. What moves instead is this list, which is a NAMED set rather than a count — W290's
+ * rule — so a shape whose cost changes for a reason nobody wrote down fails rather than being
+ * absorbed into a number somebody edited.
+ */
+export const MOVED_SINCE_W300: readonly Movement[] = [
+  // ONE CAUSE, FOUR SHAPES. `manifestDiff` reports any module that walks the tree, states a bound
+  // or reports violations and has no row in W305's manifest — so every shape carrying one of those
+  // properties costs exactly one more than it did, and `plain`, which carries none, is unmoved.
+  // That the four moved together by the same amount is the evidence the cause is a single register
+  // rather than four coincidences.
+  {
+    shape: "walks_the_tree",
+    now: 4,
+    why: "W305's manifest. A module that walks must have a row there, and `manifestDiff` reports it unknown until it does.",
+  },
+  {
+    shape: "states_a_bound",
+    now: 3,
+    why: "W305's manifest. `STATED_BOUNDS` keeps its own list, so a module stating a bound is watched by `bounds.ts` — and the manifest must have heard of it too.",
+  },
+  {
+    shape: "reports_violations",
+    now: 3,
+    why: "W305's manifest. A `*Diff` or `*Violations` export makes `refusal-branches.ts` watch the module, and `manifestDiff` requires a row for anything watched.",
+  },
+  {
+    shape: "a_full_register",
+    now: 7,
+    why: "W305's manifest, and this is the figure the quarter's premise turns on. Six was the cost of a register at W300; the manifest replaced three declaration sites with one row and then added itself as a site, so a full register now costs seven. THE TAX WENT UP. What went down is the number of files and schemas an author has to find, which this measurement does not capture and should not be read as claiming — W308 re-derives both.",
+  },
+];
+
+export interface TaxDiff {
+  /** A shape costing something the baseline and the movement list together do not account for. */
+  unaccounted: string[];
+  /** A declared movement whose shape now costs exactly what the baseline said. */
+  stale: string[];
+}
+
+/** The live measurement against the baseline plus the declared movement, both directions. */
+export function taxDiff(live: Readonly<Record<ModuleShape, number>>): TaxDiff {
+  const moved = new Map(MOVED_SINCE_W300.map((m) => [m.shape, m.now]));
+  const unaccounted: string[] = [];
+  const stale: string[] = [];
+  for (const [shape, baseline] of Object.entries(TAX_AT_W300) as [ModuleShape, number][]) {
+    const expected = moved.get(shape) ?? baseline;
+    if (live[shape] !== expected) unaccounted.push(`${shape}: costs ${live[shape]}, declared ${expected}`);
+    if (moved.has(shape) && live[shape] === baseline) stale.push(shape);
+  }
+  return { unaccounted: unaccounted.sort(), stale: stale.sort() };
+}
 
 /** What this measurement does not prove. */
 export const TAX_BOUND =

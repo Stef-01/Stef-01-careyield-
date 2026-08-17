@@ -247,6 +247,13 @@ describe("W306 every predicate is driven in the state its bound says has not arr
     );
     expect(never.map(id).sort()).toEqual([
       "src/quality/citations.ts::CITATION_BOUND",
+      // W305 ADDED THIS ONE, ON THE UNIT AFTER W306 NAMED THE CLASS, which is worth the sentence:
+      // the list is meant to shrink and it grew. It qualifies honestly — the remedy `MANIFEST_BOUND`
+      // names is a MEASUREMENT W308 takes, not a state of the tree, so no predicate over the tree
+      // could report it lifted without lying — but a fourth constant arriving immediately is the
+      // signal W306 built this list to give, and the next unit to touch it should ask whether the
+      // kind is becoming the easy answer rather than adding a fifth.
+      "src/quality/manifest.ts::MANIFEST_BOUND",
       "src/quality/planting.ts::PLANTING_BOUND",
       "src/quality/register-counts.ts::COUNT_BOUND",
     ]);

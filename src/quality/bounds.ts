@@ -65,6 +65,7 @@ import { HEADER_CITATION_BOUND } from "./unit-headers";
 import { CITATION_BOUND } from "./citations";
 import { PLANTING_BOUND } from "./planting";
 import { COUNT_BOUND } from "./register-counts";
+import { MANIFEST_BOUND } from "./manifest";
 
 /**
  * W306: how a remedy's predicate could be shown answering the other way.
@@ -141,6 +142,23 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for. W306 added the missing half of the predicate's own check — a bound carrying a constructed tree is driven in the state where its remedy EXISTS, rather than only in the state where it does not — and that is narrower than it reads too: the tree is a fixture written here, so what it shows is that the predicate reads a tree, not that it would recognise the remedy as somebody else will actually build it. The predicates declared to derive nothing from a tree are checked only for refusing to budge, which is weaker again.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/manifest.ts",
+    name: "MANIFEST_BOUND",
+    unit: "W305",
+    text: MANIFEST_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "W308 re-measures whether the tax moved",
+      reads: "nothing — the predicate beside this line is the constant `true`, in W306's sense and by its rule",
+      stillOpen: () => true,
+      lifted: {
+        kind: "never_derived",
+        why: "W306's shape, and this bound is a clean case for it. The remedy is a MEASUREMENT a later unit takes, not a state of the tree a predicate could read: `manifestDiff` already returns empty, so a predicate over the tree would say `lifted` while the thing the sentence promises — W308 re-deriving the tax and reporting whether it moved — has not happened. So the predicate is the literal `true` and the reason is written here rather than implied by a function that reads nothing.",
+      },
+    },
+    numbers: [],
+  },
   {
     module: "src/quality/register-counts.ts",
     name: "COUNT_BOUND",

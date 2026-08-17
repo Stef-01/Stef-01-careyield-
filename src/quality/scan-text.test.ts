@@ -22,6 +22,7 @@ import {
   preparationCopies,
   scanSiteDiff,
   scanSitesInTree,
+  orderingLosses,
 } from "./scan-text";
 import { stripComments } from "@/security/reachability";
 
@@ -60,27 +61,25 @@ describe("W302 one preparation, in the one order that works", () => {
 });
 
 describe("W302 the order is the finding, driven on the text that caused it", () => {
-  it("keeps the export lines that the other order eats, on the real file", () => {
-    // THE UNIT, and it is run over `register-census.ts` itself rather than a reconstruction — the
-    // file whose prose comments cost W295 four registers. Both orders, same input, and the
-    // difference is two exported functions that simply stop existing.
-    const census = readFileSync(path.join(ROOT, "src/quality/register-census.ts"), "utf8");
-    const exported = (text: string) => [...text.matchAll(/export function (\w+)/g)].map((m) => m[1]!);
-
-    const commentsFirst = exported(prepareForScan(census));
-    const literalsFirst = exported(stripComments(blankLiterals(census)));
-
-    expect(commentsFirst, "the right order lost a signature").toContain("treeWalkingFiles");
-    expect(commentsFirst).toContain("censusDiff");
-    expect(literalsFirst, "the wrong order kept them, so the order does not matter").not.toContain(
-      "treeWalkingFiles",
-    );
-    expect(literalsFirst).not.toContain("censusDiff");
+  it("keeps the export lines that the other order eats, on a real file", () => {
+    // THE UNIT, run over the tree's own text rather than a reconstruction, and over a witness that
+    // is LOOKED UP rather than named. W302 named `register-census.ts` — the file whose prose
+    // comments cost W295 four registers — and W305 moved its entries into the manifest, taking the
+    // prose with them. A named witness would have gone vacuous at that moment with the test still
+    // green, so a tree where NO file exhibits the loss now fails here instead.
+    const losses = orderingLosses(ROOT);
+    expect(losses.length, "no file in this tree loses an export to the wrong order any more").toBeGreaterThan(0);
+    const worst = losses[0]!;
+    for (const name of worst.lost) {
+      expect(worst.commentsFirst, `${worst.file}: the right order lost ${name}`).toContain(name);
+      expect(worst.literalsFirst, `${worst.file}: the wrong order kept ${name}`).not.toContain(name);
+    }
     // And the loss is silent: the wrong order still returns a plausible list, which is why nothing
     // failed when W295 shipped it except a count in another register.
-    expect(literalsFirst.length, "the wrong order returned nothing, so the loss is not silent").toBeGreaterThan(
-      0,
-    );
+    expect(
+      worst.literalsFirst.length + worst.lost.length,
+      "the wrong order returned nothing, so the loss is not silent",
+    ).toBeGreaterThan(0);
   });
 
   it("states the rule as data, so reordering means deleting an argument", () => {

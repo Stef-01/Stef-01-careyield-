@@ -93,6 +93,39 @@ export function prepareForScan(source: string, prep: ScanPrep = {}): string {
  * W196's shape: a later unit that wants to reorder these has to delete a stated rule rather than
  * quietly swap two lines.
  */
+export interface OrderingLoss {
+  file: string;
+  /** Exported functions the right order keeps and the wrong order eats. */
+  lost: string[];
+  commentsFirst: string[];
+  literalsFirst: string[];
+}
+
+/**
+ * Every file whose exported signatures the WRONG order would eat, derived rather than named.
+ *
+ * W302 drove its finding against `register-census.ts` by name — the file whose prose comments cost
+ * W295 four registers. W305 moved that file's entries into the manifest and took the prose with
+ * them, so the named witness would have gone quietly vacuous while the test kept passing: exactly
+ * the failure this quarter keeps turning up. The walk lives here rather than in the test file
+ * because W289's remedy says so — a walk inside a `.test.ts` exports nothing and cannot be pointed
+ * at a tree that differs from this one.
+ */
+export function orderingLosses(root: string): OrderingLoss[] {
+  const exported = (text: string) => [...text.matchAll(/export function (\w+)/g)].map((m) => m[1]!);
+  const out: OrderingLoss[] = [];
+  for (const file of sourceModules(root)) {
+    const text = readFileSync(file, "utf8");
+    const commentsFirst = exported(prepareForScan(text));
+    const literalsFirst = exported(stripComments(blankLiterals(text)));
+    const lost = commentsFirst.filter((n) => !literalsFirst.includes(n));
+    if (lost.length > 0) {
+      out.push({ file: path.relative(root, file).split(path.sep).join("/"), lost, commentsFirst, literalsFirst });
+    }
+  }
+  return out.sort((a, b) => b.lost.length - a.lost.length || a.file.localeCompare(b.file));
+}
+
 export const SCAN_ORDER_RULE =
   "Comments are subtracted before literals are blanked. Reversed, the literal scanner reads a `/` in a prose comment as opening a regex, runs the match on to the next `/`, and blanks whatever lies between — which in this tree is an `export function` line. W295 shipped that order into `violationReporters` and four real registers vanished from the walk; a register missing from a population reports nothing rather than something, so nothing failed except a count somewhere else. Which four vanished changed with the order the two transforms ran in, which is the clearest possible sign that the order was never a detail.";
 

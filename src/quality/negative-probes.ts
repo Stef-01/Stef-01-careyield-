@@ -244,6 +244,24 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/blind-spots.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/blind-spots.test.ts :: reports a probe whose control went unseen, so a dead plant cannot pass as a demonstration",
+      plants: "controlSeen: false",
+    },
+  },
+  {
+    register: "src/quality/manifest.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/manifest.test.ts :: lets a module declare nothing but itself, and derives nothing from it",
+      plants: "census: null, branches: []",
+    },
+  },
+  {
     register: "src/quality/register-counts.ts",
     negative: {
       kind: "already_driven",
@@ -319,15 +337,6 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
       citation:
         "src/quality/bounds.test.ts :: matches whole words, or `one` is found inside `none`",
       plants: "none of them, often, tension",
-    },
-  },
-  {
-    register: "src/quality/blind-spots.ts",
-    negative: {
-      kind: "already_driven",
-      citation:
-        "src/quality/blind-spots.test.ts :: reports a probe whose control went unseen, so a dead plant cannot pass as a demonstration",
-      plants: "controlSeen: false",
     },
   },
   {

@@ -25,6 +25,8 @@ import {
   TAX_BOUND,
   demandingRegisters,
   namingSites,
+  taxDiff,
+  MOVED_SINCE_W300,
 } from "./declaration-tax";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { withPlantedIn } from "./planting";
@@ -79,12 +81,29 @@ describe("W300 the declaration sites are derived from the census, not listed", (
 });
 
 describe("W300 a planted module is run through every one of them", () => {
-  it("costs what the baseline says, shape by shape", () => {
+  it("costs what the baseline and the declared movement say, shape by shape", () => {
     // THE MEASUREMENT. Each shape is planted into a copy of the real tree and every probe is run.
-    for (const [shape, expected] of Object.entries(TAX_AT_W300) as [ModuleShape, number][]) {
-      const demanding = withShape(shape, () => demandingRegisters(COPY, PLANTED));
-      expect(demanding, `${shape} costs ${demanding.length}, not ${expected}`).toHaveLength(expected);
-    }
+    // THE BASELINE IS NOT BUMPED WHEN A QUARTER MOVES IT, which W305 was the first unit to test:
+    // `TAX_AT_W300` is frozen so W308 has something to compare against, so a shape that now costs
+    // something else is declared in `MOVED_SINCE_W300` with the register that moved it. Both
+    // directions — a movement declared for a shape back at its baseline is stale.
+    const live = Object.fromEntries(
+      (Object.keys(TAX_AT_W300) as ModuleShape[]).map((shape) => [
+        shape,
+        withShape(shape, () => demandingRegisters(COPY, PLANTED)).length,
+      ]),
+    ) as Record<ModuleShape, number>;
+    expect(taxDiff(live)).toEqual({ unaccounted: [], stale: [] });
+  });
+
+  it("reports a shape whose cost nobody accounted for, and a movement that has gone", () => {
+    // Driven from outside, because a healthy tree produces neither arm. `plain` is the shape W305
+    // did not move, so raising it by one is a change nothing accounts for.
+    const raised = { ...TAX_AT_W300, plain: TAX_AT_W300.plain + 1 };
+    expect(taxDiff(raised).unaccounted).toContain(`plain: costs ${TAX_AT_W300.plain + 1}, declared ${TAX_AT_W300.plain}`);
+    // And the other direction: a tree back at the baseline everywhere makes every declared
+    // movement stale, which is what a quarter that undid W305 would have to notice.
+    expect(taxDiff({ ...TAX_AT_W300 }).stale).toEqual(MOVED_SINCE_W300.map((m) => m.shape).sort());
   });
 
   it("costs nothing when nothing is planted, so the numbers are the plant's", () => {

@@ -80,3 +80,8 @@ plantedDiff
 === a-joined-table ===
 const PARTS = [["one", "half"]];
 export const ALL = PARTS.map((p) => p.join(""));
+
+=== a-walking-module ===
+// W305: a planted module that walks the tree.
+import { readdirSync } from "node:fs";
+export const walk = () => readdirSync("src");

@@ -37,6 +37,7 @@ import { samplingReport } from "./mutation-sampling";
 import { separatorDiff } from "./citations";
 import { planterDiff } from "./planting";
 import { countDiff } from "./register-counts";
+import { manifestDiff } from "./manifest";
 import { coverageByBand } from "@/compliance/copy-y6";
 import { diffFoldRegister, discoverFoldSites } from "./order-independence";
 import { undeclaredInstructionSinks } from "@/security/instruction-sinks";
@@ -68,6 +69,25 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   "src/quality/citations.ts": (root) => separatorDiff(root, {}).undeclared.length > 0,
 
   "src/quality/planting.ts": (root) => planterDiff(root, {}).undeclared.length > 0,
+
+  "src/quality/manifest.ts": (root) =>
+    manifestDiff(root, [{ module: "src/gone.ts", census: null, branches: [] }]).stale.length > 0,
+
+  "src/quality/blind-spots.ts": (root) => {
+    void root;
+    const unstated = boundDiff(BLIND_SPOTS, [{ file: "src/w289-probe.ts" }]).unstated.length > 0;
+    const refuted =
+      falseBounds({
+        "src/w289-probe.ts": {
+          kind: "demonstrated",
+          bound: "a".repeat(120),
+          witness: "a witness the register reports",
+          control: "a control it also reports",
+          probe: () => ({ witnessSeen: true, controlSeen: true }),
+        },
+      }).length > 0;
+    return unstated && refuted;
+  },
 
   "src/quality/register-counts.ts": (root) =>
     countDiff(root, [{ id: "src/gone.test.ts :: t :: REG", direction: "floor", why: "x" }]).stale.length > 0,
@@ -138,22 +158,6 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       },
     ]);
     return expired && stale.length > 0;
-  },
-
-  "src/quality/blind-spots.ts": (root) => {
-    void root;
-    const unstated = boundDiff(BLIND_SPOTS, [{ file: "src/w289-probe.ts" }]).unstated.length > 0;
-    const refuted =
-      falseBounds({
-        "src/w289-probe.ts": {
-          kind: "demonstrated",
-          bound: "a".repeat(120),
-          witness: "a witness the register reports",
-          control: "a control it also reports",
-          probe: () => ({ witnessSeen: true, controlSeen: true }),
-        },
-      }).length > 0;
-    return unstated && refuted;
   },
 
   "src/quality/bounds.ts": (root) => {
