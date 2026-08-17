@@ -137,7 +137,7 @@ export const RESOLUTION_KINDS: Readonly<Record<ResolutionKind, string>> = {
   at_the_unit:
     "The sentence says what somebody found at the moment the unit was written — how many files a review read, how many registers a narrowing hid, how many copies a consolidation replaced. It is history, and history does not go stale when the tree moves; re-deriving it would ask today's tree to answer a question about a Tuesday. What makes this class safe rather than an escape hatch is that the sentences in it are in the past tense and name a unit, which a reader can check even though a program cannot.",
   not_a_tree_count:
-    "The number counts something that is not in this repository: years since a rule was made, months in a forecast window, rules in a standard, questions a design had to answer. A derivation would have nothing to read, and calling it unresolvable would suggest somebody ought to try.",
+    "The number counts something that is not in this repository: years since a rule was made, months in a forecast window, rules in a standard, questions a design had to answer — or the cardinality of a WORKED EXAMPLE, which is the first member this class took. W313's note explains its instrument with *consolidating two registers' declarations into one file*, and those two registers are a hypothetical pair rather than a pair the tree holds. A derivation would have nothing to read, and filing it as history would suggest somebody once counted it.",
   open:
     "A live count of something in this tree that nobody has derived, kept because writing a derivation for it would be a different unit's work or because the thing counted has no walk. Each row argues its own case. This is the class that goes stale silently, so it is the one to watch grow.",
 };
@@ -301,6 +301,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/declaration-tax.ts", text: "one of the files", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/declaration-tax.ts", text: "six other registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/declaration-tax.ts", text: "two files", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/declaration-tax.ts", text: "two registers", resolution: { kind: "not_a_tree_count" } },
   { module: "src/quality/declaration-tax.ts", text: "two rows", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/empty-list-sweep.ts", text: "one discharged rows", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/empty-list-sweep.ts", text: "three files", resolution: { kind: "at_the_unit" } },
