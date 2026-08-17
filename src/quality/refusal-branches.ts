@@ -335,6 +335,7 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
               derives: "x",
               checkedAgainst: "y",
               proof: { kind: "walk_unproven", contentProof: null, remedy: "z" },
+              assertion: { kind: "carries_no_assertion", claim: "x", why: "y" },
             },
           ],
         ).stale.includes("src/gone.ts"),

@@ -730,6 +730,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "An in-memory store of specs, and its strings are ids and criteria keys. What it holds is authored elsewhere and gated by G5; the store renders nothing.",
   },
   {
+    module: "src/quality/assertion-drives.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W289's assertion drives are reviewer-facing throughout: nine comparisons handed an input they must reject, a resolver for the four citations W291 already drives, and the three census entries allowed to assert nothing. Its longest strings are `DRIVE_BOUND` and the docstrings arguing why a fabricated declared list is the only way to reach an assertion — addressed to whoever adds a register. Its fixtures are file paths, register ids and a split endpoint marker; no patient, condition or appointment reason appears anywhere in it, and every function returns a boolean or a list of module paths.",
+  },
+  {
     module: "src/quality/tautology-sweep.ts",
     operatorCopy: [],
     notCopy:

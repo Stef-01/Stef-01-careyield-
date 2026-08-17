@@ -70,6 +70,45 @@ export type WalkProof =
    */
   | { kind: "walk_unproven"; contentProof: string | null; remedy: string };
 
+/**
+ * W289: how this register's ASSERTION — not its walk — has been shown to be able to fail.
+ *
+ * THE OTHER HALF OF W267'S FINDING. That unit split "the scan" into a content scanner and a walk
+ * and proved the walks. Both halves can work and the register still catch nothing, because between
+ * them sits the comparison — `expect(diff.undeclared).toEqual([])` — and nothing has ever handed
+ * that comparison a declared list it should reject. A walk that notices an arriving file and a
+ * diff that never reports it is a register that passes forever.
+ *
+ * AND THE STRUCTURAL REASON IS THE SAME ONE, ONE ARGUMENT OVER. W267: a walk can only be tested by
+ * pointing it at a different tree, and only a detector that takes a `root` can be pointed anywhere.
+ * Here: an assertion can only be tested by giving it a different DECLARED list, and only a
+ * comparison exported as a function taking that list can be given one. Twenty-five of these
+ * registers do their comparing inside a `.test.ts` file, which exports nothing — so the proof is
+ * not merely missing, it is unavailable until somebody moves the comparison out.
+ *
+ * `claim` and `mutation` are required of every entry, including the ones that cannot be driven: a
+ * register that cannot say what its assertion claims has not been read by anybody.
+ */
+export type AssertionProof =
+  /** Driven in `assertion-drives.test.ts` by handing the comparison an input it must reject. */
+  | { kind: "driven_here"; claim: string; mutation: string }
+  /**
+   * Already driven by W291's branch register. `branch` is a `REFUSAL_BRANCHES` id, and W289's test
+   * RESOLVES it and CALLS it rather than recording it — W284's citation resolved to
+   * `text.includes("/")`, which is what an unexecuted citation is worth.
+   */
+  | { kind: "driven_by_branch"; claim: string; mutation: string; branch: string }
+  /** The comparison is not callable from outside, with the change that would make it callable. */
+  | { kind: "assertion_unproven"; claim: string; mutation: string; remedy: string }
+  /**
+   * In the census for walking, but asserting nothing of its own.
+   *
+   * The escape hatch, so it is closed: `assertion-drives.test.ts` pins the exact set of files
+   * allowed to use this, with the argument for each. Three today, and a fourth is a decision
+   * somebody writes down rather than a kind somebody reaches for.
+   */
+  | { kind: "carries_no_assertion"; claim: string; why: string };
+
 export interface TreeDerivedRegister {
   /** The file that walks the tree, as the tree spells it. */
   file: string;
@@ -78,11 +117,19 @@ export interface TreeDerivedRegister {
   /** The declared thing it compares that against. */
   checkedAgainst: string;
   proof: WalkProof;
+  assertion: AssertionProof;
 }
 
 /** The one-line change that makes a welded walk provable. Same sentence for the same defect. */
 const EXPORT_THE_WALK =
   "Export the walk from a module with a `root` parameter, the way `discoverFoldSites(root)` and `reachableFromApp(root)` already do, so it can be pointed at a tree that differs from this one.";
+
+/**
+ * W289: the one-line change that makes a welded ASSERTION provable. Same sentence for the same
+ * defect, the way `EXPORT_THE_WALK` is one sentence for the walk half.
+ */
+const PARAMETERISE_THE_COMPARISON =
+  "Move the comparison out of the test file and export it as a function taking the declared list as an argument — the way `censusDiff(found, declared)`, `diffFoldRegister(actual, declared)` and `pinDiff(root, declared)` already do — so it can be handed a declared list it must reject. A comparison written inside a `.test.ts` exports nothing, so there is no second declared list to give it.";
 
 export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
   {
@@ -94,6 +141,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       mutation:
         "a module with a Y6 header is added under `src/` and `copySurfaceMembers` must report it as a member the register has to cover",
     },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every module the membership rule makes a member is covered by W200's declared copy surface — per year band, so a band that stops being covered is visible rather than averaged away.",
+      mutation:
+        "`coverageByBand` is given an EMPTY declared list, and a band with modules in it must come back covered:0 rather than reporting full coverage of nothing.",
+    },
   },
   {
     file: "src/compliance/surfaces.ts",
@@ -102,6 +156,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "a new `page.tsx` is added under `app/` and `diffCensus` must report it unmapped",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every route the App Router serves appears in W102's census, and every census row names a route that is served.",
+      mutation:
+        "`diffCensus` is given the tree's real surfaces and a census with one row removed, and must report that route unmapped.",
     },
   },
   {
@@ -112,6 +173,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "mutated_tree",
       mutation: "a new module containing a fold is added under `src/` and `diffFoldRegister` must report it undeclared",
     },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every module containing a fold is declared in W167's `FOLD_SITES` with a tie-break test or a rationale, and no declared module has stopped folding.",
+      mutation:
+        "`diffFoldRegister` is given the tree's real fold sites and a declared list with one module removed, and must report it undeclared.",
+    },
   },
   {
     file: "src/security/instruction-sinks.ts",
@@ -120,6 +188,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "a file naming a model endpoint is added and `undeclaredInstructionSinks` must return it",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "No file names a model endpoint without a ruling in W153's `DECLARED_INSTRUCTION_SINKS`.",
+      mutation:
+        "`undeclaredInstructionSinks` is given a fabricated hit in a file nobody has declared, and must return it.",
     },
   },
   {
@@ -130,6 +205,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "mutated_tree",
       mutation: "a page importing a previously unreachable module is added and `reachableFromApp` must reach it",
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Nothing reachable from a request-serving path is outside W107's package allowance, and a decision declared dormant is reachable from nothing.",
+      mutation:
+        "An allowance with a package removed, over the tree's real reach, must report that package unallowed.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/quality/route-coverage.ts",
@@ -139,6 +222,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "a citation is moved to a spec that does not open its route, and `coverageDiff` must report it unresolved",
+    },
+    assertion: {
+      kind: "driven_by_branch",
+      claim:
+        "Every route this app serves is opened by a named spec, and every citation resolves to a spec that opens it.",
+      mutation:
+        "A declared list naming a route the app does not serve must come back stale.",
+      branch: "src/quality/route-coverage.ts::coverageDiff::stale",
     },
   },
   {
@@ -152,6 +243,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       mutation:
         "three files are planted in a constructed root — a test with a tautology, a test with the real assertion it most resembles, and a non-test file carrying the same tautology — and only the first may be reported",
     },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every tautological assertion in the tree is accepted with a condition that still holds.",
+      mutation:
+        "A test file carrying a tautology is planted in a constructed root, and `unacceptedTautologies` must report it.",
+    },
   },
   {
     file: "src/quality/refusal-branches.ts",
@@ -164,6 +262,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       mutation:
         "a reporter and a renderer are planted together in a constructed root, and `violationReporters` must report the reporter and refuse the renderer — the negative planted alongside the positive, because a walk that matched everything would pass the positive on its own",
     },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every refusal arm of every violation reporter is driven with an input that makes it fire.",
+      mutation:
+        "`driveBranches` is given a branch whose drive returns false, and must report it as one that did not fire.",
+    },
   },
   {
     file: "src/quality/register-census.ts",
@@ -172,6 +277,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "a new tree-walking file is added and `censusDiff` must report it undeclared",
+    },
+    assertion: {
+      kind: "driven_by_branch",
+      claim:
+        "Every file that walks the tree is declared here, and every declared file still walks.",
+      mutation:
+        "A found file that no entry names must come back undeclared.",
+      branch: "src/quality/register-census.ts::censusDiff::undeclared",
     },
   },
   {
@@ -183,6 +296,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       contentProof: "src/api/surface.test.ts :: gives no endpoint a way to accept a practice from a caller",
       remedy: EXPORT_THE_WALK,
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every API endpoint goes through W253's single scoped dispatcher, so an unscoped one has nowhere to be written.",
+      mutation:
+        "The declared dispatcher list with one endpoint removed, over the tree's real endpoints, must report it undispatched.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/capacity/copy-lint.test.ts",
@@ -193,12 +314,28 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       contentProof: "src/capacity/copy-lint.test.ts :: finds copy to check, so the census cannot pass vacuously",
       remedy: EXPORT_THE_WALK,
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every string a practice reads on a capacity surface is inside W226's declared copy surface.",
+      mutation:
+        "The declared surface with one module removed must report that module's copy unlinted.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/capacity/coupling.test.ts",
     derives: "Source across the tree, to prove no caller enables the coupling.",
     checkedAgainst: "W231's `ENABLED_COUPLINGS`, pinned empty.",
     proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "W231's `ENABLED_COUPLINGS` is empty, so no capacity signal feeds a patient-facing decision.",
+      mutation:
+        "A declared list with one coupling in it must fail the emptiness claim.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   // `src/compliance/cdss-boundary.test.ts` WAS HERE, and its removal is the census working in the
   // direction that usually goes unnoticed. W267 recorded its walk as `walk_unproven` with the
@@ -211,12 +348,28 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     derives: "Every route under `app/`, to prove none serves an evidence document.",
     checkedAgainst: "W109's isolation rule and G6.",
     proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "No route serves an evidence document without a grant, and nothing behind G6 is reachable.",
+      mutation:
+        "A fabricated route reading evidence without a grant must be reported.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/directory/dossier-claims.test.ts",
     derives: "Directory source, to check the Q15 dossier's factual claims against it.",
     checkedAgainst: "W195's dossier claims, pinned row by row.",
     proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every claim W195's dossier makes about the directory is true of the tree, row by row.",
+      mutation:
+        "A dossier row naming a control the tree does not have must be reported.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/domain/schema-consistency.test.ts",
@@ -225,6 +378,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "a migration is added under `supabase/migrations` and `migrationSql` must contain its text",
+    },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every field the domain types declare exists in the schema, and nothing in the schema is undeclared.",
+      mutation:
+        "A declared type list with one field removed must report it undeclared.",
+      remedy: PARAMETERISE_THE_COMPARISON,
     },
   },
   {
@@ -236,6 +397,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       contentProof: "src/education/advice-lint.test.ts :: catches a W6-only rule",
       remedy: EXPORT_THE_WALK,
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every module holding education copy is in W150's `EDUCATION_COPY_MODULES` and is linted.",
+      mutation:
+        "The declared module list with one module removed must report it unlinted.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/interop/credentials.test.ts",
@@ -246,6 +415,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       contentProof: "src/interop/credentials.test.ts :: would catch one planted in a real file",
       remedy: EXPORT_THE_WALK,
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "W242's `SHIPPED_CREDENTIALS` is empty, so nothing behind G1 has been shipped.",
+      mutation:
+        "A declared list with one credential in it must fail the emptiness claim.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/lib/source-hygiene.test.ts",
@@ -255,6 +432,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "mutated_tree",
       mutation: "a file with an extension the hygiene rules cover is added and `textFiles` must return it",
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every file tooling has to read as text obeys W116's hygiene rules.",
+      mutation:
+        "A file breaking one hygiene rule — a tab, a CRLF line ending, a missing trailing newline — is planted, and the rule it breaks must report it while the others stay quiet.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/lib/stores.test.ts",
@@ -263,6 +448,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "a module exporting a new `reset*` function is added and `exportedResetters` must return its name",
+    },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every store in the tree is in W51's registry, which had already drifted four stores when it was written.",
+      mutation:
+        "The registry with one store removed, over the tree's real stores, must report it undeclared.",
+      remedy: PARAMETERISE_THE_COMPARISON,
     },
   },
   {
@@ -274,6 +467,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       contentProof: "src/messaging/send-path.test.ts :: the detector would notice a wired module",
       remedy: EXPORT_THE_WALK,
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "The send path is unwired: no module calls a live SMS transport (W182, G3).",
+      mutation:
+        "A fabricated module calling a transport must be reported.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/privacy/automated-decisions.test.ts",
@@ -283,6 +484,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "walk_unproven",
       contentProof: "src/privacy/automated-decisions.test.ts :: states its own bound honestly, with every declared scan load-bearing",
       remedy: EXPORT_THE_WALK,
+    },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every automated decision is in W201's `AUTOMATED_DECISIONS` or argued into `NOT_A_DECISION`, both directions.",
+      mutation:
+        "A declared register with one decision removed must report it undeclared.",
+      remedy: PARAMETERISE_THE_COMPARISON,
     },
   },
   {
@@ -294,6 +503,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       contentProof: "src/privacy/erasure-y5.test.ts :: finds the patient in every store the scrub must clear, BEFORE erasing",
       remedy: EXPORT_THE_WALK,
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every store resetter W51 knows about is reached by the erasure sweep and by the demo launcher.",
+      mutation:
+        "A resetter list with one entry removed must report the sweep and the launcher out of step.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/privacy/capacity-privacy.test.ts",
@@ -304,12 +521,28 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       contentProof: "src/privacy/capacity-privacy.test.ts :: exports no scrub, because a scrub would mean this claim is false",
       remedy: EXPORT_THE_WALK,
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every capacity record is classified in W106's record classes.",
+      mutation:
+        "A class list with one record removed must report it unclassified.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/privacy/outcomes-privacy.test.ts",
     derives: "Every Q14 outcome module, to check each is classified.",
     checkedAgainst: "W106's record classes, with erasure composed rather than remembered.",
     proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every outcomes record is classified in W106's record classes, with erasure composed rather than remembered.",
+      mutation:
+        "A class list with one record removed must report it unclassified.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/privacy/record-classes.test.ts",
@@ -319,18 +552,42 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "mutated_tree",
       mutation: "a module holding a `globalThis`-backed store is added and `storeModules` must return it",
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every record the product holds is in W106's `RECORD_CLASSES`.",
+      mutation:
+        "A class list with one record removed must report it undeclared.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/quality/audit-y5.test.ts",
     derives: "Seven sweeps over `src/` and `app/` — registries, date literals, focused tests and more.",
     checkedAgainst: "W256's audit findings, re-run from source rather than carried.",
     proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every Year 5 audit finding is re-run from source rather than carried from the previous audit.",
+      mutation:
+        "A sweep whose finding has returned must report it, over a tree carrying the defect again.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/quality/dossier-q18.test.ts",
     derives: "Capacity source, to check the Q18 dossier's arithmetic against the tree.",
     checkedAgainst: "W232's dossier, pinned row by row.",
     proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every claim W232's dossier makes is true of the tree, row by row.",
+      mutation:
+        "A dossier row naming a control the tree does not have must be reported.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/security/page-reach.ts",
@@ -340,6 +597,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "a route is planted under `app/` that imports a declared-dormant module, and `diffReach` must report it both unclassified and waking the module",
+    },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every route is in exactly one of W271's classes, reaches everything its class requires and nothing outside its allowance, and no route reaches a dormant module.",
+      mutation:
+        "A class list with one route removed must report that route unclassified, over the tree's real reach.",
+      remedy: PARAMETERISE_THE_COMPARISON,
     },
   },
   {
@@ -353,6 +618,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
         "src/quality/g5-rehearsal.test.ts :: proves the linter would object to content that DID read clinically",
       remedy: EXPORT_THE_WALK,
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Nothing the product ships imports the G5 rehearsal, which is the one route by which synthetic pathway content could reach a page.",
+      mutation:
+        "A fabricated shipped module importing it must be reported.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/quality/latent-y5.ts",
@@ -361,6 +634,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "a `gate-dossier-*.test.ts` file is added and `dossierTestFiles` must return it, so DOSSIER-1's anchor can be shown its subject arriving",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every open latent finding has an anchor, and every anchor's claim about the tree still holds — a dead anchor is a green suite reporting a check that no longer runs.",
+      mutation:
+        "`deadAnchors` is given an anchor whose `holds()` returns false, and must return it; `anchorCoverage` is given an open finding with no anchor, and must report it unanchored.",
     },
   },
   {
@@ -371,6 +651,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "mutated_tree",
       mutation: "it is the file that does the planting; every probe in it is a mutation of a copied tree",
     },
+    assertion: {
+      kind: "carries_no_assertion",
+      claim:
+        "None of its own. It is the file that plants probes in front of the other walks.",
+      why:
+        "Its assertions are the other registers' walk proofs, so an assertion of its own would be this file checking itself. It is in the census because the widened detector counts deriving through `tree-walks`, and exempting the prover would be the register answering its own question.",
+    },
   },
   {
     file: "src/quality/page-suite.test.ts",
@@ -380,6 +667,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "mutated_tree",
       mutation: "it IS the proof: `pageSpecFiles` must return every spec for this root and none for a root with no `e2e/`",
     },
+    assertion: {
+      kind: "carries_no_assertion",
+      claim:
+        "None of its own. It proves `pageSpecFiles` by pointing it at a tree with no `e2e/`.",
+      why:
+        "Same shape as `register-census.test.ts`: a prover rather than a register. What it asserts belongs to `page-suite.ts`, which carries its own entry.",
+    },
   },
   {
     file: "src/quality/pins.ts",
@@ -388,6 +682,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "a pin-named constant is planted in a copied tree — in a source file and again in a test file — and must be reported undeclared, while a plain SCREAMING_CASE constant planted beside it must not",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every `*_AT_W<n>` and `*_LAST_UNIT` pin in the tree is declared in `PINS` and classified by what event moves it, and a `live_by_design` pin owes an argument for interrupting somebody.",
+      mutation:
+        "`pinDiff` is given an EMPTY declared list and must report the tree's real pins undeclared.",
     },
   },
   {
@@ -407,6 +708,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "mutated_tree",
       mutation: "`pageSpecFiles` is pointed at a tree with no `e2e/` directory and must report no specs, and at this tree and must report all of them",
     },
+    assertion: {
+      kind: "driven_by_branch",
+      claim:
+        "The verify gate runs the whole page suite: the verify script chains it, the e2e script runs specs, and no filter narrows it.",
+      mutation:
+        "A package.json whose verify script does not chain the suite must be reported.",
+      branch: "src/quality/page-suite.ts::pageSuiteViolations::verify_does_not_chain_e2e",
+    },
   },
   {
     file: "src/quality/unit-headers.ts",
@@ -415,6 +724,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "three files are planted in a copied tree — one with no header, one recording its unit at the end of the line, one naming W999 — and each must land in its own list while the other two stay empty",
+    },
+    assertion: {
+      kind: "driven_by_branch",
+      claim:
+        "Every module under `src/` records the unit that wrote it, in the header position, naming a unit the ledger has.",
+      mutation:
+        "A module with no `// W<n>` header must be reported missing.",
+      branch: "src/quality/unit-headers.ts::headerViolations::missing",
     },
   },
   {
@@ -425,6 +742,13 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "mutated_tree",
       mutation: "every walk it exports is planted against in a copied tree, which is what moving them here was for",
     },
+    assertion: {
+      kind: "carries_no_assertion",
+      claim:
+        "None of its own — it IS the walking, and each caller checks its own register against what it returns.",
+      why:
+        "A comparison here would have nothing to compare: the module holds no declared list. Its callers' entries carry the assertions, which is why W282 moved the walks rather than the registers.",
+    },
   },
   {
     file: "src/quality/latent-findings.ts",
@@ -434,12 +758,27 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "mutated_tree",
       mutation: "a module with no `// W<n>` header is added and `modulesWithNoUnitHeader` must return it",
     },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "No latent finding has fired: every open finding's trigger returns false, and W281's door list is empty rather than under a tolerated count.",
+      mutation:
+        "`fired` is given a finding whose trigger returns true, and must return it.",
+    },
   },
   {
     file: "src/referrals/scoping.test.ts",
     derives: "The W103 scoping sweep across referral source.",
     checkedAgainst: "W140's triage, every hit written down.",
     proof: { kind: "walk_unproven", contentProof: null, remedy: EXPORT_THE_WALK },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every referral read is scoped to its practice, with W140's triage written down for each hit.",
+      mutation:
+        "A triage list with one hit removed must report it untriaged.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/reporting/retention.test.ts",
@@ -450,6 +789,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       contentProof: "src/reporting/retention.test.ts :: enumerates the artefacts a reader would expect it to keep",
       remedy: EXPORT_THE_WALK,
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "The weekly report has a record class in W204 with a stated life.",
+      mutation:
+        "A class list without the report must report it unclassified.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/tenancy/two-tenant.test.ts",
@@ -459,6 +806,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
       kind: "mutated_tree",
       mutation: "the detector is pointed at a one-practice fixture and must report it single-tenant, which is the gate's own words",
     },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "Every `practice_scoped` read in W209's register has a test that constructs at least two tenants.",
+      mutation:
+        "A register entry whose test constructs one tenant must be reported.",
+      remedy: PARAMETERISE_THE_COMPARISON,
+    },
   },
   {
     file: "src/verticals/assembly.test.ts",
@@ -467,6 +822,14 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     proof: {
       kind: "mutated_tree",
       mutation: "a module is added under `src/verticals/` and `verticalModules` must report it as a declaration",
+    },
+    assertion: {
+      kind: "assertion_unproven",
+      claim:
+        "No vertical re-implements the shared assembly (W250's census).",
+      mutation:
+        "A vertical module carrying its own assembly must be reported.",
+      remedy: PARAMETERISE_THE_COMPARISON,
     },
   },
 ];
