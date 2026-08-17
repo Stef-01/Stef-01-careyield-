@@ -253,6 +253,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/blind-spots.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/blind-spots.test.ts :: reports a probe whose control went unseen, so a dead plant cannot pass as a demonstration",
+      plants: "controlSeen: false",
+    },
+  },
+  {
     register: "src/quality/tautology-sweep.ts",
     negative: {
       kind: "already_driven",

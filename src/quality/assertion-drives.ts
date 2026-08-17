@@ -41,6 +41,7 @@ import { REFUSAL_BRANCHES, driveBranches, withRoot } from "./refusal-branches";
 import { anchorCoverage, deadAnchors } from "./latent-y5";
 import { LATENT_FINDINGS, fired } from "./latent-findings";
 import { pinDiff } from "./pins";
+import { BLIND_SPOTS, boundDiff, falseBounds } from "./blind-spots";
 import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptances";
 import { unacceptedTautologies } from "./tautology-sweep";
 
@@ -116,6 +117,22 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       },
     ]);
     return expired && stale.length > 0;
+  },
+
+  "src/quality/blind-spots.ts": (root) => {
+    void root;
+    const unstated = boundDiff(BLIND_SPOTS, [{ file: "src/w289-probe.ts" }]).unstated.length > 0;
+    const refuted =
+      falseBounds({
+        "src/w289-probe.ts": {
+          kind: "demonstrated",
+          bound: "a".repeat(120),
+          witness: "a witness the register reports",
+          control: "a control it also reports",
+          probe: () => ({ witnessSeen: true, controlSeen: true }),
+        },
+      }).length > 0;
+    return unstated && refuted;
   },
 
   "src/quality/pins.ts": (root) => pinDiff(root, []).undeclared.length > 0,

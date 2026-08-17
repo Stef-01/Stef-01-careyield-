@@ -233,6 +233,25 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/blind-spots.ts",
+    derives:
+      "Nothing of the tree's own — it plants WITNESSES in front of eleven other registers' detectors and reads what each reports, which is how a stated bound is shown to be true rather than plausible.",
+    checkedAgainst:
+      "W267's census, both directions: a register with no stated bound fails, and a bound for a register the census no longer has fails.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "it IS the planting: each of its eleven probes builds a tree containing a witness and a positive control, and the register it points at must report the second and not the first",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every register in the census states what it cannot see, and every stated bound that can be planted is true — the register stays silent about its witness while reporting the control beside it.",
+      mutation:
+        "`boundDiff` is given a census entry the register does not cover and must report it unstated; `falseBounds` is given a bound whose witness IS reported and must report the bound false.",
+    },
+  },
+  {
     file: "src/quality/acceptances.ts",
     derives:
       "Every module under `src/` that HOLDS acceptances — one that assigns a `reviewBy` date or exports an `ACCEPTED_*` list — which is the union of two shapes because either alone misses a real register.",

@@ -136,7 +136,11 @@ function firstArgument(args: string): string {
 export function blankLiterals(code: string): string {
   const LITERAL =
     /`(?:\\.|[^\\`])*`|"(?:\\.|[^\\"\n])*"|'(?:\\.|[^\\'\n])*'|\/(?![*/])(?:\\.|\[(?:\\.|[^\]\\\n])*\]|[^\\/\n[])+\/[gimsuy]*/g;
-  return code.replace(LITERAL, (m) => m.replace(/[^\n]/g, " "));
+  // THE OPENING DELIMITER IS KEPT. W294's detector looks for `reviewBy:` followed by a quote, so
+  // blanking the quote away would blind it to every real register while blinding it to fixtures —
+  // the fix and the defect at once. Keeping one character preserves "a literal starts here" and
+  // removes everything a scan could mistake for code.
+  return code.replace(LITERAL, (m) => m[0] + m.slice(1).replace(/[^\n]/g, " "));
 }
 
 /**

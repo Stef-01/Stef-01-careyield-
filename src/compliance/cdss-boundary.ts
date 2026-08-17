@@ -730,6 +730,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "An in-memory store of specs, and its strings are ids and criteria keys. What it holds is authored elsewhere and gated by G5; the store renders nothing.",
   },
   {
+    module: "src/quality/blind-spots.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W295's register of blind spots is reviewer-facing throughout: one sentence per register saying what it cannot see, the witness that demonstrates it, and the positive control that makes the silence mean something. Its longest strings are those bounds and `BLIND_SPOT_BOUND`, all addressed to whoever adds a register. The fixtures it plants are synthetic source files — a walker, a fold, a spec, a pin — and nothing in it renders, holds a record, or names a patient, condition or appointment reason.",
+  },
+  {
     module: "src/quality/acceptances.ts",
     operatorCopy: [],
     notCopy:

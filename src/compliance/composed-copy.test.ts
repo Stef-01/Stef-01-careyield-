@@ -40,7 +40,7 @@ describe("W278 the composing functions are found, not listed", () => {
     const found = composingFunctions(ROOT).map(key).sort();
     const declared = [...COMPOSED_COPY_SITES].map(key).sort();
     expect(found).toEqual(declared);
-    expect(found).toHaveLength(21);
+    expect(found).toHaveLength(23);
   });
 
   it("finds W200's own named example", () => {

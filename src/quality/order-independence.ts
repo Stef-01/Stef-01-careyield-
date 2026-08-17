@@ -31,6 +31,7 @@
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { blankLiterals } from "./tautology-sweep";
 
 /**
  * Assert a fold gives the same answer whichever way round its input arrives.
@@ -352,7 +353,11 @@ export function discoverFoldSites(root: string): Array<{ module: string; folds: 
       // module's own header naming the patterns was enough to make it match itself. Counting
       // comment mentions also inflates a declared count, which then has to be "corrected" by
       // somebody who has not read the code — the failure mode a register exists to prevent.
-      const source = stripComments(readFileSync(full, "utf8"));
+      // W295: STRING LITERALS BLANKED TOO. Comments were already subtracted (W168) because a fold
+      // NAMED IN PROSE is not a fold; the same is true of a fold quoted inside a fixture, and this
+      // register reported W295's own module because its bound sentence names `.reduce(` and
+      // `.at(-1)` as the patterns it looks for. Same defect one layer over, same remedy.
+      const source = blankLiterals(stripComments(readFileSync(full, "utf8")));
       const count = (source.match(FOLD_RE) ?? []).length;
       // Repo-relative with posix separators on every platform: the register is written
       // with "/" and Windows walks produce "\", which read as 20 phantom drifts.

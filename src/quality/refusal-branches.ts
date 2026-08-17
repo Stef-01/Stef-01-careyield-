@@ -35,6 +35,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fallibleDiff } from "./review-w279";
 import { duplicateDiff, pinDiff } from "./pins";
+import { stripComments } from "@/security/reachability";
+import { blankLiterals } from "./tautology-sweep";
+import { BLIND_SPOTS, boundDiff } from "./blind-spots";
 import { coverageDiff } from "./route-coverage";
 import { censusDiff } from "./register-census";
 import { negativeDiff } from "./negative-probes";
@@ -75,6 +78,17 @@ export function violationReporters(root: string): ReporterSite[] {
         continue;
       }
       if (!entry.endsWith(".ts") || entry.endsWith(".test.ts")) continue;
+      // W295: literals blanked, because a reporter written inside a FIXTURE STRING is not a
+      // reporter — W295's own module quotes `export function plantedDiff(...)` as a planted probe
+      // and this walk declared it a violation reporter the tree must have branches for.
+      // RAW TEXT, DELIBERATELY. W295 tried narrowing this scan the way W288 narrowed the tautology
+      // sweep — comments stripped, string literals blanked — because W295's fixtures quote
+      // `export function planted...` as planted probes. Both narrowings HID REAL REPORTERS: the
+      // literal scanner reads a `/` in prose as opening a regex and runs on to the next one,
+      // swallowing the `export function` line after it, and which reporters vanished changed with
+      // the order the two transforms ran in. A narrowing that silently drops registers is worse
+      // than the collision it fixes, so this stays raw and W295's fixtures split the token
+      // instead — the idiom `register-census.test.ts` already uses for its own planted walkers.
       const text = readFileSync(full, "utf8");
       // The signature may wrap, so the return type is read from the next 300 characters rather
       // than from the same line — three of the six in this tree wrap their parameters.
@@ -197,6 +211,26 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
       drive: () => fallibleDiff(process.cwd(), { "/console/interest": "no remedy stated" }).withoutRemedy.length > 0,
     },
   },
+  // ── W295's blind spots ────────────────────────────────────────────────────────────────────
+  {
+    module: "src/quality/blind-spots.ts",
+    fn: "boundDiff",
+    branch: "unstated",
+    reach: {
+      kind: "driven",
+      drive: () => boundDiff(BLIND_SPOTS, [{ file: "src/gone.ts" }]).unstated.includes("src/gone.ts"),
+    },
+  },
+  {
+    module: "src/quality/blind-spots.ts",
+    fn: "boundDiff",
+    branch: "stale",
+    reach: {
+      kind: "driven",
+      drive: () => boundDiff(BLIND_SPOTS, []).stale.length > 0,
+    },
+  },
+
   // ── W284's route coverage ─────────────────────────────────────────────────────────────────
   {
     module: "src/quality/route-coverage.ts",
