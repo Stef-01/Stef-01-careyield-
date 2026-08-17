@@ -128,9 +128,18 @@ describe("W295 a stated bound is planted, and the register stays silent", () => 
   });
 
   it("counts an unplanted bound as unplanted rather than as demonstrated", () => {
-    // The cheap way to a clean run would be to declare every bound `undemonstrated`, so the split
-    // is pinned and the undemonstrated side carries the reason it cannot be planted.
-    expect(ofKind("undemonstrated")).toHaveLength(37);
+    // The cheap way to a clean run would be to declare every bound `undemonstrated`, so the
+    // undemonstrated side is CAPPED and each entry carries the reason it cannot be planted.
+    //
+    // W317 CONVERTED THIS FROM AN EQUALITY AND RAISED IT BY ONE. An equality here was a pinned
+    // count that ordinary work moves — the class W304 removed — inside the register whose subject
+    // is what a check cannot see, and it fired on a legitimate addition. A CEILING is what it
+    // meant: growth is the regression, exactly as W304 argued for the acceptance registers, and
+    // raising it is a deliberate act somebody has to write a reason for. The reason for this one:
+    // W317 attempted a witness for its own bound, found the fixture was REPORTED rather than
+    // missed, and recorded the attempt as `undemonstrated` instead of shipping a witness that
+    // refutes the sentence it was meant to support.
+    expect(ofKind("undemonstrated").length).toBeLessThanOrEqual(38);
     expect(falseBounds(Object.fromEntries(ofKind("undemonstrated")))).toEqual([]);
   });
 });

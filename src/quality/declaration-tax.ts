@@ -160,6 +160,11 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/self-defeating.ts",
+    // Reads `*.test.ts` for equality assertions; a planted MODULE carries none, so it costs nothing.
+    demands: () => false,
+  },
+  {
     file: "src/quality/manifest.ts",
     // W305's row register. A planted module IS watched — it walks, or states a bound — and the
     // manifest has no row for it, so this is the seventh place a module must be declared. Which is

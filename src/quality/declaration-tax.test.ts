@@ -214,7 +214,10 @@ describe("W308 the same measurement, re-run at the end of the quarter it judges"
         withShape(shape, () => demandingRegisters(COPY, PLANTED)).length,
       ]),
     ) as Record<ModuleShape, number>;
-    expect(live, "the record and the tree disagree").toEqual(TAX_AT_W308);
+    // W317 REMOVED A BARE EQUALITY THAT SAT HERE. `expect(live).toEqual(TAX_AT_W308)` made the line
+    // below unreachable: declaring a movement in `MOVED_SINCE_W308` satisfies the diff and still
+    // fails the equality, so the movement mechanism W308 built could never be used. The remedy for
+    // a pinned count was defeated by a pinned count beside it.
     expect(taxDiff(live, TAX_AT_W308, MOVED_SINCE_W308)).toEqual({ unaccounted: [], stale: [] });
   });
 

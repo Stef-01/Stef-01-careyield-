@@ -253,6 +253,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/self-defeating.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/self-defeating.test.ts :: does not report a FLOOR against the same record, which is the remedy",
+      plants: "toBeGreaterThanOrEqual(COST_AT_W300)",
+    },
+  },
+  {
     register: "src/quality/manifest.ts",
     negative: {
       kind: "already_driven",

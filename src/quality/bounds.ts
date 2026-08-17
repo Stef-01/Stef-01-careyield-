@@ -71,6 +71,7 @@ import { MANIFEST_BOUND } from "./manifest";
 import { FOUNDER_BOUND } from "@/founder/outstanding";
 import { HARDENING_BOUND as HARDENING_Q24_BOUND } from "./hardening-q24";
 import { CLOSING_BOUND } from "./closing-state";
+import { REMEDY_BOUND } from "./self-defeating";
 
 /**
  * W306: how a remedy's predicate could be shown answering the other way.
@@ -147,6 +148,17 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for. W306 added the missing half of the predicate's own check — a bound carrying a constructed tree is driven in the state where its remedy EXISTS, rather than only in the state where it does not — and that is narrower than it reads too: the tree is a fixture written here, so what it shows is that the predicate reads a tree, not that it would recognise the remedy as somebody else will actually build it. The predicates declared to derive nothing from a tree are checked only for refusing to budge, which is weaker again.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/self-defeating.ts",
+    name: "REMEDY_BOUND",
+    unit: "W317",
+    text: REMEDY_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Two limits, neither liftable by a change to this tree. The first is that the RULE is a sentence and no sweep can apply it: whether a mechanism carries the defect's defining property is a judgement over arbitrary code, which is why the rule is written for a reader. The second is that the sweep can only see what `assertionsIn` returns, and a parser being exhaustive is not a state of the tree — it is a property of a parser nobody has proved, and W317 has a demonstration that it is not: an assertion it could read by eye and the parse did not return. Widening that parser is a unit, not a lifting of this sentence, and the sentence would still be true afterwards for whatever the wider parser misses.",
+    },
+    numbers: [],
+  },
   {
     module: "src/quality/closing-state.ts",
     name: "CLOSING_BOUND",

@@ -802,6 +802,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W291's branch register is reviewer-facing throughout: for each violation reporter in the tree, the arms it can produce and the input that makes each one fire. Its longest strings are the `fixture` sentences attached to the two arms nobody can construct today — instructions to whoever parameterises `EXCLUDED_SPECS` — and `REFUSED_BRANCH_SHAPES`, which is reviewer-facing in W200's split for the usual reason: its content QUOTES the citation-instead-of-execution and the line-coverage number it exists to forbid. The synthetic inputs it builds to drive each arm are file paths, register ids and spec names; no patient, condition or appointment reason appears anywhere in it.",
   },
   {
+    module: "src/quality/self-defeating.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W317's rule and sweep for a fix that carries the defect it fixes, with the two Q24 instances that produced it. Nobody but a developer reads it. Its longest strings are `REMEDY_RULE`, the arguments for each kept equality and `REMEDY_BOUND`; its inputs are the text of this tree's own test files, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/closing-state.ts",
     operatorCopy: [],
     notCopy:

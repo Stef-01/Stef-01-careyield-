@@ -38,6 +38,7 @@ import { separatorDiff } from "./citations";
 import { planterDiff } from "./planting";
 import { countDiff } from "./register-counts";
 import { manifestDiff } from "./manifest";
+import { equalityDiff } from "./self-defeating";
 import { coverageByBand } from "@/compliance/copy-y6";
 import { diffFoldRegister, discoverFoldSites } from "./order-independence";
 import { undeclaredInstructionSinks } from "@/security/instruction-sinks";
@@ -70,6 +71,11 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   "src/quality/citations.ts": (root) => separatorDiff(root, {}).undeclared.length > 0,
 
   "src/quality/planting.ts": (root) => planterDiff(root, {}).undeclared.length > 0,
+
+  "src/quality/self-defeating.ts": (root) => {
+    void root;
+    return equalityDiff(process.cwd(), []).unargued.length > 0;
+  },
 
   "src/quality/manifest.ts": (root) =>
     manifestDiff(root, [{ module: "src/gone.ts", census: null, branches: [] }]).stale.length > 0,

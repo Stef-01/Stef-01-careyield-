@@ -45,6 +45,7 @@ import { CITATION_BOUND, separatorDiff } from "./citations";
 import { PLANTING_BOUND, planterDiff } from "./planting";
 import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
 import { MANIFEST_BOUND, manifestDiff } from "./manifest";
+import { REMEDY_BOUND, frozenEqualities } from "./self-defeating";
 import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
 import { proseClaims } from "./prose-numbers";
@@ -78,6 +79,13 @@ const LEDGER_ROW = "| W1 | done | builder-A | 2026-08-14T00:00Z | abc1234 | a ro
 
 export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
   // ── Demonstrated: the detector takes a root, so a witness can be put in front of it ─────────
+  "src/quality/self-defeating.ts": {
+    kind: "undemonstrated",
+    bound: REMEDY_BOUND,
+    whyNotPlantable:
+      "THE WITNESS WAS ATTEMPTED AND COULD NOT BE BUILT, which is worth more than the bound. The sweep inherits `assertionsIn`, and while writing W317 a real assertion in `declaration-tax.test.ts` was not returned by it — the parse produced that file's other assertions and not the one naming `TAX_AT_W308`. Two fixtures were planted to reproduce it, a plain equality after a single-line binding and one after a multi-line `Object.fromEntries`, and BOTH were found: the miss does not follow from either shape. So the witness would have been a fixture the register reports, which refutes the bound rather than demonstrating it — W295's own control, working. The claim now says only that the parser is not proven exhaustive, and the specific line is gone besides: this unit removed it as part of the fix, so the evidence for its own bound was edited away by the same commit. That is Q25's theme arriving in a bound.",
+  },
+
   "src/quality/manifest.ts": {
     kind: "demonstrated",
     bound: MANIFEST_BOUND,

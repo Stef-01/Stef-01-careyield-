@@ -69,6 +69,7 @@ import { COUNT_BOUND, countDiff, registerSizeAssertions } from "./register-count
 import { SCAN_SITES, blankLiterals, fixtureDiff, fixtureText, scanSiteDiff } from "./scan-text";
 import { fallibleDiff } from "./review-w279";
 import { founderDiff } from "@/founder/outstanding";
+import { equalityDiff } from "./self-defeating";
 import { SELF_SCANNING, SPLIT_EXCEPTIONS, holderDiff, splitDiff, splitSites } from "./self-reference";
 import { coverageDiff } from "./route-coverage";
 import { negativeDiff } from "./negative-probes";
@@ -1927,6 +1928,47 @@ export const MANIFEST: readonly ModuleEntry[] = [
     module: "src/quality/assertion-drives.ts",
     census: null,
     branches: [],
+  },
+  {
+    module: "src/quality/self-defeating.ts",
+    census: {
+      derives:
+        "Every assertion in every `*.test.ts` under `src/` comparing a LIVE value to a frozen `*_AT_W<n>` record by equality — the shape a remedy for a pinned count keeps taking.",
+      checkedAgainst:
+        "`ARGUED_EQUALITIES`, the named lists an equality is right for, in both directions.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "an assertion measuring a derived value against a frozen record is planted beside one taking a FLOOR against the same record, and only the first may be reported",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No assertion in this tree measures a live derivation against a frozen record by equality except where the record is a named list, which cannot be satisfied by retyping a digit.",
+        mutation:
+          "`equalityDiff` is given an empty argued register and must report every equality the tree holds.",
+      },
+    },
+    branches: [
+      {
+        fn: "equalityDiff",
+        branch: "unargued",
+        reach: {
+          kind: "driven",
+          drive: () => equalityDiff(process.cwd(), []).unargued.length > 0,
+        },
+      },
+      {
+        fn: "equalityDiff",
+        branch: "stale",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            equalityDiff(process.cwd(), [{ id: "src/gone.test.ts :: t :: GONE_AT_W1", why: "x" }]).stale.length >
+            0,
+        },
+      },
+    ],
   },
   {
     module: "src/quality/closing-state.ts",

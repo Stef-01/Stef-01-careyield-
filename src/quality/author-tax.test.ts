@@ -11,6 +11,9 @@
 import { describe, expect, it } from "vitest";
 import {
   AUTHOR_TAX_AT_W313,
+  MOVED_SINCE_W308,
+  type ModuleShape,
+  taxDiff,
   DECLARATION_HOMES,
   INSTRUMENT_NOTES,
   MOVED_SINCE_W313,
@@ -72,13 +75,15 @@ describe("W313 both instruments, over the same planted shapes", () => {
     // THE GATE. Same copy, same plants, same run — and each number checked against the record that
     // owns it. Neither figure is stored twice: `TAX_AT_W308` owns the register count and
     // `AUTHOR_TAX_AT_W313` owns the file count.
-    const moved = new Map(MOVED_SINCE_W313.map((m) => [m.shape, m.now]));
-    for (const row of bothInstruments(COPY)) {
-      expect(row.reporting, `${row.shape}: the register instrument moved`).toBe(TAX_AT_W308[row.shape]);
-      expect(row.editing, `${row.shape}: the file instrument moved`).toBe(
-        moved.get(row.shape) ?? AUTHOR_TAX_AT_W313[row.shape],
-      );
-    }
+    // W317 ROUTED BOTH THROUGH THE MOVEMENT-AWARE DIFF. W313 wrote `reporting` as a bare equality
+    // against `TAX_AT_W308` while giving `editing` a movement path — an asymmetry that made one of
+    // the two frozen records unmovable, which is Q24-CR-9's shape in the unit that replaced Q24's
+    // instrument. Both go through `taxDiff` now, so declaring a movement works for either.
+    const rows = bothInstruments(COPY);
+    const reporting = Object.fromEntries(rows.map((r) => [r.shape, r.reporting])) as Record<ModuleShape, number>;
+    const editing = Object.fromEntries(rows.map((r) => [r.shape, r.editing])) as Record<ModuleShape, number>;
+    expect(taxDiff(reporting, TAX_AT_W308, MOVED_SINCE_W308)).toEqual({ unaccounted: [], stale: [] });
+    expect(taxDiff(editing, AUTHOR_TAX_AT_W313, MOVED_SINCE_W313)).toEqual({ unaccounted: [], stale: [] });
   });
 
   it("disagrees in BOTH directions, which is what makes it a measure and not a discount", () => {
