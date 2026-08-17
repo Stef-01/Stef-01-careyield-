@@ -97,7 +97,8 @@ describe("W246 nothing has been exchanged, and the page says which nothing", () 
     expect(WHAT_THIS_PAGE_CANNOT_SHOW[0]).toContain(
       "An empty list means nothing left; it does not mean nothing failed.",
     );
-    expect(WHAT_THIS_PAGE_CANNOT_SHOW).toHaveLength(3);
+    // W304: a non-vacuity floor rather than a total nobody re-derives.
+    expect(WHAT_THIS_PAGE_CANNOT_SHOW.length, "the register says nothing").toBeGreaterThanOrEqual(3);
   });
 });
 

@@ -152,7 +152,8 @@ describe("W281 adoption is declared, because a header names an owner and not an 
     // Both directions: the register says W281 adopted them, and the module's own first line has to
     // agree. A register claiming an adoption the tree does not show is the citation-nobody-resolved
     // failure W207 found and W258 made a rule.
-    expect(ADOPTED_MODULES).toHaveLength(4);
+    // W304: a floor, so the loop below cannot pass over an empty register.
+    expect(ADOPTED_MODULES.length, "no module is adopted").toBeGreaterThanOrEqual(4);
     for (const adopted of ADOPTED_MODULES) {
       const text = readFileSync(path.join(ROOT, adopted.module), "utf8");
       expect(headerUnit(text), `${adopted.module} does not carry the unit that adopted it`).toBe(

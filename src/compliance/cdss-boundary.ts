@@ -778,6 +778,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W291's branch register is reviewer-facing throughout: for each violation reporter in the tree, the arms it can produce and the input that makes each one fire. Its longest strings are the `fixture` sentences attached to the two arms nobody can construct today — instructions to whoever parameterises `EXCLUDED_SPECS` — and `REFUSED_BRANCH_SHAPES`, which is reviewer-facing in W200's split for the usual reason: its content QUOTES the citation-instead-of-execution and the line-coverage number it exists to forbid. The synthetic inputs it builds to drive each arm are file paths, register ids and spec names; no patient, condition or appointment reason appears anywhere in it.",
   },
   {
+    module: "src/quality/register-counts.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W304's sweep for assertions pinning a declared register's SIZE to a literal, and the ratchet mechanism for any that must stay. Nobody but a developer reads it. Its longest strings are the argument for telling a register size apart from a fixture count and `COUNT_BOUND`; its inputs are the text of the tree's own test files, and no patient, condition or appointment reason appears in it.",
+  },
+  {
     module: "src/quality/planting.ts",
     operatorCopy: [],
     notCopy:

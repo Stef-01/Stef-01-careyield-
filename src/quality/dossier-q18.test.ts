@@ -109,9 +109,14 @@ describe("W232 the coupling's state is re-derived, not quoted", () => {
   });
 
   it("counts the refused couplings rather than asserting there are some", () => {
-    expect(Object.keys(REFUSED_COUPLINGS)).toHaveLength(6);
-    expect(DOSSIER).toContain("Six ways of doing it wrong are refused by name");
-    expect(DOSSIER).toContain("refuses six ways of getting this wrong");
+    // W304: the count STAYS here, and it is the one exact register size the sweep leaves standing —
+    // because it is not a pin, it is an identity between the register and a number the dossier
+    // PUBLISHES twice in words. Derived rather than repeated: the word comes off the register, so
+    // adding a refusal fails the dossier's prose instead of silently disagreeing with it.
+    const refused = Object.keys(REFUSED_COUPLINGS).length;
+    const word = ["zero", "one", "two", "three", "four", "five", "six", "seven"][refused]!;
+    expect(DOSSIER).toContain(`${word.charAt(0).toUpperCase()}${word.slice(1)} ways of doing it wrong are refused by name`);
+    expect(DOSSIER).toContain(`refuses ${word} ways of getting this wrong`);
   });
 
   it("carries the enablement reason's real minimum length", () => {

@@ -244,6 +244,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/register-counts.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/register-counts.test.ts :: does not report a count over a fixture, which is most of this tree",
+      plants: "expect(outcomesFor(PRACTICE)).toHaveLength(3)",
+    },
+  },
+  {
     register: "src/quality/planting.ts",
     negative: {
       kind: "already_driven",

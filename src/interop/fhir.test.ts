@@ -289,7 +289,14 @@ describe("W235 a status with no R4 equivalent is refused, never approximated", (
       "open",
     ]);
     expect(STATUS_MAPPING.open).toBeNull();
-    expect(Object.values(STATUS_MAPPING).filter((v) => v !== null)).toHaveLength(4);
+    // W304: the mapped statuses by NAME. The count said four without saying which four, so a
+    // status remapped to null and another added would have kept it green.
+    expect(
+      Object.entries(STATUS_MAPPING)
+        .filter(([, v]) => v !== null)
+        .map(([k]) => k)
+        .sort(),
+    ).toEqual(["attended", "booked", "cancelled", "dna"]);
   });
 
   it("covers every AppointmentStatus the domain declares", () => {

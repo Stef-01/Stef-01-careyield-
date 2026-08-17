@@ -807,6 +807,25 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/register-counts.ts",
+    derives:
+      "Every assertion in every `*.test.ts` under `src/` that pins a declared register's SIZE to an integer literal, told apart from the far larger set of counts over a constructed fixture.",
+    checkedAgainst:
+      "`RATCHETS` — empty, because all seventeen were rewritten as the property each stood in for — in both directions.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "a test pinning a register's size and a test counting a fixture's result are planted in one constructed tree, and only the first may be reported",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "No assertion in this tree pins the size of a declared register to a literal, so no ordinary addition can move one.",
+      mutation:
+        "`countDiff` is given a ratchet the sweep does not find and must report it stale.",
+    },
+  },
+  {
     file: "src/quality/planting.ts",
     derives:
       "Every `*.test.ts` under `src/` that writes files, and whether it goes through a scoped planter or writes on its own.",

@@ -43,6 +43,7 @@ import { violationReporters, withRoot } from "./refusal-branches";
 import { mutantsIn } from "./mutation-sampling";
 import { CITATION_BOUND, separatorDiff } from "./citations";
 import { PLANTING_BOUND, planterDiff } from "./planting";
+import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
 
 /** How a register's stated bound has been shown to be true. */
 export type Blindness =
@@ -73,6 +74,29 @@ const LEDGER_ROW = "| W1 | done | builder-A | 2026-08-14T00:00Z | abc1234 | a ro
 
 export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
   // ── Demonstrated: the detector takes a root, so a witness can be put in front of it ─────────
+  "src/quality/register-counts.ts": {
+    kind: "demonstrated",
+    bound: COUNT_BOUND,
+    witness: "a register size pinned to a CONSTANT rather than to an integer literal",
+    control: "the same size pinned to the literal, which the sweep must report",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/const.test.ts":
+            'import { SOME_REGISTER, EXPECTED } from "@/x";\nit("t", () => { expect(SOME_REGISTER).toHaveLength(EXPECTED); });\n',
+          "src/planted/literal.test.ts":
+            'import { SOME_REGISTER } from "@/x";\nit("t", () => { expect(SOME_REGISTER).toHaveLength(7); });\n',
+        },
+        (root) => {
+          const found = registerSizeAssertions(root).map((h) => h.file);
+          return {
+            witnessSeen: found.includes("src/planted/const.test.ts"),
+            controlSeen: found.includes("src/planted/literal.test.ts"),
+          };
+        },
+      ),
+  },
+
   "src/quality/planting.ts": {
     kind: "demonstrated",
     bound: PLANTING_BOUND,

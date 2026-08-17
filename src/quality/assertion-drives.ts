@@ -36,6 +36,7 @@ import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
 import { separatorDiff } from "./citations";
 import { planterDiff } from "./planting";
+import { countDiff } from "./register-counts";
 import { coverageByBand } from "@/compliance/copy-y6";
 import { diffFoldRegister, discoverFoldSites } from "./order-independence";
 import { undeclaredInstructionSinks } from "@/security/instruction-sinks";
@@ -66,6 +67,9 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   "src/quality/citations.ts": (root) => separatorDiff(root, {}).undeclared.length > 0,
 
   "src/quality/planting.ts": (root) => planterDiff(root, {}).undeclared.length > 0,
+
+  "src/quality/register-counts.ts": (root) =>
+    countDiff(root, [{ id: "src/gone.test.ts :: t :: REG", direction: "floor", why: "x" }]).stale.length > 0,
 
   "src/quality/mutation-sampling.ts": () => {
     // W296's report, handed a survivor no register declares. The runner spawns processes and lives

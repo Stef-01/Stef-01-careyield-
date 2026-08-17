@@ -40,7 +40,9 @@ beforeEach(() => {
 
 describe("W41 step definitions", () => {
   it("five ordered steps ending at review", () => {
-    expect(SETUP_STEPS).toHaveLength(5);
+    // W304: the slugs in order, which is what "five ordered steps" meant. A step renamed or
+    // reordered now fails where the count passed.
+    expect(SETUP_STEPS.map((s) => s.slug)).toEqual(["practice", "clinicians", "sessions", "rules", "review"]);
     expect(SETUP_STEPS.at(-1)!.slug).toBe("review");
     expect(nextStep("review")).toBeNull();
     expect(nextStep("practice")).toBe("clinicians");

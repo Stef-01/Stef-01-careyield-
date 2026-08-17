@@ -102,7 +102,9 @@ describe("W201 every decision the tree makes is accounted for", () => {
     // list is checked by making each entry prove it: the module a scan claims to find alone must
     // be MISSED by every other scan. A scan carried after it stopped earning its place fails here.
     const found = patientTouchingModules();
-    expect(DETECTOR_SCANS.length).toBe(3);
+    // W304: the exact count is gone. The identity below is the property — every scan has its own
+    // id — and a floor keeps the loop that follows from passing over an empty register.
+    expect(DETECTOR_SCANS.length, "no scan is declared").toBeGreaterThanOrEqual(3);
     expect(new Set(DETECTOR_SCANS.map((s) => s.id)).size).toBe(DETECTOR_SCANS.length);
 
     const text = (module: string) =>

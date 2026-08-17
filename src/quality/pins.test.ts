@@ -206,7 +206,7 @@ describe("W290 what the sweep cannot see, measured per instance", () => {
   it("records all six, and admits it would have caught one of them", () => {
     // The honest half. "We swept for pins" and "we swept for the pins that have names" are
     // different claims, and a bound stated as a sentence is the one nobody checks.
-    expect(HISTORY).toHaveLength(6);
+    // W304: the count is gone; the line below names every instance, which is strictly stronger.
     expect(HISTORY.map((h) => h.unit)).toEqual(["W260", "W273", "W274", "W282", "W285", "W287"]);
     expect(HISTORY.filter((h) => h.namedConstant)).toEqual([]);
     for (const instance of HISTORY) {

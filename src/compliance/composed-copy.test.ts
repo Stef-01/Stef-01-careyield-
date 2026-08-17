@@ -112,7 +112,9 @@ describe("W278 every prose literal in every composing function is linted", () =>
       expect(accepted.reviewBy, "an acceptance with no review date").toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(accepted.why.length, "an acceptance with no argument").toBeGreaterThan(200);
     }
-    expect(ACCEPTED_COMPOSED_FINDINGS.length).toBe(1);
+    // W304: a CEILING, not a floor. This is an acceptance register — a rule switched off for one
+    // string — so growth is the regression and a floor would have inverted the check.
+    expect(ACCEPTED_COMPOSED_FINDINGS.length, "an acceptance was added").toBeLessThanOrEqual(1);
   });
 
   it("subtracts comments, or a QUOTED phrase inside one is extracted as copy", () => {

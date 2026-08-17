@@ -43,6 +43,7 @@ import { negativeDiff } from "./negative-probes";
 import { UNEVIDENCED_AT_W293, emptyListDiff } from "./empty-list-sweep";
 import { separatorDiff } from "./citations";
 import { planterDiff, withTree, withTree as withRoot } from "./planting";
+import { countDiff } from "./register-counts";
 import { headerViolations } from "./unit-headers";
 import { pageSuiteViolations } from "./page-suite";
 import { blockedSurfaceViolations } from "./blocked-surface";
@@ -520,6 +521,33 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
       kind: "unreached",
       fixture:
         "The same shape as the stale arm above and the same one-line remedy: `EXCLUDED_SPECS` is read from module scope, so an exclusion with a short reason cannot be supplied by a caller. Parameterise it and this arm is reachable with a one-entry map.",
+    },
+  },
+  // ── W304's register-size sweep ────────────────────────────────────────────────────────────
+  {
+    module: "src/quality/register-counts.ts",
+    fn: "countDiff",
+    branch: "unargued",
+    reach: {
+      kind: "driven",
+      drive: () =>
+        countDiff(process.cwd(), []).unargued.length > 0 ||
+        // A healthy tree has none, which is the point of the unit — so the arm is driven on a
+        // constructed tree holding one, the same way W291 drives every arm a clean tree refuses.
+        withTree(
+          { "src/planted/pin.test.ts": 'import { SOME_REGISTER } from "@/x";\nit("t", () => { expect(SOME_REGISTER).toHaveLength(7); });\n' },
+          (root) => countDiff(root, []).unargued.length > 0,
+        ),
+    },
+  },
+  {
+    module: "src/quality/register-counts.ts",
+    fn: "countDiff",
+    branch: "stale",
+    reach: {
+      kind: "driven",
+      drive: () =>
+        countDiff(process.cwd(), [{ id: "src/gone.test.ts :: t :: REG", direction: "floor", why: "x" }]).stale.length > 0,
     },
   },
   // ── W303's planting harness ───────────────────────────────────────────────────────────────

@@ -10,7 +10,9 @@ import { ORDER_REGRESSIONS, Q11_2, bothOrders } from "./order-regressions";
 describe("W178 every entry reproduces the defect it records", () => {
   it("holds every documented defect, and is not empty", () => {
     // Vacuity guard: an empty corpus satisfies every loop below.
-    expect(ORDER_REGRESSIONS.length).toBe(6);
+    // W304: a floor. The assertions below name the residual and both pre-fix symptoms, which is
+    // what this stood in for; the total moved whenever a regression was recorded.
+    expect(ORDER_REGRESSIONS.length, "no regression is recorded").toBeGreaterThanOrEqual(6);
     // One of the six is a residual: its original symptom is fixed, its tie is not.
     expect(ORDER_REGRESSIONS.filter((r) => r.residual !== undefined)).toHaveLength(1);
     // Both pre-fix symptoms are represented, so neither branch below is dead code.

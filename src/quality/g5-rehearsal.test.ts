@@ -255,7 +255,8 @@ describe("W264 the content signed off means nothing", () => {
 
 describe("W264 what it does not prove is on the module", () => {
   it("says the mechanism was never the obstacle", () => {
-    expect(WHAT_THIS_DOES_NOT_PROVE).toHaveLength(3);
+    // W304: a non-vacuity floor. The two index assertions below and the loop are the property.
+    expect(WHAT_THIS_DOES_NOT_PROVE.length, "the register says nothing").toBeGreaterThanOrEqual(3);
     expect(WHAT_THIS_DOES_NOT_PROVE[0]).toContain("qualified");
     expect(WHAT_THIS_DOES_NOT_PROVE[2]).toContain("W161");
     for (const line of WHAT_THIS_DOES_NOT_PROVE) {

@@ -170,6 +170,11 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/register-counts.ts",
+    // A planted MODULE carries no assertions, so the size sweep asks nothing of it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/planting.ts",
     // W303's planter sweep reads test files; a planted MODULE is not one, so it costs nothing.
     demands: () => false,

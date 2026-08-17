@@ -28,8 +28,9 @@ import { SILENCE_COPY } from "@/ops/silence";
 
 describe("W279 three states, and three different things to read", () => {
   it("gives every state copy, keyed by the union", () => {
+    // W304: the count is gone — the identity above already pins the set exactly, and a fourth
+    // state is meant to fail here by having no copy rather than by changing a number.
     expect(Object.keys(ZERO_STATE_COPY).sort()).toEqual([...ALL_ZERO_STATES].sort());
-    expect(ALL_ZERO_STATES).toHaveLength(3);
   });
 
   it("differs pairwise on headline, detail AND action", () => {
@@ -80,8 +81,9 @@ describe("W279 every console route is declared, both directions", () => {
   it("covers exactly the routes W271 calls console", () => {
     // Against W271's register rather than a list here, so a console route added tomorrow arrives
     // undeclared and this fails.
+    // W304: the count that sat here was redundant beside this identity — it named a number the
+    // line above already fixes, and moved whenever a console route was added.
     expect(CONSOLE_ZERO_STATES.map((r) => r.route).sort()).toEqual([...consoleRoutes].sort());
-    expect(CONSOLE_ZERO_STATES).toHaveLength(27);
   });
 
   it("declares routes with NO zero rather than omitting them", () => {

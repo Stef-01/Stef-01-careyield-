@@ -149,7 +149,9 @@ describe("W288 every hit in this tree is fixed or accepted, and the acceptance i
       expect(entry.condition).toBe("the test's real assertion is a @ts-expect-error");
       expect(entry.why.length, `${entry.file} is accepted without a reason`).toBeGreaterThan(120);
     }
-    expect(ACCEPTED_TAUTOLOGIES).toHaveLength(4);
+    // W304: a CEILING. Acceptances are rules switched off, so their growth is what wants noticing;
+    // a floor here would have let the register fill up quietly.
+    expect(ACCEPTED_TAUTOLOGIES.length, "a tautology acceptance was added").toBeLessThanOrEqual(4);
   });
 
   it("reports an acceptance whose reason has rotted, and one whose hit is gone", () => {

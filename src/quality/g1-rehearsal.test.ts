@@ -186,7 +186,8 @@ describe("W262 the walk drives the three modules the gate names", () => {
 describe("W262 what it does not prove is on the module", () => {
   it("says a real system has still never seen any of this", () => {
     // A green rehearsal is exactly the thing somebody quotes as "the integration works".
-    expect(WHAT_THIS_DOES_NOT_PROVE).toHaveLength(3);
+    // W304: a non-vacuity floor, which is what the count guarded — the loop below is the check.
+    expect(WHAT_THIS_DOES_NOT_PROVE.length, "the register says nothing").toBeGreaterThanOrEqual(3);
     expect(WHAT_THIS_DOES_NOT_PROVE[0]).toContain("no real system has ever seen a byte");
     for (const line of WHAT_THIS_DOES_NOT_PROVE) {
       expect(line.length).toBeGreaterThan(80);

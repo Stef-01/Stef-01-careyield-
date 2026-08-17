@@ -161,7 +161,9 @@ describe("W271 the requirements are requirements, not measurements", () => {
   });
 
   it("explains every class rather than naming it", () => {
-    expect(ROUTE_CLASSES).toHaveLength(7);
+    // W304: a floor. The loop below is what reads every class; the total moved whenever a route
+    // class was added, which is ordinary work.
+    expect(ROUTE_CLASSES.length, "no route class is declared").toBeGreaterThanOrEqual(7);
     for (const cls of ROUTE_CLASSES) {
       expect(cls.why.length, `${cls.id} is declared without a reason`).toBeGreaterThan(120);
       expect(cls.routes.length, `${cls.id} claims no route`).toBeGreaterThan(0);

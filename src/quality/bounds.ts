@@ -48,6 +48,7 @@ import { SCAN_BOUND } from "./scan-text";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
 import { CITATION_BOUND } from "./citations";
 import { PLANTING_BOUND } from "./planting";
+import { COUNT_BOUND } from "./register-counts";
 
 /** How a bound could stop being true. */
 export type Lifting =
@@ -93,6 +94,19 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/register-counts.ts",
+    name: "COUNT_BOUND",
+    unit: "W304",
+    text: COUNT_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "with the same remedy when such a pin arrives",
+      reads: "first-party test files, for a register size pinned to something other than a literal",
+      stillOpen: () => true,
+    },
+    numbers: [],
+  },
   {
     module: "src/quality/planting.ts",
     name: "PLANTING_BOUND",
