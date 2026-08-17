@@ -36,6 +36,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { OPERATOR_COPY_SURFACES } from "./cdss-boundary";
+import { prepareForScan } from "@/quality/scan-text";
 
 /**
  * A literal that reads like a sentence: five or more space-separated words.
@@ -58,12 +59,9 @@ function bodyOf(lines: readonly string[], start: number): string {
   let end = start + 1;
   while (end < lines.length && !/^\}/.test(lines[end]!)) end += 1;
   // Comments stripped so prose ABOUT a sentence is not counted as the sentence — W198's collision,
-  // which every scan in this tree has had to subtract.
-  return lines
-    .slice(start, end)
-    .join("\n")
-    .replace(/\/\/[^\n]*/g, "")
-    .replace(/\/\*[\s\S]*?\*\//g, "");
+  // which every scan in this tree has had to subtract. W302 retired the inline pair that used to
+  // sit here: literals are KEPT, because a literal is exactly what this scan is looking for.
+  return prepareForScan(lines.slice(start, end).join("\n"), { literals: "kept" });
 }
 
 /**

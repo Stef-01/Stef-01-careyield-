@@ -44,6 +44,7 @@ import { VOCABULARY_BOUND, sweepSurface } from "@/compliance/public-surfaces";
 import { RUNTIME_BOUND } from "@/console/zero-states";
 import { HARDENING_BOUND } from "./hardening-q23";
 import { TAX_BOUND } from "./declaration-tax";
+import { SCAN_BOUND } from "./scan-text";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
 import { CITATION_BOUND } from "./citations";
 
@@ -131,6 +132,40 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "Three",
         kind: "fixed_by_a_gate",
         why: "The gate names three lenses — code-review, security-review and simplify — so the number is the row's, not a measurement this unit took.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/scan-text.ts",
+    name: "SCAN_BOUND",
+    unit: "W302",
+    text: SCAN_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the fix is not",
+      reads: "W291's reporter walk, for the raw read the bound says is still there",
+      // The bound says one scan still reads raw text. It stops being true the day somebody narrows
+      // that walk — which is exactly what W295 tried and had to revert.
+      stillOpen: () =>
+        /const text = readFileSync\(full, "utf8"\);/.test(
+          readFileSync(path.join(ROOT, "src/quality/refusal-branches.ts"), "utf8"),
+        ),
+    },
+    numbers: [
+      {
+        word: "four",
+        kind: "unit_id",
+        why: "A quotation of what W295's narrowing cost — four registers lost to one order — recorded beside the three lost to the other, so the reversion's evidence travels with the sentence.",
+      },
+      {
+        word: "three",
+        kind: "unit_id",
+        why: "The other half of that quotation: literals-then-comments lost a different three, which is the fact that made the order a finding rather than a preference.",
+      },
+      {
+        word: "One",
+        kind: "rate",
+        why: "'One scan is deliberately outside this' — which scan rather than how many, and the sentence names it. `violationReporters` is the one, and it is named rather than counted.",
       },
     ],
   },

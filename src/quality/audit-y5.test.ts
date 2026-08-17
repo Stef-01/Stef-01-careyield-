@@ -22,7 +22,7 @@ import { credentialShapedLiterals } from "@/interop/credentials";
 import { patientMarkersIn } from "@/api/refusals";
 import { API_REFUSAL_COPY } from "@/api/surface";
 import { STORE_READS } from "@/tenancy/store-reads";
-import { blankLiterals } from "./tautology-sweep";
+import { blankLiterals } from "./scan-text";
 
 const ROOT = process.cwd();
 /**

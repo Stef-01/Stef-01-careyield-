@@ -233,6 +233,26 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/scan-text.ts",
+    derives:
+      "Every module under `src/` that asks for the shared scan preparation, and every module that still writes its own comment-stripper or literal-blanker.",
+    checkedAgainst:
+      "W302's `SCAN_SITES`, both directions, and the rule that one stripper and one blanker exist in the tree.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "`scanSiteDiff` is handed a module list containing one that asks for the preparation and a declared list that does not name it, and must report it undeclared; handed the reverse, it must report the declaration stale",
+    },
+    assertion: {
+      kind: "driven_by_branch",
+      claim:
+        "Every module preparing text for a scan is declared with the answers it wants and why, and the tree holds one comment-stripper and one literal-blanker.",
+      mutation:
+        "A module list naming a module the register does not know must come back undeclared.",
+      branch: "src/quality/scan-text.ts::scanSiteDiff::undeclared",
+    },
+  },
+  {
     file: "src/quality/declaration-tax.ts",
     derives:
       "What one new module costs before anything watches it: the registers that REPORT a planted module, and the files that NAME an existing one.",

@@ -31,7 +31,7 @@
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { blankLiterals } from "./tautology-sweep";
+import { prepareForScan } from "./scan-text";
 
 /**
  * Assert a fold gives the same answer whichever way round its input arrives.
@@ -331,11 +331,6 @@ const FOLD_RE = new RegExp(
   "g",
 );
 
-/** Line and block comments removed, so prose about a fold is not counted as one. */
-function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
-}
-
 /** Modules under `root` that fold a collection, with how many folds each contains. */
 export function discoverFoldSites(root: string): Array<{ module: string; folds: number }> {
   const found: Array<{ module: string; folds: number }> = [];
@@ -357,7 +352,7 @@ export function discoverFoldSites(root: string): Array<{ module: string; folds: 
       // NAMED IN PROSE is not a fold; the same is true of a fold quoted inside a fixture, and this
       // register reported W295's own module because its bound sentence names `.reduce(` and
       // `.at(-1)` as the patterns it looks for. Same defect one layer over, same remedy.
-      const source = blankLiterals(stripComments(readFileSync(full, "utf8")));
+      const source = prepareForScan(readFileSync(full, "utf8"));
       const count = (source.match(FOLD_RE) ?? []).length;
       // Repo-relative with posix separators on every platform: the register is written
       // with "/" and Windows walks produce "\", which read as 20 phantom drifts.

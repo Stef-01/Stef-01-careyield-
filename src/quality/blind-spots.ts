@@ -391,6 +391,13 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
     whyNotPlantable:
       "A witness would be a bound that resolves and is unfair, and unfairness is a judgement about prose rather than a property a plant can carry. Fabricating one would be writing the answer into the fixture, which is the detector W279 refused to tune. Stating it is what can be done from inside, and the quarterly hardening pass is where a reader looks.",
   },
+  "src/quality/scan-text.ts": {
+    kind: "undemonstrated",
+    bound:
+      "It knows about modules that ASK for the preparation. A scan added tomorrow that reads raw text and says nothing is invisible here — which is not hypothetical, because one already exists on purpose and is named in `SCAN_BOUND`. The register measures adoption, not coverage.",
+    whyNotPlantable:
+      "A witness would be a module scanning raw text without asking, and the register is silent about it by design rather than by defect — planting one would demonstrate the definition rather than a blind spot. What could be planted is a second stripper, and that is the positive `preparationCopies` already reports; the absence this bound is about has no detector to stay silent in.",
+  },
   "src/quality/declaration-tax.ts": {
     kind: "undemonstrated",
     bound:

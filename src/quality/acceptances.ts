@@ -33,8 +33,7 @@
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { stripComments } from "@/security/reachability";
-import { blankLiterals } from "./tautology-sweep";
+import { prepareForScan } from "./scan-text";
 import { sourceModules } from "./tree-walks";
 import { ACCEPTED_COPY_FINDINGS } from "@/compliance/cdss-boundary";
 import { ACCEPTED_COMPOSED_FINDINGS, COMPOSED_COPY_SITES, proseLiteralsIn } from "@/compliance/composed-copy";
@@ -284,7 +283,7 @@ export function acceptanceCarryingModules(root: string): string[] {
     // the scan to code rather than reword a comment that is saying the right thing (W198). W295
     // added the literal blanking for the same reason one layer over: a review date inside a
     // FIXTURE string is not an acceptance, and W295's witness plants exactly that.
-    const text = blankLiterals(stripComments(readFileSync(file, "utf8")));
+    const text = prepareForScan(readFileSync(file, "utf8"));
     const assignsDate = /\breviewBy:\s*["'`]/.test(text);
     const exportsAcceptances = /export const [A-Z_]*ACCEPTED[A-Z_]*\s*[:=]/.test(text);
     if (assignsDate || exportsAcceptances) {

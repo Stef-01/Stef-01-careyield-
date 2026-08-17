@@ -70,7 +70,8 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { stripComments } from "@/security/reachability";
 import { testModules } from "./tree-walks";
-import { assertionsIn, blankLiterals, enclosingTest } from "./tautology-sweep";
+import { assertionsIn, enclosingTest } from "./tautology-sweep";
+import { blankLiterals } from "./scan-text";
 
 /** An assertion that a list is empty, and the source it was read from. */
 export interface EmptyAssertion {

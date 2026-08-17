@@ -66,7 +66,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { stripComments } from "@/security/reachability";
 import { sourceModules } from "./tree-walks";
-import { blankLiterals } from "./tautology-sweep";
+import { blankLiterals } from "./scan-text";
 
 /** A single character-level edit that flips a decision the code makes. */
 export interface Operator {

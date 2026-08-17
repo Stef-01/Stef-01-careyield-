@@ -32,6 +32,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { sourceModules, testModules } from "./tree-walks";
+import { prepareForScan } from "./scan-text";
 import { copySurfaceMembers } from "@/compliance/copy-y6";
 import { discoverFoldSites } from "./order-independence";
 import { findInstructionSinks } from "@/security/instruction-sinks";
@@ -198,6 +199,12 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/scan-text.ts",
+    // Asks about modules that PREPARE text, which a planted module does not do. It demands nothing
+    // of an arriving module and is in the population because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/declaration-tax.ts",
     // ITSELF, and it demands nothing: this register measures the tax rather than levying one, so a
     // planted module owes it no declaration. It is in the population because the census holds it
@@ -226,9 +233,9 @@ export function namingSites(root: string, module: string): string[] {
   for (const file of [...sourceModules(root), ...testModules(root)]) {
     const rel = path.relative(root, file).split(path.sep).join("/");
     if (rel === module) continue;
-    const text = readFileSync(file, "utf8")
-      .replace(/\/\*[\s\S]*?\*\//g, "")
-      .replace(/(^|[^:])\/\/[^\n]*/g, (_m, lead: string) => lead);
+    // W302: the shared preparation. Literals are KEPT — a declaration IS a string literal, so
+    // blanking them would make every site disappear and this measurement read as zero.
+    const text = prepareForScan(readFileSync(file, "utf8"), { literals: "kept" });
     if (text.includes(module)) found.push(rel);
   }
   return found.sort();

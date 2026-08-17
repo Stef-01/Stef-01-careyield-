@@ -36,7 +36,7 @@ import path from "node:path";
 import { fallibleDiff } from "./review-w279";
 import { duplicateDiff, pinDiff } from "./pins";
 import { stripComments } from "@/security/reachability";
-import { blankLiterals } from "./tautology-sweep";
+import { SCAN_SITES, blankLiterals, scanSiteDiff } from "./scan-text";
 import { BLIND_SPOTS, boundDiff } from "./blind-spots";
 import { coverageDiff } from "./route-coverage";
 import { censusDiff } from "./register-census";
@@ -212,6 +212,27 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
       drive: () => fallibleDiff(process.cwd(), { "/console/interest": "no remedy stated" }).withoutRemedy.length > 0,
     },
   },
+  // ── W302's scan sites ─────────────────────────────────────────────────────────────────────
+  {
+    module: "src/quality/scan-text.ts",
+    fn: "scanSiteDiff",
+    branch: "undeclared",
+    reach: {
+      kind: "driven",
+      drive: () =>
+        scanSiteDiff([{ module: "src/probe.ts", source: "prepareForScan(x);" }], []).undeclared.length > 0,
+    },
+  },
+  {
+    module: "src/quality/scan-text.ts",
+    fn: "scanSiteDiff",
+    branch: "stale",
+    reach: {
+      kind: "driven",
+      drive: () => scanSiteDiff([], SCAN_SITES).stale.length > 0,
+    },
+  },
+
   // ── W295's blind spots ────────────────────────────────────────────────────────────────────
   {
     module: "src/quality/blind-spots.ts",

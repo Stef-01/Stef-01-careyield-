@@ -730,6 +730,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "An in-memory store of specs, and its strings are ids and criteria keys. What it holds is authored elsewhere and gated by G5; the store renders nothing.",
   },
   {
+    module: "src/quality/scan-text.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W302's scan preparation is machinery: two text transforms and the order they run in. Its strings are `SCAN_ORDER_RULE` and `SCAN_BOUND`, both addressed to whoever writes the next scan, and the `why` on each declared site. It renders nothing, holds no record, and its only input is source text this tree already wrote.",
+  },
+  {
     module: "src/quality/declaration-tax.ts",
     operatorCopy: [],
     notCopy:

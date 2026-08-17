@@ -270,6 +270,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/scan-text.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/scan-text.test.ts :: does not count a module that only names it in a comment",
+      plants: "// a note about prepareForScan",
+    },
+  },
+  {
     register: "src/quality/declaration-tax.ts",
     negative: {
       kind: "already_driven",

@@ -44,7 +44,7 @@
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { stripComments } from "@/security/reachability";
+import { blankLiterals, prepareForScan } from "./scan-text";
 import { testModules } from "./tree-walks";
 
 /** The shapes this sweep can decide. Three, each argued in `SHAPE_ARGUMENTS`. */
@@ -122,29 +122,6 @@ function firstArgument(args: string): string {
   return args;
 }
 
-/**
- * Strings, template literals and regexes with their CONTENTS blanked, same length, same lines.
- *
- * THE ELEVENTH INSTANCE OF THIS TREE'S RECURRING COLLISION, and the first draft walked into it: a
- * scan for assertion-shaped text finds the assertion-shaped text in its own test file, where the
- * probes are quoted strings. W237 hit it with an endpoint scan matching the note explaining why no
- * endpoint exists, and the fix there is the fix here — narrow the scan to code constructs rather
- * than exempt the file, because a self-exemption is the one thing a sweep must never grant itself.
- *
- * Blanking rather than deleting keeps every offset and every newline, so a hit still reports the
- * line it is on and the text it quotes is the real text — the parts are sliced from the original.
- * Regexes are consumed by the same pass so that a quote inside a character class — `/["']/` is in
- * this tree — cannot open a string that swallows the next assertion.
- */
-export function blankLiterals(code: string): string {
-  const LITERAL =
-    /`(?:\\.|[^\\`])*`|"(?:\\.|[^\\"\n])*"|'(?:\\.|[^\\'\n])*'|\/(?![*/])(?:\\.|\[(?:\\.|[^\]\\\n])*\]|[^\\/\n[])+\/[gimsuy]*/g;
-  // THE OPENING DELIMITER IS KEPT. W294's detector looks for `reviewBy:` followed by a quote, so
-  // blanking the quote away would blind it to every real register while blinding it to fixtures —
-  // the fix and the defect at once. Keeping one character preserves "a literal starts here" and
-  // removes everything a scan could mistake for code.
-  return code.replace(LITERAL, (m) => m[0] + m.slice(1).replace(/[^\n]/g, " "));
-}
 
 /**
  * Every `expect(...)...matcher(...)` in the text, with its parts.
@@ -222,8 +199,10 @@ export function enclosingTest(code: string, index: number): string {
  */
 export function tautologiesIn(file: string, source: string): Tautology[] {
   // Comments are subtracted first: a commented-out assertion is not an assertion, and this tree's
-  // notes quote the shapes they warn about. `stripComments` keeps the newlines, so lines still map.
-  const code = stripComments(source);
+  // notes quote the shapes they warn about. W302's shared preparation, which enforces that order —
+  // literals are blanked inside `assertionsIn` on the already-decommented text, because doing it
+  // the other way round consumes an `export function` line whenever a comment holds a `/`.
+  const code = prepareForScan(source, { literals: "kept" });
   const imported = importedNames(code);
   const out: Tautology[] = [];
   for (const a of assertionsIn(code)) {
