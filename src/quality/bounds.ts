@@ -26,11 +26,26 @@
 // per register" is a rate, "W284" is a unit id, "three lenses" is fixed by the gate. What cannot
 // pass is a count of something the tree can grow.
 //
-// FOUNDER GATE (plan §4): nothing crossed. This reads the tree's own exported sentences.
+// W306: AND A PREDICATE NOBODY CAN HAND A DIFFERENT TREE HAS NEVER RUN IN THE STATE IT EXISTS TO
+// DETECT. `stillOpen` took no argument, and the predicates that read the filesystem closed over a
+// module-scope `process.cwd()` — so this register could answer *has the remedy been built* about
+// this tree and no other, which is what Q23's hardening pass raised as CR-1. It takes a root now,
+// and every remedy declares HOW it could be lifted. A `constructed_tree` carries the files that
+// make its remedy EXIST, and the predicate handed that root must report itself lifted — the arm
+// `staleBounds` is for, driven at last on the real entries rather than only on a fabricated one. A
+// predicate that derives its answer from imported constants instead says so, and is checked to
+// answer the same however the tree is arranged. And a predicate that is the literal `true` says
+// THAT, is proved constant, and sits under a ceiling — because its `reads` field described a
+// derivation the code never performed, and a check that cannot fail reads exactly like one that
+// passes.
+//
+// FOUNDER GATE (plan §4): nothing crossed. This reads the tree's own exported sentences, and the
+// trees it plants are throwaway directories holding only the files a predicate reads.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { existsSync } from "node:fs";
+import { type Plantable, withTree } from "./planting";
 import { sourceModules, pageSpecFiles } from "./tree-walks";
 import { headerUnit, knownUnits } from "./unit-headers";
 import { ACCEPTANCE_REGISTERS, ACCEPTANCE_BOUND } from "./acceptances";
@@ -50,13 +65,46 @@ import { CITATION_BOUND } from "./citations";
 import { PLANTING_BOUND } from "./planting";
 import { COUNT_BOUND } from "./register-counts";
 
+/**
+ * W306: how a remedy's predicate could be shown answering the other way.
+ *
+ * The register's sharp end, and the reason it exists: `stillOpen` returning true is the answer a
+ * broken predicate gives too. Each kind names what it would take to see the OTHER answer, and each
+ * is checked by `liftedDefects` against that claim rather than trusted.
+ */
+export type Lifted =
+  /**
+   * Files that make the remedy EXIST. Handed that root, `stillOpen` must return false.
+   *
+   * The lifted state, driven. Before W306 no such root could be handed to anything.
+   */
+  | { kind: "constructed_tree"; files: Plantable }
+  /**
+   * The predicate reads imported constants rather than the tree, so no root lifts it.
+   *
+   * Not an exemption: the claim is checked, by asking the predicate again about roots that hold
+   * nothing and about the roots that lift every other bound. A different answer means it does read
+   * the tree, and the declaration is wrong.
+   */
+  | { kind: "derived_without_a_tree"; why: string }
+  /**
+   * The predicate is the literal `true`, and nothing in any tree makes it say otherwise.
+   *
+   * W306 FOUND THESE RATHER THAN INTRODUCING THEM, and every one had a `reads` field describing a
+   * derivation the code did not perform. The kind exists so they are counted and argued instead of
+   * reading like the others; the ceiling beside it is what stops the escape hatch spreading.
+   */
+  | { kind: "never_derived"; why: string };
+
 /** How a bound could stop being true. */
 export type Lifting =
   /**
    * The bound names a change that would lift it, and `stillOpen` re-derives that the change has NOT
    * been made. False means the sentence is describing a tree that no longer exists.
+   *
+   * W306: it takes the root it reads, and `lifted` says how it could be seen saying false.
    */
-  | { kind: "remedy"; remedy: string; reads: string; stillOpen: () => boolean }
+  | { kind: "remedy"; remedy: string; reads: string; stillOpen: (root: string) => boolean; lifted: Lifted }
   /**
    * Nothing would lift it — the limit is in the kind of claim, not in the tree.
    *
@@ -83,15 +131,13 @@ export interface StatedBound {
   numbers: ReadonlyArray<{ word: string; kind: "rate" | "fixed_by_a_gate" | "unit_id"; why: string }>;
 }
 
-const ROOT = process.cwd();
-
 /**
  * What this register does not prove.
  *
  * Its own bound, subject to its own rule — which is why it names no total.
  */
 export const BOUNDS_BOUND =
-  "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for.";
+  "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for. W306 added the missing half of the predicate's own check — a bound carrying a constructed tree is driven in the state where its remedy EXISTS, rather than only in the state where it does not — and that is narrower than it reads too: the tree is a fixture written here, so what it shows is that the predicate reads a tree, not that it would recognise the remedy as somebody else will actually build it. The predicates declared to derive nothing from a tree are checked only for refusing to budge, which is weaker again.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
   {
@@ -102,8 +148,12 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "with the same remedy when such a pin arrives",
-      reads: "first-party test files, for a register size pinned to something other than a literal",
+      reads: "nothing — the predicate beside this line is the constant `true`, and W306 rewrote the sentence that claimed otherwise",
       stillOpen: () => true,
+      lifted: {
+        kind: "never_derived",
+        why: "The pin it would have to find is the one the bound calls invisible: a size asserted against a constant, an expression or another register's length. A predicate for that is a second sweep with a different shape rule, not a read — so this one is the literal `true`, and W306's contribution is that the field above no longer says it reads test files.",
+      },
     },
     numbers: [],
   },
@@ -115,8 +165,12 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the same remedy applies when such a plant arrives",
-      reads: "first-party test files, for a plant written some other way",
+      reads: "nothing — the predicate beside this line is the constant `true`, and W306 rewrote the sentence that claimed otherwise",
       stillOpen: () => true,
+      lifted: {
+        kind: "never_derived",
+        why: "The plant it would have to find is the one the bound calls invisible: an `fs/promises` write, an append, a shell-out, a helper outside a test file. Finding those is the sweep W303 said it had not built, so the predicate is the literal `true` and now says so where a reader looks.",
+      },
     },
     numbers: [],
   },
@@ -128,8 +182,12 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the detector grows a scan and says so",
-      reads: "first-party source, for a module that parses the format without splitting on it",
+      reads: "nothing — the predicate beside this line is the constant `true`, and W306 rewrote the sentence that claimed otherwise",
       stillOpen: () => true,
+      lifted: {
+        kind: "never_derived",
+        why: "The parse it would have to find is the one the bound calls invisible: an index, a regex, a destructuring helper. Every cheap proxy for it — a module holding the separator without splitting on it — matches modules that merely BUILD the format, which is most of the registers that use it, so a predicate here would report a remedy nobody built. The literal `true` is the honest answer and is declared as one.",
+      },
     },
     numbers: [],
   },
@@ -174,10 +232,21 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       reads: "W291's reporter walk, for the raw read the bound says is still there",
       // The bound says one scan still reads raw text. It stops being true the day somebody narrows
       // that walk — which is exactly what W295 tried and had to revert.
-      stillOpen: () =>
+      stillOpen: (root) =>
         /const text = readFileSync\(full, "utf8"\);/.test(
-          readFileSync(path.join(ROOT, "src/quality/refusal-branches.ts"), "utf8"),
+          readFileSync(path.join(root, "src/quality/refusal-branches.ts"), "utf8"),
         ),
+      lifted: {
+        kind: "constructed_tree",
+        // The narrowing W295 shipped and reverted, planted: the walk still reads the file and no
+        // longer reads it raw. The helper is named `narrowed` rather than `blankLiterals` on
+        // purpose — W302's `preparationCopies` sweeps this tree for blanking and stripping calls,
+        // and a fixture naming one would report THIS module as a preparation site.
+        files: {
+          "src/quality/refusal-branches.ts":
+            '// W291: the reporter walk, narrowed the way W295 tried.\nconst text = narrowed(readFileSync(full, "utf8"));\n',
+        },
+      },
     },
     numbers: [
       {
@@ -208,8 +277,17 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       reads: "the ledger, for W308's row still being open",
       // The bound says the number is good for comparison with itself and names W308 as the
       // comparison. It stops being true the day W308 lands, which is the quarter's own close.
-      stillOpen: () =>
-        !/^\| W308 \| done \|/m.test(readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8")),
+      stillOpen: (root) =>
+        !/^\| W308 \| done \|/m.test(readFileSync(path.join(root, "BUILD-STATE.md"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        // A ledger in which the quarter's close has landed. This is the one bound in the register
+        // whose remedy is SCHEDULED, so its lifted state is a tree the loop is going to build.
+        files: {
+          "BUILD-STATE.md":
+            "| W308 | done | planted | 2026-08-17T00:00Z | 0000000 | the second measurement, planted so this predicate can be seen answering the other way. |\n",
+        },
+      },
     },
     numbers: [
       {
@@ -239,6 +317,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       remedy: "reach the modules' own test fixtures",
       reads: "the number of composed sites driven with real inputs against the number declared",
       stillOpen: () => COMPOSED_COPY_SITES.length > 5,
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It counts W278's own declared sites, which are an imported constant. A tree with a sixth fixture in it would not change the answer — only editing `COMPOSED_COPY_SITES` does — so there is no root to hand it, and saying so is more honest than a fixture that would prove nothing.",
+      },
     },
     numbers: [
       {
@@ -270,6 +352,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       // The bound's own claim, re-derived: a surface can carry clinical content and pass. When
       // somebody widens the vocabulary this returns a finding and the sentence becomes false.
       stillOpen: () => sweepSurface("/", "patient", "amoxicillin 500mg three times daily").length === 0,
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It runs the sweep over a string this line holds, so the answer is a property of the vocabulary the module imports rather than of any tree. This is the strongest of the untreed predicates — it re-derives the bound's own claim by driving the detector — and it is still not liftable by a root, which is the distinction the kind exists to keep visible.",
+      },
     },
     numbers: [],
   },
@@ -282,10 +368,20 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       kind: "remedy",
       remedy: "a store that can be made to fail and a rendered page to read",
       reads: "the page suite, for a spec that drives a failing read",
-      stillOpen: () =>
-        !pageSpecFiles(ROOT).some((spec) =>
-          readFileSync(path.join(ROOT, spec), "utf8").includes("could_not_load"),
+      stillOpen: (root) =>
+        !pageSpecFiles(root).some((spec) =>
+          readFileSync(path.join(root, spec), "utf8").includes("could_not_load"),
         ),
+      lifted: {
+        kind: "constructed_tree",
+        // The remedy W279 named, planted: a page spec that drives a failing read. The finding CR-1
+        // used this predicate as its example, because its answer could only ever be about this
+        // tree — the e2e directory it walks was the repository's own.
+        files: {
+          "e2e/planted-failing-read.spec.ts":
+            'import { test } from "@playwright/test";\n\ntest("the console renders could_not_load when the store throws", async () => {});\n',
+        },
+      },
     },
     numbers: [
       {
@@ -313,6 +409,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       // expected value and the sentence stops being true.
       stillOpen: () =>
         tautologiesIn("probe.test.ts", 'it("a test", () => {\n  expect(rows.length).toBe(6);\n});\n').length === 0,
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It hands W288's shape rules a source string written on this line, so the answer depends on the imported detector and not on any file. Rooting it would mean planting a test file for `sweepTautologies` to walk, which tests the walk rather than the shape this bound is about.",
+      },
     },
     numbers: [
       {
@@ -341,8 +441,22 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       kind: "remedy",
       remedy: "a pass over the TypeScript AST with the checker attached",
       reads: "first-party source, for a module that imports the TypeScript compiler",
-      stillOpen: () =>
-        !sourceModules(ROOT).some((file) => /from ["']typescript["']/.test(readFileSync(file, "utf8"))),
+      stillOpen: (root) =>
+        !sourceModules(root).some((file) => /from ["']typescript["']/.test(readFileSync(file, "utf8"))),
+      lifted: {
+        kind: "constructed_tree",
+        // THE COLLISION, PREDICTED THIS TIME. This predicate walks `src/` of the root it is given,
+        // and this module is under `src/` — so a fixture spelling the import out would make the
+        // real tree match, and the bound would report itself lifted because its own lifting
+        // fixture arrived. It is the same shape W288, W294, W295, W300 and W302 each hit by
+        // shipping it; the split is what a scan's own fixture costs.
+        files: {
+          "src/planted/ast-pass.ts": [
+            'import ts from "type',
+            'script";\n\nexport const parse = ts.createSourceFile;\n',
+          ].join(""),
+        },
+      },
     },
     numbers: [
       {
@@ -374,6 +488,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       reads: "the census, for registers whose assertion is still unprovable",
       stillOpen: () =>
         TREE_DERIVED_REGISTERS.some((r) => r.assertion.kind === "assertion_unproven"),
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads W267's census, an imported constant listing what each register proves. The remedy — a comparison moved out of a test file — is recorded in that constant when it happens, so the lifting event is an edit to the register rather than a change to any tree this could be pointed at.",
+      },
     },
     numbers: [
       {
@@ -414,6 +532,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       reads: "the acceptance registers, for one still re-derived only inside its own test",
       stillOpen: () =>
         ACCEPTANCE_REGISTERS.some((r) => r.rederivation.kind === "rederived_in_its_own_test"),
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads W294's own register of acceptance registers, an imported constant. The same shape as the drive bound beside it, and for the same reason: what would lift it is somebody re-classifying a register, which is an edit rather than a tree.",
+      },
     },
     numbers: [
       {
@@ -473,6 +595,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         STATED_BOUNDS.some(
           (b) => BLIND_SPOTS[b.module]?.kind !== "demonstrated",
         ),
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It compares this register against W295's, both imported constants. A bound demonstrated by planting a witness is recorded there, so the lifting event is an entry arriving in that register — and this module reading itself is the reason its own predicate cannot be given a tree that differs from the one it was compiled with.",
+      },
     },
     numbers: [],
   },
@@ -530,14 +656,80 @@ export interface BoundDefect {
   what: string;
 }
 
-/** Bounds whose remedy has been built — the sentence now describes a tree that is gone. */
-export function staleBounds(bounds: readonly StatedBound[] = STATED_BOUNDS): BoundDefect[] {
+/**
+ * Bounds whose remedy has been built — the sentence now describes a tree that is gone.
+ *
+ * W306: takes the root each predicate reads. Before that it took none, and the two predicates that
+ * walk the filesystem closed over `process.cwd()` at module scope, so this function could be asked
+ * about the repository and nothing else.
+ */
+export function staleBounds(
+  root: string,
+  bounds: readonly StatedBound[] = STATED_BOUNDS,
+): BoundDefect[] {
   return bounds
-    .filter((b) => b.lifting.kind === "remedy" && !b.lifting.stillOpen())
+    .filter((b) => b.lifting.kind === "remedy" && !b.lifting.stillOpen(root))
     .map((b) => ({
       bound: `${b.module}::${b.name}`,
       what: `the remedy it names has been built: ${(b.lifting as { remedy: string }).remedy}`,
     }));
+}
+
+/** Every lifting fixture in the register, merged — a tree in which every remedy that has one exists. */
+function everyLiftingTree(bounds: readonly StatedBound[]): Plantable {
+  const files: Record<string, string> = {};
+  for (const bound of bounds) {
+    if (bound.lifting.kind !== "remedy") continue;
+    if (bound.lifting.lifted.kind !== "constructed_tree") continue;
+    Object.assign(files, bound.lifting.lifted.files);
+  }
+  return files;
+}
+
+/**
+ * W306: every remedy predicate driven against the claim its `lifted` declaration makes.
+ *
+ * THE UNIT. `staleBounds` asks each predicate whether the remedy is absent and every one says yes,
+ * which is also what a predicate that had stopped deciding would say. This asks the other question:
+ * can it ever say no.
+ *
+ * - `constructed_tree` — the files are planted and the predicate is asked again. Still open means
+ *   it is not reading the tree it claims to read, and its clean answer above proved nothing.
+ * - `derived_without_a_tree` — the predicate is asked about a bare root and about the root that
+ *   lifts every other bound, and must not budge. A different answer means it does read the tree
+ *   after all, and the declaration next to it is a description of code somebody stopped writing.
+ * - `never_derived` — the same two roots, and the answer must be `true` for both. The kind says the
+ *   predicate is a constant; this is what makes that a checked claim rather than a note.
+ *
+ * The opposite direction — a predicate stuck at `false` — is `staleBounds` in the same suite, which
+ * would report every bound in the register as stale. The pair is the both-directions rule; neither
+ * half is worth anything alone.
+ */
+export function liftedDefects(
+  root: string,
+  bounds: readonly StatedBound[] = STATED_BOUNDS,
+): BoundDefect[] {
+  const out: BoundDefect[] = [];
+  const everything = everyLiftingTree(bounds);
+  for (const bound of bounds) {
+    if (bound.lifting.kind !== "remedy") continue;
+    const id = `${bound.module}::${bound.name}`;
+    const { stillOpen, lifted } = bound.lifting;
+    if (lifted.kind === "constructed_tree") {
+      if (withTree(lifted.files, (planted) => stillOpen(planted))) {
+        out.push({ bound: id, what: "reads a tree in which its remedy EXISTS and still reports it absent" });
+      }
+      continue;
+    }
+    const here = stillOpen(root);
+    const elsewhere = [withTree({}, (bare) => stillOpen(bare)), withTree(everything, (all) => stillOpen(all))];
+    if (elsewhere.some((answer) => answer !== here)) {
+      out.push({ bound: id, what: `is declared ${lifted.kind} and answers differently for a different root` });
+    } else if (lifted.kind === "never_derived" && here !== true) {
+      out.push({ bound: id, what: "is declared never_derived and is not the constant its declaration claims" });
+    }
+  }
+  return out.sort((a, b) => `${a.bound}${a.what}`.localeCompare(`${b.bound}${b.what}`));
 }
 
 /**

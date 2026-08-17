@@ -162,11 +162,20 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       name: "PROBE_BOUND" as const,
       unit: "W9999",
       text: "a sentence stating seventeen of something",
-      lifting: { kind: "remedy" as const, remedy: "a remedy nobody wrote", reads: "x", stillOpen: () => false },
+      lifting: {
+        kind: "remedy" as const,
+        remedy: "a remedy nobody wrote",
+        reads: "x",
+        stillOpen: () => false,
+        // W306: the lifting declaration this probe would need to satisfy `liftedDefects`. It says
+        // the predicate reads no tree, which is true of `() => false` and is exactly the claim
+        // `liftedDefects` checks — so the probe below is also the drive for a bound stuck closed.
+        lifted: { kind: "derived_without_a_tree" as const, why: "a probe, and it reads nothing" },
+      },
       numbers: [],
     };
     return (
-      staleBounds([probe]).length > 0 &&
+      staleBounds(root, [probe]).length > 0 &&
       numberDefects([probe]).length > 0 &&
       unresolvedBounds(root, ledger, [probe]).length > 0
     );

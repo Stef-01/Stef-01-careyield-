@@ -83,10 +83,10 @@ export const FINDINGS: readonly HardeningFinding[] = [
       "`Lifting.stillOpen` is typed `() => boolean` — no root — and two of the eleven predicates close over `const ROOT = process.cwd()` declared at module scope in `bounds.ts`. That is the exact structural defect W267 spent a unit naming and W289 restated one argument over: a detector welded to the repository can only ever be READ, never pointed at a tree that differs from this one. Its consequence here is specific rather than theoretical. `stillOpen` answers *has the remedy been built* — the page-suite bound asks whether any spec drives `could_not_load`, the AST bound whether any module imports the TypeScript compiler — and both answers can only be produced about THIS tree. So the `stale` arm of `staleBounds` can be driven for a synthetic bound (the function takes its register as a parameter, which is right) but the two real predicates can never be exercised in their LIFTED state: nobody can hand them a tree where the remedy exists. A bound that cannot be shown going stale is a bound whose staleness check has never run, in the register whose subject is bounds that have gone stale.",
     raisedOn: "2026-08-17",
     disposition: {
-      kind: "deferred",
-      why:
-        "The remedy is one parameter — `stillOpen: (root: string) => boolean`, with the two closures taking the root they are given — plus a probe planting a spec that mentions `could_not_load` and requiring the bound to report itself lifted. That is a change to W297's type and all eleven of its entries, landed hours before this pass, and rewriting another unit's register inside a review is the overreach W285 pinned its range to avoid. Recorded with the remedy so the next unit inherits a sentence rather than a rediscovery.",
-      unit: "W299+",
+      kind: "fixed",
+      by: "W306",
+      evidence:
+        "`stillOpen` takes a root, and every predicate that walks the filesystem takes the one it is given — the module-scope `process.cwd()` is gone. Each remedy now declares HOW it could be lifted, and `liftedDefects` drives that declaration rather than trusting it: a `constructed_tree` carries the files that make its remedy EXIST, and the predicate handed that root must report itself lifted while `staleBounds` on the same root reports the bound stale. The page-suite bound and the AST bound this finding named are both driven that way, and so are the scan bound and the tax bound, which the finding did not count. THE FIX ALSO FOUND MORE THAN THE FINDING DID: three predicates were the literal `true` beside a `reads` field describing a derivation over test files or source that the code never performed — staleness checks with no way to fire at all, which is the finding's own sentence one layer further down. They are declared `never_derived`, proved constant, argued, and held rarer than the bounds that are driven.",
     },
   },
   {

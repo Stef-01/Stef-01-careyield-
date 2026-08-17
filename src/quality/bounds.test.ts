@@ -17,18 +17,21 @@
 // between one and four units before this one.
 
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import {
   BOUNDS_BOUND,
+  type Lifting,
   STATED_BOUNDS,
   type StatedBound,
   boundsInTree,
+  liftedDefects,
   numberDefects,
   numberWordsIn,
   staleBounds,
   unresolvedBounds,
 } from "./bounds";
+import { type Plantable, withTree } from "./planting";
 
 const ROOT = process.cwd();
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
@@ -65,7 +68,16 @@ describe("W297 every bound resolves to its unit and to its remedy", () => {
     const misattributed = unresolvedBounds(ROOT, LEDGER, [{ ...real, unit: "W1" }]);
     expect(misattributed.some((d) => d.what.includes("the module's header says"))).toBe(true);
     const noRemedy = unresolvedBounds(ROOT, LEDGER, [
-      { ...real, lifting: { kind: "remedy", remedy: "a phrase nobody wrote", reads: "x", stillOpen: () => true } },
+      {
+        ...real,
+        lifting: {
+          kind: "remedy",
+          remedy: "a phrase nobody wrote",
+          reads: "x",
+          stillOpen: () => true,
+          lifted: { kind: "never_derived", why: "a probe" },
+        },
+      },
     ]);
     expect(noRemedy.some((d) => d.what.includes("a remedy the sentence does not contain"))).toBe(true);
   });
@@ -81,7 +93,7 @@ describe("W297 every bound resolves to its unit and to its remedy", () => {
 describe("W297 a bound whose remedy has been built fails as stale", () => {
   it("finds none stale today", () => {
     // THE UNIT. Each predicate re-derives the absence of the change its sentence names.
-    expect(staleBounds(), "a bound describing a tree that no longer exists").toEqual([]);
+    expect(staleBounds(ROOT), "a bound describing a tree that no longer exists").toEqual([]);
     expect(STATED_BOUNDS.filter((b) => b.lifting.kind === "remedy").length).toBeGreaterThan(5);
   });
 
@@ -93,16 +105,22 @@ describe("W297 a bound whose remedy has been built fails as stale", () => {
         name: "PROBE_BOUND",
         unit: "W297",
         text: "a sentence naming a remedy",
-        lifting: { kind: "remedy", remedy: "a remedy", reads: "the tree", stillOpen: () => false },
+        lifting: {
+          kind: "remedy",
+          remedy: "a remedy",
+          reads: "the tree",
+          stillOpen: () => false,
+          lifted: { kind: "derived_without_a_tree", why: "a probe" },
+        },
         numbers: [],
       },
     ];
-    expect(staleBounds(built)).toEqual([
+    expect(staleBounds(ROOT, built)).toEqual([
       { bound: "src/probe.ts::PROBE_BOUND", what: "the remedy it names has been built: a remedy" },
     ]);
-    expect(staleBounds([{ ...built[0]!, lifting: { ...built[0]!.lifting, stillOpen: () => true } as never }])).toEqual(
-      [],
-    );
+    expect(
+      staleBounds(ROOT, [{ ...built[0]!, lifting: { ...built[0]!.lifting, stillOpen: () => true } as never }]),
+    ).toEqual([]);
   });
 
   it("keeps the no-remedy kind enumerated, so it is not the easy answer", () => {
@@ -119,6 +137,138 @@ describe("W297 a bound whose remedy has been built fails as stale", () => {
       expect((bound.lifting as { why: string }).why.length, `${id(bound)} claims no remedy without an argument`).toBeGreaterThan(
         200,
       );
+    }
+  });
+});
+
+describe("W306 every predicate is driven in the state its bound says has not arrived", () => {
+  const remedyOf = (b: StatedBound) => b.lifting as Extract<Lifting, { kind: "remedy" }>;
+  const constructed = STATED_BOUNDS.filter(
+    (b) => b.lifting.kind === "remedy" && b.lifting.lifted.kind === "constructed_tree",
+  );
+  const probe: StatedBound = {
+    module: "src/probe.ts",
+    name: "PROBE_BOUND",
+    unit: "W306",
+    text: "a sentence naming a remedy",
+    lifting: {
+      kind: "remedy",
+      remedy: "a remedy",
+      reads: "the tree",
+      stillOpen: () => true,
+      lifted: { kind: "derived_without_a_tree", why: "a probe" },
+    },
+    numbers: [],
+  };
+
+  it("sweeps every remedy against the claim its lifting declaration makes", () => {
+    // `staleBounds` above says every remedy is still absent, which is also what a predicate that
+    // had stopped reading anything would say — and before this unit there was no root to hand one
+    // to find out, because the type took none and the filesystem predicates closed over
+    // `process.cwd()`. Q23's hardening pass raised exactly that as CR-1.
+    expect(liftedDefects(ROOT), "a predicate that cannot be seen answering the other way").toEqual([]);
+  });
+
+  it("plants a tree in which the remedy EXISTS and requires the bound to go stale on it", () => {
+    // THE UNIT, and it is read separately from the sweep because a sweep over an empty set of
+    // constructed trees passes in silence: `liftedDefects` decides nothing about what it is not
+    // given, so the count of bounds carrying a tree is the assertion that it was given anything.
+    expect(constructed.length, "no bound carries a tree that would lift it").toBeGreaterThan(3);
+    for (const bound of constructed) {
+      const { stillOpen, lifted } = remedyOf(bound);
+      const files = (lifted as { files: Plantable }).files;
+      // Both directions on the same predicate: open about this tree, lifted about the planted one.
+      // Either half alone passes for a predicate stuck on a constant.
+      expect(stillOpen(ROOT), `${id(bound)} reports its remedy already built here`).toBe(true);
+      expect(
+        withTree(files, (planted) => stillOpen(planted)),
+        `${id(bound)} was handed a tree holding its remedy and still reports it absent`,
+      ).toBe(false);
+      // And the register's own reporter says so, on a real entry. Until this unit the `stale` arm
+      // could only be reached by fabricating a bound whose predicate returned false by fiat.
+      expect(
+        withTree(files, (planted) => staleBounds(planted, [bound]).map((d) => d.bound)),
+        `${id(bound)} does not report itself stale in its own lifted tree`,
+      ).toEqual([id(bound)]);
+    }
+  });
+
+  it("reports a fixture that does not lift, a predicate that budges, and a constant that is not one", () => {
+    // All three arms, because they are three different lies a declaration can tell.
+    const unlifted: StatedBound = {
+      ...probe,
+      lifting: {
+        ...remedyOf(probe),
+        lifted: { kind: "constructed_tree", files: { "src/probe.ts": "export const x = 1;\n" } },
+      },
+    };
+    expect(liftedDefects(ROOT, [unlifted])).toEqual([
+      {
+        bound: "src/probe.ts::PROBE_BOUND",
+        what: "reads a tree in which its remedy EXISTS and still reports it absent",
+      },
+    ]);
+
+    const budges: StatedBound = {
+      ...probe,
+      lifting: { ...remedyOf(probe), stillOpen: (root) => existsSync(path.join(root, "BUILD-STATE.md")) },
+    };
+    expect(liftedDefects(ROOT, [budges])).toEqual([
+      {
+        bound: "src/probe.ts::PROBE_BOUND",
+        what: "is declared derived_without_a_tree and answers differently for a different root",
+      },
+    ]);
+
+    const notConstant: StatedBound = {
+      ...probe,
+      lifting: {
+        ...remedyOf(probe),
+        stillOpen: () => false,
+        lifted: { kind: "never_derived", why: "a probe" },
+      },
+    };
+    expect(liftedDefects(ROOT, [notConstant])).toEqual([
+      {
+        bound: "src/probe.ts::PROBE_BOUND",
+        what: "is declared never_derived and is not the constant its declaration claims",
+      },
+    ]);
+  });
+
+  it("names the predicates that are the literal `true`, and keeps them the exception", () => {
+    // W306 FOUND THESE RATHER THAN INTRODUCING THEM. Three bounds carried `stillOpen: () => true`
+    // beside a `reads` field describing a derivation over test files or source — a staleness check
+    // that had never had a way to fire, written to read exactly like the ones that do. The kind is
+    // enumerated so they are argued and visible; the property beside it is that they stay rarer
+    // than the bounds actually driven, which is the same shape as `inherent` above.
+    const never = STATED_BOUNDS.filter(
+      (b) => b.lifting.kind === "remedy" && b.lifting.lifted.kind === "never_derived",
+    );
+    expect(never.map(id).sort()).toEqual([
+      "src/quality/citations.ts::CITATION_BOUND",
+      "src/quality/planting.ts::PLANTING_BOUND",
+      "src/quality/register-counts.ts::COUNT_BOUND",
+    ]);
+    expect(never.length, "the constant kind stopped being the exception").toBeLessThan(constructed.length);
+    for (const bound of never) {
+      const { reads, lifted } = remedyOf(bound);
+      expect(reads, `${id(bound)} still claims to read something`).toContain("the constant `true`");
+      expect((lifted as { why: string }).why.length, `${id(bound)} is a constant without an argument`).toBeGreaterThan(
+        200,
+      );
+    }
+  });
+
+  it("argues every untreed predicate, so a fixture nobody wrote is not the same as one nobody can write", () => {
+    // The kind most likely to become the easy answer: declaring a predicate untreeable is how a
+    // bound avoids carrying a fixture. Each says what it reads instead, and `liftedDefects` checks
+    // the claim by asking it again about roots it has never seen.
+    for (const bound of STATED_BOUNDS) {
+      if (bound.lifting.kind !== "remedy") continue;
+      const { lifted } = remedyOf(bound);
+      if (lifted.kind === "constructed_tree") continue;
+      expect(lifted.why.length, `${id(bound)} claims no tree can lift it without saying why`).toBeGreaterThan(150);
     }
   });
 });

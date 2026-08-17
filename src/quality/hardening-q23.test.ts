@@ -22,6 +22,7 @@ import {
 } from "./hardening-q23";
 import { knownUnits } from "./unit-headers";
 import { separatorDiff } from "./citations";
+import { STATED_BOUNDS, liftedDefects } from "./bounds";
 
 const ROOT = process.cwd();
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
@@ -108,18 +109,29 @@ describe("W298 the quarter is accounted for, in both directions", () => {
 });
 
 describe("W298 each finding is re-derived from the tree, so a fixed one goes stale", () => {
-  it("CR-1: the lifting predicate still takes no root, and still closes over process.cwd()", () => {
+  it("CR-1: the lifting predicate takes a root, and every real one is driven in its lifted state", () => {
+    // W306 fixed this, so the re-derivation flips — SIMP-1's shape below, and for the same reason:
+    // a finding whose evidence still asserts the defect is a register describing a tree that has
+    // moved on. A revert puts the finding back rather than leaving this quietly green.
     const bounds = read("src/quality/bounds.ts");
-    expect(bounds, "`stillOpen` now takes a root — CR-1 is fixed and stale").toContain(
-      "stillOpen: () => boolean",
+    expect(bounds, "`stillOpen` takes no root again — CR-1 is back").toContain(
+      "stillOpen: (root: string) => boolean",
     );
-    expect(bounds, "the module-scope cwd is gone — CR-1 is fixed and stale").toMatch(
-      /const ROOT = process\.cwd\(\);/,
+    expect(bounds, "the module-scope cwd is back — CR-1 is back").not.toMatch(
+      /^const ROOT = process\.cwd\(\);$/m,
     );
-    // And the two predicates that read it, which is what makes the finding concrete rather than
-    // a remark about a type.
-    expect(bounds).toContain("pageSpecFiles(ROOT)");
-    expect(bounds).toContain("sourceModules(ROOT)");
+    // The two predicates the finding named, taking the root they are handed rather than the one
+    // the module was compiled in — which is what makes the fix concrete rather than a type change.
+    expect(bounds).toContain("pageSpecFiles(root)");
+    expect(bounds).toContain("sourceModules(root)");
+    // And the half that makes it a fix rather than a signature: each of them is asked about a tree
+    // in which its remedy EXISTS, and must report itself lifted.
+    expect(liftedDefects(ROOT), "a bound that cannot be shown going stale").toEqual([]);
+    expect(
+      STATED_BOUNDS.filter((b) => b.lifting.kind === "remedy" && b.lifting.lifted.kind === "constructed_tree")
+        .length,
+      "no bound carries a tree that lifts it",
+    ).toBeGreaterThan(3);
   });
 
   it("CR-2: the four counts that fired are bounds now, not equalities", () => {

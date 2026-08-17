@@ -285,9 +285,9 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     assertion: {
       kind: "driven_here",
       claim:
-        "Every stated bound resolves to the unit that wrote its module and to a remedy its own sentence contains, the remedy has not been built, and every number-word in it is declared as something other than a total.",
+        "Every stated bound resolves to the unit that wrote its module and to a remedy its own sentence contains, the remedy has not been built, every predicate can be shown answering the other way or declares why it cannot, and every number-word in it is declared as something other than a total.",
       mutation:
-        "`staleBounds` is given a bound whose `stillOpen` says the remedy is built and must report it; `numberDefects` is given a sentence stating an undeclared number and must report that too.",
+        "`staleBounds` is given a bound whose `stillOpen` says the remedy is built and must report it; `liftedDefects` is given a bound whose lifting fixture does not lift it and must report that; `numberDefects` is given a sentence stating an undeclared number and must report that too.",
     },
   },
   {
