@@ -47,11 +47,47 @@ import path from "node:path";
 import { blankLiterals, prepareForScan } from "./scan-text";
 import { testModules } from "./tree-walks";
 
-/** The shapes this sweep can decide. Three, each argued in `SHAPE_ARGUMENTS`. */
+/** The shapes this sweep can decide, each argued in `SHAPE_ARGUMENTS`. */
 export type TautologyShape =
   | "both_sides_the_same_constant"
   | "typeof_of_an_imported_binding"
-  | "lower_bound_a_count_cannot_break";
+  | "lower_bound_a_count_cannot_break"
+  | "length_preserved_by_the_operation";
+
+/**
+ * W316: array operations that return exactly as many elements as they were handed.
+ *
+ * DECLARED RATHER THAN GUESSED, which is the whole difference between this shape and a false
+ * positive. A sweep that assumed any method call on a collection preserved length would flag
+ * `xs.filter(f)` — the one operation whose whole job is to drop elements — and the register would
+ * be tuned back down until it agreed with the answer, which is what W279 refused. Each entry says
+ * why the language guarantees it, so adding one is a claim somebody has to make out loud.
+ */
+export const LENGTH_PRESERVING: Readonly<Record<string, string>> = {
+  map: "Returns a new array with one element per element of the original, in the same positions. The callback cannot skip: returning `undefined` still occupies a slot.",
+  sort: "Reorders in place and returns the same array object. Nothing is added or removed, whatever the comparator does — including a comparator that throws, which propagates rather than shortening the result.",
+  reverse: "Reorders in place and returns the same array object, so the length is the length it started with.",
+  toSorted: "The copying form of `sort`, and copying is one-for-one: same elements, new array, new order.",
+  toReversed: "The copying form of `reverse`, one-for-one for the same reason: the elements are the elements, and only their order is new.",
+  with: "Returns a copy with one index replaced. A replacement is not an insertion, so the length is unchanged by construction.",
+};
+
+/**
+ * The near-misses, declared beside the list they are not in.
+ *
+ * A REGISTER OF WHAT IS ABSENT IS WORTH MORE THAN A SHORTER LIST, because the next author reaching
+ * for this sweep will wonder about exactly these. Each one is an operation somebody could plausibly
+ * think preserves length, with the case that shows it does not.
+ */
+export const NOT_LENGTH_PRESERVING: Readonly<Record<string, string>> = {
+  filter: "Drops every element the predicate refuses, so `xs.filter(f).length` against `xs.length` is a real claim — it says the predicate accepted everything, which is usually the point of the test.",
+  flatMap: "Returns as many elements as the callbacks produce between them, which is one per element only when every callback returns exactly one.",
+  flat: "Collapses nested arrays, so the result is longer than the original whenever any element was an array and shorter whenever any was empty.",
+  slice: "Preserves length only when called with no arguments, and this sweep will not decide by counting arguments — an operation whose answer depends on how it was called is one the register declines rather than half-knows.",
+  concat: "Appends one collection to another, so the result is the sum of the two — the opposite of preserving, and the only entry here whose name says so plainly enough to be worth stating anyway.",
+  splice: "Removes and inserts in place, and returns what it removed rather than what remains.",
+  reduce: "Returns whatever the reducer built, which has no relationship to the input length at all.",
+};
 
 export interface Tautology {
   /** Repo-relative, posix separators. */
@@ -71,6 +107,8 @@ export const SHAPE_ARGUMENTS: Readonly<Record<TautologyShape, string>> = {
     "The subject and the expected value are the same text and neither contains a call, so both sides evaluate to the same value in every possible tree. `expect(true).toBe(true)` and `expect(X.length).toBe(X.length)` are the same assertion about nothing. The no-call condition is what separates this from the determinism idiom, where two calls are compared and either can differ.",
   typeof_of_an_imported_binding:
     "`typeof` of a statically imported binding is fixed by the import: if the export disappears or changes kind, tsc fails before any test runs, and if it does not, the assertion cannot. It is a runtime check of something the compiler already refuses to let through.",
+  length_preserved_by_the_operation:
+    "The subject is the result of an operation that returns exactly as many elements as it was given, and the expected value is the length of what it was given. `expect(xs.map(f)).toHaveLength(xs.length)` asks whether `map` dropped an element, and `map` cannot: the answer is fixed by the language rather than by the code under test. What makes this decidable is that the operations are DECLARED rather than guessed — the sweep knows `map` preserves length and does not know what `explainPlan` does, so a function returning one line per candidate is a real claim and stays one.",
   lower_bound_a_count_cannot_break:
     "A `.length` or a `.size` is a count, and a count is never negative — so `toBeGreaterThanOrEqual(0)` and `toBeGreaterThan(-1)` over one hold in every tree. This is Y5-1's shape, which the Year 5 audit found three times and W256 closed by requiring an upper bound in the same test; that rule polices one matcher against one number, and this refuses the shape wherever the subject is a count.",
 };
@@ -197,6 +235,34 @@ export function enclosingTest(code: string, index: number): string {
  * whatever the tree happens to contain — W291's rule about a healthy tree producing none of the
  * inputs a register exists to report.
  */
+const PRESERVING_OPS = Object.keys(LENGTH_PRESERVING).join("|");
+
+/**
+ * `const ys = xs.map(f)` — the one hop this sweep follows, and it follows exactly one.
+ *
+ * The direct form is rare in real code and the bound form is what this tree actually writes: the
+ * transform is named on one line and asserted about on another. Following two hops would mean
+ * tracking assignments through a file, which is a type-checker's job; following none would make the
+ * shape decidable only in a form nobody uses. The bound says where the line is drawn.
+ */
+function preservingBindings(code: string): Map<string, string> {
+  const out = new Map<string, string>();
+  const re = new RegExp(
+    `\\b(?:const|let)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:await\\s+)?([A-Za-z_$][\\w$.]*)\\.(?:${PRESERVING_OPS})\\(`,
+    "g",
+  );
+  for (const m of code.matchAll(re)) out.set(m[1]!, m[2]!);
+  return out;
+}
+
+/** The collection an expression's length comes from, if a length-preserving operation produced it. */
+function preservedFrom(expression: string, bindings: Map<string, string>): string | null {
+  const bare = expression.replace(/\.length$/, "");
+  const direct = new RegExp(`^([A-Za-z_$][\\w$.]*)\\.(?:${PRESERVING_OPS})\\(`).exec(bare);
+  if (direct) return direct[1]!;
+  return /^[A-Za-z_$][\w$]*$/.test(bare) ? (bindings.get(bare) ?? null) : null;
+}
+
 export function tautologiesIn(file: string, source: string): Tautology[] {
   // Comments are subtracted first: a commented-out assertion is not an assertion, and this tree's
   // notes quote the shapes they warn about. W302's shared preparation, which enforces that order —
@@ -204,6 +270,7 @@ export function tautologiesIn(file: string, source: string): Tautology[] {
   // the other way round consumes an `export function` line whenever a comment holds a `/`.
   const code = prepareForScan(source, { literals: "kept" });
   const imported = importedNames(code);
+  const bindings = preservingBindings(code);
   const out: Tautology[] = [];
   for (const a of assertionsIn(code)) {
     const shape = ((): TautologyShape | null => {
@@ -226,6 +293,20 @@ export function tautologiesIn(file: string, source: string): Tautology[] {
           (a.matcher === "toBeGreaterThan" && a.expected === "-1"))
       ) {
         return "lower_bound_a_count_cannot_break";
+      }
+      // W316. The expected value must be the length of the very collection the operation was
+      // handed: `expect(xs.map(f)).toHaveLength(ys.length)` is a real claim about two collections,
+      // and a sweep that only checked the subject would call it vacuous.
+      const expectedOf = /^([A-Za-z_$][\w$.]*)\.length$/.exec(a.expected)?.[1];
+      if (
+        !a.negated &&
+        expectedOf &&
+        (a.matcher === "toHaveLength"
+          ? !a.subject.endsWith(".length")
+          : ["toBe", "toEqual", "toStrictEqual"].includes(a.matcher) && a.subject.endsWith(".length")) &&
+        preservedFrom(a.subject, bindings) === expectedOf
+      ) {
+        return "length_preserved_by_the_operation";
       }
       return null;
     })();
@@ -358,6 +439,12 @@ export const NOT_A_TAUTOLOGY: Readonly<Record<string, string>> = {
     "`expect(start).toBeGreaterThan(-1)` on an `indexOf`. -1 is the MISS value, so the assertion is 'the heading exists' and it fails whenever it does not. The count shape is keyed on the subject being a `.length` or a `.size` for exactly this reason: the matcher alone cannot tell the two apart.",
   a_non_emptiness_claim:
     "`expect(xs.length).toBeGreaterThan(0)` — a claim about the tree that a wrong tree breaks. Eighty-odd sites, and the near-miss against the count shape is one character of the expected value.",
+  a_length_against_a_different_collection:
+    "`expect(xs.map(f)).toHaveLength(ys.length)` — a length-preserving operation on one collection, checked against the length of another. It says the two started the same size, which is a real claim about the fixtures and fails whenever they diverge. The W316 shape is keyed on the expected value naming the very collection the operation was handed, and that is the whole difference.",
+  a_length_after_an_operation_that_drops:
+    "`expect(xs.filter(f)).toHaveLength(xs.length)` — the same shape over an operation whose job is to drop elements, and therefore a real claim that the predicate accepted everything. `filter` and five more are declared in `NOT_LENGTH_PRESERVING` beside the list they are absent from, because the next author reaching for this sweep will wonder about exactly those.",
+  a_result_of_a_function_the_sweep_does_not_know:
+    "`expect(explainPlan(candidates, slots, plan)).toHaveLength(candidates.length)` — this tree's own assertion, and it is the claim that the explainer produces one line per candidate. The sweep follows ONE hop through a length-preserving array method and knows nothing about what a function returns, which is what keeps assertions like this one out of it.",
   typeof_of_a_local_binding:
     "`expect(typeof code).toBe('string')` where `code` is declared in the same test. Equally entailed by the type, and not flagged: resolving a local declaration's type is a type-checker's job, and a text sweep guessing at it would be a detector tuned toward its author's answer — W279's refusal. Named in `SWEEP_BOUND` rather than half-implemented.",
 };
@@ -369,4 +456,4 @@ export const NOT_A_TAUTOLOGY: Readonly<Record<string, string>> = {
  * exported data rather than a comment.
  */
 export const SWEEP_BOUND =
-  "This reads text. A tautology that needs a TYPE to see it is invisible here: a local const whose initialiser fixes its type, a constant compared against a value imported from the module under test, a generic that collapses to a literal. Three shapes are decided, not all of them. The change that lifts it is a pass over the TypeScript AST with the checker attached, which can ask what an expression's type is rather than what its text looks like — a different tool from this one, and worth its own unit if a hit is ever found that way. Until then a clean sweep means 'none of the three shapes', which is what it says. And the literal-blanking that keeps the scan out of quoted probes is a lexer approximation, not a parser: `a / b / c` can be consumed as a regex, and a mis-blank hides assertions rather than inventing them. The canary is the four accepted hits, which sit in four different files and are asserted to still be found — wholesale hiding fails that before it can read as a clean tree.";
+  "This reads text. A tautology that needs a TYPE to see it is invisible here: a local const whose initialiser fixes its type, a constant compared against a value imported from the module under test, a generic that collapses to a literal. Three shapes are decided, not all of them. The change that lifts it is a pass over the TypeScript AST with the checker attached, which can ask what an expression's type is rather than what its text looks like — a different tool from this one, and worth its own unit if a hit is ever found that way. Until then a clean sweep means 'none of the shapes named above', which is what it says. W316's shape has a second limit of its own: it follows ONE hop, from a `const` bound to a length-preserving call, so the same assertion written through a helper, or through a further assignment, is invisible to it — and the operations it trusts are a declared list, so an equivalent method this tree has not met is a shape it will not decide. And the literal-blanking that keeps the scan out of quoted probes is a lexer approximation, not a parser: `a / b / c` can be consumed as a regex, and a mis-blank hides assertions rather than inventing them. The canary is the four accepted hits, which sit in four different files and are asserted to still be found — wholesale hiding fails that before it can read as a clean tree.";

@@ -15,6 +15,8 @@ import { describe, expect, it } from "vitest";
 import { withRoot } from "./refusal-branches";
 import {
   ACCEPTED_TAUTOLOGIES,
+  LENGTH_PRESERVING,
+  NOT_LENGTH_PRESERVING,
   NOT_A_TAUTOLOGY,
   SHAPE_ARGUMENTS,
   SWEEP_BOUND,
@@ -97,6 +99,7 @@ describe("W288 each shape fires on the tautology and stays quiet on the real ass
       "both_sides_the_same_constant",
       "typeof_of_an_imported_binding",
       "lower_bound_a_count_cannot_break",
+      "length_preserved_by_the_operation",
     ]);
     expect(new Set(Object.keys(SHAPE_ARGUMENTS) as TautologyShape[])).toEqual(decided);
     for (const [shape, why] of Object.entries(SHAPE_ARGUMENTS)) {
@@ -194,10 +197,16 @@ describe("W288 every hit in this tree is fixed or accepted, and the acceptance i
 });
 
 describe("W288 what the sweep refuses to flag is written down", () => {
-  it("names the five near-misses, each with the argument for leaving it alone", () => {
+  it("names every near-miss, each with the argument for leaving it alone", () => {
+    // W316 added three and the title used to say five. The NAMES are the register — a count beside
+    // them is the pinned-count class CR-2 named, and this one moved on the first ordinary addition
+    // after it was written.
     expect(Object.keys(NOT_A_TAUTOLOGY).sort()).toEqual([
+      "a_length_after_an_operation_that_drops",
+      "a_length_against_a_different_collection",
       "a_lower_bound_on_a_rate",
       "a_non_emptiness_claim",
+      "a_result_of_a_function_the_sweep_does_not_know",
       "an_index_compared_against_minus_one",
       "comparing_two_calls_of_the_same_function",
       "typeof_of_a_local_binding",
@@ -212,5 +221,106 @@ describe("W288 what the sweep refuses to flag is written down", () => {
     // in a comment above it.
     expect(SWEEP_BOUND).toContain("TypeScript AST");
     expect(SWEEP_BOUND.length).toBeGreaterThan(300);
+  });
+});
+
+describe("W316 the length a length-preserving operation cannot change", () => {
+  // The direct form and the bound form, because this tree writes the second and almost never the
+  // first: the transform is named on one line and asserted about on another.
+  const direct = (assertion: string) => shapesOf(body(assertion));
+  const bound = (setup: string, assertion: string) =>
+    shapesOf(`it("a test", () => {\n  ${setup}\n  ${assertion}\n});\n`);
+
+  it("fires on the operation whose result cannot be shorter, written either way", () => {
+    // THE UNIT. `map` returns one element per element; asking whether it dropped one is asking the
+    // language, not the code under test.
+    expect(direct("expect(xs.map(f).length).toBe(xs.length);")).toEqual([
+      "length_preserved_by_the_operation",
+    ]);
+    expect(direct("expect(xs.map(f)).toHaveLength(xs.length);")).toEqual([
+      "length_preserved_by_the_operation",
+    ]);
+    expect(bound("const ys = xs.map(f);", "expect(ys).toHaveLength(xs.length);")).toEqual([
+      "length_preserved_by_the_operation",
+    ]);
+    expect(bound("const ys = xs.map(f);", "expect(ys.length).toBe(xs.length);")).toEqual([
+      "length_preserved_by_the_operation",
+    ]);
+  });
+
+  it("refuses a filter, which is the operation whose whole job is to drop elements", () => {
+    // THE NEAR-MISS THE GATE NAMES. `expect(xs.filter(f)).toHaveLength(xs.length)` says the
+    // predicate accepted everything, which is usually the point of the test — and a sweep that
+    // assumed any method on a collection preserved length would delete exactly those.
+    expect(direct("expect(xs.filter(f)).toHaveLength(xs.length);")).toEqual([]);
+    expect(direct("expect(xs.filter(f).length).toBe(xs.length);")).toEqual([]);
+    expect(bound("const kept = xs.filter(f);", "expect(kept).toHaveLength(xs.length);")).toEqual([]);
+    for (const op of Object.keys(NOT_LENGTH_PRESERVING)) {
+      expect(direct(`expect(xs.${op}(f)).toHaveLength(xs.length);`), `${op} was read as preserving`).toEqual(
+        [],
+      );
+    }
+  });
+
+  it("refuses a length checked against a DIFFERENT collection", () => {
+    // The other half of the shape, and the half a subject-only check would miss: two collections
+    // being the same size is a claim about the fixtures that a wrong fixture breaks.
+    expect(direct("expect(xs.map(f)).toHaveLength(ys.length);")).toEqual([]);
+    expect(bound("const zs = xs.map(f);", "expect(zs).toHaveLength(ys.length);")).toEqual([]);
+  });
+
+  it("refuses the result of a function it knows nothing about, which this tree really asserts", () => {
+    // `match.test.ts` says `expect(explained).toHaveLength(candidates.length)` where `explained`
+    // comes from `explainPlan`. That is the claim that the explainer produces one line per
+    // candidate — the assertion the unit exists to protect, not to delete.
+    expect(
+      bound("const explained = explainPlan(candidates, SLOTS, plan);", "expect(explained).toHaveLength(candidates.length);"),
+    ).toEqual([]);
+    expect(bound("const consents = await a.listConsents();", "expect(consents).toHaveLength(patients.length);")).toEqual(
+      [],
+    );
+  });
+
+  it("declares the operations it trusts and the ones it refuses, each argued", () => {
+    // Declared rather than guessed is the gate's own wording, and the register of what is ABSENT is
+    // where the next author will look first.
+    for (const [op, why] of Object.entries(LENGTH_PRESERVING)) {
+      expect(why.length, `${op} is trusted without an argument`).toBeGreaterThan(80);
+    }
+    for (const [op, why] of Object.entries(NOT_LENGTH_PRESERVING)) {
+      expect(why.length, `${op} is refused without an argument`).toBeGreaterThan(80);
+    }
+    // No operation may be in both lists, which is the one way this register could contradict itself
+    // — and the check is shown FINDING a collision before it is trusted to report none, because an
+    // empty list from a comparison nobody has seen fire is W293's whole subject.
+    const overlap = (a: Readonly<Record<string, string>>, b: Readonly<Record<string, string>>) =>
+      Object.keys(a).filter((op) => op in b);
+    expect(overlap(LENGTH_PRESERVING, NOT_LENGTH_PRESERVING), "an operation is declared both ways").toEqual(
+      [],
+    );
+    expect(overlap({ map: "a" }, { map: "b" }), "the overlap check cannot see a collision").toEqual(["map"]);
+    expect(Object.keys(LENGTH_PRESERVING).length).toBeGreaterThan(4);
+  });
+
+  it("follows one hop and says so, rather than half-following two", () => {
+    // The bound, driven. A second assignment is invisible — stated in `SWEEP_BOUND` rather than
+    // implemented badly, because tracking assignments through a file is a type-checker's job.
+    expect(bound("const ys = xs.map(f);\n  const zs = ys;", "expect(zs).toHaveLength(xs.length);")).toEqual([]);
+    expect(SWEEP_BOUND).toContain("ONE hop");
+  });
+
+  it("finds one planted in a tree, so the shape is not only decidable in a string", () => {
+    // W267's split: a shape that decides perfectly over a file list missing the new file reports a
+    // clean tree forever. This tree contains no instance of the class, which is exactly why the
+    // walk has to be shown one arriving.
+    const found = withRoot(
+      {
+        "src/planted/preserved.test.ts": body("expect(xs.map(f)).toHaveLength(xs.length);"),
+        "src/planted/dropped.test.ts": body("expect(xs.filter(f)).toHaveLength(xs.length);"),
+      },
+      (root) => sweepTautologies(root),
+    );
+    expect(found.map((t) => t.file)).toEqual(["src/planted/preserved.test.ts"]);
+    expect(found[0]!.shape).toBe("length_preserved_by_the_operation");
   });
 });
