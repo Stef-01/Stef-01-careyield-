@@ -742,6 +742,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W309's path register is reviewer-facing: routes, page paths, `data-testid` markers, and the argument for each gate that stops a step. The one thing on it that IS copy — the refusal sentence — lives in `src/console/gates.ts` and is re-exported here rather than restated, which is what keeps this list honest. Nothing here renders.",
   },
   {
+    module: "src/founder/second-reading.ts",
+    operatorCopy: ["SECOND_READING_COPY"],
+    notCopy:
+      "`SECOND_READING_BOUND` is reviewer-facing — it argues what a unit-number marker cannot see, and names the stored snapshot this deliberately does not keep. Everything else here is a unit id read off the ledger. The copy is four sentences addressed to the founder about build status, and the state each one belongs to is the whole point: a first reading and a quiet stretch need opposite words.",
+  },
+  {
     module: "src/quality/prose-numbers.ts",
     operatorCopy: [],
     notCopy:

@@ -12,6 +12,7 @@ import {
   builtSurface,
   outstandingRulings,
 } from "@/founder/outstanding";
+import { SECOND_READING_COPY, sinceReading } from "@/founder/second-reading";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, verifySession } from "@/console/session";
@@ -20,7 +21,14 @@ export const dynamic = "force-dynamic";
 
 export const metadata = { title: "What is waiting on you — Meherr" };
 
-export default async function FounderPage() {
+export default async function FounderPage({
+  searchParams,
+}: {
+  // W322: the reading is carried in the LINK rather than stored. A saved snapshot of this page
+  // would be a second copy of the ledger that can disagree with it, which is the class most of
+  // this tree's registers exist to catch; a unit id in a URL has nothing to reconcile.
+  searchParams: Promise<{ since?: string }>;
+}) {
   // The session primitive directly, NOT `../guard`. `requireSession` lives beside `requirePractice`
   // in a module that resolves a practice, so importing it drags the whole console spine — domain,
   // engine, tenancy — onto a page that must reach none of them. W271 said so on the first run.
@@ -30,6 +38,8 @@ export default async function FounderPage() {
   const root = process.cwd();
   const built = builtSurface(root);
   const rulings = outstandingRulings(root);
+  const since = (await searchParams).since;
+  const reading = sinceReading(root, since ? { lastUnit: since } : null);
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-12">
@@ -38,6 +48,29 @@ export default async function FounderPage() {
         <p className="text-stone-600">{FOUNDER_COPY.intro}</p>
         <p className="text-sm text-stone-500">{FOUNDER_COPY.noClinical}</p>
       </header>
+
+      {/* W322: three states, three sentences. An empty list here would tell a first-time reader
+          that nothing has changed, about a period they have never seen. */}
+      <section className="flex flex-col gap-3" data-testid="second-reading">
+        <h2 className="text-xl font-semibold tracking-tight">{SECOND_READING_COPY.heading}</h2>
+        {reading.kind === "first_reading" ? (
+          <p className="text-stone-600" data-testid="reading-first">{SECOND_READING_COPY.firstReading}</p>
+        ) : reading.kind === "unknown_unit" ? (
+          <p className="text-stone-600" data-testid="reading-unknown">{SECOND_READING_COPY.unknownUnit}</p>
+        ) : reading.quiet ? (
+          <p className="text-stone-600" data-testid="reading-quiet">{SECOND_READING_COPY.quiet}</p>
+        ) : (
+          <div className="flex flex-col gap-2" data-testid="reading-since">
+            <p className="text-sm text-stone-500">Measured from {reading.lastUnit}.</p>
+            <p className="text-stone-700">
+              {SECOND_READING_COPY.builtHeading}: {reading.built.map((b) => b.id).join(", ") || "none"}
+            </p>
+            <p className="text-stone-700">
+              {SECOND_READING_COPY.blockedHeading}: {reading.blocked.map((b) => b.id).join(", ") || "none"}
+            </p>
+          </div>
+        )}
+      </section>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-xl font-semibold tracking-tight">{FOUNDER_COPY.builtHeading}</h2>

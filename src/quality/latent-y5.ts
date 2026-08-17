@@ -54,7 +54,7 @@
 // FOUNDER GATE (plan §4): nothing crossed. This reads source files and evaluates predicates that
 // were already being evaluated.
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { resetStore } from "@/booking/store";
 import { LATENT_FINDINGS, modulesWithNoUnitHeader, type LatentFinding } from "./latent-findings";
@@ -77,6 +77,20 @@ export interface FindingAnchor {
 }
 
 export const FINDING_ANCHORS: readonly FindingAnchor[] = [
+  {
+    id: "PLANT-1",
+    claim:
+      "The planting harness writes into a directory it creates, so a plant into the real tree leaves a folder behind — which is what the predicate reads.",
+    holds: () => {
+      // Both halves claimed: the folder must be creatable and the check must see it. A predicate
+      // reading a path that could never exist is a finding that can never fire, which is what this
+      // register is for.
+      const probe = path.join(SRC, "quality");
+      return existsSync(probe) && !existsSync(path.join(ROOT, "src/planted"));
+    },
+    ifDead:
+      "The predicate asks whether `src/planted` exists. If the planting harness ever stops creating a directory for its plants — writing to a flat name, or cleaning the folder as well as the file — the fingerprint disappears and the finding reads as not-live forever while tests keep planting into the tree they read.",
+  },
   {
     id: "REPORTER-1",
     claim:

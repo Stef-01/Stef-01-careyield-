@@ -92,4 +92,25 @@ test.describe("signed in", () => {
     // The demo practice this session signed into must not appear: the page is not practice-scoped.
     expect(body).not.toContain("demo family practice");
   });
+
+  test("W322: a first visit says so, and a marker shows what has moved since", async ({ page }) => {
+    // THE THREE STATES, READ OFF THE SCREEN. A unit suite cannot tell a page that renders the
+    // right branch from one that renders the same paragraph in every case, because both agree
+    // with the module. The first visit is the one that matters: an empty list there tells a reader
+    // who has never looked that nothing has changed.
+    await page.goto("/console/founder");
+    await expect(page.getByTestId("reading-first")).toBeVisible();
+    await expect(page.getByTestId("reading-since")).toHaveCount(0);
+
+    // A marker the ledger has: the page names it and lists what landed after it.
+    await page.goto("/console/founder?since=W300");
+    await expect(page.getByTestId("reading-since")).toContainText("Measured from W300");
+    await expect(page.getByTestId("reading-since")).toContainText("W320");
+    await expect(page.getByTestId("reading-first")).toHaveCount(0);
+
+    // A marker it does not: refused, rather than measured from nothing and reported as a busy year.
+    await page.goto("/console/founder?since=W9999");
+    await expect(page.getByTestId("reading-unknown")).toBeVisible();
+    await expect(page.getByTestId("reading-since")).toHaveCount(0);
+  });
 });

@@ -37,7 +37,7 @@
 // the check worthless. So the both-directions half is a habit, not a control, and saying so is
 // better than a scan that would pass over a note nobody read.
 
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { REFUSAL_BRANCHES, violationReporters } from "./refusal-branches";
 import path from "node:path";
 import { resetStore } from "@/booking/store";
@@ -125,6 +125,16 @@ export function modulesWithNoUnitHeader(): string[] {
  */
 
 export const LATENT_FINDINGS: readonly LatentFinding[] = [
+  declareFinding({
+    id: "PLANT-1",
+    what:
+      "A test plants into the REAL `src/` tree rather than into a copy, and the fingerprint it leaves is the directory: `withPlantedIn` removes the file it wrote and not the `src/planted/` folder that had to be created for it. While the file exists, any other test file walking `src/` in a parallel worker can list it and then fail to open it — which is how `record-classes.test.ts` and `stores.test.ts` have each died once with ENOENT on `src/planted/w313-probe.ts`, in runs where every file passes in isolation. The predicate is the directory rather than the race, because a race cannot be asserted and its residue can.",
+    recordedBy: "W322",
+    triggerStatement:
+      "The real tree holds a `src/planted/` directory. Nothing in this repository should: every planting harness writes into a temporary copy, so the folder existing at all means some run wrote into the tree it was reading.",
+    trigger: () => existsSync(path.join(ROOT, "src/planted")),
+    status: "open",
+  }),
   declareFinding({
     id: "REPORTER-1",
     what:

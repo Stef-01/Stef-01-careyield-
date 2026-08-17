@@ -64,6 +64,7 @@ import { TAX_BOUND } from "./declaration-tax";
 import { SCAN_BOUND, fixtureText } from "./scan-text";
 import { SELF_REFERENCE_BOUND, fixtureFiles } from "./self-reference";
 import { CLAIMS, PROSE_BOUND, proseClaims } from "./prose-numbers";
+import { SECOND_READING_BOUND, sinceReading } from "@/founder/second-reading";
 import { DEMO_PATH, PATH_BOUND, gateStops } from "@/demo/path";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
 import { CITATION_BOUND } from "./citations";
@@ -295,6 +296,31 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       kind: "inherent",
       why:
         "THE FIRST DRAFT OF THIS ENTRY CLAIMED A REMEDY AND THE REGISTER REFUSED IT. The predicate said the bound stays open while any declared gate goes unwalked by the e2e spec, and W306's driver reported it stale on the spot: the spec already walks all four, so the sentence would have been describing a tree that had moved before it was committed. The mistake was reading the mechanical clause as the whole bound. What this sentence is actually about is that a green walk over synthetic data says nothing about a practice — and what would lift THAT is a pilot, which is G4. A founder gate is not a change to this tree, so there is no root that makes this false and no predicate that could be honest about it. The mechanical clause beside it — a component call read from source is not a rendered element — is closed for the routes the spec walks and stated rather than remedied for the rest, because widening the walk is a decision about e2e runtime rather than a defect somebody should be nagged about.",
+    },
+    numbers: [],
+  },
+  {
+    module: "src/founder/second-reading.ts",
+    name: "SECOND_READING_BOUND",
+    unit: "W322",
+    text: SECOND_READING_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the stored snapshot this deliberately does not keep",
+      reads: "the ledger, for a reader whose marker is older than the oldest week-unit it holds",
+      // The bound says a marker older than the ledger's first week-unit gets everything back with
+      // no way to tell that from a busy quarter. It stops being true if the ledger ever stops
+      // holding W1 — at which point the oldest marker a reader can carry IS inside the ledger.
+      stillOpen: (root) => sinceReading(root, { lastUnit: "W1" }).kind === "since",
+      lifted: {
+        kind: "constructed_tree",
+        // A ledger whose first week-unit is not W1: the oldest marker anybody holds now falls
+        // outside it and comes back refused rather than as everything-is-new.
+        files: {
+          "BUILD-STATE.md":
+            "| Unit | Status | By | At | Commit | Note |\n| --- | --- | --- | --- | --- | --- |\n| W900 | done | b | t | c | a ledger that starts late. |\n",
+        },
+      },
     },
     numbers: [],
   },

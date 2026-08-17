@@ -382,6 +382,14 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/founder/second-reading.ts",
+    // Reads the ledger through `allLedgerRows` rather than walking the tree, so W267's census does
+    // not hold it — `treeWalkingFiles` does not see it and a row there would be a declaration
+    // nothing re-derives. It is here because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/prose-numbers.ts",
     census: {
       derives:
