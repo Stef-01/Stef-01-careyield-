@@ -182,6 +182,14 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/horizon-q25.test.ts",
+    name: "Q25_HORIZON_LAST_UNIT",
+    classification: {
+      kind: "range_bound",
+      why: "The same bound for Q25, carried forward by W312 — the fifth horizon to bound itself from its first line. W312 also had to repair Q24's version, which bounded its unit list correctly and sliced the plan section to a heading that stopped being the next one.",
+    },
+  },
+  {
     module: "src/quality/horizon-q24.test.ts",
     name: "Q24_HORIZON_LAST_UNIT",
     classification: {

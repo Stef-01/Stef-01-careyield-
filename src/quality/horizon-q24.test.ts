@@ -53,7 +53,21 @@ function rows(): Row[] {
 
 const asAtHorizon = () => rows().filter((r) => r.n <= Q24_HORIZON_LAST_UNIT);
 const Q24 = Array.from({ length: 13 }, (_, i) => `W${300 + i}`);
-const section = () => PLAN.slice(PLAN.indexOf("## 5i."), PLAN.indexOf("## 6. Horizon rule"));
+/**
+ * §5i alone, ending at whatever heading comes next.
+ *
+ * W312 FIXED THIS AT THE CLOSE IT WAS WRITTEN TO SURVIVE. The slice ran to `## 6. Horizon rule`,
+ * which was the next heading only until a quarter was expanded between them — so the moment §5j
+ * was laid down this section grew to twenty-six units and the tests below read Q25's plan as part
+ * of Q24's. `horizon-q23.test.ts` already scoped its own section for exactly this reason and W291
+ * had already fixed the whole-plan form once; this file's comment claims that fix and applies half
+ * of it. Ending at the NEXT heading needs no edit at the next expansion.
+ */
+const section = () => {
+  const start = PLAN.indexOf("## 5i.");
+  const after = PLAN.indexOf("\n## ", start + 1);
+  return PLAN.slice(start, after === -1 ? PLAN.length : after);
+};
 
 describe("W299 the document reads the ledger it claims to read", () => {
   it("parses the ledger at all", () => {
@@ -108,8 +122,12 @@ describe("W299 the six preconditions are evaluated against the thing each claims
       expect(row!.status, `${id} was planned as buildable and is now blocked`).not.toBe("blocked");
     }
     expect(PLAN).toContain("## 5i. Year 6 — Q24 (W300–W312)");
-    expect(PLAN).not.toContain("W313");
-    expect(rows().every((r) => r.n <= Q24_HORIZON_LAST_UNIT)).toBe(true);
+    // SCOPED TO §5i, not to the whole plan. The claim is that THIS expansion planned one quarter,
+    // which stays true forever; "the plan mentions no W313" stops being true the moment the next
+    // quarter close does its job, and would have reported W312 succeeding as W299 failing.
+    expect(section(), "§5i plans a unit beyond the quarter it expands").not.toContain("W313");
+    expect(Q24.every((id) => Number(id.slice(1)) <= Q24_HORIZON_LAST_UNIT)).toBe(true);
+    expect(asAtHorizon()).toHaveLength(Q24_HORIZON_LAST_UNIT);
   });
 
   it("(2) cites the two documents the rule names, by path", () => {

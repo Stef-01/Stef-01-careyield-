@@ -194,6 +194,7 @@ describe("W305 the registers that kept their own lists agree with it, both direc
       "src/quality/horizon-q22.test.ts",
       "src/quality/horizon-q23.test.ts",
       "src/quality/horizon-q24.test.ts",
+      "src/quality/horizon-q25.test.ts",
       "src/quality/horizon-y6.test.ts",
     ]);
   });

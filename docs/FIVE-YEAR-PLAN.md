@@ -675,6 +675,40 @@ blocked row.**
 - **W311** [P] Q24 hardening → verify: code-review, security-review and simplify run over the quarter's diff; every finding recorded with a disposition and a date, and the accepted ones carry a review date.
 - **W312** **QUARTER CLOSE.** Q25 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
 
+## 5j. Year 7 — Q25 (W313–W325)
+
+Expanded by W312 on 2026-08-17 under the §6 horizon rule, from `docs/AUDIT-Y5.md` and
+`docs/GATE-DOSSIER-Y5.md` — and from `src/quality/hardening-q24.ts`, which is newer than both and
+is where the theme comes from. **One quarter, not a year.** See `docs/HORIZON-Q25.md` for the
+rule's six preconditions evaluated one at a time, and for the gate position recorded at this
+expansion.
+
+**Q25 — the claims, not the code.** Q24 set out to pay down what the controls cost and missed its
+own gate: the declaration tax went UP, six to seven, and the quarter's note says the instrument was
+wrong rather than the work. Its hardening pass then found the larger thing, four separate times — a
+tautology shipped INTO the unit whose subject was assertions that check nothing, the fourth stale
+count in prose in two quarters, and two fixes that reproduced the class they were fixing. Add the
+process fact none of them is a finding against: **the verify gate runs before the ledger row is
+written**, which cost three separate defects in one session. The common shape is that this tree
+checks its code and not the CLAIMS it makes about its code — prose, records, dispositions, the
+ledger row itself. Every Q25 unit makes one class of unchecked claim checkable or retires it. The
+gate is deliberately not a number this time: W324 re-reads the class list, because Q24's gate was a
+number and counting controls measured the wrong thing. **Q25 adds no blocked row.**
+
+- **W313** A better instrument for the declaration tax → verify: the tax measured as the files an AUTHOR must edit to declare a module rather than the registers that report it undeclared, both instruments run over the same planted shapes, and the disagreement between them recorded as the reason W308's gate read the wrong way.
+- **W314** [P] Numbers in prose, resolved against the tree → verify: every numeric claim in a module header or doc comment either resolves to something derived or is declared unresolvable with its reason; the four stale counts of Q23 and Q24 reproduced as planted headers and each one reported.
+- **W315** The gate that ran before the row → verify: the ledger row a unit will commit is present in the tree the gate runs over, driven on the three consequences this quarter produced — a lost `[P]` prefix, a bound stale on its own close, and a `PENDING` SHA in a committed row.
+- **W316** [P] Length-preserving operations: the tautology class W288 cannot see → verify: `xs.map(f).length` against `xs.length` reported, the operations that preserve length declared rather than guessed, and a planted assertion over a filter — which does NOT preserve length — refused.
+- **W317** [P] A remedy that reproduces its own defect → verify: the two Q24 instances re-derived as a pair, a stated rule for what makes a fix an instance of the class it fixes, and a planted remedy carrying the defect reported.
+- **W318** Every disposition on a clock → verify: a deferred finding carries a unit by which it is answered and fails when that unit lands without it, the accepted ones keep W294's review dates, and a disposition with no clock at all refused at the type level.
+- **W319** [P] The blocked surface reachable from one place → verify: every blocked row reachable from the founder's page and every rendered row present in the ledger, both directions, driven on a planted row that no release path names.
+- **W320** Module headers derived from what the module exports → verify: a header naming an export the module does not have reported, a header omitting the module's own subject reported, and the class W298's citation door leaves open stated with what it still cannot read.
+- **W321** [P] The demo path's second scenario: a practice that refuses → verify: one spec walking a practice that declines at each gate the path offers, every refusal rendered where it happens, and no founder gate crossed.
+- **W322** The founder's page, second reading → verify: what has changed since a recorded reading, derived from the ledger rather than stored, with a first visit saying so rather than rendering an empty diff.
+- **W323** [P] Assertion vocabulary: one way to say a list is non-empty → verify: the ways this tree currently spells the same assertion enumerated from the suite, one form chosen, the rest converted, and a planted variant reported.
+- **W324** The claim classes re-read — this quarter's gate → verify: every class named in `docs/HORIZON-Q25.md` either driven by a check that exists or declared unprovable with its reason; a class named and neither driven nor declared fails.
+- **W325** **QUARTER CLOSE.** Q26 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
 ## 6. Horizon rule (supersedes the five-year expansion rule, W260)
 
 **The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,

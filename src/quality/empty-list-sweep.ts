@@ -478,6 +478,8 @@ export const UNEVIDENCED_AT_W293: readonly string[] = [
   "src/quality/g5-rehearsal.test.ts :: is imported by nothing the product ships :: importers",
   "src/quality/gate-readiness.test.ts :: opens every path, and finds a file at each :: missing",
   "src/quality/hardening-q22.test.ts :: disposes all of them, with review dates on the accepted ones :: undisposed",
+  "src/quality/horizon-q25.test.ts :: (3) states the number the loop may answer, and it is still zero :: answerable+blocker+map",
+  "src/quality/horizon-q25.test.ts :: (4) adds no blocked row, and says why the count moved anyway :: plannedBlocked",
   "src/quality/horizon-y6.test.ts :: blocks none of them, which is the quarter's own constraint :: blocked",
   "src/quality/latent-findings.test.ts :: finds no header-less module at all, because W281 closed CENSUS-1 :: modulesWithNoUnitHeader",
   "src/quality/latent-y5.test.ts :: anchors every open finding, and anchors nothing that is not one :: anchorCoverage.orphaned",
