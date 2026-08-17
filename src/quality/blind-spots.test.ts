@@ -126,7 +126,7 @@ describe("W295 a stated bound is planted, and the register stays silent", () => 
   it("counts an unplanted bound as unplanted rather than as demonstrated", () => {
     // The cheap way to a clean run would be to declare every bound `undemonstrated`, so the split
     // is pinned and the undemonstrated side carries the reason it cannot be planted.
-    expect(ofKind("undemonstrated")).toHaveLength(34);
+    expect(ofKind("undemonstrated")).toHaveLength(35);
     expect(falseBounds(Object.fromEntries(ofKind("undemonstrated")))).toEqual([]);
   });
 });

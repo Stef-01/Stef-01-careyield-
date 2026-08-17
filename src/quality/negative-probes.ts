@@ -253,6 +253,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/bounds.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/bounds.test.ts :: matches whole words, or `one` is found inside `none`",
+      plants: "none of them, often, tension",
+    },
+  },
+  {
     register: "src/quality/blind-spots.ts",
     negative: {
       kind: "already_driven",

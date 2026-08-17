@@ -22,7 +22,7 @@
 // run is silent about by construction. W292 plants a negative to show a detector is not too broad;
 // this plants a negative the detector is ADMITTED to miss, and requires the admission to be true.
 //
-// ELEVEN ARE DEMONSTRATED AND THIRTY-THREE ARE NOT, and the split is W289's structural one: a
+// SOME ARE DEMONSTRATED AND MOST ARE NOT, and the split is W289's structural one: a
 // register whose detector is not callable from outside cannot be given a witness. Each undemonstrated
 // entry says so and states its bound anyway, because a bound nobody wrote down is worse than one
 // nobody has planted.
@@ -343,6 +343,13 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
     whyNotPlantable:
       "A witness for this register would be a bound that is false in a way its own plant cannot observe, which is the definition of what the plant cannot observe. Stating it is the whole of what can be done from inside, and refusing to state it would be the register exempting itself from the question it asks of everything else (W201).",
   },
+  "src/quality/bounds.ts": {
+    kind: "undemonstrated",
+    bound:
+      "It resolves a bound's unit, remedy and numbers against the sentence and the tree, so it cannot see whether the sentence is a FAIR description of the limit. A bound naming a real remedy for half of what the remedy would fix resolves cleanly here and understates the limit anyway — which is the shape `BOUNDS_BOUND` names and hands to a reader.",
+    whyNotPlantable:
+      "A witness would be a bound that resolves and is unfair, and unfairness is a judgement about prose rather than a property a plant can carry. Fabricating one would be writing the answer into the fixture, which is the detector W279 refused to tune. Stating it is what can be done from inside, and the quarterly hardening pass is where a reader looks.",
+  },
   "src/security/reachability.ts": {
     kind: "undemonstrated",
     bound:
@@ -624,4 +631,4 @@ export function boundDiff(
  * one exclusion a register allows is the one it states.
  */
 export const BLIND_SPOT_BOUND =
-  "A demonstrated bound proves that ONE witness went unseen. It does not enumerate the register's blind spots, and it cannot: a detector's false negatives are not a finite list anybody can write down. What eleven demonstrations buy is that eleven stated sentences are true rather than plausible, and — because a bound restating the register's job would produce a hit rather than silence — that none of the eleven is a sentence describing what the register already does. The other thirty-three are stated and unplanted, which is strictly better than unstated and strictly worse than planted, and each says which it is. This register is subject to its own rule and its bound is this paragraph: nothing here plants a witness against `falseBounds` itself except the fabricated one in its test, so a bound that is true for the wrong reason — a witness the register misses because it was malformed rather than because of the shape the sentence names — would read as a demonstration. The remedy is the one the tree already uses: each witness is written to be otherwise ordinary, and the positive control sits beside it in the test.";
+  "A demonstrated bound proves that ONE witness went unseen. It does not enumerate the register's blind spots, and it cannot: a detector's false negatives are not a finite list anybody can write down. What the demonstrations buy is that the sentences they plant against are true rather than plausible, and — because a bound restating the register's job would produce a hit rather than silence — that none of them is a sentence describing what the register already does. The rest are stated and unplanted, which is strictly better than unstated and strictly worse than planted, and each says which it is; the split is counted in the register rather than written into this sentence, because W288 found the same totals-in-prose wrong two units after they were typed. This register is subject to its own rule and its bound is this paragraph: nothing here plants a witness against `falseBounds` itself except the fabricated one in its test, so a bound that is true for the wrong reason — a witness the register misses because it was malformed rather than because of the shape the sentence names — would read as a demonstration. The remedy is the one the tree already uses: each witness is written to be otherwise ordinary, and the positive control sits beside it in the test.";

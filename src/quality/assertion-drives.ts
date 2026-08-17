@@ -14,18 +14,18 @@
 // THE STRUCTURAL REASON IS W267'S, ONE ARGUMENT OVER. A walk can only be tested by pointing it at a
 // different tree, so only a detector taking a `root` can be tested. An assertion can only be tested
 // by handing it a different DECLARED list, so only a comparison exported as a function taking that
-// list can be tested. Twenty-five of the census's forty-one do their comparing inside a `.test.ts`
+// list can be tested. MOST of the census's registers do their comparing inside a `.test.ts`
 // file, and a test file exports nothing: there is no second declared list to give it, and the
 // proof is unavailable rather than merely absent. Each of those carries the one-line change.
 //
-// THIRTEEN ARE DRIVEN AND THE DRIVES ARE EXECUTED, NOT CITED. Nine here, four already covered by
-// W291's branch register — and those four are RESOLVED and CALLED rather than recorded, because
+// THE DRIVEN ONES ARE EXECUTED, NOT CITED. Some here, the rest already covered by
+// W291's branch register — and those are RESOLVED and CALLED rather than recorded, because
 // W284's central citation resolved to `text.includes("/")` and nobody had run it. A citation this
 // register cannot resolve fails; a citation naming a branch W291 lists as unreachable fails too.
 //
 // WHAT THIS IS NOT. It is not a second copy of W291. That register asks, of six violation
-// reporters, whether every ARM has ever been produced; this asks, of all forty-one census
-// registers, whether the ONE assertion that is the register's point can fail at all. Where they
+// reporters, whether every ARM has ever been produced; this asks, of EVERY census
+// register, whether the ONE assertion that is the register's point can fail at all. Where they
 // meet, this cites and executes rather than rewriting the drive.
 //
 // FOUNDER GATE (plan §4): nothing crossed. Fabricated declared lists and temporary directories.
@@ -41,6 +41,7 @@ import { REFUSAL_BRANCHES, driveBranches, withRoot } from "./refusal-branches";
 import { anchorCoverage, deadAnchors } from "./latent-y5";
 import { LATENT_FINDINGS, fired } from "./latent-findings";
 import { pinDiff } from "./pins";
+import { numberDefects, staleBounds, unresolvedBounds } from "./bounds";
 import { BLIND_SPOTS, boundDiff, falseBounds } from "./blind-spots";
 import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptances";
 import { unacceptedTautologies } from "./tautology-sweep";
@@ -133,6 +134,23 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
         },
       }).length > 0;
     return unstated && refuted;
+  },
+
+  "src/quality/bounds.ts": (root) => {
+    const ledger = readFileSync(path.join(root, "BUILD-STATE.md"), "utf8");
+    const probe = {
+      module: "src/w289-probe.ts",
+      name: "PROBE_BOUND" as const,
+      unit: "W9999",
+      text: "a sentence stating seventeen of something",
+      lifting: { kind: "remedy" as const, remedy: "a remedy nobody wrote", reads: "x", stillOpen: () => false },
+      numbers: [],
+    };
+    return (
+      staleBounds([probe]).length > 0 &&
+      numberDefects([probe]).length > 0 &&
+      unresolvedBounds(root, ledger, [probe]).length > 0
+    );
   },
 
   "src/quality/pins.ts": (root) => pinDiff(root, []).undeclared.length > 0,
@@ -235,4 +253,4 @@ export const ASSERTS_NOTHING: readonly string[] = [
  * violation reporter and nobody's question where it is not.
  */
 export const DRIVE_BOUND =
-  "One assertion per register, driven once. That is the gate's demand and it is not the same as 'this register works': a comparison can reject the input this drive gives it and still miss a different one, and a register with four arms has three that nothing here touches. What a clean run means is narrower and worth saying plainly — every register in the census names a claim and the mutation that breaks it, thirteen of those mutations have been executed and did break it, and twenty-five cannot be executed at all until the comparison moves out of the test file. The twenty-five are the finding, not the thirteen.";
+  "One assertion per register, driven once. That is the gate's demand and it is not the same as 'this register works': a comparison can reject the input this drive gives it and still miss a different one, and a register with four arms has three that nothing here touches. What a clean run means is narrower and worth saying plainly — every register in the census names a claim and the mutation that breaks it, some of those mutations have been executed and did break it, and the rest cannot be executed at all until the comparison moves out of the test file. THE UNEXECUTABLE ONES ARE THE FINDING, not the driven ones, and they are the majority. (W297 removed the totals this sentence carried. It said thirteen executed while seventeen were, because four registers arrived after it was written — the same defect W288 found in `FIXTURE_BOUND`, in a sentence about how narrow a claim should be. The counts live in the census, where the suite reads them.)";

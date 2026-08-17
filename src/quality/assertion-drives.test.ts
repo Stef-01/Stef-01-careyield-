@@ -66,7 +66,7 @@ describe("W289 the drivable assertions are driven, and they report", () => {
       if (!drive(ROOT)) failed.push(file);
     }
     expect(failed, "a register accepted an input its assertion exists to reject").toEqual([]);
-    expect(Object.keys(ASSERTION_DRIVES)).toHaveLength(11);
+    expect(Object.keys(ASSERTION_DRIVES)).toHaveLength(12);
   });
 
   it("agrees with the census in both directions", () => {
@@ -142,6 +142,6 @@ describe("W289 what a green run does not prove", () => {
     expect(unproven, "a register arrived whose assertion cannot be driven").toBeLessThanOrEqual(25);
     expect(driven + unproven + byKind("carries_no_assertion").length).toBe(TREE_DERIVED_REGISTERS.length);
     expect(DRIVE_BOUND).toContain("One assertion per register");
-    expect(DRIVE_BOUND, "the bound does not say which half is the finding").toContain("are the finding");
+    expect(DRIVE_BOUND, "the bound does not say which half is the finding").toContain("ARE THE FINDING");
   });
 });

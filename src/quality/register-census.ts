@@ -233,6 +233,25 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/bounds.ts",
+    derives:
+      "Every `export const *_BOUND` under `src/` — the sentences this tree exports about what it does not prove.",
+    checkedAgainst:
+      "W297's `STATED_BOUNDS`, both directions: a bound the tree states and this register does not know fails, and a declared bound whose export is gone fails.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "a module exporting a `*_BOUND` is planted in a constructed root beside one exporting a differently-named constant, and only the first may be reported",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every stated bound resolves to the unit that wrote its module and to a remedy its own sentence contains, the remedy has not been built, and every number-word in it is declared as something other than a total.",
+      mutation:
+        "`staleBounds` is given a bound whose `stillOpen` says the remedy is built and must report it; `numberDefects` is given a sentence stating an undeclared number and must report that too.",
+    },
+  },
+  {
     file: "src/quality/blind-spots.ts",
     derives:
       "Nothing of the tree's own — it plants WITNESSES in front of eleven other registers' detectors and reads what each reports, which is how a stated bound is shown to be true rather than plausible.",

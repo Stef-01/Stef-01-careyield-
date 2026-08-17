@@ -730,6 +730,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "An in-memory store of specs, and its strings are ids and criteria keys. What it holds is authored elsewhere and gated by G5; the store renders nothing.",
   },
   {
+    module: "src/quality/bounds.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W297's bounds register is reviewer-facing throughout: for each exported `*_BOUND` in the tree, the unit that stated it, the remedy it names, the predicate that re-derives that remedy's absence, and what every number-word in the sentence is. It holds no copy of its own — the sentences it checks belong to the eight modules that state them, and everything it returns is a `module::NAME` key plus a phrase saying what went wrong. No patient, condition or appointment reason appears anywhere in it.",
+  },
+  {
     module: "src/quality/blind-spots.ts",
     operatorCopy: [],
     notCopy:
