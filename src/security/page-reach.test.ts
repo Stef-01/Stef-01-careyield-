@@ -126,6 +126,10 @@ describe("W271 the requirements are requirements, not measurements", () => {
     const withRequirements = ROUTE_CLASSES.filter((c) => c.mustReach.length > 0);
     expect(withRequirements.map((c) => c.id).sort()).toEqual([
       "console",
+      // W310. Its rule is the narrowest in the register and the reason it exists: the founder page
+      // must reach `founder`, because a page under `/console` that stopped reaching the derivation
+      // and started holding its own list would satisfy every other check here.
+      "founder",
       "operator_export",
       "patient_token",
       "platform_api",

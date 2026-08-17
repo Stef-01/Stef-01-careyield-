@@ -122,6 +122,14 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    module: "src/founder/outstanding.ts",
+    folds: 1,
+    disposition: {
+      kind: "rationale",
+      why: "ONE `reduce`, and it is a maximum rather than a fold over an order. `builtSurface` walks the done rows keeping the highest week number, comparing `Number(id.slice(1))` on both sides — so the result is the same whichever order the rows arrive in, and two rows cannot tie because a week number appears once in the ledger (W208's plan-ledger check is what makes that true rather than hoped). It reads the row rather than a field of it, which is the case the other rationales here argue is fine only when the tie is impossible; here it is impossible by the ledger's own uniqueness. The sort in `outstandingRulings` is not a fold and is stable on `blocker` as its second key, so equal waits render in a fixed order.",
+    },
+  },
+  {
     module: "src/guardrails/condition-monitors.ts",
     folds: 1,
     disposition: {

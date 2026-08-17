@@ -188,6 +188,7 @@ export const ROUTE_COVERAGE: readonly RouteCoverage[] = [
   { route: "/console/credentials", exercise: { kind: "literal", spec: "credentials.spec.ts" } },
   { route: "/console/dashboard", exercise: { kind: "literal", spec: "dashboard.spec.ts" } },
   { route: "/console/education", exercise: { kind: "literal", spec: "education.spec.ts" } },
+  { route: "/console/founder", exercise: { kind: "literal", spec: "founder.spec.ts" } },
   { route: "/console/interest", exercise: { kind: "literal", spec: "interest.spec.ts" } },
   { route: "/console/interop", exercise: { kind: "literal", spec: "interop.spec.ts" } },
   { route: "/console/onboarding", exercise: { kind: "literal", spec: "console.spec.ts" } },

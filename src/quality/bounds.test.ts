@@ -247,13 +247,13 @@ describe("W306 every predicate is driven in the state its bound says has not arr
     );
     expect(never.map(id).sort()).toEqual([
       "src/quality/citations.ts::CITATION_BOUND",
-      // W305 ADDED THIS ONE, ON THE UNIT AFTER W306 NAMED THE CLASS, which is worth the sentence:
-      // the list is meant to shrink and it grew. It qualifies honestly — the remedy `MANIFEST_BOUND`
-      // names is a MEASUREMENT W308 takes, not a state of the tree, so no predicate over the tree
-      // could report it lifted without lying — but a fourth constant arriving immediately is the
-      // signal W306 built this list to give, and the next unit to touch it should ask whether the
-      // kind is becoming the easy answer rather than adding a fifth.
-      "src/quality/manifest.ts::MANIFEST_BOUND",
+      // W305 ADDED `MANIFEST_BOUND` HERE and W310 took it back out, which is the list doing its
+      // job. W305 added a fourth constant on the unit after W306 named the class, flagged that the
+      // kind was becoming the easy answer, and asked the next unit to check rather than add a
+      // fifth. W310 checked: the remedy `MANIFEST_BOUND` named was W308's re-measurement, W308
+      // landed, and what remains of the sentence cannot be lifted by anything — so the entry was
+      // wrong about its KIND, not about its predicate, and it is `inherent` now. `TAX_BOUND` left
+      // the register the same way on the same unit, for the same reason.
       "src/quality/planting.ts::PLANTING_BOUND",
       "src/quality/register-counts.ts::COUNT_BOUND",
     ]);

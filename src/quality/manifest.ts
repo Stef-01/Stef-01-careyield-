@@ -68,6 +68,7 @@ import { PLANTING_BOUND, planterDiff, withTree } from "./planting";
 import { COUNT_BOUND, countDiff, registerSizeAssertions } from "./register-counts";
 import { SCAN_SITES, blankLiterals, fixtureDiff, fixtureText, scanSiteDiff } from "./scan-text";
 import { fallibleDiff } from "./review-w279";
+import { founderDiff } from "@/founder/outstanding";
 import { SELF_SCANNING, SPLIT_EXCEPTIONS, holderDiff, splitDiff, splitSites } from "./self-reference";
 import { coverageDiff } from "./route-coverage";
 import { negativeDiff } from "./negative-probes";
@@ -126,7 +127,9 @@ export const MANIFEST_BOUND =
   "in more places than this. What `manifestDiff` catches is the worse case — a module watched by " +
   "some register that this manifest has never heard of. It does not reach TEST FILES: several pin " +
   "a constant and W290 watches them, but none can hold a census entry, a blind spot or a refusal " +
-  "branch, so a row here could never say anything. W308 re-measures whether the tax moved.";
+  "branch, so a row here could never say anything. W308 has since re-measured the tax and " +
+  "recorded that this manifest raised it, which settles the tax question and leaves this bound " +
+  "saying what it always said.";
   "branch, so a row here would be one that could never say anything. W308 re-measures the tax.";
   "here would be one that could never say anything. And W308 re-measures whether the tax moved.";
 
@@ -1494,6 +1497,37 @@ export const MANIFEST: readonly ModuleEntry[] = [
             withTree({ "src/probe.ts": "// W9999: a unit the ledger does not have.\nexport const x = 1;\n" }, (root) =>
               headerViolations(root, LEDGER_ROW(1)).some((v) => v.includes("does not have")),
             ),
+        },
+      },
+    ],
+  },
+  {
+    module: "src/founder/outstanding.ts",
+    // CENSUS: NULL, AND W267 IS WHY. The first draft gave this module a census entry and the
+    // register said "a declared walker no longer walks" — correctly. `treeWalkingFiles` looks for a
+    // module that ENUMERATES the tree; this one opens `BUILD-STATE.md` and `FIVE-YEAR-PLAN.md` by
+    // name. Reading two known files is not a walk, and claiming a census row for it would have
+    // bought a blind spot, a negative probe, an assertion drive and a place in W300's tax
+    // measurement, all describing a walk that does not happen.
+    census: null,
+    branches: [
+      {
+        fn: "founderDiff",
+        branch: "undescribed",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            founderDiff(process.cwd(), [
+              { blocker: "G404", kind: "founder_gate", whoDecides: "x", releases: ["W161"] },
+            ]).undescribed.length > 0,
+        },
+      },
+      {
+        fn: "founderDiff",
+        branch: "unrendered",
+        reach: {
+          kind: "driven",
+          drive: () => founderDiff(process.cwd(), []).unrendered.length > 0,
         },
       },
     ],

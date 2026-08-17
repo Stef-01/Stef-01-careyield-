@@ -47,6 +47,7 @@ import { reachableFrom } from "./reachability";
 
 export type RouteClassId =
   | "public"
+  | "founder"
   | "patient_token"
   | "console"
   | "mock_seed"
@@ -85,6 +86,13 @@ export const ROUTE_CLASSES: readonly RouteClass[] = [
     ],
     mustReach: [],
     mayReach: ["compliance", "demo", "interest", "lib", "privacy", "security"],
+  },
+  {
+    id: "founder",
+    why: "One route, one reader, and its own class because no existing allowance fits it. It lives under `/console` because it is not public — the public sweep visits signed out, so a redirect would measure as an empty page — but it is NOT practice-scoped: it resolves no tenant, so the console class's session-and-tenancy spine would be wrong for it, and it reaches `quality`, which that class deliberately excludes. The allowance is what makes the claim checkable rather than intended: `domain`, `engine`, `session` and `tenancy` all arrived on the first run — the page had imported `requireSession` from `../guard`, which sits beside `requirePractice` and drags the console spine with it — and W271 is why the page now takes the session primitive directly. That reach is the page's whole purpose: it renders the blocked-surface register. What it must never reach is anything holding practice or patient state, and the allowance below is what makes that a check rather than an intention.",
+    routes: ["/console/founder"],
+    mustReach: ["founder"],
+    mayReach: ["console", "founder", "lib", "quality"],
   },
   {
     id: "patient_token",

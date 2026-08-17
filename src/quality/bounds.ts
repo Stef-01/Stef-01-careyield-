@@ -67,6 +67,7 @@ import { CITATION_BOUND } from "./citations";
 import { PLANTING_BOUND } from "./planting";
 import { COUNT_BOUND } from "./register-counts";
 import { MANIFEST_BOUND } from "./manifest";
+import { FOUNDER_BOUND } from "@/founder/outstanding";
 
 /**
  * W306: how a remedy's predicate could be shown answering the other way.
@@ -144,19 +145,24 @@ export const BOUNDS_BOUND =
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
   {
+    module: "src/founder/outstanding.ts",
+    name: "FOUNDER_BOUND",
+    unit: "W310",
+    text: FOUNDER_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "W305 flagged that `never_derived` was becoming the easy answer and asked the next unit to check rather than add a fifth. This is that unit, and the honest answer is that the kind was wrong, not the count: what this bound says cannot be judged is whether a blocker is the RIGHT blocker for a row, and a correct block and a mistaken one are the same text in the same column. No change to the tree lifts that — it takes somebody reading the unit and disagreeing — so the limit is in the kind of claim and `inherent` is what it is. The remedy the sentence does name is already built and is not what the bound is about.",
+    },
+    numbers: [],
+  },
+  {
     module: "src/quality/manifest.ts",
     name: "MANIFEST_BOUND",
     unit: "W305",
     text: MANIFEST_BOUND,
     lifting: {
-      kind: "remedy",
-      remedy: "W308 re-measures whether the tax moved",
-      reads: "nothing — the predicate beside this line is the constant `true`, in W306's sense and by its rule",
-      stillOpen: () => true,
-      lifted: {
-        kind: "never_derived",
-        why: "W306's shape, and this bound is a clean case for it. The remedy is a MEASUREMENT a later unit takes, not a state of the tree a predicate could read: `manifestDiff` already returns empty, so a predicate over the tree would say `lifted` while the thing the sentence promises — W308 re-deriving the tax and reporting whether it moved — has not happened. So the predicate is the literal `true` and the reason is written here rather than implied by a function that reads nothing.",
-      },
+      kind: "inherent",
+      why: "W305 wrote this as a remedy pointing at W308's re-measurement, and W310 is the unit that watched W308 land. The measurement happened; the tax went up; `MOVED_SINCE_W300` and `TAX_AT_W308` both record it. So the remedy is spent, and what the sentence still says cannot be lifted by any change to the tree: a row here is a DECLARATION and not a proof that the declaration is true, and no manifest can make itself honest — that a module says `census: null` is checked by W267's derivation and that its blind spot is true is checked by W295's witness, both of them elsewhere and on purpose. The limit is in the kind of claim a manifest makes.",
     },
     numbers: [],
   },
@@ -333,22 +339,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     unit: "W300",
     text: TAX_BOUND,
     lifting: {
-      kind: "remedy",
-      remedy: "the same two derivations over the tree Q24 leaves behind, which is W308's whole job",
-      reads: "the ledger, for W308's row still being open",
-      // The bound says the number is good for comparison with itself and names W308 as the
-      // comparison. It stops being true the day W308 lands, which is the quarter's own close.
-      stillOpen: (root) =>
-        !/^\| W308 \| done \|/m.test(readFileSync(path.join(root, "BUILD-STATE.md"), "utf8")),
-      lifted: {
-        kind: "constructed_tree",
-        // A ledger in which the quarter's close has landed. This is the one bound in the register
-        // whose remedy is SCHEDULED, so its lifted state is a tree the loop is going to build.
-        files: {
-          "BUILD-STATE.md":
-            "| W308 | done | planted | 2026-08-17T00:00Z | 0000000 | the second measurement, planted so this predicate can be seen answering the other way. |\n",
-        },
-      },
+      kind: "inherent",
+      why: "W310 CLOSED THIS AND W308 IS WHY. The predicate read the ledger for W308's row still being open, and W308 landed — so the bound went stale the moment the quarter's close was written, which is the register working exactly as W300 designed it. The comparison the sentence promised has now happened: `TAX_AT_W308` re-derives it and `EDIT_SITES_AT_W308` measures the author-effort half the sentence said a count could not capture. What is left of the bound cannot be lifted by anything: a census entry costs four sentences and a copy-surface row costs one, and no measurement over this tree makes a count of declaration sites into a measure of the work of declaring. That limit is in the kind of claim. NOTE FOR THE HARDENING PASS: W308's own gate ran while its ledger row still said `claimed`, so its suite never saw this — the second time this session a check keyed to a ledger row was blind to the unit closing it.",
     },
     numbers: [
       {

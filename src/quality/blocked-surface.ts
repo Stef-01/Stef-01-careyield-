@@ -39,12 +39,17 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-const LEDGER_ROW = /^\| (W\d+) \| ([\w-]+) \| ([^|]*) \| ([^|]*) \| ([^|]*) \| (.*) \|\s*$/;
+// W310 widened the id from `W\d+`. The ledger holds rows that are not week-units — `SUP-1` and
+// `SUP-2`, both blocked, and `A11Y-1`, `PRIV-3` — and the old pattern skipped them silently. It
+// must still reject the table's own header, so the id has to END IN A DIGIT: `Unit` does not.
+const LEDGER_ROW = /^\| ([A-Z][A-Z0-9-]*[0-9]) \| ([\w-]+) \| ([^|]*) \| ([^|]*) \| ([^|]*) \| (.*) \|\s*$/;
 
 export interface LedgerRow {
   id: string;
   status: string;
   note: string;
+  /** The row's timestamp column, as written. Empty for rows that never carried one. */
+  at: string;
 }
 
 /** The same parse, over ledger TEXT — so a caller with the text in hand does not write a second regex. */
@@ -53,16 +58,29 @@ export function parseLedgerRows(ledger: string): LedgerRow[] {
     .split("\n")
     .flatMap((line) => {
       const m = LEDGER_ROW.exec(line);
-      return m ? [{ id: m[1]!, status: m[2]!, note: m[6]! }] : [];
+      return m ? [{ id: m[1]!, status: m[2]!, note: m[6]!, at: m[4]!.trim() }] : [];
     });
 }
 
-export function ledgerRows(root: string): LedgerRow[] {
+/**
+ * Every row the ledger holds, week-unit or not.
+ *
+ * W310: `SUP-1` and `SUP-2` are BLOCKED ROWS and no register had ever seen them, because the parse
+ * matched `W\d+` and they are not week-units. A page listing what waits on a ruling cannot omit
+ * two of them, and a budget counting the blocked surface cannot either.
+ */
+export function allLedgerRows(root: string): LedgerRow[] {
   return parseLedgerRows(readFileSync(path.join(root, "BUILD-STATE.md"), "utf8"));
 }
 
+/** The week-units only — what every register before W310 meant by a ledger row. */
+export function ledgerRows(root: string): LedgerRow[] {
+  return allLedgerRows(root).filter((r) => /^W\d+$/.test(r.id));
+}
+
+/** Every blocked row, week-unit or not — the surface W263 budgets. */
 export function blockedRows(root: string): LedgerRow[] {
-  return ledgerRows(root).filter((r) => r.status === "blocked");
+  return allLedgerRows(root).filter((r) => r.status === "blocked");
 }
 
 /**
@@ -95,7 +113,11 @@ export interface ReleasePath {
  * causes it. A new blocked row fails here until somebody moves this number, and moving it means
  * having written its release path.
  */
-export const BLOCKED_AT_W263 = 16;
+export const BLOCKED_AT_W263 = 18;
+// W310 MOVED THIS AND DID NOT ADD A BLOCKED ROW. The parse above matched `W\d+`, so `SUP-1` and
+// `SUP-2` — blocked since W89 on G5 — had never been counted, named by a release path, or shown to
+// anybody. The budget was right that the number only goes up; it was wrong about what the number
+// was. Two rows were waiting on a ruling with nothing in the tree admitting it.
 
 export const RELEASE_PATHS: readonly ReleasePath[] = [
   {
@@ -107,8 +129,8 @@ export const RELEASE_PATHS: readonly ReleasePath[] = [
   {
     blocker: "G5",
     kind: "founder_gate",
-    whoDecides: "The founder, on clinical pathway content Meherr publishes. The largest single blocker for three years, and it has grown — Y5's two vertical-content units joined it when W248 and W250 built the assembly and left the content where it belongs.",
-    releases: ["W161", "W162", "W163", "W186", "W249", "W251"],
+    whoDecides: "The founder, on clinical pathway content Meherr publishes. The largest single blocker for three years, and it has grown — Y5's two vertical-content units joined it when W248 and W250 built the assembly and left the content where it belongs, and W310 found `SUP-1` and `SUP-2` waiting on it unseen since W89. `SUP-2` needs a second answer as well: whether Meherr is willing to become a party to individual clinical care, which is a company-direction question and not a clinical one.",
+    releases: ["W161", "W162", "W163", "W186", "W249", "W251", "SUP-1", "SUP-2"],
   },
   {
     blocker: "G6",
