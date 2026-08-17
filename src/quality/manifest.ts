@@ -379,6 +379,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/prose-numbers.ts",
+    census: {
+      derives:
+        "Every numeric claim in a module header or doc comment under `src/` — a number followed by one of a closed vocabulary of countable nouns.",
+      checkedAgainst:
+        "W314's `CLAIMS`, in three directions: a claim nobody classified fails, a classification for a sentence that has been rewritten fails, and a claim declared `derived` whose number the tree disagrees with fails.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module carrying a numeric claim in its header is planted in a constructed root beside one carrying the same words in code, and only the first may be reported",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every number this tree's prose states about itself is either re-derived from the tree or classified as history, as a count outside the repository, or as open with a reason.",
+        mutation:
+          "The four counts this tree records as having gone stale are replanted as headers with derivations that know the true number, and each must be reported.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/scan-text.ts",
     census: {
       derives:

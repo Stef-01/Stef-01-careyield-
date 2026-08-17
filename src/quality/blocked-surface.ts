@@ -4,7 +4,7 @@
 // blocked surface without saying so — a new blocked row must name the ruling that would release it
 // and the units released with it.* A clause in a plan is a promise. This is the check.
 //
-// WHY THE SURFACE NEEDS A BUDGET AT ALL. Sixteen rows are blocked, and every one of them was added
+// WHY THE SURFACE NEEDS A BUDGET AT ALL. Eighteen rows are blocked, and every one of them was added
 // by a firing that was doing its job: a unit reached a boundary no existing gate covered, or needed
 // content behind G5, and the honest move was to schedule it blocked rather than half-build it.
 // Nothing in that is wrong. What is wrong is that the count can only go up, quietly, one correct

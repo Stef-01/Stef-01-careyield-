@@ -52,6 +52,7 @@ import { BLIND_SPOTS, boundDiff, falseBounds } from "./blind-spots";
 import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptances";
 import { unacceptedTautologies } from "./tautology-sweep";
 import { fixtureToken } from "./scan-text";
+import { claimDefects } from "./prose-numbers";
 
 /**
  * A comparison handed an input it must reject, keyed by the register the census names.
@@ -183,6 +184,21 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       staleBounds(root, [probe]).length > 0 &&
       numberDefects([probe]).length > 0 &&
       unresolvedBounds(root, ledger, [probe]).length > 0
+    );
+  },
+
+  "src/quality/prose-numbers.ts": (root) => {
+    // W314's comparison, handed a claim the register does not classify. The planted module states
+    // one in its header and the declared list is empty, so the arm that must fire is the one that
+    // says a number went past unread.
+    void root;
+    return withRoot(
+      { "src/planted/w289-prose.ts": "// W1: four registers walk this tree.\nexport const x = 1;\n" },
+      (planted) =>
+        claimDefects(planted, []).some((d) => d.what.includes("nobody classified")) &&
+        claimDefects(planted, [
+          { module: "src/planted/w289-prose.ts", text: "four registers", resolution: { kind: "at_the_unit" } },
+        ]).length === 0,
     );
   },
 

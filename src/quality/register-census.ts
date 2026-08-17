@@ -6,13 +6,15 @@
 // Year 5's audit found one LOW finding because the registers got to everything else first. They
 // are now this tree's principal control. **Nobody has ever checked that they would notice.**
 //
-// WHAT A REGISTER HERE IS. Twenty-six files derive something from the tree by walking it and check
-// a declared list against what they found: W102's route census, W106's record classes, W167's fold
+// WHAT A REGISTER HERE IS. A file that derives something from the tree by walking it, and checks
+// a declared list against what it found: W102's route census, W106's record classes, W167's fold
 // sites, W200's copy surface, W201's decision register, W153's instruction sinks, W107's
-// reachability, and nineteen more. Each exists for one failure: **a file arrives in the tree and
+// reachability, and the rest — `TREE_DERIVED_REGISTERS` holds the total, because W314 corrected
+// this sentence from twenty-six to fifty-four and the correction was stale again before the unit
+// that made it had finished. Each exists for one failure: **a file arrives in the tree and
 // nobody declares it.** That is the event they are all built to catch.
 //
-// AND ALMOST NONE OF THEM HAS EVER SEEN ONE ARRIVE. Reading all twenty-six turned up a distinction
+// AND ALMOST NONE OF THEM HAS EVER SEEN ONE ARRIVE. Reading all twenty-six of them AT W267 turned up a distinction
 // that had gone unnoticed because both halves are called "the scan":
 //
 //   Many of these files DO carry a fires-on-known-bad proof, and this tree is rigorous about it —
@@ -22,13 +24,13 @@
 //
 //   The walk is the other half, and it is the half the register is for. A content scanner that
 //   fires perfectly over a file list missing the new file reports nothing, cleanly, forever. Not
-//   one of the twenty-six proves its own walk by putting a file in front of it.
+//   one of the twenty-six proved its own walk by putting a file in front of it.
 //
 // WHY THAT WENT UNPROVED, AND IT IS STRUCTURAL RATHER THAN CARELESS. A walk can only be tested by
 // pointing it at a DIFFERENT tree, and a detector can only be pointed at a different tree if it
 // takes a root. Four shipped detectors do — `discoverSurfaces(appDir)`, `discoverFoldSites(root)`,
 // `findInstructionSinks(root)`, `reachableFromApp(root)` — and this unit proves all four by
-// copying the tree, adding a file, and requiring each to report it. The other twenty-two close
+// copying the tree, adding a file, and requiring each to report it. The other twenty-two closed
 // over the repository root inside the test file that owns them: there is no second tree to give
 // them, so the proof is not merely missing, it is **unavailable until somebody adds a parameter**.
 // So every unproven entry below carries the one-line change that would make it provable, and a

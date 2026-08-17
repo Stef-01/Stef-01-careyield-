@@ -3,7 +3,7 @@
 // Q21's finding 5 recorded that `pnpm verify` does not run Playwright, so the only control that
 // exercises a rendered page is the one a green build excludes. W274 fixed the guard that suite had
 // been failing on. This asks the question underneath both: WHICH ROUTES DOES IT OPEN AT ALL —
-// because a suite of thirty-four spec files that never loads a page is invisible in exactly the
+// because a suite of thirty-six spec files that never loads a page is invisible in exactly the
 // same way as a suite nobody runs.
 //
 // W271 declares every route and what it may reach. This checks the other axis against the same

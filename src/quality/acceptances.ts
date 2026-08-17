@@ -1,6 +1,6 @@
 // W294: the acceptance registers, re-derived — and the review date nobody was enforcing.
 //
-// AN ACCEPTANCE IS A RULE SWITCHED OFF FOR ONE STRING. This tree has seven registers of them:
+// AN ACCEPTANCE IS A RULE SWITCHED OFF FOR ONE STRING. This tree has nine registers of them:
 // advice-linter findings accepted on operator copy, on composed copy and on public pages, hardening
 // findings accepted after a review, tautologies accepted because the real assertion is a
 // `@ts-expect-error`, and dependency advisories accepted in the audit gate. Every one carries a

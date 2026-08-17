@@ -1,6 +1,6 @@
 // W297: the bounds register — every stated `*_BOUND` resolved to its unit and to its remedy.
 //
-// EIGHT MODULES EXPORT A SENTENCE SAYING WHAT THEY DO NOT PROVE. They are this tree's most useful
+// TWENTY-TWO MODULES EXPORT A SENTENCE SAYING WHAT THEY DO NOT PROVE. They are this tree's most useful
 // habit and its least checked one: a bound is written once, at the moment somebody understands the
 // limit best, and then it sits — while the tree moves underneath it. Two things go wrong, and both
 // have already happened here.
@@ -61,6 +61,7 @@ import { HARDENING_BOUND } from "./hardening-q23";
 import { TAX_BOUND } from "./declaration-tax";
 import { SCAN_BOUND, fixtureText } from "./scan-text";
 import { SELF_REFERENCE_BOUND, fixtureFiles } from "./self-reference";
+import { CLAIMS, PROSE_BOUND, proseClaims } from "./prose-numbers";
 import { DEMO_PATH, PATH_BOUND, gateStops } from "@/demo/path";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
 import { CITATION_BOUND } from "./citations";
@@ -268,6 +269,27 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       kind: "inherent",
       why:
         "THE FIRST DRAFT OF THIS ENTRY CLAIMED A REMEDY AND THE REGISTER REFUSED IT. The predicate said the bound stays open while any declared gate goes unwalked by the e2e spec, and W306's driver reported it stale on the spot: the spec already walks all four, so the sentence would have been describing a tree that had moved before it was committed. The mistake was reading the mechanical clause as the whole bound. What this sentence is actually about is that a green walk over synthetic data says nothing about a practice — and what would lift THAT is a pilot, which is G4. A founder gate is not a change to this tree, so there is no root that makes this false and no predicate that could be honest about it. The mechanical clause beside it — a component call read from source is not a rendered element — is closed for the routes the spec walks and stated rather than remedied for the rest, because widening the walk is a decision about e2e runtime rather than a defect somebody should be nagged about.",
+    },
+    numbers: [],
+  },
+  {
+    module: "src/quality/prose-numbers.ts",
+    name: "PROSE_BOUND",
+    unit: "W314",
+    text: PROSE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the vocabulary grows and says so",
+      reads: "W314's own register, for a claim classified as open that nobody has derived yet",
+      // The bound says a claim phrased outside the vocabulary is invisible and that the
+      // classification is a judgement. It stops being true the day the register carries no open
+      // rows — at that point every claim the scan finds is either derived or history, and the
+      // sentence's warning about the unresolved class is describing a tree that has moved.
+      stillOpen: () => CLAIMS.some((c) => c.resolution.kind === "open"),
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads W314's own declared register, which is an imported constant: the open rows are a classification somebody wrote down rather than anything a walk finds, so no root can be handed to it. What would lift it is a later unit deriving the four claims left open, which is an edit to the register rather than a change to any tree.",
+      },
     },
     numbers: [],
   },

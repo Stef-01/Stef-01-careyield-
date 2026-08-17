@@ -47,6 +47,7 @@ import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
 import { MANIFEST_BOUND, manifestDiff } from "./manifest";
 import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
+import { proseClaims } from "./prose-numbers";
 
 /** How a register's stated bound has been shown to be true. */
 export type Blindness =
@@ -465,6 +466,28 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
     whyNotPlantable:
       "A witness would be a bound that resolves and is unfair, and unfairness is a judgement about prose rather than a property a plant can carry. Fabricating one would be writing the answer into the fixture, which is the detector W279 refused to tune. Stating it is what can be done from inside, and the quarterly hardening pass is where a reader looks.",
   },
+  "src/quality/prose-numbers.ts": {
+    kind: "demonstrated",
+    bound:
+      "A claim is a number followed by one of a CLOSED vocabulary of countable nouns. A sentence that counts something the vocabulary does not name — assertions, tests, quarters, gates — is invisible to the scan, and the register reports the tree clean over it. That is the class of bound W267 states about `readdirSync`, and the same remedy applies: the vocabulary grows and says so rather than the register growing an exemption.",
+    witness: "a header counting something the vocabulary does not name",
+    control: "the identical header counting something it does, which the scan must report",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/unnamed-noun.ts": "// W1: this suite runs four assertions.\nexport const x = 1;\n",
+          "src/planted/named-noun.ts": "// W1: this tree holds four registers.\nexport const y = 1;\n",
+        },
+        (root) => {
+          const found = proseClaims(root).map((c) => c.module);
+          return {
+            witnessSeen: found.some((m) => m.includes("unnamed-noun")),
+            controlSeen: found.some((m) => m.includes("named-noun")),
+          };
+        },
+      ),
+  },
+
   "src/quality/self-reference.ts": {
     kind: "demonstrated",
     bound:

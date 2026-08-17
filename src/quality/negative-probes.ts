@@ -304,6 +304,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/prose-numbers.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/prose-numbers.test.ts :: does not read a claim out of code, which is where a count is already derived",
+      plants: 'export const n = ["four modules", 4];',
+    },
+  },
+  {
     register: "src/quality/self-reference.ts",
     negative: {
       kind: "already_driven",

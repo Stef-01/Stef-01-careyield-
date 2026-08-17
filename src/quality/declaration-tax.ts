@@ -207,6 +207,13 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/prose-numbers.ts",
+    // Demands a classification of any module whose header states a numeric claim. A planted module
+    // carries no such claim in any of the five shapes, so it owes this register nothing — and the
+    // register is in the population because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/self-reference.ts",
     // Asks about modules that assemble a literal from fragments, which a planted module does not do.
     // It demands nothing of an arriving module, and is in the population because the census holds it.

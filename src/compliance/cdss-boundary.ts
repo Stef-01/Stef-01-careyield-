@@ -742,6 +742,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W309's path register is reviewer-facing: routes, page paths, `data-testid` markers, and the argument for each gate that stops a step. The one thing on it that IS copy — the refusal sentence — lives in `src/console/gates.ts` and is re-exported here rather than restated, which is what keeps this list honest. Nothing here renders.",
   },
   {
+    module: "src/quality/prose-numbers.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W314's register is reviewer-facing: module paths, the phrase each claim is written as, and the argument for each class. Every string in it is a QUOTATION of a comment somebody else wrote or a sentence about how to read one — the strings it holds are the tree describing itself, not the product describing care. Nothing here renders and no practice sees it.",
+  },
+  {
     module: "src/quality/self-reference.ts",
     operatorCopy: [],
     notCopy:

@@ -13,7 +13,7 @@
 //
 // AND THE FIRST THING THE SWEEP FOUND IS THAT THE UNIT'S OWN FRAMING IS WRONG. The row asks for
 // pins "checked to be bounded rather than live", as though live were the defect. `BLOCKED_AT_W263`
-// is live — sixteen blocked rows, and a seventeenth fails the build — and it is RIGHT. Its
+// is live — eighteen blocked rows, and a nineteenth fails the build — and it is RIGHT. Its
 // docstring says why: *"a new blocked row fails here until somebody moves this number, and moving
 // it means having written its release path."* A new founder-gate blocker is not an ordinary event.
 // It is a decision arriving, and stopping the build is the control working.
