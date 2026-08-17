@@ -36,6 +36,7 @@ import * as walks from "./tree-walks";
 import { DORMANT_MODULES, diffReach } from "@/security/page-reach";
 import { coverageDiff } from "@/quality/route-coverage";
 import { readFileSync } from "node:fs";
+import { withPlantedIn } from "./planting";
 import { resolveCitation } from "./citations";
 
 const ROOT = process.cwd();
@@ -57,16 +58,14 @@ afterAll(() => {
   if (COPY) rmSync(COPY, { recursive: true, force: true });
 });
 
-/** Plant a file into the copy, run the probe, remove it. The copy returns to the tree's own shape. */
+/**
+ * Plant a file into the copy for the duration of the probe. W303's shared harness.
+ *
+ * The body moved to `@/quality/planting`: this was one of five local planting helpers, and two of
+ * the five removed the file only if the assertions passed.
+ */
 function withPlanted<T>(relPath: string, contents: string, probe: () => T): T {
-  const full = path.join(COPY, relPath);
-  mkdirSync(path.dirname(full), { recursive: true });
-  writeFileSync(full, contents, "utf8");
-  try {
-    return probe();
-  } finally {
-    rmSync(full, { force: true });
-  }
+  return withPlantedIn(COPY, { [relPath]: contents }, probe);
 }
 
 describe("W267 the census describes the tree, in both directions", () => {

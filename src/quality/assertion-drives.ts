@@ -35,6 +35,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
 import { separatorDiff } from "./citations";
+import { planterDiff } from "./planting";
 import { coverageByBand } from "@/compliance/copy-y6";
 import { diffFoldRegister, discoverFoldSites } from "./order-independence";
 import { undeclaredInstructionSinks } from "@/security/instruction-sinks";
@@ -63,6 +64,8 @@ const BEYOND_EVERY_REVIEW = "2099-01-01";
 
 export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   "src/quality/citations.ts": (root) => separatorDiff(root, {}).undeclared.length > 0,
+
+  "src/quality/planting.ts": (root) => planterDiff(root, {}).undeclared.length > 0,
 
   "src/quality/mutation-sampling.ts": () => {
     // W296's report, handed a survivor no register declares. The runner spawns processes and lives

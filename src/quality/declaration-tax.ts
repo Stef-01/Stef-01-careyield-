@@ -170,6 +170,11 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/planting.ts",
+    // W303's planter sweep reads test files; a planted MODULE is not one, so it costs nothing.
+    demands: () => false,
+  },
+  {
     file: "src/quality/citations.ts",
     // W301's separator sweep asks nothing of a module that does not parse the citation format, so
     // a planted module costs it nothing — the same answer as the other content-conditional

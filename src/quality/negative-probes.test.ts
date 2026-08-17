@@ -28,6 +28,7 @@ import { reachableFromApp } from "@/security/reachability";
 import { DORMANT_MODULES, diffReach } from "@/security/page-reach";
 import { coverageDiff, type RouteCoverage } from "./route-coverage";
 import * as walks from "./tree-walks";
+import { withPlantedIn } from "./planting";
 
 const ROOT = process.cwd();
 
@@ -264,19 +265,9 @@ afterAll(() => {
   if (COPY) rmSync(COPY, { recursive: true, force: true });
 });
 
+/** W303's shared harness. The body moved to `@/quality/planting`; the name stays for its callers. */
 function withPlanted<T>(files: Record<string, string>, probe: () => T): T {
-  const written: string[] = [];
-  try {
-    for (const [rel, contents] of Object.entries(files)) {
-      const full = path.join(COPY, rel);
-      mkdirSync(path.dirname(full), { recursive: true });
-      writeFileSync(full, contents, "utf8");
-      written.push(full);
-    }
-    return probe();
-  } finally {
-    for (const full of written) rmSync(full, { force: true });
-  }
+  return withPlantedIn(COPY, files, probe);
 }
 
 /**

@@ -807,6 +807,25 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/planting.ts",
+    derives:
+      "Every `*.test.ts` under `src/` that writes files, and whether it goes through a scoped planter or writes on its own.",
+    checkedAgainst:
+      "`WRITES_WITHOUT_A_PLANTER` — the suites that write an artefact or substitute a module rather than planting a probe — in both directions.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "the declared register is emptied and every writing test file must come back undeclared, and a declaration naming a file that writes nothing must come back stale",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "A probe planted in front of a detector cannot outlive the probe that planted it, because there is no exported way to plant without a scope.",
+      mutation:
+        "`planterDiff` is given an empty declared register and must report the tree's real writers undeclared.",
+    },
+  },
+  {
     file: "src/quality/citations.ts",
     derives:
       "Every file under `src/` that splits the `<file> :: <assertion>` separator, and whether it resolves through the shared resolver or splits a composite id instead.",

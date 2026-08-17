@@ -21,6 +21,7 @@ import {
   pinsInTree,
 } from "./pins";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
+import { withPlantedIn } from "./planting";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
 import { emptyListDiff } from "./empty-list-sweep";
 import { SURVIVORS_AT_W296, UNTESTED_AT_W296, untestedModules } from "./mutation-sampling";
@@ -40,10 +41,16 @@ afterAll(() => {
   rmSync(COPY, { recursive: true, force: true });
 });
 
-function plant(relPath: string, contents: string): void {
-  const full = path.join(COPY, relPath);
-  mkdirSync(path.dirname(full), { recursive: true });
-  writeFileSync(full, contents, "utf8");
+/**
+ * Plant into the copy for the duration of the probe, and remove it whatever happens.
+ *
+ * W303 REPLACED AN UNSCOPED `plant()` HERE. It wrote the file and returned; the caller removed it
+ * on the line after the assertions, so a FAILING assertion skipped the cleanup and left the probe
+ * in the copied tree for every later test in this file — one real failure becoming a cascade of
+ * unrelated ones. The scope is the fix: there is no way to plant here without a `finally`.
+ */
+function planted<T>(relPath: string, contents: string, probe: () => T): T {
+  return withPlantedIn(COPY, { [relPath]: contents }, probe);
 }
 
 describe("W290 every pin in the tree is classified, both directions", () => {
@@ -136,25 +143,27 @@ describe("W290 the sweep, proved on a planted pin", () => {
   it("reports a pin nothing classifies", () => {
     // The gate's own words. A planted `*_AT_W<n>` constant is exactly what an author adds when
     // they pin a count at the unit that measured it.
-    plant("src/quality/w290-probe.ts", "// W290: probe.\nexport const REGISTERS_AT_W290 = 42;\n");
-    const diff = pinDiff(COPY);
-    expect(diff.undeclared).toContain("src/quality/w290-probe.ts::REGISTERS_AT_W290");
-    rmSync(path.join(COPY, "src/quality/w290-probe.ts"));
+    // Asserted INSIDE the scope: the plant exists only for the probe now, and keeping the
+    // assertion here also keeps both halves reading the same expression, which is what W293's
+    // evidence check follows.
+    planted("src/quality/w290-probe.ts", "// W290: probe.\nexport const REGISTERS_AT_W290 = 42;\n", () => {
+      expect(pinDiff(COPY).undeclared).toContain("src/quality/w290-probe.ts::REGISTERS_AT_W290");
+    });
     expect(pinDiff(COPY).undeclared, "the copied tree was dirty before the plant").toEqual([]);
   });
 
   it("reports a pin in a TEST file, which is where five of the six historically lived", () => {
-    plant("src/quality/w290-probe.test.ts", "export const THINGS_AT_W290 = 7;\n");
-    expect(pinDiff(COPY).undeclared).toContain("src/quality/w290-probe.test.ts::THINGS_AT_W290");
-    rmSync(path.join(COPY, "src/quality/w290-probe.test.ts"));
+    planted("src/quality/w290-probe.test.ts", "export const THINGS_AT_W290 = 7;\n", () => {
+      expect(pinDiff(COPY).undeclared).toContain("src/quality/w290-probe.test.ts::THINGS_AT_W290");
+    });
   });
 
   it("does not report a constant that is not pin-shaped", () => {
     // The other direction, and it earns its place: a detector matching every SCREAMING_CASE export
     // would report most of this tree and the register would become a chore nobody reads.
-    plant("src/quality/w290-probe-plain.ts", "// W290: probe.\nexport const DEFAULT_TIMEOUT = 30;\n");
-    expect(pinDiff(COPY).undeclared).toEqual([]);
-    rmSync(path.join(COPY, "src/quality/w290-probe-plain.ts"));
+    planted("src/quality/w290-probe-plain.ts", "// W290: probe.\nexport const DEFAULT_TIMEOUT = 30;\n", () => {
+      expect(pinDiff(COPY).undeclared).toEqual([]);
+    });
     expect(PIN_NAME.test("DEFAULT_TIMEOUT")).toBe(false);
     expect(PIN_NAME.test("BLOCKED_AT_W263")).toBe(true);
     expect(PIN_NAME.test("Q22_HORIZON_LAST_UNIT")).toBe(true);
@@ -179,11 +188,16 @@ describe("W290 a pin declared twice must be reconciled by something that resolve
   });
 
   it("reports a duplicate nothing reconciles", () => {
-    plant("src/quality/w290-dupe-a.ts", "// W290: probe.\nexport const DUPE_AT_W290 = 1;\n");
-    plant("src/quality/w290-dupe-b.ts", "// W290: probe.\nexport const DUPE_AT_W290 = 1;\n");
-    expect(duplicateDiff(COPY).unreconciled).toEqual(["DUPE_AT_W290"]);
-    rmSync(path.join(COPY, "src/quality/w290-dupe-a.ts"));
-    rmSync(path.join(COPY, "src/quality/w290-dupe-b.ts"));
+    withPlantedIn(
+      COPY,
+      {
+        "src/quality/w290-dupe-a.ts": "// W290: probe.\nexport const DUPE_AT_W290 = 1;\n",
+        "src/quality/w290-dupe-b.ts": "// W290: probe.\nexport const DUPE_AT_W290 = 1;\n",
+      },
+      () => {
+        expect(duplicateDiff(COPY).unreconciled).toEqual(["DUPE_AT_W290"]);
+      },
+    );
     expect(duplicateDiff(COPY).unreconciled).toEqual([]);
   });
 });

@@ -27,6 +27,7 @@ import {
   namingSites,
 } from "./declaration-tax";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
+import { withPlantedIn } from "./planting";
 import { withRoot } from "./refusal-branches";
 
 const ROOT = process.cwd();
@@ -48,14 +49,9 @@ afterAll(() => {
 
 /** Plant one shape, measure, remove. The copy returns to the tree's own shape between probes. */
 function withShape<T>(shape: ModuleShape, probe: () => T): T {
-  const full = path.join(COPY, PLANTED);
-  mkdirSync(path.dirname(full), { recursive: true });
-  writeFileSync(full, SHAPE_BODIES[shape], "utf8");
-  try {
-    return probe();
-  } finally {
-    rmSync(full, { force: true });
-  }
+  // W303 moved the body to the shared harness. This one was already scoped; two of the five were
+  // not, which is why there is now only one way to plant.
+  return withPlantedIn(COPY, { [PLANTED]: SHAPE_BODIES[shape] }, probe);
 }
 
 describe("W300 the declaration sites are derived from the census, not listed", () => {

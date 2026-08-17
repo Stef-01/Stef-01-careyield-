@@ -42,6 +42,7 @@ import { acceptanceCarryingModules } from "./acceptances";
 import { violationReporters, withRoot } from "./refusal-branches";
 import { mutantsIn } from "./mutation-sampling";
 import { CITATION_BOUND, separatorDiff } from "./citations";
+import { PLANTING_BOUND, planterDiff } from "./planting";
 
 /** How a register's stated bound has been shown to be true. */
 export type Blindness =
@@ -72,6 +73,29 @@ const LEDGER_ROW = "| W1 | done | builder-A | 2026-08-14T00:00Z | abc1234 | a ro
 
 export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
   // ── Demonstrated: the detector takes a root, so a witness can be put in front of it ─────────
+  "src/quality/planting.ts": {
+    kind: "demonstrated",
+    bound: PLANTING_BOUND,
+    witness: "a test file that writes with `appendFileSync` instead of `writeFileSync`",
+    control: "the same write spelled `writeFileSync`, which the sweep must report",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/appender.test.ts":
+            'import { appendFileSync } from "node:fs";\nit("t", () => appendFileSync("x", "y"));\n',
+          "src/planted/writer.test.ts":
+            'import { writeFileSync } from "node:fs";\nit("t", () => writeFileSync("x", "y"));\n',
+        },
+        (root) => {
+          const undeclared = planterDiff(root, {}).undeclared;
+          return {
+            witnessSeen: undeclared.includes("src/planted/appender.test.ts"),
+            controlSeen: undeclared.includes("src/planted/writer.test.ts"),
+          };
+        },
+      ),
+  },
+
   "src/quality/citations.ts": {
     kind: "demonstrated",
     bound: CITATION_BOUND,

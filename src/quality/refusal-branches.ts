@@ -30,8 +30,7 @@
 // FOUNDER GATE (plan §4): fabricated registry inputs and temporary directories. No store, no
 // patient, no page.
 
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fallibleDiff } from "./review-w279";
 import { duplicateDiff, pinDiff } from "./pins";
@@ -43,6 +42,7 @@ import { censusDiff } from "./register-census";
 import { negativeDiff } from "./negative-probes";
 import { UNEVIDENCED_AT_W293, emptyListDiff } from "./empty-list-sweep";
 import { separatorDiff } from "./citations";
+import { planterDiff, withTree, withTree as withRoot } from "./planting";
 import { headerViolations } from "./unit-headers";
 import { pageSuiteViolations } from "./page-suite";
 import { blockedSurfaceViolations } from "./blocked-surface";
@@ -119,20 +119,14 @@ export interface RefusalBranch {
   reach: Reach;
 }
 
-/** A throwaway root holding only the files a register reads, removed when the probe returns. */
-export function withRoot<T>(files: Record<string, string>, probe: (root: string) => T): T {
-  const root = mkdtempSync(path.join(tmpdir(), "w291-"));
-  try {
-    for (const [rel, contents] of Object.entries(files)) {
-      const full = path.join(root, rel);
-      mkdirSync(path.dirname(full), { recursive: true });
-      writeFileSync(full, contents, "utf8");
-    }
-    return probe(root);
-  } finally {
-    rmSync(root, { recursive: true, force: true });
-  }
-}
+/**
+ * A throwaway root holding only the files a register reads, removed when the probe returns.
+ *
+ * W303 moved the body to `@/quality/planting` and re-exports it here: this was one of four planting
+ * harnesses, and two of the four could leave a probe behind. Re-exported under the name its
+ * twenty-six callers already use.
+ */
+export { withRoot };
 
 const LEDGER_ROW = (n: number) => `| W${n} | done | builder-A | 2026-08-14T00:00Z | abc1234 | a row |`;
 
@@ -526,6 +520,22 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
       kind: "unreached",
       fixture:
         "The same shape as the stale arm above and the same one-line remedy: `EXCLUDED_SPECS` is read from module scope, so an exclusion with a short reason cannot be supplied by a caller. Parameterise it and this arm is reachable with a one-entry map.",
+    },
+  },
+  // ── W303's planting harness ───────────────────────────────────────────────────────────────
+  {
+    module: "src/quality/planting.ts",
+    fn: "planterDiff",
+    branch: "undeclared",
+    reach: { kind: "driven", drive: () => planterDiff(process.cwd(), {}).undeclared.length > 0 },
+  },
+  {
+    module: "src/quality/planting.ts",
+    fn: "planterDiff",
+    branch: "stale",
+    reach: {
+      kind: "driven",
+      drive: () => planterDiff(process.cwd(), { "src/quality/pins.test.ts": "gone" }).stale.length > 0,
     },
   },
   // ── W301's citation resolver ──────────────────────────────────────────────────────────────

@@ -24,6 +24,7 @@ import {
 import { LATENT_FINDINGS, modulesWithNoUnitHeader } from "./latent-findings";
 import { FINDING_ANCHORS, deadAnchors } from "./latent-y5";
 import { OPERATOR_COPY_SURFACES } from "@/compliance/cdss-boundary";
+import { withPlantedIn } from "./planting";
 import { RECORD_CLASSES } from "@/privacy/record-classes";
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -40,10 +41,16 @@ afterAll(() => {
   rmSync(COPY, { recursive: true, force: true });
 });
 
-function plant(relPath: string, contents: string): void {
-  const full = path.join(COPY, relPath);
-  mkdirSync(path.dirname(full), { recursive: true });
-  writeFileSync(full, contents, "utf8");
+/**
+ * Plant into the copy for the duration of the probe, and remove it whatever happens.
+ *
+ * W303 REPLACED AN UNSCOPED `plant()` HERE. It wrote the file and returned; the caller removed it
+ * on the line after the assertions, so a FAILING assertion skipped the cleanup and left the probe
+ * in the copied tree for every later test in this file — one real failure becoming a cascade of
+ * unrelated ones. The scope is the fix: there is no way to plant here without a `finally`.
+ */
+function planted<T>(relPath: string, contents: string, probe: () => T): T {
+  return withPlantedIn(COPY, { [relPath]: contents }, probe);
 }
 
 describe("W281 the door, against this tree", () => {
@@ -68,10 +75,10 @@ describe("W281 the door, against this tree", () => {
 
 describe("W281 each half of the door, proved by planting what it exists to notice", () => {
   it("catches a module with no header at all", () => {
-    plant("src/quality/w281-probe-none.ts", "export const NOTHING = 1;\n");
-    const census = headerCensus(COPY, LEDGER);
+    const census = planted("src/quality/w281-probe-none.ts", "export const NOTHING = 1;\n", () =>
+      headerCensus(COPY, LEDGER),
+    );
     expect(census.missing).toContain("src/quality/w281-probe-none.ts");
-    rmSync(path.join(COPY, "src/quality/w281-probe-none.ts"));
     expect(headerCensus(COPY, LEDGER).missing).toEqual([]);
   });
 
@@ -80,22 +87,26 @@ describe("W281 each half of the door, proved by planting what it exists to notic
     // in exactly this state — `domain/types.ts` opened with "// Meherr core domain model (W2)."
     // and was counted as having no unit. Reporting it as `missing` would say "undocumented" about
     // a module that documented itself.
-    plant("src/quality/w281-probe-late.ts", "// Meherr core domain model (W2).\nexport const X = 1;\n");
-    const census = headerCensus(COPY, LEDGER);
+    const census = planted(
+      "src/quality/w281-probe-late.ts",
+      "// Meherr core domain model (W2).\nexport const X = 1;\n",
+      () => headerCensus(COPY, LEDGER),
+    );
     expect(census.misplaced).toContainEqual({ module: "src/quality/w281-probe-late.ts", unit: 2 });
     expect(census.missing, "a misplaced unit was reported as no unit").toEqual([]);
-    rmSync(path.join(COPY, "src/quality/w281-probe-late.ts"));
   });
 
   it("catches a header naming a unit the ledger does not have", () => {
     // A header is a MEMBERSHIP CLAIM: W200's census covers `unit >= COPY_SURFACE_FLOOR`, so the
     // number decides whether the copy linter ever reads the module. `// W999` satisfies a
     // header-shaped check and names nothing.
-    plant("src/quality/w281-probe-unknown.ts", "// W999: a unit that never happened.\nexport const X = 1;\n");
-    const census = headerCensus(COPY, LEDGER);
+    const census = planted(
+      "src/quality/w281-probe-unknown.ts",
+      "// W999: a unit that never happened.\nexport const X = 1;\n",
+      () => headerCensus(COPY, LEDGER),
+    );
     expect(census.unknownUnit).toContainEqual({ module: "src/quality/w281-probe-unknown.ts", unit: 999 });
     expect(census.missing).toEqual([]);
-    rmSync(path.join(COPY, "src/quality/w281-probe-unknown.ts"));
   });
 
   it("leaves the copied tree clean once the probes are gone", () => {
