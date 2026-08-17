@@ -357,8 +357,11 @@ describe("W292 every proved walk has a negative, and the register says which kin
         },
       },
     ];
+    // W301 unified the vocabulary: "no such file" was this register's private wording for what
+    // three other registers called something else, and the shared resolver's phrasing wins. The
+    // `plants` half stays this register's own, because no other register asks that question.
     expect(unresolvedCitations(ROOT, broken)).toEqual([
-      "src/quality/no-such-file.test.ts :: nothing — no such file",
+      "src/quality/no-such-file.test.ts :: nothing: names a file that does not exist",
       "src/quality/pins.test.ts :: does not report a constant that is not pin-shaped — the test no longer plants `A_CONSTANT_THAT_IS_NOT_THERE`",
     ]);
   });

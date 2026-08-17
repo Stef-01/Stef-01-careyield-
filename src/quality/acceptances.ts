@@ -246,18 +246,13 @@ export function staleAcceptances(
     .sort();
 }
 
-/** A cited re-derivation resolved against the file it names, or the reason it does not resolve. */
-export function resolveCitation(root: string, citation: string): true | string {
-  const [file, assertion] = citation.split(" :: ");
-  if (!file || !assertion) return `${citation}: not a <file> :: <assertion> citation`;
-  let text: string;
-  try {
-    text = readFileSync(path.join(root, file), "utf8");
-  } catch {
-    return `${citation}: names a file that does not exist`;
-  }
-  return text.includes(assertion) ? true : `${citation}: the file does not contain that assertion`;
-}
+/**
+ * A cited re-derivation resolved against the file it names, or the reason it does not resolve.
+ *
+ * W301 moved the body to `@/quality/citations`: this had the best of four independent error
+ * vocabularies, so it became the shared one. Re-exported under the name its callers already use.
+ */
+export { resolveCitation } from "./citations";
 
 /**
  * Every module that HOLDS acceptances, read off the tree.

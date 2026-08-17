@@ -10,6 +10,7 @@
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { unresolved } from "@/quality/citations";
 import { describe, expect, it } from "vitest";
 import * as mod from "./adm-y5";
 import { ADM_REDERIVATIONS, Y5_FIRST_UNIT, rederivationSummary, reviewedAgainst } from "./adm-y5";
@@ -41,13 +42,10 @@ describe("W258 the re-derivation has a subject, and it is Y5", () => {
   it("cites tests that exist, and assertions that exist inside them", () => {
     // A re-derivation citing a test nobody wrote reads as coverage. Both halves are checked: the
     // file, and the `it(...)` name after the `::`.
-    for (const entry of ADM_REDERIVATIONS) {
-      const [file, assertion] = entry.assertedBy.split(" :: ");
-      const text = readFileSync(path.join(ROOT, file!), "utf8");
-      expect(text, `${entry.assertedBy} names a test file that says nothing of the kind`).toContain(
-        assertion!,
-      );
-    }
+    // W301: resolved through the shared resolver. The inline version reported a `toContain`
+    // failure that named neither the citation nor which half of it was wrong.
+    expect(unresolved(ROOT, ADM_REDERIVATIONS.map((e) => e.assertedBy))).toEqual([]);
+    expect(ADM_REDERIVATIONS.length, "no re-derivation is cited, so this checks nothing").toBeGreaterThan(0);
   });
 
   it("does not report that everything held", () => {

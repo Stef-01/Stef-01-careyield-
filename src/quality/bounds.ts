@@ -45,6 +45,7 @@ import { RUNTIME_BOUND } from "@/console/zero-states";
 import { HARDENING_BOUND } from "./hardening-q23";
 import { TAX_BOUND } from "./declaration-tax";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
+import { CITATION_BOUND } from "./citations";
 
 /** How a bound could stop being true. */
 export type Lifting =
@@ -90,6 +91,19 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/citations.ts",
+    name: "CITATION_BOUND",
+    unit: "W301",
+    text: CITATION_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the detector grows a scan and says so",
+      reads: "first-party source, for a module that parses the format without splitting on it",
+      stillOpen: () => true,
+    },
+    numbers: [],
+  },
   {
     module: "src/quality/unit-headers.ts",
     name: "HEADER_CITATION_BOUND",

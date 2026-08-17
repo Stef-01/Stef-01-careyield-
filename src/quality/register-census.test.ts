@@ -36,6 +36,7 @@ import * as walks from "./tree-walks";
 import { DORMANT_MODULES, diffReach } from "@/security/page-reach";
 import { coverageDiff } from "@/quality/route-coverage";
 import { readFileSync } from "node:fs";
+import { resolveCitation } from "./citations";
 
 const ROOT = process.cwd();
 
@@ -149,11 +150,9 @@ describe("W267 the census describes the tree, in both directions", () => {
     expect(cited.length, "no content proof is cited, so this checks nothing").toBeGreaterThan(5);
     for (const entry of cited) {
       const proof = entry.proof as { contentProof: string };
-      const [file, assertion] = proof.contentProof.split(" :: ");
-      expect(
-        readFileSync(path.join(ROOT, file!), "utf8"),
-        `${proof.contentProof} names an assertion that does not exist`,
-      ).toContain(assertion!);
+      // W301: resolved through the shared resolver rather than split and `toContain`ed here — an
+      // inline resolution names neither the cause nor the citation when it fails.
+      expect(resolveCitation(ROOT, proof.contentProof)).toBe(true);
     }
   });
 });

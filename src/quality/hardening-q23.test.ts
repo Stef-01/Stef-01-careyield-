@@ -21,6 +21,7 @@ import {
   undisposed,
 } from "./hardening-q23";
 import { knownUnits } from "./unit-headers";
+import { separatorDiff } from "./citations";
 
 const ROOT = process.cwd();
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
@@ -137,24 +138,22 @@ describe("W298 each finding is re-derived from the tree, so a fixed one goes sta
     expect(spots).toContain("falseBounds()");
   });
 
-  it("SIMP-1: the citation separator is still parsed in five places", () => {
-    // Re-derived by counting the implementations rather than trusting the sentence. When somebody
-    // consolidates them this drops and the finding fails as stale, which is the point.
-    const sites = [
-      "src/quality/acceptances.ts",
-      "src/quality/negative-probes.ts",
-      "src/quality/register-census.test.ts",
-      "src/privacy/adm-y5.test.ts",
-      "src/quality/mutation-sampling.test.ts",
-    ];
-    for (const site of sites) {
-      expect(read(site), `${site} no longer splits the citation separator`).toContain('split(" :: ")');
+  it("SIMP-1: the resolver is in one place, and a fifth cannot arrive quietly", () => {
+    // W301 fixed this, so the re-derivation flips: it asserted the four implementations were still
+    // there, and now asserts the consolidation holds. A revert puts the finding back rather than
+    // leaving the register describing a tree that has moved on.
+    expect(separatorDiff(ROOT)).toEqual({ undeclared: [], stale: [] });
+    const citations = read("src/quality/citations.ts");
+    expect(citations).toContain("export function resolveCitation");
+    // The three causes stay distinct — folding them is what made two of the four worst.
+    for (const cause of ["not a <file>", "names a file that does not exist", "does not contain that assertion"]) {
+      expect(citations).toContain(cause);
     }
-    // The winner named in the disposition exists and is the one with the richest error vocabulary.
-    const acceptances = read("src/quality/acceptances.ts");
-    expect(acceptances).toContain("export function resolveCitation");
-    for (const cause of ["not a <file> :: <assertion> citation", "names a file that does not exist"]) {
-      expect(acceptances).toContain(cause);
+    // And the three that used to resolve inline do not any more.
+    for (const site of ["src/quality/register-census.test.ts", "src/privacy/adm-y5.test.ts"]) {
+      expect(read(site), `${site} resolves a citation inline again`).not.toMatch(
+        /\.split\(\s*["'] :: ["']\s*\)/,
+      );
     }
   });
 

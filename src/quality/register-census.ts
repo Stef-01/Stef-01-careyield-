@@ -787,6 +787,25 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/citations.ts",
+    derives:
+      "Every file under `src/` that splits the `<file> :: <assertion>` separator, and whether it resolves through the shared resolver or splits a composite id instead.",
+    checkedAgainst:
+      "`SEPARATOR_NOT_A_CITATION` — the two files that split it for an id — in both directions, so a fifth independent resolver cannot arrive quietly.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "the declared register is emptied and both real separator-splitting files must come back undeclared, and a declaration naming a file that does not split it must come back stale",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every citation the tree carries resolves against the file it names, and every file that parses the format either uses the shared resolver or says why it is not resolving a citation.",
+      mutation:
+        "`separatorDiff` is given an empty declared register and must report the tree's real splitters undeclared.",
+    },
+  },
+  {
     file: "src/quality/empty-list-sweep.ts",
     derives:
       "Every `toEqual([])` and `toHaveLength(0)` in every `*.test.ts` under `src/`, with the `(producer, field)` pair each was read from and whether anything anywhere shows that pair holding something.",

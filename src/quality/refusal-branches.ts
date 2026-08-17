@@ -42,6 +42,7 @@ import { coverageDiff } from "./route-coverage";
 import { censusDiff } from "./register-census";
 import { negativeDiff } from "./negative-probes";
 import { UNEVIDENCED_AT_W293, emptyListDiff } from "./empty-list-sweep";
+import { separatorDiff } from "./citations";
 import { headerViolations } from "./unit-headers";
 import { pageSuiteViolations } from "./page-suite";
 import { blockedSurfaceViolations } from "./blocked-surface";
@@ -504,6 +505,22 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
       kind: "unreached",
       fixture:
         "The same shape as the stale arm above and the same one-line remedy: `EXCLUDED_SPECS` is read from module scope, so an exclusion with a short reason cannot be supplied by a caller. Parameterise it and this arm is reachable with a one-entry map.",
+    },
+  },
+  // ── W301's citation resolver ──────────────────────────────────────────────────────────────
+  {
+    module: "src/quality/citations.ts",
+    fn: "separatorDiff",
+    branch: "undeclared",
+    reach: { kind: "driven", drive: () => separatorDiff(process.cwd(), {}).undeclared.length > 0 },
+  },
+  {
+    module: "src/quality/citations.ts",
+    fn: "separatorDiff",
+    branch: "stale",
+    reach: {
+      kind: "driven",
+      drive: () => separatorDiff(process.cwd(), { "src/quality/tree-walks.ts": "gone" }).stale.length > 0,
     },
   },
   // ── W293's empty-list sweep ───────────────────────────────────────────────────────────────

@@ -41,6 +41,7 @@ import { sweepTautologies } from "./tautology-sweep";
 import { acceptanceCarryingModules } from "./acceptances";
 import { violationReporters, withRoot } from "./refusal-branches";
 import { mutantsIn } from "./mutation-sampling";
+import { CITATION_BOUND, separatorDiff } from "./citations";
 
 /** How a register's stated bound has been shown to be true. */
 export type Blindness =
@@ -71,6 +72,29 @@ const LEDGER_ROW = "| W1 | done | builder-A | 2026-08-14T00:00Z | abc1234 | a ro
 
 export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
   // ── Demonstrated: the detector takes a root, so a witness can be put in front of it ─────────
+  "src/quality/citations.ts": {
+    kind: "demonstrated",
+    bound: CITATION_BOUND,
+    witness: "a module that parses the format with a regex instead of `.split(\" :: \")`",
+    control: "the same parse written with the split the sweep looks for",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/regex-parser.ts":
+            'export const parse = (c: string) => /^(.+?) :: (.+)$/.exec(c);\n',
+          "src/planted/split-parser.ts":
+            'export const parse = (c: string) => c.split(" :: ");\n',
+        },
+        (root) => {
+          const undeclared = separatorDiff(root, {}).undeclared;
+          return {
+            witnessSeen: undeclared.includes("src/planted/regex-parser.ts"),
+            controlSeen: undeclared.includes("src/planted/split-parser.ts"),
+          };
+        },
+      ),
+  },
+
   "src/quality/mutation-sampling.ts": {
     kind: "demonstrated",
     bound:

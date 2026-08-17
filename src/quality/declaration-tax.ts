@@ -169,6 +169,13 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/citations.ts",
+    // W301's separator sweep asks nothing of a module that does not parse the citation format, so
+    // a planted module costs it nothing — the same answer as the other content-conditional
+    // registers here, and the reason the tax is measured per register rather than counted.
+    demands: () => false,
+  },
+  {
     file: "src/quality/empty-list-sweep.ts",
     demands: () => false,
   },

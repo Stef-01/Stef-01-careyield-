@@ -54,6 +54,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { TREE_DERIVED_REGISTERS, walkProven, type TreeDerivedRegister } from "./register-census";
+import { parseCitation, resolveCitation } from "./citations";
 
 /** How a proved walk has been shown to REFUSE a file, rather than only to report one. */
 export type NegativeCase =
@@ -243,6 +244,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/citations.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/citations.test.ts :: does not count a module that only MENTIONS the format in prose",
+      plants: "a note about splitting on",
+    },
+  },
+  {
     register: "src/quality/empty-list-sweep.ts",
     negative: {
       kind: "already_driven",
@@ -409,16 +418,18 @@ export function unresolvedCitations(
   const out: string[] = [];
   for (const probe of probes) {
     if (probe.negative.kind !== "already_driven") continue;
-    const [file, title] = probe.negative.citation.split(" :: ");
-    let source: string;
-    try {
-      source = readFileSync(path.join(root, file ?? ""), "utf8");
-    } catch {
-      out.push(`${probe.negative.citation} — no such file`);
+    // W301: the file-and-title half is the shared resolver's job now. The `plants` half is this
+    // register's own second question — a citation that names a test proves the test exists, not
+    // that it plants a negative — so it stays here and runs only once the first half resolved.
+    const resolved = resolveCitation(root, probe.negative.citation);
+    if (resolved !== true) {
+      out.push(resolved);
       continue;
     }
-    if (!source.includes(title ?? "")) out.push(`${probe.negative.citation} — no such test`);
-    else if (!source.includes(probe.negative.plants)) {
+    const parsed = parseCitation(probe.negative.citation);
+    if (typeof parsed === "string") continue;
+    const source = readFileSync(path.join(root, parsed.file), "utf8");
+    if (!source.includes(probe.negative.plants)) {
       out.push(`${probe.negative.citation} — the test no longer plants \`${probe.negative.plants}\``);
     }
   }
