@@ -187,7 +187,12 @@ export function pathDefects(root: string, steps: readonly PathStep[] = DEMO_PATH
   }
 
   const patientFacing = new Set(
-    PUBLIC_SURFACES.filter((s) => s.audience === "patient").map((s) => `app${s.path}/page.tsx`),
+    // `app${"/"}/page.tsx` is `app//page.tsx`, so the HOME page — the one public surface declared
+    // patient-facing that a patient is most likely to land on — could never match this set and the
+    // rule below could never fire for it. Q24's review found it.
+    PUBLIC_SURFACES.filter((s) => s.audience === "patient").map(
+      (s) => `app${s.path === "/" ? "" : s.path}/page.tsx`,
+    ),
   );
   for (const surface of discoverSurfaces(path.join(root, "app"))) {
     const file = path.relative(root, surface.file).split(path.sep).join("/");

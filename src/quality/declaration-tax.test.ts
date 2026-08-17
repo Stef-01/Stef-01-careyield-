@@ -240,9 +240,17 @@ describe("W308 the same measurement, re-run at the end of the quarter it judges"
     // measurement does not capture". Both halves checked, on the two modules added since it landed.
     for (const site of EDIT_SITES_AT_W308) {
       expect(consolidationDefects(ROOT, site.module), `${site.module} is not consolidated`).toEqual([]);
-      expect(namingSites(ROOT, site.module).length, `${site.module} costs a different number of files`).toBe(
-        site.files,
-      );
+      // A FLOOR, NOT AN IDENTITY, and W311 is why. `site.files` records the files somebody had to
+      // EDIT to declare the module; `namingSites` returns the files that NAME it, which is a
+      // superset that grows whenever anything mentions the path — a hardening record discussing
+      // `self-reference.ts` moved this from 8 to 9 without a declaration being added anywhere.
+      // Asserting equality made it a pinned count that ordinary work moves, which is exactly the
+      // class W304 spent a unit removing and this re-introduced four units later. Declarations do
+      // not get deleted, so the recorded figure is a genuine floor and the record stays frozen.
+      expect(
+        namingSites(ROOT, site.module).length,
+        `${site.module} names fewer files than were edited to declare it`,
+      ).toBeGreaterThanOrEqual(site.files);
       expect(site.why.length, `${site.module} records a number without saying what it is`).toBeGreaterThan(120);
     }
     expect(EDIT_SITES_AT_W308.length).toBeGreaterThan(1);

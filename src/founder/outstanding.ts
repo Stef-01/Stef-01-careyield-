@@ -99,15 +99,45 @@ function doneSince(rows: readonly LedgerRow[], origin: string): number {
   }).length;
 }
 
-export function waitedFor(gate: Gate | null, rows: readonly LedgerRow[]): Waited {
-  const origin = gate?.proposedAt ?? "W1";
+/**
+ * How long a ruling has waited.
+ *
+ * `origin` IS PASSED RATHER THAN DEFAULTED TO W1, and Q24's review is why. The first draft took
+ * `gate?.proposedAt ?? "W1"`, which is right for a standing GATE and wrong for a founder DECISION:
+ * `Q9 action 1` and `Q17 action 1` are not §4 gates, so they fell to the null branch and rendered
+ * as *outstanding since the plan was written* — sorting above three gates that really have waited
+ * longer, and telling the reader a decision raised at W217 had been open since W1.
+ */
+export function waitedFor(gate: Gate | null, rows: readonly LedgerRow[], origin = gate?.proposedAt ?? "W1"): Waited {
   const row = rows.find((r) => r.id === origin);
   return {
     sinceUnit: origin,
     sinceAt: row?.at ?? "",
     unitsSince: doneSince(rows, origin),
-    kind: gate?.proposedAt ? "proposed" : "standing",
+    kind: origin === "W1" ? "standing" : "proposed",
   };
+}
+
+/**
+ * Where a blocker's wait starts.
+ *
+ * A gate says so in §4. A DECISION says nothing anywhere, so it is taken from the earliest unit it
+ * blocks — the unit that reached the boundary and had to schedule itself blocked, which is the
+ * moment the question became outstanding. Derived from the release path rather than typed.
+ */
+function originOf(gate: Gate | null, releases: readonly string[], rows: readonly LedgerRow[]): string {
+  if (gate?.proposedAt) return gate.proposedAt;
+  if (gate) return "W1";
+  const weeks = releases.filter((id) => /^W\d+$/.test(id)).map((id) => Number(id.slice(1)));
+  if (weeks.length === 0) return "W1";
+  // The blocked unit itself carries no date — a row nobody built has no timestamp — so the wait
+  // runs from the last unit BUILT before it, which is when the quarter reached that boundary and
+  // somebody had to schedule the row blocked. A lower bound on the wait, and a real date.
+  const reached = Math.min(...weeks);
+  const before = rows
+    .filter((r) => r.status === "done" && /^W\d+$/.test(r.id) && Number(r.id.slice(1)) < reached)
+    .map((r) => Number(r.id.slice(1)));
+  return before.length > 0 ? `W${Math.max(...before)}` : "W1";
 }
 
 /** One outstanding ruling, with everything a reader needs to answer it. */
@@ -135,7 +165,7 @@ export function outstandingRulings(root: string, paths: readonly ReleasePath[] =
         whoDecides: p.whoDecides,
         gateText: gate?.text ?? null,
         releases: p.releases.map((id) => ({ id, note: byId.get(id)?.note ?? "" })),
-        waited: waitedFor(gate, rows),
+        waited: waitedFor(gate, rows, originOf(gate, p.releases, rows)),
       };
     })
     .sort((a, b) => b.waited.unitsSince - a.waited.unitsSince || a.blocker.localeCompare(b.blocker));
@@ -152,13 +182,18 @@ export interface Built {
 export function builtSurface(root: string): Built {
   const rows = allLedgerRows(root);
   const done = rows.filter((r) => r.status === "done");
+  // `weeks[0]!` was a non-null assertion over a possibly empty array: a root with no done week-unit
+  // returned `undefined` and the page threw on `last.id` rather than rendering an empty state.
   const weeks = done.filter((r) => /^W\d+$/.test(r.id));
-  const last = weeks.reduce((best, r) => (Number(r.id.slice(1)) > Number(best.id.slice(1)) ? r : best), weeks[0]!);
+  const last = weeks.reduce<LedgerRow | null>(
+    (best, r) => (best === null || Number(r.id.slice(1)) > Number(best.id.slice(1)) ? r : best),
+    null,
+  );
   return {
     done: done.length,
     blocked: rows.filter((r) => r.status === "blocked").length,
-    latestUnit: last.id,
-    latestAt: last.at,
+    latestUnit: last?.id ?? "none",
+    latestAt: last?.at ?? "",
   };
 }
 

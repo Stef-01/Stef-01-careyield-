@@ -39,10 +39,14 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-// W310 widened the id from `W\d+`. The ledger holds rows that are not week-units — `SUP-1` and
-// `SUP-2`, both blocked, and `A11Y-1`, `PRIV-3` — and the old pattern skipped them silently. It
-// must still reject the table's own header, so the id has to END IN A DIGIT: `Unit` does not.
-const LEDGER_ROW = /^\| ([A-Z][A-Z0-9-]*[0-9]) \| ([\w-]+) \| ([^|]*) \| ([^|]*) \| ([^|]*) \| (.*) \|\s*$/;
+// W310 widened the id from `W\d+`: the ledger holds rows that are not week-units — `SUP-1` and
+// `SUP-2`, both blocked, and `A11Y-1`, `PRIV-3` — and the old pattern skipped them silently.
+//
+// W311 REMOVED THE TRAILING-DIGIT REQUIREMENT W310 ADDED. It was there to reject the table's own
+// header and it also dropped `W-MIGRATE`, a done row — so the fix for a silent omission shipped a
+// smaller silent omission. The header is rejected without it: `Unit` is not all-caps, so the id
+// group stops at `U` and the row fails to match at the next separator.
+const LEDGER_ROW = /^\| ([A-Z][A-Z0-9-]*) \| ([\w-]+) \| ([^|]*) \| ([^|]*) \| ([^|]*) \| (.*) \|\s*$/;
 
 export interface LedgerRow {
   id: string;

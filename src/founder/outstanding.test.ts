@@ -8,6 +8,7 @@
 // firing after. So the derivation is proved by CHANGING THE SOURCES in a copied tree — a gate that
 // is not in this plan, a unit this ledger does not block — and requiring the output to move.
 
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   FOUNDER_BOUND,
@@ -20,7 +21,7 @@ import {
 } from "./outstanding";
 import { blockedRows, blockersIn, parseLedgerRows } from "@/quality/blocked-surface";
 import { lintEducationCopy } from "@/education/advice-lint";
-import { copyTree, withPlantedIn } from "@/quality/planting";
+import { copyTree, withPlantedIn, withTree } from "@/quality/planting";
 
 const ROOT = process.cwd();
 
@@ -91,16 +92,12 @@ describe("W310 the page is derived from the two documents, not written", () => {
   it("holds no gate list and no blocked count of its own", () => {
     // The property that makes the page unable to go stale, checked as text: a literal `G5` or a
     // number of blocked units written into this module is the defect the whole unit is about.
-    const source = parseLedgerRows("").length === 0 ? readSelf() : "";
+    const source = readFileSync("src/founder/outstanding.ts", "utf8");
     expect(source).not.toMatch(/"G\d+"/);
     expect(Object.values(FOUNDER_COPY).join(" ")).not.toMatch(/\bG\d+\b/);
   });
 });
 
-function readSelf(): string {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require("node:fs").readFileSync("src/founder/outstanding.ts", "utf8");
-}
 
 describe("W310 every outstanding ruling, its units, and its wait", () => {
   it("names every blocker the ledger blocks on, and none it does not", () => {
@@ -135,11 +132,41 @@ describe("W310 every outstanding ruling, its units, and its wait", () => {
   });
 
   it("gives every gate its own sentence from §4 rather than one written here", () => {
-    const plan = readSelfPlan();
+    const plan = readFileSync("docs/FIVE-YEAR-PLAN.md", "utf8");
     for (const ruling of outstandingRulings(ROOT)) {
       if (!ruling.gateText) continue;
       expect(plan, `${ruling.blocker}'s sentence is not §4's`).toContain(ruling.gateText);
     }
+  });
+
+  it("dates a founder DECISION from when it was reached, not from the plan", () => {
+    // Q24'S REVIEW FOUND THIS. A decision is not a §4 gate, so it fell to the `?? "W1"` branch and
+    // rendered as *outstanding since the plan was written* — sorting above three gates that really
+    // have waited longer, and telling a reader that a question raised at W217 had been open since
+    // W1. The wait now runs from the last unit BUILT before the row it blocks, which is when the
+    // quarter reached that boundary; the blocked row itself carries no date, having never been
+    // built. Both directions: a decision must not read as standing, and a standing gate must.
+    const rulings = outstandingRulings(ROOT);
+    const decisions = rulings.filter((r) => r.kind === "founder_decision");
+    expect(decisions.length).toBeGreaterThan(0);
+    for (const decision of decisions) {
+      expect(decision.waited.kind, `${decision.blocker} reads as standing`).toBe("proposed");
+      expect(decision.waited.sinceUnit, `${decision.blocker} dates from W1`).not.toBe("W1");
+      expect(decision.waited.sinceAt).toMatch(/^\d{4}-\d{2}-\d{2}/);
+    }
+    const standing = rulings.filter((r) => r.waited.kind === "standing");
+    expect(standing.length, "no gate reads as standing any more").toBeGreaterThan(0);
+    for (const gate of standing) expect(gate.waited.sinceUnit).toBe("W1");
+  });
+
+  it("reports an empty state rather than throwing when nothing is built", () => {
+    // `weeks.reduce(..., weeks[0]!)` over an empty array returned `undefined` and the page threw
+    // on `last.id`. A root with no done week-unit is not a tree this repository will ever have,
+    // which is exactly why nothing would have caught it.
+    const built = withTree({ "BUILD-STATE.md": "| W1 | claimed | b | — | — | not built |\n" }, (root) =>
+      builtSurface(root),
+    );
+    expect(built).toEqual({ done: 0, blocked: 0, latestUnit: "none", latestAt: "" });
   });
 
   it("sorts the longest wait first, so the page leads with the oldest question", () => {
@@ -216,7 +243,3 @@ describe("W310 the copy makes no clinical claim", () => {
   });
 });
 
-function readSelfPlan(): string {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require("node:fs").readFileSync("docs/FIVE-YEAR-PLAN.md", "utf8");
-}

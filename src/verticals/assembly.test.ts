@@ -103,10 +103,17 @@ describe("W250 the gate list deduplicates gates, not prose", () => {
     // The finding, pinned at the fixture that exposed it. Five members, one founder gate and two
     // authoring acts — and the prose version returned five because the three G5 sentences were
     // worded differently.
-    // W304: the members by NAME rather than by count. The finding is the contrast — five members
-    // collapsing to one gate — and naming them keeps it while surviving a member being renamed.
-    expect(DERMATOLOGY_MEMBERS.map((m) => m.kind).length).toBe(DERMATOLOGY_MEMBERS.length);
-    expect(DERMATOLOGY_MEMBERS.length, "the dermatology fixture lost members").toBeGreaterThanOrEqual(5);
+    // W304 replaced a count here and wrote a TAUTOLOGY doing it: `map(m => m.kind).length` equals
+    // `.length` for every array there has ever been, so the line checked nothing while its comment
+    // claimed to check names. Q24's review found it; W288's sweep did not, because the two sides
+    // are not syntactically identical. The members are named now, which is what the comment said.
+    expect(DERMATOLOGY_MEMBERS.map((m) => m.kind).sort()).toEqual([
+      "content",
+      "education_item",
+      "interval",
+      "pathway",
+      "pathway",
+    ]);
     expect(gatesFor(DERMATOLOGY_MEMBERS)).toEqual(["G5"]);
   });
 

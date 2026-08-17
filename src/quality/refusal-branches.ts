@@ -11,8 +11,8 @@
 // fixture had ever reached. A register whose violation list is always empty is indistinguishable
 // from a register that cannot produce one, and the tree has now shipped both.
 //
-// So this drives them. Six registers report violations, between them on twenty-one branches, and
-// each branch here carries a `reach` that CONSTRUCTS the input that makes it fire and returns
+// So this drives them. Every register that reports violations is here, and each branch carries a
+// `reach` that CONSTRUCTS the input that makes it fire and returns
 // whether it did. Not a citation to a test that might cover it — W284's lesson is that a citation
 // nobody resolves reads as coverage — and not a coverage percentage, which says a line executed
 // and not that anything asserted on it.
@@ -32,23 +32,8 @@
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
-import { fallibleDiff } from "./review-w279";
-import { duplicateDiff, pinDiff } from "./pins";
-import { stripComments } from "@/security/reachability";
-import { SCAN_SITES, blankLiterals, fixtureDiff, scanSiteDiff } from "./scan-text";
-import { BLIND_SPOTS, boundDiff } from "./blind-spots";
 import { coverageDiff } from "./route-coverage";
-import { censusDiff } from "./register-census";
-import { negativeDiff } from "./negative-probes";
-import { UNEVIDENCED_AT_W293, emptyListDiff } from "./empty-list-sweep";
-import { separatorDiff } from "./citations";
-import { planterDiff, withTree, withTree as withRoot } from "./planting";
-import { countDiff } from "./register-counts";
-import { headerViolations } from "./unit-headers";
-import { pageSuiteViolations } from "./page-suite";
-import { blockedSurfaceViolations } from "./blocked-surface";
-import { coherenceViolations } from "@/tenancy/fixture-coherence";
-import { SELF_SCANNING, SPLIT_EXCEPTIONS, holderDiff, splitDiff } from "./self-reference";
+import { withTree as withRoot } from "./planting";
 
 /** A violation-reporting function found in the tree: the file it lives in and its name. */
 export interface ReporterSite {
@@ -133,7 +118,7 @@ export { withRoot };
 /**
  * Every refusal branch in the tree's violation-reporting registers, and how each is reached.
  *
- * Six registers, twenty-one branches. The inputs are constructed rather than borrowed from the
+ * The inputs are constructed rather than borrowed from the
  * tree, because a healthy tree cannot produce any of them — which is exactly why they went
  * undriven long enough to be worth a unit.
  */

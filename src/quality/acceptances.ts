@@ -43,6 +43,7 @@ import { lintEducationCopy } from "@/education/advice-lint";
 import { ACCEPTED_TAUTOLOGIES, brokenAcceptances } from "./tautology-sweep";
 import { FINDINGS as HARDENING_Q22_FINDINGS, type HardeningFinding } from "./hardening-q22";
 import { FINDINGS as Q23_FINDINGS } from "./hardening-q23";
+import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
 import { FINDINGS as W279_REVIEW_FINDINGS } from "./review-w279";
 
 /** One acceptance, flattened out of whichever register holds it. */
@@ -91,6 +92,16 @@ const hardeningAcceptances = (
     );
 
 export const ACCEPTANCE_REGISTERS: readonly AcceptanceRegister[] = [
+  {
+    module: "src/quality/hardening-q24.ts",
+    unit: "W311",
+    register: "FINDINGS",
+    entries: () => hardeningAcceptances("W311", Q24_FINDINGS),
+    rederivation: {
+      kind: "rederived_in_its_own_test",
+      citation: "src/quality/hardening-q24.test.ts :: Q24-SEC-1: exactly one module in the quarter is reachable from a page",
+    },
+  },
   {
     unit: "W298",
     module: "src/quality/hardening-q23.ts",
