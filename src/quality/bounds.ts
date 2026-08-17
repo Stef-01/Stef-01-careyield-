@@ -70,6 +70,7 @@ import { COUNT_BOUND } from "./register-counts";
 import { MANIFEST_BOUND } from "./manifest";
 import { FOUNDER_BOUND } from "@/founder/outstanding";
 import { HARDENING_BOUND as HARDENING_Q24_BOUND } from "./hardening-q24";
+import { CLOSING_BOUND } from "./closing-state";
 
 /**
  * W306: how a remedy's predicate could be shown answering the other way.
@@ -146,6 +147,17 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for. W306 added the missing half of the predicate's own check — a bound carrying a constructed tree is driven in the state where its remedy EXISTS, rather than only in the state where it does not — and that is narrower than it reads too: the tree is a fixture written here, so what it shows is that the predicate reads a tree, not that it would recognise the remedy as somebody else will actually build it. The predicates declared to derive nothing from a tree are checked only for refusing to budge, which is weaker again.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/closing-state.ts",
+    name: "CLOSING_BOUND",
+    unit: "W315",
+    text: CLOSING_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "The bound's first half is a circularity rather than a gap: a row carries the hash of the commit that contains it, so no version of this check can verify the SHA before the commit exists, and no change to the tree makes that false. Its second half — that a row-dependent check welded inside a `.test.ts` is invisible here — names W289's remedy, which is a thing an AUTHOR does to some future check rather than a state of the tree a predicate could read. Neither half is liftable, and W311 established that mis-typing a limit as a deferred remedy is how `never_derived` becomes the easy answer.",
+    },
+    numbers: [],
+  },
   {
     module: "src/quality/hardening-q24.ts",
     name: "HARDENING_BOUND",

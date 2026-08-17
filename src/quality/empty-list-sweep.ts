@@ -475,6 +475,8 @@ export const UNEVIDENCED_AT_W293: readonly string[] = [
   "src/quality/audit-y5.test.ts :: has no hardcoded date comparison in shipped source :: hits",
   "src/quality/audit-y5.test.ts :: leaves no focused or skipped test anywhere :: hits",
   "src/quality/author-tax.test.ts :: charges nothing for a register that is satisfied by writing the module itself :: home.files",
+  "src/quality/closing-state.test.ts :: reports a bound that its own close makes stale :: whileClaimed",
+  "src/quality/closing-state.test.ts :: reports a note that dropped the `[P]` prefix its plan line carries :: clean",
   "src/quality/dossier-q18.test.ts :: checks that it really is off and really is unwired :: importers",
   "src/quality/g5-rehearsal.test.ts :: is imported by nothing the product ships :: importers",
   "src/quality/gate-readiness.test.ts :: opens every path, and finds a file at each :: missing",

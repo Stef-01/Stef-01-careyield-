@@ -1929,6 +1929,11 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/closing-state.ts",
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/hardening-q24.ts",
     census: null,
     branches: [],
