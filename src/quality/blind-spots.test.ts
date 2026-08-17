@@ -59,12 +59,16 @@ describe("W295 every register in the census states what it cannot see", () => {
 });
 
 describe("W295 a stated bound is planted, and the register stays silent", () => {
-  it("demonstrates eleven of them, and none of the eleven is refuted", () => {
+  it("demonstrates every bound it can, and none of them is refuted", () => {
     // THE UNIT. Each witness has the property its bound describes and is otherwise ordinary code;
     // the register must not report it. A hit means the sentence is false — either the register can
     // see the shape after all, or the sentence was describing what the register already does.
     expect(falseBounds(), "a register reports the shape its bound says it cannot see").toEqual([]);
-    expect(ofKind("demonstrated")).toHaveLength(11);
+    // W296: was `toHaveLength(11)` and moved on the first register added after this unit landed.
+    // Fourth instance this quarter of the count-that-ordinary-work-moves shape W290 named, and the
+    // same restatement: the property is that MOST bounds are demonstrated rather than merely
+    // asserted, and `falseBounds()` above is what reads every one of them.
+    expect(ofKind("demonstrated").length).toBeGreaterThanOrEqual(11);
     // AND THE CONTROL, which is what makes the silence above mean anything: each probe plants an
     // ordinary positive beside its witness, and the register must report THAT. A tree the detector
     // cannot read is silent about everything and would pass the assertion above on its own.

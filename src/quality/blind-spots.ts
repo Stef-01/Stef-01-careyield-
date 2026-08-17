@@ -40,6 +40,7 @@ import { pinsInTree } from "./pins";
 import { sweepTautologies } from "./tautology-sweep";
 import { acceptanceCarryingModules } from "./acceptances";
 import { violationReporters, withRoot } from "./refusal-branches";
+import { mutantsIn } from "./mutation-sampling";
 
 /** How a register's stated bound has been shown to be true. */
 export type Blindness =
@@ -70,6 +71,22 @@ const LEDGER_ROW = "| W1 | done | builder-A | 2026-08-14T00:00Z | abc1234 | a ro
 
 export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
   // ── Demonstrated: the detector takes a root, so a witness can be put in front of it ─────────
+  "src/quality/mutation-sampling.ts": {
+    kind: "demonstrated",
+    bound:
+      "Five textual operators — `===`, `!==`, `&&`, `>=`, `<=`. A module whose decisions are spelled with `>`, `<`, `||`, `??`, a ternary or an early return has NO mutation site at all, so it is sampled zero times and can never produce a survivor. Silence about such a module is silence rather than coverage, which is the distinction the whole register exists for.",
+    witness: "a module whose only decision is `a > b`, which none of the five operators reaches",
+    control: "the same decision written `a >= b`, which the sampler must find",
+    probe: () => ({
+      witnessSeen:
+        mutantsIn("src/planted/gt.ts", "export const f = (a: number, b: number) => a > b;\n", "src/planted/gt.test.ts")
+          .length > 0,
+      controlSeen:
+        mutantsIn("src/planted/gte.ts", "export const f = (a: number, b: number) => a >= b;\n", "src/planted/gte.test.ts")
+          .length > 0,
+    }),
+  },
+
   "src/quality/register-census.ts": {
     kind: "demonstrated",
     bound:
