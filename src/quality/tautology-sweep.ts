@@ -274,6 +274,15 @@ export interface AcceptedTautology {
   test: string;
   condition: "the test's real assertion is a @ts-expect-error";
   why: string;
+  /**
+   * ISO date. Past this, somebody looks again — and W294 made that sentence true.
+   *
+   * Added at W294, which found that five of the tree's seven acceptance registers checked a review
+   * date's SHAPE and never compared it to a clock. This register had no date at all, on the
+   * argument that its condition is machine-checked; a machine-checked condition says the reason is
+   * still literally true, not that it is still the right reason.
+   */
+  reviewBy: string;
 }
 
 export const ACCEPTED_TAUTOLOGIES: readonly AcceptedTautology[] = [
@@ -281,24 +290,28 @@ export const ACCEPTED_TAUTOLOGIES: readonly AcceptedTautology[] = [
     file: "src/referrals/acceptance.test.ts",
     test: "has no overload taking a status, a referral id, or anything else",
     condition: "the test's real assertion is a @ts-expect-error",
+    reviewBy: "2027-02-14",
     why: "W133's obligations API is checked at COMPILE time — two `@ts-expect-error` lines say the function has no overload taking a status or a bare id. tsc errors on the call if the overload appears AND on the expect-error if it does not, so the test is enforced in both directions by the compiler. The runtime line closes a body vitest would otherwise report as an empty test.",
   },
   {
     file: "src/credentials/vault.test.ts",
     test: "does not typecheck without a grant",
     condition: "the test's real assertion is a @ts-expect-error",
+    reviewBy: "2027-02-14",
     why: "W109's whole mechanism is that a route skipping the grant does not fail review, it fails to COMPILE: the grant is branded with a unique symbol the module never exports, so no literal satisfies it. Three `@ts-expect-error` lines are the assertion; nothing about it is observable at runtime, which is the property.",
   },
   {
     file: "src/education/curation.test.ts",
     test: "takes no count, threshold or cutoff — and no overload adds one",
     condition: "the test's real assertion is a @ts-expect-error",
+    reviewBy: "2027-02-14",
     why: "The claim is about a signature that does NOT exist — `curate` takes items and a context and nothing else. An absent overload has no runtime trace, so the only place to assert it is the compiler.",
   },
   {
     file: "src/pathways/evaluation.test.ts",
     test: "requires a pathway as an argument — evaluation cannot start from facts alone",
     condition: "the test's real assertion is a @ts-expect-error",
+    reviewBy: "2027-02-14",
     why: "The direction is the posture: evaluation cannot start from facts alone, so there is no overload taking facts on their own. Same shape as the three above — a statement about what will not typecheck.",
   },
 ];

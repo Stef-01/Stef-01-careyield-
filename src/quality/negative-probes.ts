@@ -244,6 +244,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/acceptances.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/acceptances.test.ts :: notices a register ARRIVING in a tree that is not this one",
+      plants: "src/planted/reader.ts",
+    },
+  },
+  {
     register: "src/quality/tautology-sweep.ts",
     negative: {
       kind: "already_driven",

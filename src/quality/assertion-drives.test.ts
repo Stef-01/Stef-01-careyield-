@@ -66,7 +66,7 @@ describe("W289 the drivable assertions are driven, and they report", () => {
       if (!drive(ROOT)) failed.push(file);
     }
     expect(failed, "a register accepted an input its assertion exists to reject").toEqual([]);
-    expect(Object.keys(ASSERTION_DRIVES)).toHaveLength(9);
+    expect(Object.keys(ASSERTION_DRIVES)).toHaveLength(10);
   });
 
   it("agrees with the census in both directions", () => {

@@ -41,6 +41,7 @@ import { REFUSAL_BRANCHES, driveBranches, withRoot } from "./refusal-branches";
 import { anchorCoverage, deadAnchors } from "./latent-y5";
 import { LATENT_FINDINGS, fired } from "./latent-findings";
 import { pinDiff } from "./pins";
+import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptances";
 import { unacceptedTautologies } from "./tautology-sweep";
 
 /**
@@ -51,6 +52,9 @@ import { unacceptedTautologies } from "./tautology-sweep";
  * between "nothing fired" and "nothing was driven".
  */
 export type Drive = (root: string) => boolean;
+
+/** A date past every review date in the tree. Named, not inline — see the acceptances drive. */
+const BEYOND_EVERY_REVIEW = "2099-01-01";
 
 export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   "src/compliance/surfaces.ts": (root) => {
@@ -88,6 +92,30 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     const bands = coverageByBand(root, []);
     const populated = bands.filter((b) => b.modules > 0);
     return populated.length > 0 && populated.every((b) => b.covered === 0);
+  },
+
+  "src/quality/acceptances.ts": (root) => {
+    // Both arms of W294's register, each given the input it exists to reject: a date beyond every
+    // review date must expire every acceptance, and a register whose sweep produces nothing must
+    // report its acceptance stale.
+    //
+    // THE PROBE'S DATE IS NAMED RATHER THAN WRITTEN INLINE, for the reason the split marker above
+    // is split: W294's detector looks for `reviewBy:` followed by a literal, which is what a module
+    // HOLDING acceptances does, and a fixture written that way made this file look like an eighth
+    // acceptance register. Naming the constant is ordinary code, not a contortion, and it leaves
+    // the detector's rule intact rather than carving an exemption into it.
+    void root;
+    const expired = expiredAcceptances(BEYOND_EVERY_REVIEW).length === allAcceptances().length;
+    const stale = staleAcceptances([
+      {
+        unit: "W289",
+        module: "src/w289-probe.ts",
+        register: "PROBE",
+        entries: () => [{ id: "W289::probe", reviewBy: BEYOND_EVERY_REVIEW, why: "a probe" }],
+        rederivation: { kind: "rederived_here", sweep: "nothing", stale: () => ["W289::probe"] },
+      },
+    ]);
+    return expired && stale.length > 0;
   },
 
   "src/quality/pins.ts": (root) => pinDiff(root, []).undeclared.length > 0,

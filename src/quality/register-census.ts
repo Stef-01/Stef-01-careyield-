@@ -233,6 +233,25 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/acceptances.ts",
+    derives:
+      "Every module under `src/` that HOLDS acceptances — one that assigns a `reviewBy` date or exports an `ACCEPTED_*` list — which is the union of two shapes because either alone misses a real register.",
+    checkedAgainst:
+      "W294's `ACCEPTANCE_REGISTERS`, both directions: a module holding acceptances that no entry names fails, and a declared register that has stopped holding any fails.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "a module assigning a review date and one merely naming the field in a type are planted together in a constructed root, and only the first may be reported",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "Every acceptance in the tree carries a review date that is still in the future, and every acceptance whose sweep can be re-run still has a finding behind it.",
+      mutation:
+        "`expiredAcceptances` is given a date beyond every review date and must report all of them; `staleAcceptances` is given a register whose sweep reports nothing and must report its acceptance stale.",
+    },
+  },
+  {
     file: "src/quality/tautology-sweep.ts",
     derives:
       "Every assertion in every `*.test.ts` under `src/`, classified against three shapes whose expected value follows from the assertion's own text.",

@@ -730,6 +730,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "An in-memory store of specs, and its strings are ids and criteria keys. What it holds is authored elsewhere and gated by G5; the store renders nothing.",
   },
   {
+    module: "src/quality/acceptances.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W294's register of acceptance registers is reviewer-facing throughout: seven registers, how each re-derives the finding behind its acceptances, and `ACCEPTANCE_BOUND`, which says which half runs and which half is only cited. It holds no copy of its own — every string it returns is an id built from a module path, a rule name and a review date read out of somebody else's register. Its longest strings are the arguments for why a by-review acceptance can never be re-swept, addressed to whoever adds one. No patient, condition or appointment reason appears anywhere in it.",
+  },
+  {
     module: "src/quality/assertion-drives.ts",
     operatorCopy: [],
     notCopy:
