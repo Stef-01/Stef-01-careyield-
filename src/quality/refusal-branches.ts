@@ -37,6 +37,7 @@ import { fallibleDiff } from "./review-w279";
 import { duplicateDiff, pinDiff } from "./pins";
 import { coverageDiff } from "./route-coverage";
 import { censusDiff } from "./register-census";
+import { negativeDiff } from "./negative-probes";
 import { headerViolations } from "./unit-headers";
 import { pageSuiteViolations } from "./page-suite";
 import { blockedSurfaceViolations } from "./blocked-surface";
@@ -467,6 +468,32 @@ export const REFUSAL_BRANCHES: readonly RefusalBranch[] = [
       kind: "unreached",
       fixture:
         "The same shape as the stale arm above and the same one-line remedy: `EXCLUDED_SPECS` is read from module scope, so an exclusion with a short reason cannot be supplied by a caller. Parameterise it and this arm is reachable with a one-entry map.",
+    },
+  },
+  // ── W292's negative probes ────────────────────────────────────────────────────────────────
+  {
+    module: "src/quality/negative-probes.ts",
+    fn: "negativeDiff",
+    branch: "unprobed",
+    reach: { kind: "driven", drive: () => negativeDiff(undefined, []).unprobed.length > 0 },
+  },
+  {
+    module: "src/quality/negative-probes.ts",
+    fn: "negativeDiff",
+    branch: "stale",
+    reach: { kind: "driven", drive: () => negativeDiff([], undefined).stale.length > 0 },
+  },
+  {
+    module: "src/quality/negative-probes.ts",
+    fn: "negativeDiff",
+    branch: "unsupportedExemption",
+    reach: {
+      kind: "driven",
+      drive: () =>
+        negativeDiff(
+          [{ file: "src/x.ts", derives: "d", checkedAgainst: "c", proof: { kind: "mutated_tree", mutation: "m" } }],
+          [{ register: "src/x.ts", negative: { kind: "no_detector_of_its_own", why: "asserted rather than earned" } }],
+        ).unsupportedExemption.length > 0,
     },
   },
 ];

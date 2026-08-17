@@ -391,6 +391,15 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/negative-probes.test.ts",
+    derives: "Nothing of its own — it imports the shared rooted walks in order to plant a NEGATIVE beside each positive, which is what W292's discriminating pairs are made of.",
+    checkedAgainst: "Each detector's own pair. It is a member because deriving through `tree-walks` counts, and exempting the file that does the proving would be the register answering its own question — `register-census.test.ts`'s precedent, one unit over.",
+    proof: {
+      kind: "mutated_tree",
+      mutation: "it is the file that does the planting; every pair in it plants two files into a copied tree and asks the detector one question about both",
+    },
+  },
+  {
     file: "src/quality/page-suite.ts",
     derives: "Every `*.spec.ts` under `e2e/`, to ask which of them the verify gate runs.",
     checkedAgainst: "`EXCLUDED_SPECS` — empty today — plus the verify script, the e2e script and the Playwright config, each of which can drop a spec without touching the others.",
