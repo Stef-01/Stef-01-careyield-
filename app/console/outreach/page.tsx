@@ -28,6 +28,7 @@ import { syntheticReferrals } from "@/synthetic/referrals";
 import { authorize } from "@/tenancy/tenancy";
 import { requirePractice } from "../guard";
 import { ConsoleShell } from "../ui";
+import { GateRefusal } from "../../gate-refusal";
 
 export const dynamic = "force-dynamic";
 
@@ -82,7 +83,7 @@ export default async function OutreachPage() {
 
   return (
     <ConsoleShell email={email}>
-      <h1 className="text-2xl font-semibold tracking-tight">Outreach</h1>
+      <h1 className="text-2xl font-semibold tracking-tight" data-testid="outreach-plan">Outreach</h1>
       <p className="mt-2 max-w-2xl text-sm text-stone-500">
         Referrals your practice wrote with nothing recorded since. Where an invitation can go
         out, it is the ordinary availability message — it does not mention the referral, the
@@ -171,10 +172,9 @@ export default async function OutreachPage() {
         </dl>
       </section>
 
-      <p className="mt-6 max-w-2xl text-xs text-stone-500">
-        Referral records here are synthetic. No message is sent from this page — live sending
-        stays switched off until the practice authorises it.
-      </p>
+      {/* W309: was a sentence of this page's own that said "no message is sent" without saying
+          what stops it. One component, one copy, and the gate named. */}
+      <GateRefusal gate="G3" />
     </ConsoleShell>
   );
 }

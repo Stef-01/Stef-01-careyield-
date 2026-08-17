@@ -15,10 +15,21 @@ export const dynamic = "force-dynamic";
 // reached from an SMS deserves its own title regardless.
 export const metadata = { title: "Your appointment — Meherr" };
 
-function Panel({ heading, children }: { heading: string; children: React.ReactNode }) {
+function Panel({
+  heading,
+  children,
+  testId,
+}: {
+  heading: string;
+  children: React.ReactNode;
+  /** W309: the demo path's marker for this step. No gate copy here — this page is patient-facing. */
+  testId?: string;
+}) {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-4 px-6">
-      <h1 className="text-2xl font-semibold tracking-tight">{heading}</h1>
+      <h1 className="text-2xl font-semibold tracking-tight" data-testid={testId}>
+        {heading}
+      </h1>
       {children}
     </main>
   );
@@ -158,7 +169,7 @@ export default async function BookingPage({
       (a) => a.patientId === invitation.patientId && a.generatedByInvitation,
     );
     return (
-      <Panel heading={`Your ${kind} is booked`}>
+      <Panel heading={`Your ${kind} is booked`} testId="booking-confirmed">
         <p className="text-stone-600">
           {store.clinicianName} at {store.practiceName}
           {appointment ? ` — ${new Date(appointment.startsAt).toLocaleString("en-AU")}` : ""}.

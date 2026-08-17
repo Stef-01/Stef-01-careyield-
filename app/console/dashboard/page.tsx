@@ -7,6 +7,7 @@ import { getDashboardData } from "@/sim/dashboard-data";
 import { counterfactual, withheldCopy } from "@/outcomes/counterfactual";
 import { requireSession } from "../guard";
 import { ConsoleShell } from "../ui";
+import { GateRefusal } from "../../gate-refusal";
 import { WeeklyArmsChart } from "./chart";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +36,7 @@ export default async function DashboardPage() {
     <ConsoleShell email={email}>
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Incrementality</h1>
-        <span className="text-sm text-stone-500">
+        <span className="text-sm text-stone-500" data-testid="incrementality-answer">
           {data.weeks} simulated weeks · {data.patientCount.toLocaleString()} synthetic patients
         </span>
       </div>
@@ -107,6 +108,10 @@ export default async function DashboardPage() {
           </table>
         </div>
       </section>
+
+      {/* W309: the headline answer of the whole product, and the gate that makes it a
+          demonstration rather than a measurement, said on the same screen. */}
+      <GateRefusal gate="G4" />
 
       <p className="mt-6 text-xs text-stone-500">
         Attribution definitions: docs/ATTRIBUTION.md {attr.version} — intention-to-treat; no claim

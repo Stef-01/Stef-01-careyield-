@@ -31,7 +31,9 @@ export default async function ConsoleHome() {
       activeId={record.practice.id as string}
     >
       <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">{record.practice.name}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight" data-testid="console-practice">
+          {record.practice.name}
+        </h1>
         <span className="text-sm text-stone-500">
           {record.practice.timezone} · holdout {Math.round(record.practice.holdoutRate * 100)}%
         </span>

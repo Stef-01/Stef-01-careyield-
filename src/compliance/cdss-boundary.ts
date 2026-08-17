@@ -730,6 +730,18 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "An in-memory store of specs, and its strings are ids and criteria keys. What it holds is authored elsewhere and gated by G5; the store renders nothing.",
   },
   {
+    module: "src/console/gates.ts",
+    operatorCopy: ["GATE_REFUSAL_COPY"],
+    notCopy:
+      "Nothing. THIS MODULE IS COPY ALL THE WAY THROUGH, which is unusual enough here to say out loud: it is one sentence per founder gate, rendered by `GateRefusal` to whoever is looking at the console or presenting the demo. It makes no clinical claim and names no condition — each says what the product does instead of the thing the gate stops, and who has to rule on it.",
+  },
+  {
+    module: "src/demo/path.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W309's path register is reviewer-facing: routes, page paths, `data-testid` markers, and the argument for each gate that stops a step. The one thing on it that IS copy — the refusal sentence — lives in `src/console/gates.ts` and is re-exported here rather than restated, which is what keeps this list honest. Nothing here renders.",
+  },
+  {
     module: "src/quality/self-reference.ts",
     operatorCopy: [],
     notCopy:

@@ -9,6 +9,7 @@ import { getConsole } from "@/console/store";
 import { DemoNavigator } from "../demo-navigator";
 import { assertDemoEnabled } from "@/lib/demo-guard";
 import { launchDemo } from "./actions";
+import { GateRefusal } from "../gate-refusal";
 
 export const dynamic = "force-dynamic";
 
@@ -32,11 +33,14 @@ export default function DemoPage() {
           <DemoNavigator />
         </div>
         <h1 className="text-3xl font-semibold tracking-tight">Meherr demo</h1>
-        <p className="mt-3 max-w-xl text-stone-500">
+        <p className="mt-3 max-w-xl text-stone-500" data-testid="demo-seeded">
           A scripted synthetic practice: {rail.practiceName}, {rail.clinicianName}, one open
-          session, three invited patients. No real patient data, no live SMS — the walkthrough
-          script is docs/DEMO.md.
+          session, three invited patients. The walkthrough script is docs/DEMO.md.
         </p>
+
+        {/* W309: was "No real patient data, no live SMS" folded into the sentence above — true,
+            and silent about which decisions those two are waiting on. */}
+        <GateRefusal gate="G2" />
 
         <form action={launchDemo} className="mt-8">
           <button
@@ -54,6 +58,11 @@ export default function DemoPage() {
               Open one in a second tab when the script reaches the patient moment. Statuses are
               live — return here after booking to show the third offer expiring.
             </p>
+
+            {/* W309: the booking step's refusal, and it renders HERE rather than on the patient's
+                page — see `whyElsewhere` on that step. The presenter hands out these links, and
+                the person who can move G1 is the one standing at this screen. */}
+            <GateRefusal gate="G1" />
             <ul className="mt-4 divide-y divide-stone-100">
               {rail.state.invitations.map((inv, i) => (
                 <li key={inv.id} className="flex items-center justify-between gap-4 py-2.5 text-sm">
