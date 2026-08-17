@@ -290,7 +290,9 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/acceptances.ts", text: "nine registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
   { module: "src/quality/acceptances.ts", text: "seven re-derive their findings", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/blocked-surface.ts", text: "Eighteen rows", resolution: { kind: "derived", derive: blockedRows } },
-  { module: "src/quality/bounds.ts", text: "TWENTY-TWO MODULES", resolution: { kind: "derived", derive: modulesStatingABound } },
+  // W315 REMOVED THE SENTENCE THIS CLASSIFIED. Its own new bound moved the total from 22 to 23 on
+  // the firing after W314 landed, and Q25 stated the habit for exactly this: name the things or
+  // state a bound, never a total. The prose says 'modules across this tree' now and nothing counts.
   { module: "src/quality/bounds.ts", text: "Two modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/citations.ts", text: "seven registers", resolution: {
       kind: "open",

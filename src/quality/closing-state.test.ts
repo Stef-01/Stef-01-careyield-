@@ -19,7 +19,7 @@ import {
   closingDefects,
   unitsInFlight,
 } from "./closing-state";
-import { withTree } from "./planting";
+import { copyTree, withPlantedIn, withTree } from "./planting";
 import { type StatedBound, staleBounds } from "./bounds";
 
 const ROOT = process.cwd();
@@ -173,17 +173,20 @@ describe("W315 the tree's own closing state", () => {
   });
 
   it("reports a defect for the row in flight when there is one", () => {
-    // NON-VACUITY FOR THE EMPTINESS ABOVE, and it runs over the REAL tree with a bad SHA rather
-    // than a constructed root. The first attempt planted a two-file tree and `bounds-not-stale`
-    // threw on it: that check copies the repository to run real predicates against a rewritten
-    // ledger, so it needs a repository. Handing the live root a hash that is not one exercises the
-    // whole pipeline — every row in flight, every check — without pretending a tree is smaller
-    // than the checks require.
-    const found = closingDefects(ROOT, "notasha");
+    // NON-VACUITY FOR THE EMPTINESS ABOVE, on a CLAIMED ROW PLANTED into a copy of the real tree.
+    //
+    // The first version read the live ledger and required a row to be in flight — which broke
+    // within one firing, the moment this unit and its sibling both closed and nothing was claimed.
+    // That is the module's own documented ordinary state, asserted against by its own test: a test
+    // that depends on the tree being mid-firing passes only while somebody is watching it.
+    //
+    // A copy of the repository rather than a constructed root, because `bounds-not-stale` runs real
+    // predicates and needs a real tree.
+    const copy = copyTree(ROOT);
+    const claimed = `${LEDGER}\n| W999 | claimed | builder-B | 2026-08-17T00:00Z | — | a note the plan does not state |`;
+    const found = withPlantedIn(copy, { "BUILD-STATE.md": claimed }, () => closingDefects(copy, "notasha"));
     expect(found.length, "a bad SHA closes cleanly, so nothing is being checked").toBeGreaterThan(0);
-    for (const unit of unitsInFlight(LEDGER)) {
-      expect(found.join(" "), `${unit} closes badly and is not reported`).toContain(unit);
-    }
+    expect(found.join(" "), "the planted row in flight is not reported").toContain("W999");
   });
 
   it("uses a placeholder that is shaped like a hash and is not one", () => {

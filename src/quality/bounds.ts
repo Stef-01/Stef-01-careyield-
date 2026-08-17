@@ -1,6 +1,6 @@
 // W297: the bounds register — every stated `*_BOUND` resolved to its unit and to its remedy.
 //
-// TWENTY-TWO MODULES EXPORT A SENTENCE SAYING WHAT THEY DO NOT PROVE. They are this tree's most useful
+// MODULES ACROSS THIS TREE EXPORT A SENTENCE SAYING WHAT THEY DO NOT PROVE. They are its most useful
 // habit and its least checked one: a bound is written once, at the moment somebody understands the
 // limit best, and then it sits — while the tree moves underneath it. Two things go wrong, and both
 // have already happened here.
