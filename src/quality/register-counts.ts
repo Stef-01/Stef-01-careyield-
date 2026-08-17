@@ -45,6 +45,8 @@
 // helper this sweep does not recognise as a register. The class of bound W267 states about
 // `readdirSync`, with the same remedy when one arrives.
 //
+// WHAT THIS DOES NOT PROVE is `COUNT_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads the text of the tree's own test files.
 
 import { readFileSync } from "node:fs";

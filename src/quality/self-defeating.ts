@@ -29,6 +29,8 @@
 // because declaring a movement satisfies the diff and still fails the equality. The remedy is
 // defeated by the line next to it.
 //
+// WHAT THIS DOES NOT PROVE is `REMEDY_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads the text of the tree's own test files.
 
 import { readFileSync } from "node:fs";

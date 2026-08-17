@@ -39,6 +39,8 @@
 // works but says nothing, so each site re-derives the reason in a comment or does not explain
 // itself at all.
 //
+// WHAT THIS DOES NOT PROVE is `SCAN_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This transforms source text in memory.
 
 import { readFileSync } from "node:fs";
@@ -167,6 +169,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     module: "src/quality/tautology-sweep.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "Its parser blanks literals itself, one layer down, so that boundaries are found on blanked text while the PARTS are sliced from the real thing — a hit has to quote what the author wrote. Asking for them blanked here would blank them twice and leave nothing to quote.",
+  },
+  {
+    module: "src/quality/unit-headers.ts",
+    prep: { comments: "subtracted", literals: "blanked" },
+    why: "W320 reads a module's `export const NAME` lines to learn what it OWNS, and an export named inside a string is not an export — `declaration-tax.ts` carries a planted register body quoting `export const PLANTED_BOUND`, which the first run of this scan reported as a real bound whose header never mentions it. Comments are subtracted for the ordinary reason and because this module's own prose quotes the shapes it looks for.",
   },
   {
     module: "src/quality/self-reference.ts",

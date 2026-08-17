@@ -28,6 +28,8 @@
 // register, whether the ONE assertion that is the register's point can fail at all. Where they
 // meet, this cites and executes rather than rewriting the drive.
 //
+// WHAT THIS DOES NOT PROVE is `DRIVE_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. Fabricated declared lists and temporary directories.
 
 import { diffCensus, discoverSurfaces, parseCensus } from "@/compliance/surfaces";

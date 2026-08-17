@@ -39,6 +39,8 @@
 // derivation the code never performed, and a check that cannot fail reads exactly like one that
 // passes.
 //
+// WHAT THIS DOES NOT PROVE is `BOUNDS_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads the tree's own exported sentences, and the
 // trees it plants are throwaway directories holding only the files a predicate reads.
 

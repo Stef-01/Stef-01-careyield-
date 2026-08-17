@@ -25,6 +25,8 @@
 // guessed at that would classify by grammar and be wrong about the sentences that matter, so this
 // register is declared and the DERIVED half is what carries teeth.
 //
+// WHAT THIS DOES NOT PROVE is `PROSE_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads the tree's own comments.
 
 import { readFileSync } from "node:fs";

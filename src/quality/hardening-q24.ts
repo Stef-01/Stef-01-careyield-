@@ -23,6 +23,8 @@
 // the eleven units — which `SELF_REVIEWED` names, because a pass that hid the overlap would be
 // claiming an independence it does not have.
 //
+// WHAT THIS DOES NOT PROVE is `HARDENING_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads diffs and registers.
 
 import { parseLedgerRows } from "./blocked-surface";

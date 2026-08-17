@@ -65,12 +65,15 @@
 // the tree. It is recorded rather than papered over, and it is a smaller hole than the one closed:
 // under-claiming a unit takes a deliberate wrong number, where before it took forgetting.
 //
+// WHAT THIS DOES NOT PROVE is `HEADER_CITATION_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads module headers and the ledger's unit ids.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parseLedgerRows } from "./blocked-surface";
 import { sourceModules, typescriptFiles } from "./tree-walks";
+import { prepareForScan } from "./scan-text";
 
 /** The shape, in one sentence, so the rule is quotable rather than only enforced. */
 export const HEADER_RULE =
@@ -257,4 +260,135 @@ export const HEADER_CITATION_BOUND =
   "in correct identifiers passes, and that is the larger half: W293's stale header named nothing " +
   "that had gone, it quoted numbers that had changed. Nothing mechanical closes that; what closed " +
   "it there was a rule against stating counts in a header at all, and rules of that shape have to " +
-  "be found a class at a time.";
+  "be found a class at a time. W320 CLOSED A FURTHER STRIP OF IT AND THE STRIP IS NARROW. A cited " +
+  "name is now checked for OWNERSHIP as well as existence — a header claiming a constant another " +
+  "module owns, with no unit named beside it, is reported — and a module that exports a bound must " +
+  "point at it. Neither reaches the sentence AROUND the name. A header that cites its own constant " +
+  "and describes it wrongly passes both checks, which is the same door W298 left open standing in a " +
+  "narrower frame; and the ownership arm cannot tell a wrong citation from an unattributed but " +
+  "correct citation, so what it reports is a missing attribution rather than a false claim.";
+
+// ---------------------------------------------------------------------------------------------
+// W320: a header measured against what its own module exports.
+// ---------------------------------------------------------------------------------------------
+
+/** Every `SCREAMING_CASE` export a module declares, read off code with literals blanked. */
+export function screamingExports(source: string): string[] {
+  const code = prepareForScan(source, { literals: "blanked" });
+  return [
+    ...new Set(
+      [...code.matchAll(/export (?:const|type|interface|function) ([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)\b/g)].map(
+        (m) => m[1]!,
+      ),
+    ),
+  ].sort();
+}
+
+/** The header — everything above the first import, which is where a module explains itself. */
+function headerOf(source: string): string {
+  const cut = source.indexOf("\nimport ");
+  return cut > 0 ? source.slice(0, cut) : "";
+}
+
+/**
+ * Headers that cite another module's constant without naming a unit, and are right to.
+ *
+ * DECLARED RATHER THAN EDITED, and the difference matters: the fix for most of these is two words
+ * — the unit that owns the name — and doing that to eighteen headers would be a unit spending its
+ * whole budget rewriting other people's prose. What each row buys instead is that the citation is
+ * SEEN: a new one arrives failing, and a declaration for a citation somebody has since attributed
+ * fails too, so the list can only shrink by somebody improving a header.
+ */
+export const FOREIGN_CITATIONS: readonly string[] = [
+  "src/api/refusals.ts::API_REFUSAL_COPY",
+  "src/compliance/cdss-boundary.ts::EDUCATION_COPY_MODULES",
+  "src/console/zero-states.ts::SILENCE_COPY",
+  "src/education/triggers.ts::SHIPPED_TRIGGERS",
+  "src/interop/conformance.ts::WHAT_THIS_DOES_NOT_PROVE",
+  "src/interop/console.ts::SHIPPED_DISCLOSURES",
+  "src/interop/disclosure-ledger.ts::PROPOSED_DISCLOSURE_LOG",
+  "src/pathways/registry.ts::SHIPPED_ATTESTATIONS",
+  "src/pathways/registry.ts::SHIPPED_PATHWAYS",
+  "src/privacy/access-y5.ts::ERASURE_PATHS",
+  "src/privacy/adm-y5.ts::NOT_A_DECISION",
+  "src/quality/manifest.ts::STATED_BOUNDS",
+  "src/quality/register-counts.ts::ACCEPTED_COMPOSED_FINDINGS",
+  "src/quality/register-counts.ts::ACCEPTED_TAUTOLOGIES",
+  "src/quality/register-counts.ts::ALL_ZERO_STATES",
+  "src/quality/register-counts.ts::SETUP_STEPS",
+  "src/quality/review-w279.ts::RUNTIME_BOUND",
+  "src/quality/route-coverage.ts::PUBLIC_SURFACES",
+  "src/security/reachability.ts::DEFAULT_REPORT_OPTIONS",
+];
+
+export interface HeaderSubjectDefect {
+  module: string;
+  what: string;
+}
+
+/**
+ * W320: a header that does not name the module's own bound, and one that claims a name it does not own.
+ *
+ * TWO DIRECTIONS, AND W298 CLOSED NEITHER. That check asks whether a cited name exists ANYWHERE in
+ * the tree, which is the right question for a name that has been deleted and the wrong one for a
+ * name that was never this module's. Both halves here are about OWNERSHIP.
+ *
+ * The omission arm is narrowed to the bound on purpose. A header naming every export would be a
+ * second copy of the module's API and this tree does not write them that way — more than half its
+ * modules name none of their exports in prose, which is a house style rather than a defect. The
+ * bound is different: it is the module's own statement of what it does not prove, W237 put it in an
+ * export precisely so a reader would meet it, and a header that never points at it leaves the most
+ * load-bearing sentence in the file to be found by accident. Eighteen of the twenty-two bound-
+ * bearing modules were in exactly that state when this ran.
+ *
+ * The ownership arm takes `FOREIGN_CITATIONS` as a parameter so both arms can be driven from
+ * outside — this tree's headers cite each other constantly and correctly, so what is reported is a
+ * foreign name with no unit attribution anywhere near it.
+ */
+export function headerSubjectDefects(
+  root: string,
+  declared: readonly string[] = FOREIGN_CITATIONS,
+  files: readonly string[] = sourceModules(root),
+): HeaderSubjectDefect[] {
+  const owner = new Map<string, string>();
+  const read = new Map<string, string>();
+  for (const file of files) {
+    const rel = path.relative(root, file).split(path.sep).join("/");
+    const source = readFileSync(file, "utf8");
+    read.set(rel, source);
+    for (const name of screamingExports(source)) owner.set(name, rel);
+  }
+  const out: HeaderSubjectDefect[] = [];
+  const seen = new Set<string>();
+  for (const [rel, source] of read) {
+    const header = headerOf(source);
+    if (!header) continue;
+    for (const bound of screamingExports(source).filter((n) => n.endsWith("_BOUND"))) {
+      if (!header.includes(bound)) {
+        out.push({ module: rel, what: `exports ${bound} and its header never names it` });
+      }
+    }
+    for (const match of header.matchAll(/`([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)`/g)) {
+      const name = match[1]!;
+      const home = owner.get(name);
+      if (!home || home === rel) continue;
+      // ATTRIBUTION IS A UNIT THAT IS NOT THIS ONE. Every header in this tree opens `// W<n>:`, so
+      // a window that accepted any unit id would count the module's own header line as attributing
+      // a name it does not own — which it did, until a planted probe wrote `// W2:` above a
+      // citation and the check went quiet on the very case it was written for.
+      const own = headerUnit(source);
+      const around = header.slice(Math.max(0, match.index - 160), match.index + 160);
+      const cited = [...around.matchAll(/W(\d+)/g)].map((u) => Number(u[1]));
+      if (cited.some((u) => u !== own)) continue;
+      const id = `${rel}::${name}`;
+      seen.add(id);
+      if (!declared.includes(id)) {
+        out.push({ module: rel, what: `cites ${name}, which ${home} owns, with no unit named near it` });
+      }
+    }
+  }
+  for (const stale of declared.filter((d) => !seen.has(d))) {
+    out.push({ module: stale.split("::")[0]!, what: `is declared as an unattributed citation it no longer makes` });
+  }
+  return out.sort((a, b) => `${a.module}${a.what}`.localeCompare(`${b.module}${b.what}`));
+}

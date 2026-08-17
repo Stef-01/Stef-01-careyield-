@@ -29,6 +29,8 @@
 // there is no sweep to re-run and the date is the only thing keeping it live, which is exactly why
 // the date had to start working.
 //
+// WHAT THIS DOES NOT PROVE is `ACCEPTANCE_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads registers the tree already exports.
 
 import { readFileSync } from "node:fs";

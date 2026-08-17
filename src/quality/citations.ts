@@ -29,6 +29,8 @@
 // sentence said and its count did not. Corrected in W298's register rather than quietly here: a
 // hardening finding that overstates by one is a hardening finding somebody stops trusting.
 //
+// WHAT THIS DOES NOT PROVE is `CITATION_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads source files and returns strings.
 
 import { readFileSync } from "node:fs";

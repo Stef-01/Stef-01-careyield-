@@ -27,6 +27,8 @@
 // the quarter that added twelve of them, and why one of the six is downstream of the census entry
 // rather than of the module — declaring a walk in W267 creates a place it must be declared in W295.
 //
+// WHAT THIS DOES NOT PROVE is `TAX_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. Synthetic module bodies planted into a temporary copy.
 
 import { existsSync, readFileSync } from "node:fs";

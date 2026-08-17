@@ -9,8 +9,11 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { withRoot } from "./refusal-branches";
 import { fixtureToken } from "./scan-text";
 import {
+  FOREIGN_CITATIONS,
+  headerSubjectDefects,
   ADOPTED_MODULES,
   HEADER_CITATION_BOUND,
   HEADER_RULE,
@@ -279,5 +282,73 @@ describe("W298 a header cites no name the tree does not have", () => {
   it("says what resolving a name does not prove", () => {
     expect(HEADER_CITATION_BOUND).toMatch(/not/);
     expect(HEADER_CITATION_BOUND).toMatch(/W293/);
+  });
+});
+
+describe("W320 a header measured against what its own module exports", () => {
+  it("agrees with the tree in both directions", () => {
+    // THE UNIT. A module whose header never names its own bound, and a header claiming a name that
+    // belongs to somebody else — neither of which W298's check can see, because that one asks only
+    // whether the name exists SOMEWHERE.
+    expect(headerSubjectDefects(ROOT), "a header that does not describe its own module").toEqual([]);
+    expect(FOREIGN_CITATIONS.length, "nothing declared, so the second arm is vacuous").toBeGreaterThan(10);
+  });
+
+  it("reports a module whose header never names its own bound", () => {
+    // EIGHTEEN OF THE TWENTY-TWO BOUND-BEARING MODULES WERE IN THIS STATE, which is why the arm is
+    // narrowed to the bound rather than to every export: more than half this tree's modules name
+    // none of their exports in prose, and that is a house style rather than a defect. The bound is
+    // the one export W237 put in the code so a reader would meet it.
+    const silent = withRoot(
+      { "src/planted/quiet.ts": '// W1: a module that says nothing about its own limit.\nimport path from "node:path";\nexport const QUIET_BOUND = "x";\nexport const v = path;\n' },
+      (root) => headerSubjectDefects(root, []),
+    );
+    expect(silent).toEqual([
+      { module: "src/planted/quiet.ts", what: "exports QUIET_BOUND and its header never names it" },
+    ]);
+    // And the same module with the pointer added is silent, so the arm is about the header rather
+    // than about the export.
+    const loud = withRoot(
+      { "src/planted/loud.ts": '// W1: what this does not prove is `LOUD_BOUND`.\nimport path from "node:path";\nexport const LOUD_BOUND = "x";\nexport const v = path;\n' },
+      (root) => headerSubjectDefects(root, []),
+    );
+    expect(loud).toEqual([]);
+  });
+
+  it("reports a header claiming a name another module owns, and not one it owns itself", () => {
+    const borrowed = withRoot(
+      {
+        "src/planted/owner.ts": '// W1: the owner.\nimport path from "node:path";\nexport const OWNED_THING = "x";\nexport const v = path;\n',
+        "src/planted/borrower.ts": '// W2: this module is about `OWNED_THING` and says so.\nimport path from "node:path";\nexport const w = path;\n',
+      },
+      (root) => headerSubjectDefects(root, []).map((d) => d.what),
+    );
+    expect(borrowed).toEqual(["cites OWNED_THING, which src/planted/owner.ts owns, with no unit named near it"]);
+    // THE NEAR-MISS, and it is most of this tree's headers: a citation WITH a unit beside it is how
+    // these modules refer to each other, correctly, on nearly every page.
+    const attributed = withRoot(
+      {
+        "src/planted/owner.ts": '// W1: the owner.\nimport path from "node:path";\nexport const OWNED_THING = "x";\nexport const v = path;\n',
+        "src/planted/cites.ts": '// W2: this reads W1\'s `OWNED_THING` and says whose it is.\nimport path from "node:path";\nexport const w = path;\n',
+      },
+      (root) => headerSubjectDefects(root, []),
+    );
+    expect(attributed).toEqual([]);
+  });
+
+  it("reports a declaration for a citation the tree no longer makes", () => {
+    // The stale direction, which is how the register can only shrink by somebody improving a header
+    // rather than by somebody deleting a row.
+    expect(headerSubjectDefects(ROOT, [...FOREIGN_CITATIONS, "src/gone.ts::GONE_NAME"])).toEqual([
+      { module: "src/gone.ts", what: "is declared as an unattributed citation it no longer makes" },
+    ]);
+  });
+
+  it("says what the door still leaves open, which is the larger half", () => {
+    // W298's own bound said the expensive half stays open. It still does, and now it says which
+    // half in terms of ownership rather than existence.
+    expect(HEADER_CITATION_BOUND).toContain("W320");
+    expect(HEADER_CITATION_BOUND).toMatch(/does not|cannot/i);
+    expect(HEADER_CITATION_BOUND.length).toBeGreaterThan(600);
   });
 });

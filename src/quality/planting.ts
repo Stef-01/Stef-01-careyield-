@@ -40,6 +40,8 @@
 // that already exists — right when the question is what a detector says about a REAL tree with one
 // thing added, which is W267's whole subject. Collapsing them would lose that distinction.
 //
+// WHAT THIS DOES NOT PROVE is `PLANTING_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. Everything written goes into a temporary directory that
 // is removed before the call returns.
 

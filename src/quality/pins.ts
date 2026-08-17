@@ -46,6 +46,8 @@
 // W282 was aiming for, reported as a failure each time. It is `UNPROVEN_AT_W290` now: a list of
 // NAMES that a proved arrival does not touch and an unproven one does.
 //
+// WHAT THIS DOES NOT PROVE is `SWEEP_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads constant declarations.
 
 import { readFileSync } from "node:fs";

@@ -38,6 +38,8 @@
 // find, which W300's measurement does not capture and this must not be read as claiming. W308
 // re-derives both, against a baseline deliberately left frozen.
 //
+// WHAT THIS DOES NOT PROVE is `MANIFEST_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. Declarations about this tree's own modules.
 
 import type { TreeDerivedRegister } from "./register-census";

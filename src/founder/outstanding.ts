@@ -26,6 +26,8 @@
 // WHAT THIS DOES NOT DO IS DECIDE ANYTHING, and the page says so where a reader will see it. Every
 // release path names whose ruling it is and none of them names a builder — W263's rule, rendered.
 //
+// WHAT THIS DOES NOT PROVE is `FOUNDER_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads the plan and the ledger. No practice, no
 // patient and no clinical content appears anywhere in it, which `founderCopy` is linted for.
 

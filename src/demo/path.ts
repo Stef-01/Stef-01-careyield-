@@ -23,6 +23,8 @@
 // the routes in order and reads the refusals off the screen. The register cannot drift from the
 // product without one of the two going red.
 //
+// WHAT THIS DOES NOT PROVE is `PATH_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed, and the unit is about not crossing them. Every step runs
 // on synthetic data; the gates that stop the path are named rather than worked around.
 

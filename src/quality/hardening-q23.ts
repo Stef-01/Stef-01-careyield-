@@ -18,6 +18,8 @@
 // paragraph of evidence rather than a finding — recorded that way deliberately, because a clean
 // security result stated as an absence is indistinguishable from one nobody ran.
 //
+// WHAT THIS DOES NOT PROVE is `HARDENING_BOUND`, exported below and read by W297's register.
+//
 // FOUNDER GATE (plan §4): nothing crossed. This reads diffs and registers.
 
 import { parseLedgerRows } from "./blocked-surface";

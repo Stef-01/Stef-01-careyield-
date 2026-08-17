@@ -32,6 +32,8 @@
 // held the register chain for two years over transcribing published intervals, which is less
 // clinically consequential. Both positions are defensible; they are not simultaneously
 // defensible, and `STANDING_FLAGS` keeps that in the suite rather than in a document.
+//
+// WHAT THIS DOES NOT PROVE is `VOCABULARY_BOUND`, exported below and read by W297's register.
 
 import { lintLandingCopy, type LandingViolation } from "./landing";
 import { lintMessageText } from "@/messaging/templates";
