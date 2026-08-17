@@ -1,15 +1,15 @@
 // W303: one planting harness, and a probe that cannot outlive its test.
 //
-// SEVENTEEN FILES IN THIS TREE PLANT A FILE IN FRONT OF A DETECTOR. It is how every register built
-// since W267 proves it notices anything, and it grew four independent harnesses: `withRoot` builds
-// a bare root holding only what a detector reads, two files declare their own `withPlanted`, and
-// seven copy `src/` into a temporary directory in `beforeAll`.
+// FILES ALL OVER THIS TREE PLANT A FILE IN FRONT OF A DETECTOR. It is how every register built
+// since W267 proves it notices anything, and it grew a separate harness almost every time:
+// `withRoot` builds a bare root holding only what a detector reads, `register-census.test.ts` and
+// `negative-probes.test.ts` each declare a `withPlanted`, W300's `withShape` plants one module
+// shape at a time, and `pins.test.ts` and `unit-headers.test.ts` each have a bare `plant()`.
 //
-// TWO OF THE FOUR CANNOT LEAVE A PROBE BEHIND AND TWO CAN, which is the finding rather than the
-// duplication. `withRoot` and `withPlanted` take the probe as a CALLBACK and remove the file in a
-// `finally`, so there is no path where the plant outlives it. The `plant()` helpers in
-// `pins.test.ts` and `unit-headers.test.ts` return after writing, and their callers remove the file
-// on the line after the assertions:
+// MOST OF THEM CANNOT LEAVE A PROBE BEHIND, AND TWO CAN, which is the finding rather than the
+// duplication. `withRoot`, both `withPlanted`s and `withShape` take the probe as a CALLBACK and
+// remove the file in a `finally`, so there is no path where the plant outlives it. The `plant()`
+// helpers return after writing, and their callers remove the file on the line after the assertions:
 //
 //     plant("src/quality/w281-probe-none.ts", "export const NOTHING = 1;\n");
 //     expect(headerCensus(COPY, LEDGER).missing).toContain("src/quality/w281-probe-none.ts");
@@ -21,6 +21,13 @@
 // failures in tests that have nothing wrong with them, which is the worst possible moment to make a
 // suite harder to read. This tree has spent a quarter on checks that do not notice; a check that
 // misreports its neighbours when it fires is the same defect wearing the other face.
+//
+// NO COUNTS APPEAR ABOVE, and that is W293's rule applied after breaking it. The first draft of
+// this header said "four independent harnesses" and "two of the four", written before `withShape`
+// was found — so it contradicted its own commit message on the day it shipped. It is the third
+// header this session to state a number the code disagreed with, and W298's `headerNamesUnknown`
+// does not catch it because a count is not an identifier. Naming the harnesses instead of counting
+// them costs a line and cannot go stale by arithmetic.
 //
 // SO THE FIX IS THE SHAPE, NOT THE DILIGENCE. The gate asks for a probe left behind to be "made
 // impossible rather than cleaned up", and the way to make it impossible is to export no way to
