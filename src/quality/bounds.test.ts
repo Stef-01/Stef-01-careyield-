@@ -108,7 +108,13 @@ describe("W297 a bound whose remedy has been built fails as stale", () => {
   it("keeps the no-remedy kind enumerated, so it is not the easy answer", () => {
     // An `inherent` bound can never go stale, which is precisely why it would be the cheap way out.
     const inherent = STATED_BOUNDS.filter((b) => b.lifting.kind === "inherent");
-    expect(inherent).toHaveLength(1);
+    // W298: was `toHaveLength(1)`. The property is that `inherent` stays the EXCEPTION — it can
+    // never go stale, which is what makes it the cheap answer — so it is checked against the
+    // bounds that do name a remedy rather than against a number that moves whenever one is added.
+    const withRemedy = STATED_BOUNDS.filter((b) => b.lifting.kind === "remedy");
+    expect(inherent.length, "the no-remedy kind stopped being the exception").toBeLessThan(
+      withRemedy.length,
+    );
     for (const bound of inherent) {
       expect((bound.lifting as { why: string }).why.length, `${id(bound)} claims no remedy without an argument`).toBeGreaterThan(
         200,

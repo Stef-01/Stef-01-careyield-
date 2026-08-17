@@ -42,6 +42,7 @@ import { SWEEP_BOUND as TAUTOLOGY_SWEEP_BOUND, tautologiesIn } from "./tautology
 import { COMPOSED_COPY_SITES, FIXTURE_BOUND } from "@/compliance/composed-copy";
 import { VOCABULARY_BOUND, sweepSurface } from "@/compliance/public-surfaces";
 import { RUNTIME_BOUND } from "@/console/zero-states";
+import { HARDENING_BOUND } from "./hardening-q23";
 
 /** How a bound could stop being true. */
 export type Lifting =
@@ -87,6 +88,24 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/hardening-q23.ts",
+    name: "HARDENING_BOUND",
+    unit: "W298",
+    text: HARDENING_BOUND,
+    lifting: {
+      kind: "inherent",
+      why:
+        "Nothing lifts it, because the limit is in the kind of claim rather than in the tree. A review is a reader's passes over a diff; no change to the code makes three lenses into exhaustive coverage, and a bound that claimed otherwise would be promising that the next reviewer finds nothing because this one did not. The mechanical half is W296's and carries its own separate bound.",
+    },
+    numbers: [
+      {
+        word: "Three",
+        kind: "fixed_by_a_gate",
+        why: "The gate names three lenses — code-review, security-review and simplify — so the number is the row's, not a measurement this unit took.",
+      },
+    ],
+  },
   {
     module: "src/compliance/composed-copy.ts",
     name: "FIXTURE_BOUND",

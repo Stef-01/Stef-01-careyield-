@@ -43,6 +43,7 @@ import { AUDIT_ALLOWLIST } from "@/security/audit-allowlist";
 import { lintEducationCopy } from "@/education/advice-lint";
 import { ACCEPTED_TAUTOLOGIES, brokenAcceptances } from "./tautology-sweep";
 import { FINDINGS as HARDENING_Q22_FINDINGS, type HardeningFinding } from "./hardening-q22";
+import { FINDINGS as Q23_FINDINGS } from "./hardening-q23";
 import { FINDINGS as W279_REVIEW_FINDINGS } from "./review-w279";
 
 /** One acceptance, flattened out of whichever register holds it. */
@@ -91,6 +92,16 @@ const hardeningAcceptances = (
     );
 
 export const ACCEPTANCE_REGISTERS: readonly AcceptanceRegister[] = [
+  {
+    unit: "W298",
+    module: "src/quality/hardening-q23.ts",
+    register: "FINDINGS",
+    entries: () => hardeningAcceptances("W298", Q23_FINDINGS),
+    rederivation: {
+      kind: "rederived_in_its_own_test",
+      citation: "src/quality/hardening-q23.test.ts :: SEC-1: the three checked properties still hold",
+    },
+  },
   {
     unit: "W53",
     module: "src/security/audit-allowlist.ts",

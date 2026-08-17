@@ -40,7 +40,9 @@ describe("W294 the register of acceptance registers is checked against the tree"
       [...declared].filter((d) => !found.includes(d)),
       "a declared register no longer holds acceptances",
     ).toEqual([]);
-    expect(ACCEPTANCE_REGISTERS).toHaveLength(7);
+    // W298: was `toHaveLength(7)` and moved the first time a register was added. The
+    // both-directions diff two lines up is what reads the whole set; this is the non-vacuity floor.
+    expect(ACCEPTANCE_REGISTERS.length).toBeGreaterThanOrEqual(7);
   });
 
   it("finds registers written in either shape, because one pattern misses real ones", () => {
@@ -89,7 +91,11 @@ describe("W294 every acceptance in the tree carries a live review date", () => {
     // Non-vacuity first: every assertion below iterates this list, and an empty read would pass
     // each of them — the exact shape this quarter keeps finding.
     expect(acceptances.length).toBeGreaterThan(15);
-    expect(new Set(acceptances.map((a) => a.id.split("::")[0])).size).toBe(7);
+    // W298: was `toBe(7)`. The PROPERTY is that every declared register actually contributes an
+    // acceptance — a sweep reading nothing out of one of them is the vacuity the comment names —
+    // and that is an identity against the register rather than a number that moves when one is
+    // added. Strictly stronger than the count it replaces.
+    expect(new Set(acceptances.map((a) => a.id.split("::")[0])).size).toBe(ACCEPTANCE_REGISTERS.length);
     expect(new Set(acceptances.map((a) => a.id)).size, "two acceptances share an id").toBe(
       acceptances.length,
     );
@@ -153,7 +159,8 @@ describe("W294 the finding behind each acceptance is re-derived, and the kinds d
     // Resolved, not recorded. A citation naming a file that does not exist, or an assertion that is
     // not in it, is worth nothing — W284's resolved to `text.includes("/")` and read as coverage.
     const cited = ACCEPTANCE_REGISTERS.filter((r) => r.rederivation.kind === "rederived_in_its_own_test");
-    expect(cited.length).toBe(3);
+    // W298: was `toBe(3)`. Non-vacuity for the loop below, so a floor is what it means.
+    expect(cited.length).toBeGreaterThanOrEqual(3);
     for (const r of cited) {
       const citation = (r.rederivation as { citation: string }).citation;
       expect(resolveCitation(ROOT, citation), `${r.module}: ${resolveCitation(ROOT, citation)}`).toBe(true);
