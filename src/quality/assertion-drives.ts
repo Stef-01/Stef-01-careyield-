@@ -42,6 +42,7 @@ import { REFUSAL_BRANCHES, driveBranches, withRoot } from "./refusal-branches";
 import { anchorCoverage, deadAnchors } from "./latent-y5";
 import { LATENT_FINDINGS, fired } from "./latent-findings";
 import { pinDiff } from "./pins";
+import { demandingRegisters, namingSites } from "./declaration-tax";
 import { numberDefects, staleBounds, unresolvedBounds } from "./bounds";
 import { BLIND_SPOTS, boundDiff, falseBounds } from "./blind-spots";
 import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptances";
@@ -159,6 +160,14 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       numberDefects([probe]).length > 0 &&
       unresolvedBounds(root, ledger, [probe]).length > 0
     );
+  },
+
+  "src/quality/declaration-tax.ts": (root) => {
+    // Both arms of W300's measurement, each given the input it exists to refuse: an unplanted tree
+    // must demand nothing, and a module path the tree does not hold must have no naming sites.
+    const quiet = demandingRegisters(root, "src/planted/w289-never-planted.ts").length === 0;
+    const unnamed = namingSites(root, ["src/no-such", "-module-w289.ts"].join("")).length === 0;
+    return quiet && unnamed;
   },
 
   "src/quality/pins.ts": (root) => pinDiff(root, []).undeclared.length > 0,

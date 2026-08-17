@@ -261,6 +261,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/declaration-tax.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/declaration-tax.test.ts :: costs nothing when nothing is planted, so the numbers are the plant's",
+      plants: "the copied tree was dirty before the plant",
+    },
+  },
+  {
     register: "src/quality/bounds.ts",
     negative: {
       kind: "already_driven",

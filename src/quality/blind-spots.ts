@@ -367,6 +367,13 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
     whyNotPlantable:
       "A witness would be a bound that resolves and is unfair, and unfairness is a judgement about prose rather than a property a plant can carry. Fabricating one would be writing the answer into the fixture, which is the detector W279 refused to tune. Stating it is what can be done from inside, and the quarterly hardening pass is where a reader looks.",
   },
+  "src/quality/declaration-tax.ts": {
+    kind: "undemonstrated",
+    bound:
+      "It counts the places a module must be declared, and a count treats a four-sentence census entry and a one-line surface entry alike. A quarter that halved the WORK of declaring without changing where the declarations live would move neither of its derivations, and this register would report no progress at all.",
+    whyNotPlantable:
+      "A witness would be a declaration that got cheaper without moving, and 'cheaper' is a judgement about how much writing a reader has to do rather than a property a planted module can carry. Fabricating one would be writing the answer into the fixture, which is the detector W279 refused to tune. `TAX_BOUND` says the same thing in the register's own words.",
+  },
   "src/security/reachability.ts": {
     kind: "undemonstrated",
     bound:

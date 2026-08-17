@@ -730,6 +730,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "An in-memory store of specs, and its strings are ids and criteria keys. What it holds is authored elsewhere and gated by G5; the store renders nothing.",
   },
   {
+    module: "src/quality/declaration-tax.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W300's measurement is reviewer-facing throughout: the planted module bodies, the probe per plantable register, and `TAX_BOUND`. Its strings are synthetic TypeScript source and module paths — the shapes it plants into a temporary copy of the tree — and everything it returns is a repo-relative file path or a count. Nothing here renders and no practice sees it; no patient, condition or appointment reason appears anywhere in it.",
+  },
+  {
     module: "src/quality/bounds.ts",
     operatorCopy: [],
     notCopy:

@@ -43,6 +43,7 @@ import { COMPOSED_COPY_SITES, FIXTURE_BOUND } from "@/compliance/composed-copy";
 import { VOCABULARY_BOUND, sweepSurface } from "@/compliance/public-surfaces";
 import { RUNTIME_BOUND } from "@/console/zero-states";
 import { HARDENING_BOUND } from "./hardening-q23";
+import { TAX_BOUND } from "./declaration-tax";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
 
 /** How a bound could stop being true. */
@@ -116,6 +117,38 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "Three",
         kind: "fixed_by_a_gate",
         why: "The gate names three lenses — code-review, security-review and simplify — so the number is the row's, not a measurement this unit took.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/declaration-tax.ts",
+    name: "TAX_BOUND",
+    unit: "W300",
+    text: TAX_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the same two derivations over the tree Q24 leaves behind, which is W308's whole job",
+      reads: "the ledger, for W308's row still being open",
+      // The bound says the number is good for comparison with itself and names W308 as the
+      // comparison. It stops being true the day W308 lands, which is the quarter's own close.
+      stillOpen: () =>
+        !/^\| W308 \| done \|/m.test(readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8")),
+    },
+    numbers: [
+      {
+        word: "four",
+        kind: "rate",
+        why: "'a census entry costs four sentences' — the shape of one declaration, said to make the point that a count treats unequal work alike. It measures nothing the tree can grow.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'a one-line surface entry' and 'a count treats them alike' — the other half of the same contrast, a unit of work rather than a total.",
+      },
+      {
+        word: "two",
+        kind: "rate",
+        why: "'the same two derivations' — how many ways the tax is measured, which is a property of this module's design rather than a measurement of the tree.",
       },
     ],
   },

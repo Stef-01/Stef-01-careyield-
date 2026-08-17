@@ -233,6 +233,25 @@ export const TREE_DERIVED_REGISTERS: readonly TreeDerivedRegister[] = [
     },
   },
   {
+    file: "src/quality/declaration-tax.ts",
+    derives:
+      "What one new module costs before anything watches it: the registers that REPORT a planted module, and the files that NAME an existing one.",
+    checkedAgainst:
+      "W267's census itself — the probe population is the census's plantable entries, both directions — and `TAX_AT_W300`, the frozen baseline W308 re-derives the live figure against.",
+    proof: {
+      kind: "mutated_tree",
+      mutation:
+        "five module shapes are planted one at a time into a copy of the tree and every probe is run over each; an unplanted copy must demand nothing and a register-shaped plant must demand several",
+    },
+    assertion: {
+      kind: "driven_here",
+      claim:
+        "The measured tax matches the recorded baseline shape by shape, the probe population is exactly the census's plantable registers, and a module nobody names has no naming sites.",
+      mutation:
+        "`demandingRegisters` is run over a copy with nothing planted and must report none; `namingSites` is given a module path the tree does not hold and must report none.",
+    },
+  },
+  {
     file: "src/quality/bounds.ts",
     derives:
       "Every `export const *_BOUND` under `src/` — the sentences this tree exports about what it does not prove.",

@@ -158,6 +158,14 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/declaration-tax.ts",
+    name: "TAX_AT_W300",
+    classification: {
+      kind: "floor",
+      why: "A FROZEN MEASUREMENT, which is the one shape of pinned number this tree wants: W300 records what a module cost when Q24 opened and W308 re-derives the live figure against it. A baseline that moved with the tree would destroy the comparison it exists for, so this one is supposed to be stale — the opposite of every other pin here, and the reason it is classified rather than left to be read as a live count.",
+    },
+  },
+  {
     module: "src/quality/horizon-q24.test.ts",
     name: "Q24_HORIZON_LAST_UNIT",
     classification: {
