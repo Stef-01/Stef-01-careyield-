@@ -117,6 +117,22 @@ export interface NamedCondition {
  */
 export const NAMED_CONDITIONS: readonly NamedCondition[] = [
   {
+    bound: "src/quality/unasked-facts.ts::UNASKED_BOUND",
+    condition: "asked for by somebody this register cannot see",
+    reading: {
+      kind: "not_observable",
+      why: "The condition is that a fact reached through syntax the parse does not read — a namespace import, a dynamic `import()`, a re-export shape it misses — is reported unasked. Nothing can report THAT, and the reason is not effort: knowing this register missed a reader means having resolved the reader, and a thing that resolved the reader would not have missed it. The remedy is a wider parse, which closes the gap rather than reporting it, and the sentence would still be true afterwards of whatever the wider parse misses — W267's class about `readdirSync`, arriving in an import graph.",
+    },
+  },
+  {
+    bound: "src/quality/unasked-facts.ts::UNASKED_BOUND",
+    condition: "is invisible here, which is the larger half of the tree",
+    reading: {
+      kind: "not_observable",
+      why: "The condition is a derivation nobody asks for in a module no route reaches. Widening the population to the whole tree is trivial and would report several hundred functions — nearly every quality register exports for its own suite and is right to. What makes one of those a DEFECT is that the module ought to be served, and that is a judgement about the product rather than a property of the import graph. So the condition is real, and no check can read it: the reading is the same one W340 makes seventy-one times by hand in the population it did take.",
+    },
+  },
+  {
     bound: "src/quality/planting.ts::PLANTING_BOUND",
     condition: "a suite that forgets its `afterAll` leaks a temporary directory, which no register here reads",
     reading: {

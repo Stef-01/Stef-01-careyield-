@@ -75,8 +75,15 @@ function specifiersIn(rawSource: string): string[] {
   return found;
 }
 
-/** Resolve a first-party specifier to a file, or null when it is an npm package. */
-function resolveFirstParty(specifier: string, fromFile: string, root: string): string | null {
+/**
+ * Resolve a first-party specifier to a file, or null when it is an npm package.
+ *
+ * EXPORTED SINCE W340, which needed to say which module an imported NAME came from. The rules are
+ * this tree's tsconfig paths plus the extension candidates, and a second implementation of them
+ * would have to rediscover the two W165 fixes — the reason `reachableFrom` was extracted from
+ * `reachableFromApp` in the first place, one level down.
+ */
+export function resolveFirstParty(specifier: string, fromFile: string, root: string): string | null {
   let base: string;
   if (specifier.startsWith("@/")) base = join(root, "src", specifier.slice(2));
   else if (specifier.startsWith(".")) base = resolve(dirname(fromFile), specifier);

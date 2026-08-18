@@ -211,6 +211,7 @@ export const REVIEWED_AT_W345: readonly Review[] = [
   { id: "bounds::src/quality/repository-clean.ts::CLEAN_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/self-defeating.ts::REMEDY_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/unit-headers.ts::HEADER_CITATION_BOUND", verdict: { kind: "still_correct" } },
+  { id: "bounds::src/quality/unasked-facts.ts::UNASKED_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/unrun.ts::UNRUN_BOUND", verdict: { kind: "still_correct" } },
   { id: "self-ending::W319::Q17 action 1", verdict: { kind: "still_correct" } },
   { id: "self-ending::W319::Q9 action 1", verdict: { kind: "still_correct" } },

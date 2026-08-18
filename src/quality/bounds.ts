@@ -53,6 +53,7 @@ import { headerUnit, knownUnits } from "./unit-headers";
 import { ACCEPTANCE_REGISTERS, ACCEPTANCE_BOUND } from "./acceptances";
 import { BLIND_SPOTS, BLIND_SPOT_BOUND } from "./blind-spots";
 import { HATCH_BOUND } from "./escape-hatches";
+import { UNASKED_BOUND } from "./unasked-facts";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -326,6 +327,23 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "two",
         kind: "unit_id",
         why: "The entries W345 reclassified `NOT_A_SILENCE`, fixed at the unit that reclassified them. History about a reading that has happened, which is why quoting it is safe; a third would be a third unit's finding and its own sentence.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/unasked-facts.ts",
+    name: "UNASKED_BOUND",
+    unit: "W340",
+    text: UNASKED_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Three limits and the kind of claim is where each of them lives. A reader is an import, and widening the parse to namespace imports and dynamic ones would move the number without touching the sentence — whatever the parse reaches, a fact reached by the syntax after it is still invisible, which is the class W267 states about `readdirSync`. The population is `reachableFromApp`'s answer, so what this register cannot see is inherited from a walk that states its own bound one register over; making this one wider would be re-deriving reach here, which is the duplication W301 spent a unit removing. And the half that matters least mechanically matters most in the reading: whether a fact SHOULD have a surface is a judgement about the product, made by somebody who knows what a screen is for, and no measurement over this tree returns it. W311 established that mis-typing a limit as a deferred remedy is how `never_derived` becomes the easy answer, so each of these is named rather than pointed at a unit nobody would write.",
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one level up', 'one register over', 'a second register' — the unit of the comparison rather than a count of anything the tree holds. It stays one however many facts the population grows to, which is the distinction W297's own entry draws for 'One assertion per register, driven once'.",
       },
     ],
   },

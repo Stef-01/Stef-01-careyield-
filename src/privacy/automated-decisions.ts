@@ -413,6 +413,7 @@ export const NOT_A_DECISION: Readonly<Record<string, string>> = {
   "src/privacy/privacy.ts": "Access, export and erasure. Executed when somebody asks, never on the software's initiative.",
   "src/privacy/record-classes.ts": "W106's register of where patient identity can live.",
   "src/privacy/store.ts": "Storage for access, correction and erasure requests and how they were answered. A record of what people asked for.",
+  "src/quality/unasked-facts.ts": "W340's reader count over the derivations a route can reach. It takes no patient as input, its inputs are the import graph of this repository's own modules, and its outputs are module paths and function names. Engineering.",
   "src/quality/escape-hatches.ts": "W345's re-reading of every declaration in the tree that says a check cannot be made to fail. It reads registers and source text, takes no patient as input and decides nothing about anybody. Engineering.",
   "src/quality/order-regressions.ts": "W178's corpus of past order-dependence defects. Engineering.",
   "src/quality/ranker-behaviour.ts":
@@ -520,9 +521,16 @@ export const NOTICE_REVISION: NoticeRevision = {
   // what a check can be made to fail on. It reaches this register the same way the sampler does —
   // through what it reads about modules that do decide things about people — which is the detector
   // working rather than a false positive. The published text stays at fifteen decisions.
-  reviewedAt: "W345",
+  //
+  // W340 MOVED IT A SEVENTH TIME, and the module joining the ruled-out half is the READER COUNT.
+  // Re-read rather than bumped. Nothing published changed: it decides nothing about anybody, takes
+  // no patient as input, and reads the import graph of this repository. It reaches this register
+  // for the sampler's reason — it names modules that do decide things about people — and the right
+  // answer is to say why that is not a decision rather than to narrow the scan. The published text
+  // stays at fifteen decisions, and the date does not move: same calendar day, a later unit.
+  reviewedAt: "W340",
   decisionsAtReview: 15,
-  modulesAtReview: 103,
+  modulesAtReview: 104,
 };
 
 /** The line the page renders. Composed, so the page cannot state a date the register disagrees with. */

@@ -52,6 +52,7 @@ import { pinDiff } from "./pins";
 import { demandingRegisters, namingSites } from "./declaration-tax";
 import { numberDefects, staleBounds, unresolvedBounds } from "./bounds";
 import { BLIND_SPOTS, boundDiff, falseBounds } from "./blind-spots";
+import { unaskedDefects, unaskedFacts } from "./unasked-facts";
 import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptances";
 import { unacceptedTautologies } from "./tautology-sweep";
 import { fixtureToken } from "./scan-text";
@@ -241,6 +242,27 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // module in the tree is unwatched. The arm that must fire is the one saying a module reads the
     // ledger and no closing check knows.
     return readerDiff(root, [], []).unwatched.length > 0;
+  },
+
+  "src/quality/unasked-facts.ts": (root) => {
+    // W340's comparison, driven in a constructed tree so the answer is not this tree's seventy-one.
+    // One page, one export it imports and one it does not: only the second may be reported, and a
+    // declaration for it must silence the register.
+    void root;
+    return withRoot(
+      {
+        "app/page.tsx": 'import { asked } from "@/facts";\nexport default function P() { return asked(); }\n',
+        "src/facts.ts": "export function asked(): number {\n  return 1;\n}\nexport function unread(): number {\n  return 2;\n}\n",
+      },
+      (planted) => {
+        const found = unaskedFacts(planted);
+        if (found.length !== 1 || found[0] !== "src/facts.ts::unread") return false;
+        return (
+          unaskedDefects(planted, [{ id: "src/facts.ts::unread", why: { kind: "no_surface_asks", where: "a page could render it and none does, which is the whole register" } }], found)
+            .length === 0
+        );
+      },
+    );
   },
 
   "src/quality/unrun.ts": (root) => {

@@ -59,6 +59,7 @@ import { REMEDY_BOUND, frozenEqualities } from "./self-defeating";
 import { CLOSE_GATE_BOUND, ledgerNamingModules } from "./close-gate";
 import { CONTROLS, INSTANT_BOUND, instantDiff } from "./instant";
 import { QUARTER_MUTANT_BOUND, quarterModules } from "./quarter-mutants";
+import { UNASKED_BOUND, unaskedFacts } from "./unasked-facts";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
   vocabularyDefects,
@@ -133,6 +134,29 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/unasked-facts.ts": {
+    kind: "demonstrated",
+    bound: UNASKED_BOUND,
+    witness: "an unread export in a module NO ROUTE REACHES, which is outside the population and must not be reported",
+    control: "the same unread export in a module a page imports, which must be",
+    probe: () =>
+      withRoot(
+        {
+          "app/page.tsx": 'import { served } from "@/planted/served";\nexport default function P() { return served(); }\n',
+          "src/planted/served.ts":
+            "export function served(): number {\n  return 1;\n}\nexport function orphanOnTheSurface(): number {\n  return 2;\n}\n",
+          "src/planted/unserved.ts": "export function orphanOffTheSurface(): number {\n  return 3;\n}\n",
+        },
+        (root) => {
+          const unasked = unaskedFacts(root);
+          return {
+            witnessSeen: unasked.includes("src/planted/unserved.ts::orphanOffTheSurface"),
+            controlSeen: unasked.includes("src/planted/served.ts::orphanOnTheSurface"),
           };
         },
       ),

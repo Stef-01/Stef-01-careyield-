@@ -253,6 +253,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/unasked-facts.ts",
+    // Asks which derivations on the SERVED surface nothing imports. A planted module is reached by
+    // no route, so it falls outside the population entirely and the register has no question for it
+    // — the bound below says so in its own words. It demands nothing on arrival and is in the
+    // population because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/unrun.ts",
     // Asks which modules no test file can reach. A planted module arrives with no test importing
     // it, so it WOULD be reported — but the demand is on the arriving module's author only when

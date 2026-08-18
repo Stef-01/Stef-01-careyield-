@@ -210,6 +210,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/unasked-facts.ts",
+    name: "UNASKED_AT_W340",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a derivation arriving on the served surface with no reader, or one of these gaining a surface that asks",
+      whyStopping:
+        "A NAMED ROW PER FACT, each carrying the screen that would ask for it, checked against the import graph in both directions — so neither direction can be satisfied by retyping a digit, which is the property W304 draws the line on. A fact arriving is a computation added to a request-serving module that nothing reads, and it has to be READ before its row can be written. A fact leaving is somebody having built the surface, which is the event this register exists to celebrate rather than to tolerate. Both are worth stopping a build for.",
+    },
+  },
+  {
     module: "src/quality/escape-hatches.ts",
     name: "REVIEWED_AT_W345",
     classification: {

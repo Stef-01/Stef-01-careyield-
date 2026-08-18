@@ -358,6 +358,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/unasked-facts.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/unasked-facts.test.ts :: does not count a file that only names the export",
+      plants: "src/planted/talks-about-it.ts",
+    },
+  },
+  {
     register: "src/quality/unrun.ts",
     negative: {
       kind: "already_driven",

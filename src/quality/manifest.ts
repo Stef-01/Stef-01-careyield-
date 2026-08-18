@@ -436,6 +436,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/unasked-facts.ts",
+    census: {
+      derives:
+        "Every exported function in a module `reachableFromApp` reaches, with the files that IMPORT it — the tree's own modules through `typescriptFiles`, its specs through `pageSpecFiles`, and its pages out of the reachability walk itself, resolved through W165's specifier rules rather than matched by name.",
+      checkedAgainst:
+        "W340's `UNASKED_AT_W340`, in three directions: a served derivation with no non-test importer that nothing declares fails, a declared row something now reads fails, and a row pleading a founder ruling names a gate resolved against §4 rather than trusted.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module that only NAMES an export in a comment and a string is planted beside one that imports it, and only the first may be reported unasked; a second pair plants an export its own module calls and one only a suite calls",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every fact the product computes on a request-serving path and no surface asks for is named, with the screen that would ask for it.",
+        mutation:
+          "A fact is added to the derived population and must be reported as undeclared; a declaration is dropped from the population and must be reported the other way.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/escape-hatches.ts",
     // Reads three registers and, for the one claim that is about the tree, opens the files those
     // registers NAME. It walks nothing: `callableDetectorsBorrowingTheSentence` iterates

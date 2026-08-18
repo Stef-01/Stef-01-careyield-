@@ -21,6 +21,7 @@ import {
   pinsInTree,
 } from "./pins";
 import { hatchDefects } from "./escape-hatches";
+import { unaskedDefects } from "./unasked-facts";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { withPlantedIn } from "./planting";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
@@ -91,6 +92,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
       "REVIEWED_AT_W345",
       "SURVIVORS_AT_W296",
       "SURVIVORS_AT_W332",
+      "UNASKED_AT_W340",
       "UNEVIDENCED_AT_W293",
       "UNPROVEN_AT_W290",
       "UNTESTED_AT_W296",
@@ -109,6 +111,9 @@ describe("W290 the live pins, and why live is not the defect", () => {
     // arriving in any of the three registers that hold them — or leaving, because a conversion has
     // to say which way it went.
     expect(hatchDefects(ROOT)).toEqual([]);
+    // W340's is the seventh, and its event is a derivation arriving on the served surface with
+    // nothing importing it — or one of the seventy-one finally getting the screen that asks.
+    expect(unaskedDefects(ROOT)).toEqual([]);
   });
 
   it("makes each argue for interrupting somebody, not merely declare itself live", () => {
