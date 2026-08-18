@@ -87,6 +87,7 @@ import { CONTROLS, INSTANT_BOUND } from "./instant";
 import { DEFERRAL_BOUND } from "./deferrals";
 import { QUARTER_MUTANT_BOUND } from "./quarter-mutants";
 import { DOSSIER_BOUND, dossierDiffFor } from "./dossier-derived";
+import { NAMED_CONDITIONS, UNREAD_BOUND } from "./unread-bounds";
 import { REMEDY_BOUND } from "./self-defeating";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
@@ -345,6 +346,28 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         why: "How many claims these registers normalise: non-emptiness by W323's gate and emptiness by W336's. It counts the REGISTERS this module declares — `NON_EMPTY_FORMS` and `EMPTY_FORMS` — which two units' verify gates put there, rather than anything a walk over the tree finds. A third arrives only with a third unit, whose gate would rewrite this sentence anyway.",
       },
     ],
+  },
+  {
+    module: "src/quality/unread-bounds.ts",
+    name: "UNREAD_BOUND",
+    unit: "W339",
+    text: UNREAD_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the vocabulary grows and says so",
+      reads: "the register itself, for a condition owed to a unit that has not read it yet",
+      // The sentence's first clause is the W267 class and has no predicate. The one with teeth is
+      // that `not_observable` is an argument rather than a derivation and is the majority — which
+      // stops being the shape of the register the day every row either names a check or names a
+      // unit that owes one. Rows are `owed` today; when the last of them is read, this
+      // sentence is describing a register that has moved.
+      stillOpen: () => NAMED_CONDITIONS.some((c) => c.reading.kind === "owed"),
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads W339's own declared register, an imported constant: whether a condition is owed to a unit is a classification somebody wrote down rather than anything a walk finds, so no root can be handed to it. What lifts it is a later unit reading the last owed condition, which is an edit to this register rather than a change to any tree.",
+      },
+    },
+    numbers: [],
   },
   {
     module: "src/quality/dossier-derived.ts",

@@ -2149,6 +2149,11 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/unread-bounds.ts",
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/dossier-derived.ts",
     census: null,
     branches: [
