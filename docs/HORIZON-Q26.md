@@ -25,14 +25,14 @@ holds rather than over the week-units alone — sixteen week-units plus `SUP-1` 
 
 | Waiting on | Units | Which | Waited |
 | --- | --- | --- | --- |
-| **G5** — clinical pathway content sign-off | 8 | W161, W162, W163, W186, W249, W251, SUP-1, SUP-2 | 306 units, since the plan |
-| **G6** — public directory launch | 2 | W133, W185 | 306 units, since the plan |
-| **G8** — third-party model processing | 2 | W146, W147 | 204 units, proposed at W104 |
-| **G9** — third-party organisational reporting | 2 | W202, W203 | 155 units, proposed at W156 |
-| **G10** — payer and insurer data flows | 2 | W240, W241 | 111 units, proposed at W208 |
-| **G3** — live SMS to real patients | 1 | W174 | 306 units, since the plan |
-| **Q9 action 1** — the Ahpra advertising review ask | 1 | W133 | 176 units, reached at W132 |
-| **Q17 action 1** — may patients be ordered by anything a model learns | 1 | W217 | 103 units, reached at W216 |
+| **G5** — clinical pathway content sign-off | 8 | W161, W162, W163, W186, W249, W251, SUP-1, SUP-2 | 307 units, since the plan |
+| **G6** — public directory launch | 2 | W133, W185 | 307 units, since the plan |
+| **G8** — third-party model processing | 2 | W146, W147 | 205 units, proposed at W104 |
+| **G9** — third-party organisational reporting | 2 | W202, W203 | 156 units, proposed at W156 |
+| **G10** — payer and insurer data flows | 2 | W240, W241 | 112 units, proposed at W208 |
+| **G3** — live SMS to real patients | 1 | W174 | 307 units, since the plan |
+| **Q9 action 1** — the Ahpra advertising review ask | 1 | W133 | 177 units, reached at W132 |
+| **Q17 action 1** — may patients be ordered by anything a model learns | 1 | W217 | 104 units, reached at W216 |
 
 **G1, G2, G4 and G7 still block nothing**, five years and five quarters in.
 
@@ -41,7 +41,7 @@ it restated at every expansion, and because five quarters of building have not m
 
 The wait figures above are **as at this expansion** and are re-derived that way rather than live:
 counted over the units that existed when the document was written, so they say what they said on
-the day. Q25's horizon wrote 293 for the standing gates and the live figure is 306 today, which is
+the day. Q25's horizon wrote 293 for the standing gates and the live figure is 307 today, which is
 the same sentence going quietly out of date in a document nobody re-reads — the shape Q25 spent a
 quarter on, in the document that recorded it.
 

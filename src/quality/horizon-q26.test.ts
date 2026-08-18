@@ -79,9 +79,18 @@ function gateTable(): Map<string, { count: string; which: string[]; waited: stri
   return out;
 }
 
-/** Units built between a gate's origin and this horizon — the wait, frozen at the moment priced. */
+/**
+ * Units built between a gate's origin and this horizon — the wait, frozen at the moment priced.
+ *
+ * THE CLOSING ROW COUNTS AS DONE WHETHER IT IS OR NOT, for the same reason the done count does:
+ * the document prices the position *once this close lands*, and a figure that answers 306 while
+ * the gate runs and 307 a commit later is a control that cannot reach the moment it describes.
+ * Both derivations in this file were written the other way first, and both broke on the close.
+ */
 const waitedAsAt = (origin: string): number =>
-  asAtHorizon().filter((r) => r.status === "done" && r.n > Number(origin.slice(1))).length;
+  asAtHorizon().filter(
+    (r) => r.n > Number(origin.slice(1)) && (r.status === "done" || r.n === Q26_HORIZON_LAST_UNIT),
+  ).length;
 
 describe("W325 the document reads the ledger it claims to read", () => {
   it("parses the ledger at all", () => {
@@ -91,11 +100,16 @@ describe("W325 the document reads the ledger it claims to read", () => {
   });
 
   it("states the done count the ledger held when the horizon was written", () => {
-    // AS AT THE HORIZON, NOT LIVE. The close itself is the +1: this row is `claimed` while the gate
-    // runs and `done` a commit later, which is the gap the whole quarter is named after.
+    // AS AT THE HORIZON, NOT LIVE — and counting THIS row as done either way, which is the whole
+    // quarter in one line. The document says "308 are done once this close lands". The first draft
+    // wrote `done + 1` because the row still said `claimed` while the gate ran; the close then made
+    // it 308 and the assertion asked for 309. A control that answers differently before and after
+    // the event it describes is the defect Q26 is named after, and it was in this test.
     const before = Number(Q26[0]!.slice(1)) - 1;
-    const done = rows().filter((r) => r.status === "done" && r.n <= before).length;
-    expect(DOC, `the document does not say ${done + 1} are done`).toContain(`${done + 1} are done`);
+    const done = rows().filter(
+      (r) => r.n <= before && (r.status === "done" || r.n === Q26_HORIZON_LAST_UNIT),
+    ).length;
+    expect(DOC, `the document does not say ${done} are done`).toContain(`${done} are done`);
   });
 
   it("states the ledger size before and after this expansion", () => {
