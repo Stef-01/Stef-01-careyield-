@@ -94,6 +94,7 @@ import { NAMED_CONDITIONS, UNREAD_BOUND } from "./unread-bounds";
 import { PRIVATE_COPY_BOUND, SHARED_PARSES } from "./private-copies";
 import { PLANTED_NAMES, TYPED_NAME_BOUND } from "./typed-names";
 import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SELF } from "./hardening-q26";
+import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
 import { REMEDY_BOUND } from "./self-defeating";
 import type { UnitId } from "./typed-names";
 import {
@@ -465,6 +466,44 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       },
     },
     numbers: [],
+  },
+  {
+    module: "src/quality/timelines.ts",
+    name: "TIMELINE_BOUND",
+    unit: "W344",
+    text: TIMELINE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a sentence claiming an order and never declared here",
+      reads: "the register itself, for how many order claims it holds",
+      // TWO CLAUSES ARE INHERENT AND ONE MOVES. That a window is two commits, and that resolving
+      // the commit a claim NAMES is not reading the state it describes, are properties of a record
+      // rather than gaps somebody could close. What moves is the population: three claims are
+      // declared out of the hundreds of order sentences this tree writes, and the day a unit
+      // derives them instead of listing them this sentence stops describing the register.
+      stillOpen: () => TIMELINE_CLAIMS.length < 10,
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads the length of this module's own declared table. How many order claims a register watches is a decision somebody writes down rather than anything a walk or a log finds, so no root can be handed to it, and what lifts it is an edit to `TIMELINE_CLAIMS` rather than a change to any repository.",
+      },
+    },
+    numbers: [
+      {
+        word: "two",
+        kind: "fixed_by_a_gate",
+        why: "How many commits a window is: the claim commit the protocol makes a unit push before building, and the commit its ledger row names. It counts the ends of a window rather than anything the tree holds, and it stays two however many units the ledger grows — the protocol in `BUILD-STATE.md` is what fixes it.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'a reading somebody did once' — the sentence uses `one` for a single instance of a shape rather than as a count of anything the tree holds. It stays one however many claims the register grows to.",
+      },
+      {
+        word: "three",
+        kind: "unit_id",
+        why: "How many order claims are declared here, which is `TIMELINE_CLAIMS.length` and the register's own table. The bound's predicate reads the same length, so the sentence and the check move together and the suite reads the table rather than this word.",
+      },
+    ],
   },
   {
     module: "src/quality/hardening-q26.ts",

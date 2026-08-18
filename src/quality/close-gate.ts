@@ -236,6 +236,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
     why: "It COPIES `BUILD-STATE.md` into a constructed tree — `COPIED_FILES` names it because four registers read the ledger — and copying a file is not reading a row. Without this the planted trees below would have no ledger at all.",
   },
   {
+    module: "src/quality/timelines.ts",
+    why: "It reads the ledger for the SHA column of a row that has ALREADY closed — the commit a past unit landed at — so the close of a row today adds a window rather than moving one. A row whose SHA changed under a rebase comes back `unreadable` rather than wrong, which is the state this register was built to report honestly.",
+  },
+  {
     module: "src/quality/hardening-q26.ts",
     why: "It parses a ledger it is HANDED — `unaccountedUnitsFor` takes the text — to ask which units in one past quarter this pass never read. A row closing today cannot change which units Q326–Q338 held, and the range is pinned to a quarter that is over. Same standing as the three hardening registers before it.",
   },

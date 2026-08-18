@@ -168,6 +168,22 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/timelines.ts::TIMELINE_BOUND",
+    condition: "a sentence claiming an order and never declared here is unread",
+    reading: {
+      kind: "not_observable",
+      why: "An order claim is a sentence in English — *since W89*, *the second quarter running*, *W310 fixed it and the copies kept the old answer* — and finding them by shape would mean deciding which prose is a claim about the commit record, which is a reading rather than a derivation. The tree has refused that class of scan three times for the same reason: a detector that half-understands prose reports confidently about sentences nobody meant that way, and the remedy is worse than the gap. What IS derivable, and what this register does, is check the ones somebody wrote down — so the population grows by a reader noticing rather than by a walk, and the bound's own predicate reads that growth.",
+    },
+  },
+  {
+    bound: "src/quality/timelines.ts::TIMELINE_BOUND",
+    condition: "if the state arrived in a different commit the register will confirm a wrong claim precisely",
+    reading: {
+      kind: "not_observable",
+      why: "The register resolves the commit a claim NAMES and reads its date; whether that commit is really where the state arrived is a judgement about a diff, which is the same limit W310's bound states about blockers and W258's about citations — a correct citation and a mistaken one are the same text in the same field. A derivation would have to decide what a `state` is in general, which nothing here can do; what the register does instead is make the naming explicit, so a reader checking one claim has a commit to open rather than a memory to trust.",
+    },
+  },
+  {
     bound: "src/quality/typed-names.ts::TYPED_NAME_BOUND",
     condition: "a register that builds its citations with a template literal is unchecked",
     reading: {
