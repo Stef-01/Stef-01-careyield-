@@ -424,7 +424,6 @@ export const UNEVIDENCED_AT_W293: readonly string[] = [
   "src/collateral/collateral.test.ts :: no asset copy states a bare number — figures come only from the register :: literalNumbersIn+text",
   "src/compliance/cdss-boundary.test.ts :: declares each module once :: twice",
   "src/compliance/surfaces.test.ts :: an empty dossier maps nothing :: parseCensus",
-  "src/console/zero-states.test.ts :: declares could_not_load nowhere, and says why :: declaring",
   "src/credentials/scope.test.ts :: carries the permissions it was given, and nothing is inferred from the scope :: ok.permits+scopeStatement.permits+statement.permits",
   "src/credentials/vault.test.ts :: no surface reaches the vault outside an authenticated console path :: misplaced",
   "src/directory/dossier-claims.test.ts :: holds: no page consumes a directory module :: walk",

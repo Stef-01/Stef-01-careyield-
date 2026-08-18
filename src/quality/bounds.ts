@@ -65,8 +65,10 @@ import { SCAN_BOUND, fixtureText } from "./scan-text";
 import { SELF_REFERENCE_BOUND, fixtureFiles } from "./self-reference";
 import { CLAIMS, PROSE_BOUND, proseClaims } from "./prose-numbers";
 import { SECOND_READING_BOUND, sinceReading } from "@/founder/second-reading";
+import { unfinishedDefects } from "@/demo/path";
 import { CLAIM_CLASS_BOUND } from "./claim-classes";
 import { CLEAN_BOUND } from "./repository-clean";
+import { SETUP_GAP_BOUND } from "@/console/setup-gaps";
 import { Q25_HARDENING_BOUND } from "./hardening-q25";
 import { ENDING_BOUND } from "./self-ending";
 import { DEMO_PATH, PATH_BOUND, gateStops } from "@/demo/path";
@@ -162,6 +164,29 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for. W306 added the missing half of the predicate's own check — a bound carrying a constructed tree is driven in the state where its remedy EXISTS, rather than only in the state where it does not — and that is narrower than it reads too: the tree is a fixture written here, so what it shows is that the predicate reads a tree, not that it would recognise the remedy as somebody else will actually build it. The predicates declared to derive nothing from a tree are checked only for refusing to budge, which is weaker again.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/console/setup-gaps.ts",
+    name: "SETUP_GAP_BOUND",
+    unit: "W334",
+    text: SETUP_GAP_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a console surface whose author did not pass the readiness in",
+      reads: "the pages W334's walk names, which are the ones that render it",
+      // The sentence holds while the notice is opt-in per page. A shared shell rendering it for
+      // every route would lift the first half — and would break the second, which is why it is
+      // stated as a trade rather than as a defect. `unfinishedDefects` reads the walk's pages, so
+      // the predicate is the walk being smaller than the console.
+      stillOpen: (root) => unfinishedDefects(root).length === 0,
+      lifted: {
+        kind: "constructed_tree",
+        // A tree where a page in the walk has stopped rendering it: the notice is no longer a
+        // property of the pages that ask, and the sentence describing the trade stops applying.
+        files: { "app/console/dashboard/page.tsx": "export default function Page() { return null; }\n" },
+      },
+    },
+    numbers: [],
+  },
   {
     module: "src/quality/hardening-q25.ts",
     name: "Q25_HARDENING_BOUND",

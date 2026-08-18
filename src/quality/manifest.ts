@@ -409,6 +409,13 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/console/setup-gaps.ts",
+    // Product copy and a pure derivation over `SetupReadiness`. It walks no tree, so W267's census
+    // does not hold it; it is here because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/hardening-q25.ts",
     // A record of a review rather than a walk of the tree, so W267's census does not hold it — the
     // same shape as the three hardening registers before it. Here because it states a bound.

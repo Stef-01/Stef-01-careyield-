@@ -748,6 +748,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "`SECOND_READING_BOUND` is reviewer-facing — it argues what a unit-number marker cannot see, and names the stored snapshot this deliberately does not keep. Everything else here is a unit id read off the ledger. The copy is four sentences addressed to the founder about build status, and the state each one belongs to is the whole point: a first reading and a quiet stretch need opposite words.",
   },
   {
+    module: "src/console/setup-gaps.ts",
+    operatorCopy: ["SETUP_GAP_COPY"],
+    notCopy:
+      "`SETUP_GAP_BOUND` is reviewer-facing — it argues why the notice is rendered by the pages that ask for it rather than by the shared shell, and what that costs. `PREREQUISITES` is the wizard's own vocabulary. The copy is three sentences shown to a practice about ITS OWN unfinished setup: no clinical claim, no advice about any patient, and each one names a consequence and a link rather than telling anybody what to do about anyone's care.",
+  },
+  {
     module: "src/quality/hardening-q25.ts",
     operatorCopy: [],
     notCopy:

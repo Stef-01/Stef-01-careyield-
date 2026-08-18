@@ -106,17 +106,16 @@ describe("W279 every console route is declared, both directions", () => {
     }
   });
 
-  it("declares could_not_load nowhere, and says why", () => {
-    // The honest reading rather than an oversight: the state has nowhere to arise, so declaring it
-    // would be a control that does not exist.
-    //
-    // W287 NARROWED THE REASON. This comment said "no console read can fail", and that is true of
-    // twenty-six of the twenty-seven — `/console/interest` reads a file on disk. The conclusion
-    // survives and its argument changes: the state stays declared nowhere because the one route
-    // that can reach it has a store that cannot tell the page which zero it is holding. The
-    // refusal is required to carry the exception, so nobody can quote the universal again.
+  it("declares could_not_load exactly where a read can fail, and nowhere else", () => {
+    // THE CLAIM HAS MOVED TWICE AND THIS IS THE THIRD READING. It began as "no console read can
+    // fail"; W287 narrowed it to twenty-six of twenty-seven, because `/console/interest` reads a
+    // file on disk; and W279 still declined to declare the state there, on the ground that a
+    // control declared where the page cannot reach it is the paper trail of a control that does
+    // not exist. W334 built the read that reaches it — `readInterestSignups` tells a missing file
+    // from one holding a line that will not parse — so the declaration is now the true one and the
+    // refusal below still holds for every other route.
     const declaring = CONSOLE_ZERO_STATES.filter((r) => r.states.includes("could_not_load"));
-    expect(declaring).toEqual([]);
+    expect(declaring.map((r) => r.route)).toEqual(["/console/interest"]);
     expect(REFUSED_ZERO_SHAPES.declaring_could_not_load_everywhere).toContain("cannot throw");
     expect(
       REFUSED_ZERO_SHAPES.declaring_could_not_load_everywhere,

@@ -50,12 +50,15 @@ describe("W287 every finding is disposed, with a date and a lens", () => {
     expect(REVIEW_SCOPE).toMatch(/zero-states/);
   });
 
-  it("defers the one thing it will not do, naming the remedy rather than the intention", () => {
-    const deferred = FINDINGS.find((f) => f.disposition.kind === "deferred")!;
-    expect(deferred.id).toBe("W279-CR-2");
-    // W318: the unit it is deferred TO, and the type refuses a range — `W288+` is what this said
-    // for thirty-one units, and a range is a unit that never arrives.
-    expect(deferred.disposition.kind === "deferred" && deferred.disposition.by).toMatch(/^W\d+$/);
+  it("defers nothing any more, because the one thing it would not do has been done", () => {
+    // IT SAID `W288+` FOR THIRTY-ONE UNITS. W318 retyped the field so a range could not be
+    // written, which forced it onto W334; W334 built the read it was waiting for, and the
+    // disposition moved to `fixed` rather than to another unit. What this test now guards is that
+    // nothing quietly goes back to deferred without a unit that exists to be deferred to.
+    expect(FINDINGS.filter((f) => f.disposition.kind === "deferred")).toEqual([]);
+    const answered = FINDINGS.find((f) => f.id === "W279-CR-2")!;
+    expect(answered.disposition.kind).toBe("fixed");
+    expect(answered.disposition.kind === "fixed" && answered.disposition.by).toBe("W334");
   });
 });
 
@@ -122,10 +125,15 @@ describe("W287 the false universal is corrected everywhere it was stated", () =>
     expect(interest.why, "the route still argues from where the data comes from").toMatch(/READ goes/);
   });
 
-  it("leaves the conclusion standing, because the conclusion was right", () => {
-    // The correction narrows an argument; it does not license declaring a state the page cannot
-    // render. W279's refusal is the thing being upheld, not overturned.
-    expect(CONSOLE_ZERO_STATES.filter((r) => r.states.includes("could_not_load"))).toEqual([]);
+  it("upheld the refusal until the remedy existed, and then the remedy arrived", () => {
+    // THE CONCLUSION HELD FOR AS LONG AS ITS REASON DID, which is the strongest thing a refusal
+    // can do. W287 narrowed the argument, W279 declined to declare a state the page could not
+    // render, and W334 built the read — so the declaration is now the true one rather than a
+    // paper trail. What is checked here is the ORDER: the route declares it, and the remedy the
+    // refusal named is the one that was built.
+    expect(CONSOLE_ZERO_STATES.filter((r) => r.states.includes("could_not_load")).map((r) => r.route)).toEqual([
+      "/console/interest",
+    ]);
     expect(FALLIBLE_READS["/console/interest"]).toContain("REMEDY:");
   });
 

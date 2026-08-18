@@ -21,18 +21,39 @@ function defaultStorePath(): string {
   return configured || path.join(process.cwd(), ".data", "interest-signups.jsonl");
 }
 
-function readRows(filePath: string): InterestSignup[] {
-  if (!existsSync(filePath)) return [];
-  return readFileSync(filePath, "utf8")
+/**
+ * A read that says which nothing, answering W279-CR-2.
+ *
+ * `readRows` returned `[]` for a missing file, for a file whose lines will not parse, and for a
+ * file with no signups in it — three states an operator would act on differently, rendered
+ * identically as *nothing yet*. W279 declined to declare `could_not_load` on the route while the
+ * page could not reach it, which was right: a control declared where the page cannot reach it is
+ * the paper trail of a control that does not exist. This is the read the declaration was waiting on.
+ *
+ * A MISSING FILE IS NOT A FAILURE. Nobody has signed up, so the file was never appended to — that
+ * is genuinely nothing yet. What is a failure is a file that EXISTS and holds a line this cannot
+ * read: a truncated append or an unmounted volume, where the count shown would be lower than the
+ * count held and nothing would say so.
+ */
+export type InterestRead =
+  | { kind: "read"; signups: InterestSignup[] }
+  | { kind: "unreadable"; signups: InterestSignup[]; dropped: number };
+
+function readRows(filePath: string): InterestRead {
+  if (!existsSync(filePath)) return { kind: "read", signups: [] };
+  let dropped = 0;
+  const signups = readFileSync(filePath, "utf8")
     .split("\n")
     .filter(Boolean)
     .flatMap((line) => {
       try {
         return [JSON.parse(line) as InterestSignup];
       } catch {
+        dropped += 1;
         return [];
       }
     });
+  return dropped > 0 ? { kind: "unreadable", signups, dropped } : { kind: "read", signups };
 }
 
 export function saveInterestSignup(
@@ -41,7 +62,7 @@ export function saveInterestSignup(
 ): { created: boolean; signup: InterestSignup } {
   const filePath = options.filePath ?? defaultStorePath();
   const email = input.email.trim().toLowerCase();
-  const existing = readRows(filePath).find((signup) => signup.email === email);
+  const existing = readRows(filePath).signups.find((signup) => signup.email === email);
   if (existing) return { created: false, signup: existing };
 
   const createdAt = (options.now ?? new Date()).toISOString();
@@ -61,8 +82,19 @@ export function saveInterestSignup(
 }
 
 export function listInterestSignups(options: { filePath?: string } = {}): InterestSignup[] {
-  return readRows(options.filePath ?? defaultStorePath())
-    .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+  return readInterestSignups(options).signups;
+}
+
+/**
+ * The same read, with what it could not read.
+ *
+ * Kept beside `listInterestSignups` rather than replacing it: every other caller wants the rows,
+ * and a page that has to distinguish an empty file from an unreadable one asks for the result.
+ */
+export function readInterestSignups(options: { filePath?: string } = {}): InterestRead {
+  const result = readRows(options.filePath ?? defaultStorePath());
+  const signups = [...result.signups].sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+  return result.kind === "unreadable" ? { ...result, signups } : { kind: "read", signups };
 }
 
 /**

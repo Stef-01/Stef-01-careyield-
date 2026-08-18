@@ -29,6 +29,7 @@
 // on synthetic data; the gates that stop the path are named rather than worked around.
 
 import { readFileSync } from "node:fs";
+import { PREREQUISITES, type Prerequisite } from "@/console/setup-gaps";
 import path from "node:path";
 import { liveConnectionsPermitted } from "@/interop/credentials";
 import { discoverSurfaces } from "@/compliance/surfaces";
@@ -349,6 +350,100 @@ export function refusalDefects(root: string, steps: readonly RefusalStep[] = REF
         step: `${step.route} :: ${step.marker}`,
         what: `declines something ${step.page} renders no marker for`,
       });
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------------------------
+// W334: the third scenario — a practice that started setting up and did not finish.
+// ---------------------------------------------------------------------------------------------
+
+/** A page an operator lands on while a setup step is still unfinished. */
+export interface UnfinishedStep {
+  route: string;
+  page: string;
+  /** The wizard step that is unmet, as `setupReadiness` names it. */
+  unmet: Prerequisite;
+  /** What is empty or blank on this page BECAUSE of it. */
+  consequence: string;
+  /** Why an operator would be on this page rather than in the wizard. */
+  why: string;
+}
+
+/**
+ * The third walk: nothing is refused and nothing is broken — the practice simply is not finished.
+ *
+ * IT IS THE COMMONEST STATE A NEW PRACTICE IS IN and the one the console said least about. W309's
+ * walk is a practice that goes all the way; W321's is a practice that declines at every offer.
+ * This one is neither: every screen works, every screen is empty, and until now not one of them
+ * said the reason was three fields in a wizard. An operator in that state was being shown *Nothing
+ * here yet* — true, and indistinguishable from a practice that finished and had a quiet fortnight.
+ *
+ * THE PAGES ARE NAMED RATHER THAN DERIVED, and `SETUP_GAP_BOUND` argues why: the notice belongs
+ * where the consequence shows up, not on every console route, because the wizard is a console
+ * route too and telling somebody mid-setup that their setup is unfinished is not help.
+ */
+export const UNFINISHED_PATH: readonly UnfinishedStep[] = [
+  {
+    route: "/console/dashboard",
+    page: "app/console/dashboard/page.tsx",
+    unmet: "clinicians",
+    consequence: "Every figure is computed over appointments, and a practice with no participating clinician has none.",
+    why: "The first screen anybody opens. If one page in the console has to say why the product looks empty, it is the one an operator lands on without being sent there.",
+  },
+  {
+    route: "/console/capacity",
+    page: "app/console/capacity/page.tsx",
+    unmet: "sessions",
+    consequence: "Capacity is worked out from the appointment types that can be filled and how far ahead to look, and neither has been set.",
+    why: "An operator checking whether there is room to see anybody. A blank capacity page reads as no room rather than as no settings, which is the opposite conclusion.",
+  },
+  {
+    route: "/console/registers",
+    page: "app/console/registers/page.tsx",
+    unmet: "rules",
+    consequence: "Nobody is eligible under rules nobody has set, so every register is empty.",
+    why: "Where a practice goes to see who is due. An empty register with no rules behind it is the exact zero W179 refused: it looks like an answer and is the absence of a question.",
+  },
+  {
+    route: "/console/outreach",
+    page: "app/console/outreach/page.tsx",
+    unmet: "clinicians",
+    consequence: "There is nobody to contact on behalf of a practice with no participating clinician.",
+    why: "The page where an operator would expect the product to be doing something. Included alongside the dashboard because `clinicians` is the step whose absence is felt in the most places, and a walk naming it once would suggest it bites once.",
+  },
+];
+
+export interface UnfinishedDefect {
+  step: string;
+  what: string;
+}
+
+/**
+ * Every page in the walk renders the notice, and names a step the wizard really checks.
+ *
+ * TWO DIRECTIONS AND THE SECOND IS THE ONE THAT ROTS. A page that stops rendering the notice is
+ * the obvious failure; a step named here that `setupReadiness` no longer has is the quiet one,
+ * because the walk would keep passing while describing a prerequisite the wizard had dropped.
+ */
+export function unfinishedDefects(
+  root: string,
+  steps: readonly UnfinishedStep[] = UNFINISHED_PATH,
+): UnfinishedDefect[] {
+  const out: UnfinishedDefect[] = [];
+  for (const step of steps) {
+    const id = `${step.route} :: ${step.unmet}`;
+    if (!PREREQUISITES.includes(step.unmet)) {
+      out.push({ step: id, what: `names ${step.unmet}, which the wizard does not check` });
+    }
+    const source = read(root, step.page);
+    if (source === null) {
+      out.push({ step: id, what: `names a page the tree does not have: ${step.page}` });
+      continue;
+    }
+    if (!source.includes("<SetupGaps")) {
+      out.push({ step: id, what: `is in the walk and ${step.page} renders no setup notice` });
     }
   }
   return out;

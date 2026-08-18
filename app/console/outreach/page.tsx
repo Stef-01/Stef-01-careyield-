@@ -13,7 +13,7 @@
 // need is not.
 
 import { redirect } from "next/navigation";
-import { getConsole } from "@/console/store";
+import { getConsole, setupReadiness } from "@/console/store";
 import { isPracticePaused } from "@/ops/switches";
 import { getOps } from "@/ops/store";
 import type { PatientId } from "@/domain/types";
@@ -29,7 +29,7 @@ import {
 import { syntheticReferrals } from "@/synthetic/referrals";
 import { authorize } from "@/tenancy/tenancy";
 import { requirePractice } from "../guard";
-import { ConsoleShell } from "../ui";
+import { ConsoleShell, SetupGaps } from "../ui";
 import { GateRefusal } from "../../gate-refusal";
 
 export const dynamic = "force-dynamic";
@@ -88,6 +88,7 @@ export default async function OutreachPage() {
 
   return (
     <ConsoleShell email={email}>
+      <SetupGaps readiness={setupReadiness(record)} />
       <h1 className="text-2xl font-semibold tracking-tight" data-testid="outreach-plan">Outreach</h1>
       {paused || killed ? (
         // W321: THE PLAN IS STILL SHOWN AND THE SENDING IS WHAT STOPS. A paused practice used to

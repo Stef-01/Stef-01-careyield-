@@ -241,6 +241,13 @@ const q24Findings = (): number => HARDENING_Q24_FINDINGS.length;
  * already wrong when it read them.
  */
 export const CLAIMS: readonly DeclaredClaim[] = [
+  // W334: written in DIGITS, and the reason is a scan finding rather than a style choice. Spelled
+  // out, this count reads as two claims — `CLAIM_RE` matched `eight specs` inside `thirty-eight
+  // specs` and reported one number nobody classified beside one the tree no longer said. A
+  // hyphenated compound is a vocabulary gap in the scanner, and until somebody closes it the
+  // honest move is to write the number in a form the scanner reads as one thing.
+  { module: "src/quality/page-suite.ts", text: "38 specs", resolution: { kind: "derived", derive: pageSpecs } },
+  { module: "src/quality/route-coverage.ts", text: "38 spec files", resolution: { kind: "derived", derive: pageSpecs } },
   {
     module: "src/quality/hardening-q25.ts",
     text: "426 copies",
@@ -371,7 +378,6 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/order-independence.ts", text: "twelve fold modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/order-regressions.ts", text: "SEVEN entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/order-regressions.ts", text: "two of its entries", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/page-suite.ts", text: "thirty-seven specs", resolution: { kind: "derived", derive: pageSpecs } },
   { module: "src/quality/pins.ts", text: "eighteen blocked rows", resolution: { kind: "derived", derive: blockedRows } },
   { module: "src/quality/pins.ts", text: "two modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/planting.ts", text: "four registers", resolution: { kind: "at_the_unit" } },
@@ -390,7 +396,6 @@ export const CLAIMS: readonly DeclaredClaim[] = [
       kind: "open",
       why: "Two modules state a route total and the two count under different inclusion rules. Deriving both against one walk would silently rewrite what one of the two sentences means, so both are left open together rather than one made to agree with a walk it never meant.",
     } },
-  { module: "src/quality/route-coverage.ts", text: "thirty-seven spec files", resolution: { kind: "derived", derive: pageSpecs } },
   { module: "src/quality/scan-text.ts", text: "eight first-party modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/scan-text.ts", text: "FOUR REAL REGISTERS", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/scan-text.ts", text: "four registers", resolution: { kind: "at_the_unit" } },

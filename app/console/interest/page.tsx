@@ -7,7 +7,8 @@
 
 import { ConsoleShell } from "../ui";
 import { requireSession } from "../guard";
-import { listInterestSignups } from "@/interest/store";
+import { readInterestSignups } from "@/interest/store";
+import { ZERO_STATE_COPY } from "@/console/zero-states";
 import { isMeherrStaff, STAFF_REFUSAL_COPY } from "@/tenancy/staff";
 import { attributionFor, ingested, quoteForOperator } from "@/security/untrusted";
 
@@ -37,7 +38,12 @@ export default async function CommunityInterestPage() {
     );
   }
 
-  const signups = listInterestSignups();
+  // W334, answering W279-CR-2: the read now says WHICH nothing. A file that exists and holds a
+  // line nothing can parse is a truncated append or an unmounted volume, and the count below would
+  // be lower than the count held with nothing saying so. A missing file is not that — nobody has
+  // signed up — so the two zeros are rendered as the different things they are.
+  const read = readInterestSignups();
+  const signups = read.signups;
 
   return (
     <ConsoleShell email={email}>
@@ -55,9 +61,23 @@ export default async function CommunityInterestPage() {
         <strong className="mt-1 block text-4xl tracking-tight">{signups.length}</strong>
       </div>
 
-      {signups.length === 0 ? (
+      {read.kind === "unreadable" ? (
+        <div
+          data-testid="interest-could-not-load"
+          className="mt-8 rounded-xl border border-amber-300 bg-amber-50 p-6 text-sm text-stone-700"
+        >
+          <p className="font-medium text-stone-800">{ZERO_STATE_COPY.could_not_load.headline}</p>
+          <p className="mt-1">{ZERO_STATE_COPY.could_not_load.detail}</p>
+          <p className="mt-2 text-stone-600">
+            The signup file holds lines this page could not read, so the figure above is lower than
+            the number of registrations actually recorded.
+          </p>
+        </div>
+      ) : null}
+
+      {read.kind === "read" && signups.length === 0 ? (
         <p className="mt-8 rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-500">No registrations yet.</p>
-      ) : (
+      ) : signups.length === 0 ? null : (
         <>
         <p data-testid="interest-attribution" className="mt-8 text-sm text-stone-500">
           {ATTRIBUTION}

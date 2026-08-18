@@ -4,6 +4,8 @@ import { signOut, switchPractice } from "./actions";
 import { DemoNavigator } from "../demo-navigator";
 import Link from "next/link";
 import { isMeherrStaff } from "@/tenancy/staff";
+import { SETUP_GAP_COPY, unmetSteps } from "@/console/setup-gaps";
+import type { SetupReadiness } from "@/console/store";
 
 /**
  * W166: the practices this session may act for, and which one it is on.
@@ -84,6 +86,35 @@ export function ConsoleShell({
       </header>
       <main className="mx-auto max-w-3xl px-6 py-10">{children}</main>
     </div>
+  );
+}
+
+/**
+ * W334: the unfinished setup steps, named where the consequence shows up.
+ *
+ * Rendered by the pages that ASK for it rather than by `ConsoleShell`, which would have covered
+ * every route at once — including the setup wizard, where it would tell a practice mid-setup that
+ * its setup is unfinished on the screen they are finishing it on. `SETUP_GAP_BOUND` says what that
+ * trade costs: a page whose author does not pass the readiness in shows nothing.
+ */
+export function SetupGaps({ readiness }: { readiness: SetupReadiness }) {
+  const steps = unmetSteps(readiness);
+  if (steps.length === 0) return null;
+  return (
+    <section data-testid="setup-gaps" className="mb-6 rounded border border-amber-300 bg-amber-50 p-4">
+      <p className="text-sm font-medium text-stone-800">This practice is not finished setting up</p>
+      <ul className="mt-2 flex flex-col gap-3">
+        {steps.map((step) => (
+          <li key={step} data-testid={`setup-gap-${step}`}>
+            <p className="text-sm font-medium text-stone-800">{SETUP_GAP_COPY[step].headline}</p>
+            <p className="text-sm text-stone-600">{SETUP_GAP_COPY[step].detail}</p>
+            <Link href={SETUP_GAP_COPY[step].href} className="text-sm text-stone-700 underline">
+              Finish this step
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

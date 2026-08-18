@@ -141,10 +141,10 @@ export const FINDINGS: readonly HardeningFinding[] = [
       "The founder-gate clause of W321's spec — *nothing is sent, and the refusal walk crosses no founder gate* — counts `[data-testid=\"send-row\"]` on `/console/ops`. That testid is rendered only by `/console/outreach`, so the count is zero on any tree, whatever the walk did. The assertion also POSTs `/api/mock/console`, a state reset, immediately before counting. It is the quarter's own founder-gate check, and it cannot fail.",
     raisedOn: "2026-08-18",
     disposition: {
-      kind: "deferred",
-      why:
-        "Pointing the locator at `/console/outreach` was tried and FAILS: `send-row` is the queue of nudges a practice would send, non-zero by design in the seeded fixture, so it is not evidence that anything was sent. The assertion is wrong about the page and about the observable, and choosing the right one — what does *nothing was sent* mean when the app never sends? — is a design decision inside W321's unit. W334 walks the demo path again for a third scenario and is where somebody will be holding these specs.",
+      kind: "fixed",
       by: "W334",
+      evidence:
+        "The assertion is replaced with one about a field the product WRITES: the refusal walk must leave `setupCompletedAt` null, and the same spec then finishes the wizard and requires it to be non-null, so the null is a state that was observed rather than a field nothing ever sets. WHAT IT COST TO GET THERE IS THE FINDING'S REAL LESSON, and W334 records it against itself: writing the replacement, I counted `feed-row` on `/console/ops` — a testid that exists nowhere in the tree — and then asserted the ops screen showed `silence`, which the seeded practice never does. Two more absences asserted against locators that could not match, in the test written to avoid exactly that. An absence is only a claim when something in the same test shows the observable can be present.",
     },
   },
   {

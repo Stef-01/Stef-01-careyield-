@@ -13,6 +13,7 @@
 // G3 differently is the citation failure W258 is about, one document over.
 
 import { describe, expect, it } from "vitest";
+import { SETUP_GAP_BOUND, SETUP_GAP_COPY, PREREQUISITES, unmetSteps } from "@/console/setup-gaps";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import {
@@ -25,8 +26,7 @@ import {
   pathDefects,
   syntheticOnlyDefects,
   REFUSAL_PATH,
-  refusalDefects,
-} from "./path";
+  refusalDefects, UNFINISHED_PATH, unfinishedDefects } from "./path";
 import { sweepSurface } from "@/compliance/public-surfaces";
 import { withTree } from "@/quality/planting";
 
@@ -241,5 +241,88 @@ describe("W321 the refusal walk, and every marker resolved to the page that rend
 
   it("declines something at more than one route, so the walk is a walk", () => {
     expect(new Set(REFUSAL_PATH.map((s) => s.route)).size).toBeGreaterThan(2);
+  });
+});
+
+describe("W334 the third walk: a practice that started and did not finish", () => {
+  it("names pages that exist and render the notice", () => {
+    expect(unfinishedDefects(ROOT)).toEqual([]);
+  });
+
+  it("reports a page that renders no notice, which is the arm that rots first", () => {
+    const invented = [
+      { ...UNFINISHED_PATH[0]!, page: "app/console/signin/page.tsx", route: "/console/signin" },
+    ];
+    expect(unfinishedDefects(ROOT, invented)).toEqual([
+      {
+        step: "/console/signin :: clinicians",
+        what: "is in the walk and app/console/signin/page.tsx renders no setup notice",
+      },
+    ]);
+  });
+
+  it("reports a page the tree does not have", () => {
+    const gone = [{ ...UNFINISHED_PATH[0]!, page: "app/console/gone/page.tsx" }];
+    expect(unfinishedDefects(ROOT, gone)).toEqual([
+      {
+        step: "/console/dashboard :: clinicians",
+        what: "names a page the tree does not have: app/console/gone/page.tsx",
+      },
+    ]);
+  });
+
+  it("reports a step the wizard does not check, which is the quiet direction", () => {
+    // A walk describing a prerequisite `setupReadiness` has dropped would keep passing while
+    // telling an operator to finish something the wizard no longer asks for.
+    const stale = [{ ...UNFINISHED_PATH[0]!, unmet: "billing" as never }];
+    expect(unfinishedDefects(ROOT, stale).map((d) => d.what)).toContain(
+      "names billing, which the wizard does not check",
+    );
+  });
+
+  it("covers every step the wizard checks, so no prerequisite is unnamed anywhere", () => {
+    // The walk is named rather than derived, so THIS is what stops it going out of date: a fourth
+    // prerequisite added to the wizard fails here until some page in the walk names it.
+    const named = new Set(UNFINISHED_PATH.map((s) => s.unmet));
+    expect([...named].sort()).toEqual([...PREREQUISITES].sort());
+  });
+
+  it("crosses no founder gate: the walk reads screens and writes nothing to anybody", () => {
+    // The same claim W309 and W321 make, re-derived over this walk's pages rather than assumed
+    // from theirs — every page it names is one the synthetic-data check already covers.
+    expect(syntheticOnlyDefects(ROOT)).toEqual([]);
+    for (const step of UNFINISHED_PATH) {
+      expect(step.route.startsWith("/console/"), `${step.route} is not a console route`).toBe(true);
+    }
+  });
+});
+
+describe("W334 the copy an operator is given", () => {
+  it("names the consequence, not only the field", () => {
+    for (const step of PREREQUISITES) {
+      const copy = SETUP_GAP_COPY[step];
+      expect(copy.headline.length, `${step} has no headline`).toBeGreaterThan(10);
+      expect(copy.detail.length, `${step} says what is unfinished and not what it stops`).toBeGreaterThan(120);
+      expect(copy.href, `${step} does not say where to finish it`).toMatch(/^\/console\/setup\//);
+    }
+  });
+
+  it("says nothing when the setup is complete, and everything unmet when it is not", () => {
+    expect(unmetSteps({ practice: true, clinicians: true, sessions: true, rules: true, complete: true })).toEqual([]);
+    // Complete wins even if a flag is stale: the wizard's own completion is the authority.
+    expect(unmetSteps({ practice: true, clinicians: false, sessions: true, rules: true, complete: true })).toEqual([]);
+    expect(
+      unmetSteps({ practice: true, clinicians: false, sessions: false, rules: false, complete: false }),
+    ).toEqual(["clinicians", "sessions", "rules"]);
+  });
+
+  it("lists them in the wizard's order, because that is where the reader is going", () => {
+    const some = unmetSteps({ practice: true, clinicians: false, sessions: true, rules: false, complete: false });
+    expect(some).toEqual(["clinicians", "rules"]);
+  });
+
+  it("says what the notice cannot know", () => {
+    expect(SETUP_GAP_BOUND).toContain("a page nobody put in the walk is not checked");
+    expect(SETUP_GAP_BOUND).toContain("has decided not to participate");
   });
 });

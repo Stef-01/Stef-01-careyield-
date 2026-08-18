@@ -168,11 +168,25 @@ describe("W318 every disposition carries a clock, and the clock is read", () => 
     expect(ALL.length, "no findings, so nothing is on a clock").toBeGreaterThan(20);
   });
 
-  it("still holds findings of both kinds that carry one, so the clean run is not an empty set", () => {
-    // W293's rule. `overdueDispositions` over a register with no deferred and no accepted rows is
-    // clean forever, and would stay clean through any breakage of the comparison.
-    expect(ALL.filter((f) => f.disposition.kind === "deferred").length).toBeGreaterThan(0);
+  it("drives both arms, because the tree no longer holds a deferral to drive them with", () => {
+    // W293'S RULE, AND THE TREE MOVED UNDER IT. `overdueDispositions` over a register with no
+    // deferred and no accepted rows is clean forever and would stay clean through any breakage.
+    // Accepted rows are still live and still assert; DEFERRED rows are not — W334 answered the
+    // last one this tree held. So the deferred arm is driven on a constructed finding rather than
+    // asserted to exist, which is the same evidence with none of the dependence on a queue that a
+    // healthy loop is supposed to empty.
     expect(ALL.filter((f) => f.disposition.kind === "accepted").length).toBeGreaterThan(0);
+    const probe: HardeningFinding = {
+      id: "W334-PROBE",
+      lens: "code-review",
+      unit: "W334",
+      what: "a fabrication, so the deferred arm has something to be overdue about",
+      raisedOn: "2026-01-01",
+      disposition: { kind: "deferred", why: "deferred to a unit the ledger has closed", by: "W1" },
+    };
+    expect(overdueDispositions(LEDGER, [probe], "2026-01-01").map((d) => d.finding)).toEqual([
+      "W334-PROBE",
+    ]);
   });
 
   it("reports a deferral whose unit has landed, and an acceptance past its date", () => {

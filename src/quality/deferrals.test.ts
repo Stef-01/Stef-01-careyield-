@@ -148,15 +148,25 @@ describe("W329 the unit reads what it inherits, before the close rather than aft
     expect(inheritedBy("W901", [deferredTo("W902", "MINE")])).toEqual([]);
   });
 
-  it("resolves what this tree's one live deferral is waiting for", () => {
-    // NAMED, NOT COUNTED. The tree holds exactly one deferral; when a second arrives this fails and
-    // somebody writes down what it is, which is the edit W304 asks for instead of a bumped total.
-    const deferred = ALL.filter((f) => f.disposition.kind === "deferred").map((f) => f.id);
-    expect(deferred).toEqual(["W279-CR-2"]);
-    expect(inheritedBy("W334", ALL)).toEqual(["W279-CR-2"]);
+  it("resolves what this tree is waiting for, which is now nothing", () => {
+    // NAMED, NOT COUNTED, and the name has gone. W329 was written while `W279-CR-2` was the tree's
+    // one live deferral, pointing at W334 — a row nobody had claimed. W334 was then claimed and
+    // built the read that finding had been waiting for since W279, so the register it describes is
+    // empty. That is the mechanism finishing, not the check going quiet: a deferral arriving fails
+    // this line and makes somebody write down what it is, which is what it was always for.
+    // W293: the same derivation is shown finding one before it is asserted to find none, so the
+    // empty list is a reading rather than a filter nobody drove.
+    const deferredIn = (findings: readonly HardeningFinding[]) =>
+      findings.filter((f) => f.disposition.kind === "deferred").map((f) => f.id);
+    expect(deferredIn([...ALL, deferredTo("W999", "PROBE")]), "the derivation finds nothing when handed one").toEqual([
+      "PROBE",
+    ]);
+    expect(deferredIn(ALL)).toEqual([]);
+    // And the resolver still works, driven on a fabricated deferral rather than on a live one.
+    expect(inheritedBy("W334", [...ALL, deferredTo("W334", "PROBE")])).toEqual(["PROBE"]);
     const row = parseLedgerRows(LEDGER).find((r) => r.id === "W334");
-    expect(row?.status, "W334 is not a row a builder can claim, so the deferral is a wish").toBe(
-      "available",
+    expect(row?.status, "W334 is not a row anybody built, so the answer above proves nothing").toBe(
+      "claimed",
     );
   });
 

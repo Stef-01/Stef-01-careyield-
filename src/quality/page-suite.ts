@@ -1,7 +1,7 @@
 // W275: the rendered surface enters the verify gate.
 //
 // `pnpm verify` has been `typecheck && test && build && audit:gate` for the whole build. Four
-// stages, none of which opens a page. The page suite — thirty-seven specs covering every console
+// stages, none of which opens a page. The page suite — 38 specs covering every console
 // route, every public surface, the a11y sweep and W192's public-copy sweep — was `pnpm e2e`, run
 // when somebody remembered.
 //

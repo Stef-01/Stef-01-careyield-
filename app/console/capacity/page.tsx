@@ -34,11 +34,11 @@ import {
 } from "@/capacity/console";
 import { CAPACITY_SURFACE_COPY } from "@/capacity/copy-lint";
 import { sessionsFrom } from "@/capacity/model";
-import { getConsole } from "@/console/store";
+import { getConsole, setupReadiness } from "@/console/store";
 import { getSimResult } from "@/sim/dashboard-data";
 import { authorize } from "@/tenancy/tenancy";
 import { requirePractice } from "../guard";
-import { ConsoleShell } from "../ui";
+import { ConsoleShell, SetupGaps } from "../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -98,6 +98,7 @@ export default async function CapacityPage() {
 
   return (
     <ConsoleShell email={email}>
+      <SetupGaps readiness={setupReadiness(record)} />
       <h1 className="text-2xl font-semibold tracking-tight">Capacity</h1>
       <p className="mt-2 max-w-2xl text-sm text-stone-600">{CAPACITY_SURFACE_COPY.whatThisIs}</p>
       <p className="mt-1 text-xs text-stone-500">

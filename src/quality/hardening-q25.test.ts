@@ -119,17 +119,17 @@ describe("W331 each finding is re-derived, so a fix that came undone fails here"
     expect(finding("Q25-CR-3").disposition.kind).toBe("fixed");
   });
 
-  it("CR-4: the founder-gate assertion still counts a testid that is not on the page it visits", () => {
-    // DEFERRED, so the defect must still be there — an open finding whose defect has gone away is
-    // a register describing code that no longer exists.
-    const spec = read("e2e/refusal-path.spec.ts");
-    const clause = spec.slice(spec.indexOf("nothing is sent, and the refusal walk"));
-    expect(clause).toContain('page.goto("/console/ops")');
-    expect(clause).toContain('data-testid="send-row"');
-    expect(read("app/console/ops/page.tsx"), "ops renders send-row now, so the finding is fixed").not.toContain(
-      'data-testid="send-row"',
+  it("CR-4: the walk asserts a field the product writes, and drives it both ways", () => {
+    // FIXED BY W334, which replaced the unmatchable locator rather than repointing it. The test
+    // that matters is that the null is EARNED: the same spec finishes the wizard and requires the
+    // field to move, so an assertion about an absence has something in it that shows presence.
+    const spec = read("e2e/unfinished-path.spec.ts");
+    expect(spec).toContain("setupCompletedAt");
+    expect(spec, "the null is never shown to be a state anything sets").toContain("not.toBeNull()");
+    expect(spec, "the mistake this replaces is not recorded where the next author will read it").toContain(
+      "feed-row",
     );
-    expect(finding("Q25-CR-4").disposition.kind).toBe("deferred");
+    expect(finding("Q25-CR-4").disposition.kind).toBe("fixed");
   });
 
   it("CR-5: the prose scan still falls back to the whole file when a module has no import", () => {

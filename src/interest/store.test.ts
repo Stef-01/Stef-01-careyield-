@@ -7,6 +7,7 @@ import {
   interestSignupsCsv,
   interestSignupsFor,
   listInterestSignups,
+  readInterestSignups,
   pruneInterestSignups,
   saveInterestSignup,
 } from "./store";
@@ -130,5 +131,32 @@ describe("W106 access and retention for the interest register", () => {
     writeFileSync(filePath, readFileSync(filePath, "utf8").replace(/"createdAt":"[^"]*"/, '"createdAt":"whenever"'));
     expect(pruneInterestSignups(1, "2026-08-10", { filePath })).toBe(0);
     expect(listInterestSignups({ filePath })).toHaveLength(1);
+  });
+});
+
+describe("W334 the read says which nothing, which W279-CR-2 was waiting for", () => {
+  it("tells a missing file from an unreadable one from an empty one", () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "w334-"));
+    try {
+      const missing = path.join(dir, "absent.jsonl");
+      // Nobody has signed up. That is genuinely nothing yet, not a failure to read.
+      expect(readInterestSignups({ filePath: missing })).toEqual({ kind: "read", signups: [] });
+
+      const empty = path.join(dir, "empty.jsonl");
+      writeFileSync(empty, "", "utf8");
+      expect(readInterestSignups({ filePath: empty }).kind).toBe("read");
+
+      // A truncated append: the count shown would be lower than the count held, silently.
+      const truncated = path.join(dir, "truncated.jsonl");
+      const good = JSON.stringify({ id: "1", name: "A", email: "a@example.test", interests: [], createdAt: "2026-01-01T00:00:00.000Z" });
+      writeFileSync(truncated, `${good}\n{"id":"2","na`, "utf8");
+      const read = readInterestSignups({ filePath: truncated });
+      expect(read.kind).toBe("unreadable");
+      expect(read.kind === "unreadable" && read.dropped).toBe(1);
+      // And the rows it COULD read still come back, because losing them would be a second defect.
+      expect(read.signups).toHaveLength(1);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

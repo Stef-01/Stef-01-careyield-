@@ -142,7 +142,15 @@ export function dispositionDefects(
         what: `is deferred to ${cited.unit}, which no builder can claim — it waits on a founder ruling`,
       });
     }
-    if (cited.kind === "fixed" && cited.standing !== "landed") {
+    // W334: `in_flight` is excluded here for the reason this module's own `STANDINGS` gives —
+    // *reporting it as one would fail a builder's tree before they had done the work the deferral
+    // is asking for*. The sentence was written for the `deferred` arm and the `fixed` arm did not
+    // honour it, so the first unit to actually answer a finding deferred to itself was told its
+    // fix cited a unit that had not landed. Every such fix is written before its own row closes:
+    // the verify gate runs first, which is W315's whole subject. The moment the row DOES close is
+    // covered — W326 runs these readers over the closing ledger, so a fix whose unit never lands
+    // is caught there rather than being caught here at a moment nobody can be green at.
+    if (cited.kind === "fixed" && cited.standing !== "landed" && cited.standing !== "in_flight") {
       out.push({
         finding: cited.finding,
         what: `claims a fix by ${cited.unit}, which the ledger says is ${cited.standing}`,

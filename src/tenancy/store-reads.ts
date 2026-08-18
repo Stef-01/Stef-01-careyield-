@@ -322,6 +322,13 @@ export const STORE_READS: readonly StoreRead[] = [
   },
   {
     module: "src/interest/store.ts",
+    fn: "readInterestSignups",
+    kind: "no_practice_data",
+    reason:
+      "The same waitlist read, returning what it could NOT read alongside what it could — W334's answer to W279-CR-2, so the page can tell a missing file from a truncated one. Same rows, same absence of any practice on them.",
+  },
+  {
+    module: "src/interest/store.ts",
     fn: "interestSignupsCsv",
     kind: "no_practice_data",
     reason: "The same waitlist rendered for export.",

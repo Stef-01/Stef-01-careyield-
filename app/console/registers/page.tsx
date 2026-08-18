@@ -6,12 +6,12 @@
 // boundary W58 types is also a copy boundary here.
 
 import { redirect } from "next/navigation";
-import { getConsole } from "@/console/store";
+import { getConsole, setupReadiness } from "@/console/store";
 import { toViewIntervals } from "@/registers/provenance";
 import { registersFor } from "@/registers/store";
 import { authorize } from "@/tenancy/tenancy";
 import { requirePractice } from "../guard";
-import { ConsoleShell } from "../ui";
+import { ConsoleShell, SetupGaps } from "../ui";
 import { toggleRegister } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -40,6 +40,7 @@ export default async function RegistersPage({
 
   return (
     <ConsoleShell email={email}>
+      <SetupGaps readiness={setupReadiness(record)} />
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">Registers</h1>

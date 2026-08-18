@@ -5,8 +5,9 @@
 import Link from "next/link";
 import { getDashboardData } from "@/sim/dashboard-data";
 import { counterfactual, withheldCopy } from "@/outcomes/counterfactual";
-import { requireSession } from "../guard";
-import { ConsoleShell } from "../ui";
+import { requirePracticeOptional } from "../guard";
+import { setupReadiness } from "@/console/store";
+import { ConsoleShell, SetupGaps } from "../ui";
 import { GateRefusal } from "../../gate-refusal";
 import { WeeklyArmsChart } from "./chart";
 
@@ -23,7 +24,7 @@ function StatTile({ label, value, detail }: { label: string; value: string; deta
 }
 
 export default async function DashboardPage() {
-  const email = await requireSession();
+  const { email, record } = await requirePracticeOptional();
   const data = getDashboardData();
   const attr = data.attribution;
   // W215: the headline is the counterfactual's, not the raw arithmetic's. The tile below used to
@@ -34,6 +35,7 @@ export default async function DashboardPage() {
 
   return (
     <ConsoleShell email={email}>
+      {record && <SetupGaps readiness={setupReadiness(record)} />}
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Incrementality</h1>
         <span className="text-sm text-stone-500" data-testid="incrementality-answer">
