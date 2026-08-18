@@ -48,6 +48,7 @@
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { prepareForScan } from "./scan-text";
 import { typescriptFiles } from "./tree-walks";
 
 /** Files to plant, keyed by path relative to the tree they are planted in. */
@@ -127,7 +128,17 @@ export function withPlantedIn<T>(root: string, files: Plantable, probe: () => T)
 export const COPIED_DIRECTORIES = ["src", "app", "e2e", "supabase", "docs", "scripts"] as const;
 
 /** The root files a copied tree needs. `BUILD-STATE.md` because four registers read the ledger. */
-export const COPIED_FILES = ["vitest.config.ts", "package.json", "tsconfig.json", "BUILD-STATE.md"] as const;
+export const COPIED_FILES = [
+  "vitest.config.ts",
+  // W328: the config NAMES this file, so a copy without it cannot start vitest at all. The
+  // mutation sampler runs the suite inside a copy, and leaving this out made every mutant die of a
+  // missing hook rather than of the suite catching it — eight declared survivors read as caught in
+  // one run, which is what a harness looks like when it has stopped measuring its subject.
+  "vitest.global-setup.ts",
+  "package.json",
+  "tsconfig.json",
+  "BUILD-STATE.md",
+] as const;
 
 export interface CopyOptions {
   /** Subset of `COPIED_DIRECTORIES`, for a suite that only reads `src/`. */
@@ -197,12 +208,20 @@ export const WRITES_WITHOUT_A_PLANTER: Readonly<Record<string, string>> = {
     "Writes a simulation report into a temporary directory, for the same reason: an output being checked, not a file planted for a scan to notice.",
   "src/interest/store.test.ts":
     "Writes the append-only signup file the store under test reads, into a temporary directory. The file IS the subject rather than a probe.",
+  "src/quality/unit-headers.test.ts":
+    "Plants header probes into a copied tree with `writeFileSync` beside its `withPlantedIn` calls, for the cases that need the file to outlive one scope — a probe written, read by two derivations, then removed by the test's own `rmSync`. It used to be exempt for importing the planter, which said nothing about the writes it does not route through it.",
+  "src/quality/self-reference.test.ts":
+    "Writes fixture modules into a copied tree for the detectors that must see a planted instance, alongside the planter for the ones that do not. Same shape and same reason as the header probes above, and it was exempt on the same weak ground.",
+  "src/quality/planting.ts":
+    "The planter itself. Its `write` is the mechanism every declared and undeclared plant in this list is measured against, so a rule that sent it through a planter would be sending it through itself. It is here rather than exempted in code because W328 found it dropping out of its own population silently — the line that tests whether a file imports the planter contains the words it tests for.",
+  "src/interest/store.ts":
+    "The append-only signup store, which writes the file it exists to keep. A product module writing product data at the path it was configured with: nothing is planted, nothing is put in front of a detector, and the write is the module's whole purpose rather than a fixture for one. W328 added it when the sweep's population widened past test files, which is where W322's leak had been living.",
   "src/compliance/composed-copy.test.ts":
     "Copies the tree and edits a copy-carrying module in place to prove the composed-copy linter reads the edit, restoring it afterwards — a substitution, like the mutation sampler's.",
 };
 
 export interface PlanterDiff {
-  /** A test file that writes files and neither imports a planter nor is declared. */
+  /** A module that writes files and neither imports a planter nor is declared. */
   undeclared: string[];
   /** A declared file that no longer writes anything. */
   stale: string[];
@@ -210,6 +229,21 @@ export interface PlanterDiff {
 
 /**
  * Both directions, W102's shape, so a fifth harness cannot arrive quietly.
+ *
+ * THE POPULATION IS EVERY MODULE AND NOT ONLY THE TEST FILES, which is W328's correction and is
+ * owed to this register's own bound. That sentence said *a helper in a non-test module is invisible
+ * to it* — and then W322 met exactly that: the write that landed in the repository came from
+ * `declaration-tax.ts`, a register module, driven by `manifest.ts`, another one. The bound named
+ * the class before it arrived and nothing in this tree turns a named class into a check on the day
+ * it stops being hypothetical, so the sweep stayed narrow through the whole event it described.
+ *
+ * AND THE EXEMPTION IS GONE. It used to pass any file that IMPORTED a planter, which is a claim
+ * about a file made from a fact about one line of it: `mutation-sampling.test.ts` gained a
+ * `copyTree` import in this very unit and its raw write — declared, and still a real write —
+ * silently left the population. A file that plants only through the harness never calls
+ * `writeFileSync` at all, so it is out of the population by construction and needs no special
+ * case; a file that calls it says why. The substring form had also exempted THIS file from its own
+ * sweep, since the line testing for `from "./planting"` contained `from "./planting"`.
  *
  * Takes the register as an argument — W291's rule, and the reason both arms can be shown firing.
  */
@@ -220,10 +254,12 @@ export function planterDiff(
   const writers: string[] = [];
   for (const file of typescriptFiles(root)) {
     const rel = path.relative(root, file).split(path.sep).join("/");
-    if (!rel.endsWith(".test.ts")) continue;
-    const text = readFileSync(file, "utf8");
+    const raw = readFileSync(file, "utf8");
+    // W302's preparation: a register that quotes a write as a FIXTURE is not a register that
+    // writes. `blind-spots.ts` carries both spellings of this call in probe bodies, and the first
+    // draft of the widened population reported it for the strings it hands to a planted tree.
+    const text = prepareForScan(raw, { comments: "subtracted", literals: "blanked" });
     if (!/\bwriteFileSync\s*\(/.test(text)) continue;
-    if (text.includes('from "./planting"') || text.includes('from "@/quality/planting"')) continue;
     writers.push(rel);
   }
   return {
@@ -234,9 +270,16 @@ export function planterDiff(
 
 /** What a green `planterDiff` does not prove. */
 export const PLANTING_BOUND =
-  "The sweep reads `writeFileSync` in a `*.test.ts`. A plant written with `fs/promises`, an " +
-  "`appendFileSync`, a shell-out or a helper in a non-test module is invisible to it — the class " +
-  "of bound W267 states about `readdirSync`, and the same remedy applies when such a plant arrives. " +
-  "It also says nothing about the copies themselves: a suite that forgets its `afterAll` leaks a " +
-  "temporary directory, which no register here reads, and the operating system rather than this " +
-  "tree is what eventually collects it.";
+  "The sweep reads `writeFileSync` in any module under `src/`. A plant written with `fs/promises`, " +
+  "an `appendFileSync` or a shell-out is invisible to it — the class of bound W267 states about " +
+  "`readdirSync`, and the same remedy applies when such a plant arrives. THE CLAUSE THAT USED TO " +
+  "SIT BESIDE THOSE IS GONE, and how it went is worth more than the sentence was: this bound also " +
+  "excused a helper in a non-test module, and then W322's plant into the repository came from " +
+  "`declaration-tax.ts` driven by `manifest.ts`, both of them register modules — the excused class exactly. " +
+  "A stated bound names a way in, and nothing in this tree notices the day something walks through " +
+  "it, so the sweep stayed narrow through the whole event it had predicted. What it still says " +
+  "nothing about is the copies themselves: a suite that forgets its `afterAll` leaks a temporary " +
+  "directory, which no register here reads, and the operating system rather than this tree is what " +
+  "eventually collects it. Nor does it reach WHERE a write lands — a module using the harness and " +
+  "handing it the repository passed this sweep every day W322's leak was live, which is why the " +
+  "refusal that stops it is a runtime check and not a reading of source.";

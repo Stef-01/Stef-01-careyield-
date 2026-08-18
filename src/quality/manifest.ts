@@ -406,6 +406,14 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/repository-clean.ts",
+    // Reads directory entries at a path it names, so W267's census — which is about tree WALKS —
+    // does not hold it and a row there would be a declaration nothing re-derives. It is here
+    // because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/claim-classes.ts",
     // Reads a planning document and drives other registers; it walks no tree of its own, so W267's
     // census does not hold it and a row there would be a declaration nothing re-derives. It is here

@@ -166,6 +166,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "A declaration IS a string literal — `\"src/quality/bounds.ts\"` in a register — so blanking literals would make every declaration site disappear and the quarter's baseline read as zero. Comments are subtracted because this tree's notes cite each other's paths constantly, and counting those would inflate the number Q24 is measured against.",
   },
   {
+    module: "src/quality/planting.ts",
+    prep: { comments: "subtracted", literals: "blanked" },
+    why: "The sweep asks whether a module CALLS `writeFileSync`, and `blind-spots.ts` hands planted trees probe bodies that contain that call as text — so the raw form reported the register that quotes the write rather than the module that performs it. Comments go for the same reason and one more: this file's own notes discuss the call it looks for. The exemption beside it deliberately reads the RAW source instead, because a real import is a string literal and blanking would erase every import there is.",
+  },
+  {
     module: "src/quality/tautology-sweep.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "Its parser blanks literals itself, one layer down, so that boundaries are found on blanked text while the PARTS are sliced from the real thing — a hit has to quote what the author wrote. Asking for them blanked here would blank them twice and leave nothing to quote.",

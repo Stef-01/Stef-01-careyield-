@@ -282,8 +282,8 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     register: "src/quality/planting.ts",
     negative: {
       kind: "already_driven",
-      citation: "src/quality/planting.test.ts :: does not count a non-test module, or one that goes through the harness",
-      plants: "a non-test module was reported",
+      citation: "src/quality/planting.test.ts :: does not count a file that goes through the harness, however it names it",
+      plants: "plants outside the harness again",
     },
   },
   {

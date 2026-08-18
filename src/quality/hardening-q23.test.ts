@@ -175,7 +175,13 @@ describe("W298 each finding is re-derived from the tree, so a fixed one goes sta
     const sampler = read("src/quality/mutation-sampling.test.ts");
     // An argument ARRAY rather than a shell string — the property, asserted structurally.
     expect(sampler).toContain('pexec("npx", ["vitest", "run"');
-    expect(sampler).toContain("mkdtempSync");
+    // THE PROPERTY IS THAT THE COPY IS A TEMPORARY DIRECTORY, not that this file spells it. W328
+    // moved the sampler onto `copyTree`, whose whole job is a `mkdtempSync` root — the property
+    // held and the derivation broke, which is what a check on a spelling does when the mechanism
+    // moves. Asserted through the helper AND at the helper, so neither can drift alone.
+    expect(sampler).toContain("copyTree(ROOT");
+    expect(read("src/quality/planting.ts")).toContain("mkdtempSync");
+    expect(sampler, "the copy is inside the repository").not.toContain("copyTree(process.cwd()");
     expect(sampler).toContain("rmSync");
     // No shipped module in the quarter spawns anything.
     for (const module of ["bounds", "blind-spots", "acceptances", "empty-list-sweep", "negative-probes"]) {

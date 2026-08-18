@@ -10,8 +10,7 @@
 // is changed under a test, and the suite must notice.
 
 import { execFile, execFileSync } from "node:child_process";
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { promisify } from "node:util";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -29,6 +28,7 @@ import {
   siblingSuite,
   untestedModules,
 } from "./mutation-sampling";
+import { copyTree } from "./planting";
 
 const pexec = promisify(execFile);
 const ROOT = process.cwd();
@@ -38,15 +38,13 @@ const CONCURRENCY = 4;
 let COPY = "";
 
 beforeAll(() => {
-  COPY = mkdtempSync(path.join(tmpdir(), "w296-"));
-  for (const dir of ["src", "app", "e2e", "supabase", "docs", "scripts"]) {
-    cpSync(path.join(ROOT, dir), path.join(COPY, dir), { recursive: true });
-  }
-  for (const file of ["vitest.config.ts", "package.json", "tsconfig.json", "BUILD-STATE.md"]) {
-    cpSync(path.join(ROOT, file), path.join(COPY, file));
-  }
-  // Symlinked rather than copied: the mutants never touch it and a real copy is the slow half.
-  symlinkSync(path.join(ROOT, "node_modules"), path.join(COPY, "node_modules"));
+  // W328: `copyTree`, not a hand-rolled list. This file kept its own copy of the directories and
+  // root files a runnable tree needs — the duplication W303 removed everywhere else — and it went
+  // stale the moment `vitest.config.ts` started naming a hook file beside it. Every mutant then
+  // died of a tree that could not start vitest rather than of its suite catching it, and eight
+  // declared survivors read as caught in one run. A harness that stops measuring its subject
+  // reports a clean sweep, which is the most convincing wrong answer available.
+  COPY = copyTree(ROOT, { withNodeModules: true });
 }, 120_000);
 
 afterAll(() => {

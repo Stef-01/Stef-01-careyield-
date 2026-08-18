@@ -133,11 +133,16 @@ export const LATENT_FINDINGS: readonly LatentFinding[] = [
     triggerStatement:
       "The real tree holds a `src/planted/` directory. Nothing in this repository should: every planting harness writes into a temporary copy, so the folder existing at all means some run wrote into the tree it was reading.",
     trigger: () => existsSync(path.join(ROOT, "src/planted")),
-    // Closed in the firing that recorded it, which is unusual enough to say why it is still here.
-    // The cause is gone — `withPlantedIn` now refuses a root inside the repository, so the drivers
-    // plant into a copy of their own — and the record is what makes two firings of an unexplained
-    // ENOENT legible to whoever meets the third. The live guard moved to `planting.test.ts`, where
-    // it belongs: the refusal is a check a healthy tree runs, not a defect awaiting its day.
+    // Closed in the firing that recorded it, and RE-DISPOSED at W328 on evidence rather than on
+    // quiet runs, which is what Q26's plan asked for. Q25's close read the residue as having
+    // survived the fix; the timeline says otherwise — the run that left it was W321's, whose verify
+    // ran before W322's refusal landed. So the instrumentation went looking anyway: a FILE was
+    // placed at `src/planted` so that any `mkdirSync` on that path would fail loudly instead of
+    // succeeding quietly, and `pnpm verify` was run against it end to end. Every collision it
+    // produced was inside a temp tree that had copied the landmine; none was a write to the
+    // repository. The guard now answers at a moment that dominates the run rather than at whatever
+    // instant a test file reaches it — `src/quality/repository-clean.ts`, wired to vitest's
+    // teardown — which is the difference between a quiet run and an answer.
     status: "closed",
     closedBy: "W322",
   }),

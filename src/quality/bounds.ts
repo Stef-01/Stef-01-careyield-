@@ -66,6 +66,7 @@ import { SELF_REFERENCE_BOUND, fixtureFiles } from "./self-reference";
 import { CLAIMS, PROSE_BOUND, proseClaims } from "./prose-numbers";
 import { SECOND_READING_BOUND, sinceReading } from "@/founder/second-reading";
 import { CLAIM_CLASS_BOUND } from "./claim-classes";
+import { CLEAN_BOUND } from "./repository-clean";
 import { DEMO_PATH, PATH_BOUND, gateStops } from "@/demo/path";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
 import { CITATION_BOUND } from "./citations";
@@ -157,6 +158,17 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for. W306 added the missing half of the predicate's own check — a bound carrying a constructed tree is driven in the state where its remedy EXISTS, rather than only in the state where it does not — and that is narrower than it reads too: the tree is a fixture written here, so what it shows is that the predicate reads a tree, not that it would recognise the remedy as somebody else will actually build it. The predicates declared to derive nothing from a tree are checked only for refusing to budge, which is weaker again.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/repository-clean.ts",
+    name: "CLEAN_BOUND",
+    unit: "W328",
+    text: CLEAN_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "The sentence is about what a moment can see. This check answers after every worker has finished, so what it reports is what PERSISTED — and a probe written and deleted inside one test is gone before it looks, which is the half another worker actually trips over. No change to this tree moves that: a check at the end of a run cannot observe a file that existed only in the middle of it, and observing the middle is a different mechanism answering at a different moment, which is what `withPlantedIn`'s refusal already is. The other clause is a judgement rather than a derivation — the artefacts are a list of paths this repository has no reason to hold — and widening it to every untracked file would report ordinary states of a working tree, which is a check somebody turns off rather than a stronger one.",
+    },
+    numbers: [],
+  },
   {
     module: "src/quality/claim-classes.ts",
     name: "CLAIM_CLASS_BOUND",

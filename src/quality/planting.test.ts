@@ -195,14 +195,44 @@ describe("W303 a fifth harness cannot arrive quietly", () => {
     ]);
   });
 
-  it("does not count a non-test module, or one that goes through the harness", () => {
-    // Both directions on the scan's own narrowing: `planting.ts` itself writes, and the two suites
-    // migrated by this unit write only through `withPlantedIn`.
+  it("counts a non-test module that writes, which W328 corrected", () => {
+    // W303 EXCLUDED THESE ON PURPOSE and the bound said so: *a helper in a non-test module is
+    // invisible to it*. Then W322's leak came from `declaration-tax.ts`, driven by `manifest.ts` —
+    // two register modules — so the excluded class was the class the defect lived in. The sweep is
+    // over every module now, and the writers that are not plants are declared with their reason.
     const undeclared = planterDiff(ROOT, {}).undeclared;
-    expect(undeclared, "a non-test module was reported").not.toContain("src/quality/planting.ts");
-    for (const migrated of ["src/quality/pins.test.ts", "src/quality/unit-headers.test.ts"]) {
+    expect(undeclared, "a non-test module that writes is out of the population again").toContain(
+      "src/quality/planting.ts",
+    );
+    expect(planterDiff(ROOT).undeclared, "the declared writers are not accepted").toEqual([]);
+  });
+
+  it("does not count a file that goes through the harness, however it names it", () => {
+    // A file that plants only through `withPlantedIn` never calls `writeFileSync` itself, so it is
+    // out of the population by construction rather than by an exemption. That is the whole reason
+    // W328 could delete the exemption: it was doing no work that the population did not already do.
+    const undeclared = planterDiff(ROOT, {}).undeclared;
+    for (const migrated of ["src/quality/pins.test.ts", "src/quality/register-census.test.ts"]) {
       expect(undeclared, `${migrated} plants outside the harness again`).not.toContain(migrated);
     }
+  });
+
+  it("counts a file that imports the harness AND writes on its own, which the exemption hid", () => {
+    // THE DEFECT THE EXEMPTION CARRIED, driven. It passed a file for one line of it — the import —
+    // and said nothing about the writes that do not go through what was imported. This unit gave
+    // `mutation-sampling.test.ts` a `copyTree` import, and its declared raw write left the
+    // population on the spot: a declaration going stale because the file it describes got quieter.
+    const both = withTree(
+      {
+        "src/quality/importer.ts": [
+          'import { writeFileSync } from "node:fs";',
+          'import { withTree } from "./planting";',
+          'export const w = () => { withTree({}, () => 0); writeFileSync("x", "y"); };',
+        ].join("\n"),
+      },
+      (root) => planterDiff(root, {}).undeclared,
+    );
+    expect(both, "importing the planter still launders a raw write").toContain("src/quality/importer.ts");
   });
 
   it("says what the sweep cannot see", () => {

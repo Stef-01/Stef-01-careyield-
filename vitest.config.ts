@@ -18,5 +18,10 @@ export default defineConfig({
     // budget time (W48's fleet run) assert their own numbers inside the test body, so
     // raising this removes no real check. 30s still catches a genuine hang quickly.
     testTimeout: 30_000,
+    // W328: the residue check runs once, after every worker. An assertion inside a test file
+    // answers about the instant it executes at, and vitest runs files in parallel, so one that
+    // reads the repository passes whenever it happens to run before whatever writes. This is the
+    // moment that dominates the run.
+    globalSetup: ["./vitest.global-setup.ts"],
   },
 });
