@@ -62,6 +62,7 @@ import { classDefects } from "./claim-classes";
 import { endedDeclarations } from "./self-ending";
 import { CLAIMS, claimDefects } from "./prose-numbers";
 import { founderDiff } from "@/founder/outstanding";
+import { dispositionDefects } from "./deferrals";
 import { headerViolations } from "./unit-headers";
 import { fired } from "./latent-findings";
 import { deadAnchors } from "./latent-y5";
@@ -129,6 +130,15 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
         ledgerOf(root),
         allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, W279_FINDINGS]),
         CLOSE_GATE_TODAY,
+      ).map((d) => `${d.finding} ${d.what}`),
+  },
+  {
+    id: "src/quality/deferrals.ts::dispositionDefects",
+    why: "W329's standings. Closing a row moves the unit a disposition cites from `in_flight` to `landed`, and a close that renamed or dropped a row would leave a fix or a deferral citing something the ledger no longer has — a citation that resolves at the gate and not a commit later.",
+    run: (root) =>
+      dispositionDefects(
+        ledgerOf(root),
+        allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, W279_FINDINGS]),
       ).map((d) => `${d.finding} ${d.what}`),
   },
   {

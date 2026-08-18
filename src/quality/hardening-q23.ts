@@ -100,9 +100,9 @@ export const FINDINGS: readonly HardeningFinding[] = [
     raisedOn: "2026-08-17",
     disposition: {
       kind: "fixed",
-      by: "W293, W296 and W298",
+      by: "W298",
       evidence:
-        "All eight that fired were restated as the property each meant rather than bumped. Four as floors where the comment already called them non-vacuity guards; `unproven` as a CEILING, because its growth is the regression W289 exists to catch and a floor would have inverted the check; and two rewritten into identities that are strictly stronger than the counts they replace — the distinct-unit count now equals `ACCEPTANCE_REGISTERS.length`, so a register contributing no acceptance fails where before only a change in the total did, and W297's `inherent` kind is checked to stay smaller than the remedy-bearing kind rather than to equal one. The exhaustiveness identities beside them are untouched: restating a count as a bound is only right because something else already reads the whole set.",
+        "THE FIX SPANNED W293, W296 AND W298, and this field named all three in prose until W329 typed it. `by` is one unit — the one that finished the work and the one a reader follows — because a field that resolves against the ledger cannot hold a sentence, and this one resolved to no row at all for two quarters. The other two are named here, where a span belongs. All eight that fired were restated as the property each meant rather than bumped. Four as floors where the comment already called them non-vacuity guards; `unproven` as a CEILING, because its growth is the regression W289 exists to catch and a floor would have inverted the check; and two rewritten into identities that are strictly stronger than the counts they replace — the distinct-unit count now equals `ACCEPTANCE_REGISTERS.length`, so a register contributing no acceptance fails where before only a change in the total did, and W297's `inherent` kind is checked to stay smaller than the remedy-bearing kind rather than to equal one. The exhaustiveness identities beside them are untouched: restating a count as a bound is only right because something else already reads the whole set.",
     },
   },
   {

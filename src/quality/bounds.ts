@@ -79,6 +79,7 @@ import { HARDENING_BOUND as HARDENING_Q24_BOUND } from "./hardening-q24";
 import { CLOSING_BOUND } from "./closing-state";
 import { CLOSE_GATE_BOUND, weldedLedgerTests } from "./close-gate";
 import { CONTROLS, INSTANT_BOUND } from "./instant";
+import { DEFERRAL_BOUND } from "./deferrals";
 import { REMEDY_BOUND } from "./self-defeating";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
@@ -232,6 +233,23 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'This covers ONE claim' and 'this unit normalised one' — the unit of the sentence, not a count of anything in the tree. It stays one however many spellings the register grows, which is the distinction W297's own entry draws for 'One assertion per register, driven once'.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/deferrals.ts",
+    name: "DEFERRAL_BOUND",
+    unit: "W329",
+    text: DEFERRAL_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Two limits, neither liftable by a change to this tree. The first is that a citation resolving is not a citation being RIGHT: a finding deferred to a unit about something else resolves perfectly and closes having answered nothing, and only a reader who understands both can tell. W310's bound states the same limit about blockers and W311 established that the kind was the honest answer there rather than a deferred remedy. The second is that `in_flight` is surfaced and never fails, which is a choice rather than a gap — making it fail would break a tree for work not yet done — so what stands between a deferral and a builder who ignores it is W318's arm at the close. Neither is a state of the tree a predicate could read.",
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'deferred to a unit about something else', 'only a reader who understands both', 'W318's arm', 'one commit later' — the sentence uses `one` for a single instance of a shape rather than as a count of anything the tree holds. It stays one however many dispositions arrive, because it is the unit of the illustration.",
       },
     ],
   },

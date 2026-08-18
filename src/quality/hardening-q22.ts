@@ -85,7 +85,10 @@ export type UnitId = `W${number}`;
  * written: there is no arm for one.
  */
 export type Disposition =
-  | { kind: "fixed"; by: string; evidence: string }
+  // W329: `by` is a `UnitId` here too. W318 typed the `deferred` arm so `W299+` would stop
+  // compiling and left this one `string`, where `Q23-CR-2` had been claiming a fix by
+  // `W293, W296 and W298` — three units in prose, resolving to no row in the ledger.
+  | { kind: "fixed"; by: UnitId; evidence: string }
   | { kind: "accepted"; why: string; reviewBy: string }
   | { kind: "deferred"; why: string; by: UnitId };
 

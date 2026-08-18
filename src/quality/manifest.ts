@@ -79,6 +79,7 @@ import { negativeDiff } from "./negative-probes";
 import { UNEVIDENCED_AT_W293, emptyListDiff } from "./empty-list-sweep";
 import { readerDiff } from "./close-gate";
 import { instantDiff } from "./instant";
+import { dispositionDefects } from "./deferrals";
 
 /**
  * Everything one module owes the registers that watch it.
@@ -2089,6 +2090,11 @@ export const MANIFEST: readonly ModuleEntry[] = [
           "`vocabularyDefects` is given a different canonical form and must report every site in the tree.",
       },
     },
+    branches: [],
+  },
+  {
+    module: "src/quality/deferrals.ts",
+    census: null,
     branches: [],
   },
   {
