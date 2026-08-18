@@ -343,7 +343,18 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         why: "It reads W314's own declared register, which is an imported constant: the open rows are a classification somebody wrote down rather than anything a walk finds, so no root can be handed to it. What would lift it is a later unit deriving the four claims left open, which is an edit to the register rather than a change to any tree.",
       },
     },
-    numbers: [],
+    numbers: [
+      {
+        word: "thirty",
+        kind: "unit_id",
+        why: "Inside `thirty-seven`, the compound W321 added to the map. It counts nothing: the sentence is quoting the word whose absence made the scan misread it, and this register's own scan splits the compound at the hyphen for exactly the reason the sentence describes.",
+      },
+      {
+        word: "seven",
+        kind: "unit_id",
+        why: "The tail the scan read instead, quoted twice — once as `thirty-seven scanned as seven` and once in the two stale rows it named. A quotation of a corrected misreading, which is why both halves are written down; W297's own entry freezes 'thirteen' and 'seventeen' the same way.",
+      },
+    ],
   },
   {
     module: "src/quality/self-reference.ts",

@@ -14,6 +14,8 @@
 
 import { redirect } from "next/navigation";
 import { getConsole } from "@/console/store";
+import { isPracticePaused } from "@/ops/switches";
+import { getOps } from "@/ops/store";
 import type { PatientId } from "@/domain/types";
 import { DEFAULT_PREFERENCES } from "@/messaging/preferences";
 import { detectLeakage } from "@/referrals/leakage";
@@ -80,10 +82,29 @@ export default async function OutreachPage() {
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
   const sample = plan.send[0]?.text ?? null;
+  const ops = getOps();
+  const killed = ops.switches.killSwitch;
+  const paused = isPracticePaused(ops.switches, practiceId);
 
   return (
     <ConsoleShell email={email}>
       <h1 className="text-2xl font-semibold tracking-tight" data-testid="outreach-plan">Outreach</h1>
+      {paused || killed ? (
+        // W321: THE PLAN IS STILL SHOWN AND THE SENDING IS WHAT STOPS. A paused practice used to
+        // read this page with nothing saying its invitations would not go — the plan, the wording,
+        // the counts, all of it, and no indication that the answer to "will this be sent" is no.
+        // Blanking the page instead would have been worse: an empty outreach page reads as *nobody
+        // was eligible*, which is the opposite of *everybody was and you have it switched off*.
+        <p
+          className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+          data-testid="sending-paused"
+        >
+          {killed
+            ? "Nothing below will be sent: sending is halted for every practice."
+            : "Nothing below will be sent: your practice has sending paused."}{" "}
+          The plan is shown so you can see what would go out when it resumes.
+        </p>
+      ) : null}
       <p className="mt-2 max-w-2xl text-sm text-stone-500">
         Referrals your practice wrote with nothing recorded since. Where an invitation can go
         out, it is the ordinary availability message — it does not mention the referral, the

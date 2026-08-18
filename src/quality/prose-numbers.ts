@@ -45,6 +45,7 @@ const WORDS: Readonly<Record<string, number>> = {
   eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17,
   eighteen: 18, nineteen: 19, twenty: 20, "twenty-one": 21, "twenty-two": 22, "twenty-five": 25,
   "twenty-six": 26, thirty: 30, "thirty-three": 33, "thirty-four": 34, "thirty-six": 36,
+  "thirty-seven": 37,
   forty: 40, fifty: 50, "fifty-four": 54,
 };
 
@@ -194,8 +195,16 @@ export function claimDefects(
 export const PROSE_BOUND =
   "The scan finds a number followed by a countable noun from a closed vocabulary. A claim phrased " +
   "any other way is invisible to it — 'the register holds as many entries as the census', a number " +
-  "written into a sentence about something the vocabulary does not name, a count spelled as a word " +
-  "the map does not have — and the register would report the tree clean over all of them. That is " +
+  "written into a sentence about something the vocabulary does not name — and the register would " +
+  "report the tree clean over both. A COUNT SPELLED AS A WORD THE MAP DOES NOT HAVE IS WORSE THAN " +
+  "INVISIBLE, AND THIS BOUND SAID INVISIBLE UNTIL W321. A hyphen is a word boundary, so the tail " +
+  "of an unknown compound is a number word the map DOES have: `thirty-seven` scanned as `seven`. " +
+  "The register reports the wrong number as an unclassified claim rather than reporting nothing, " +
+  "and the author who classifies it writes down the tail — which is what happened here. W321 " +
+  "added `thirty-seven` to the map for its own prose and the rows `adm-y5.ts :: seven new " +
+  "modules` and `erasure-y5.ts :: seven modules` went stale: both had been classified against " +
+  "a phrase nobody had written, in a register whose purpose is that the tree's numbers are the " +
+  "numbers it says. Every compound the map does not carry still reads as its tail. That is " +
   "the class of bound W267 states about `readdirSync`, with the same remedy: the vocabulary grows " +
   "and says so. AND THE CLASSIFICATION IS A JUDGEMENT A PROGRAM CANNOT MAKE. Whether a sentence " +
   "claims what the tree holds now or what somebody found on a Tuesday is a question about tense and " +
@@ -277,7 +286,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/privacy/access-y5.ts", text: "seven copies", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/adm-y5.ts", text: "Four modules", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/adm-y5.ts", text: "one of its rows", resolution: { kind: "at_the_unit" } },
-  { module: "src/privacy/adm-y5.ts", text: "seven new modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/privacy/adm-y5.ts", text: "thirty-seven new modules", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/adm-y5.ts", text: "two original scans", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/adm-y5.ts", text: "two privacy registers", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/automated-decisions.ts", text: "four files", resolution: { kind: "at_the_unit" } },
@@ -286,7 +295,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/privacy/automated-decisions.ts", text: "three scans", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/automated-decisions.ts", text: "two original scans", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/automated-decisions.ts", text: "two registers", resolution: { kind: "at_the_unit" } },
-  { module: "src/privacy/erasure-y5.ts", text: "seven modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/privacy/erasure-y5.ts", text: "thirty-seven modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "five registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "Five registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "nine registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
@@ -340,7 +349,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/order-independence.ts", text: "twelve fold modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/order-regressions.ts", text: "SEVEN entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/order-regressions.ts", text: "two of its entries", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/page-suite.ts", text: "thirty-six specs", resolution: { kind: "derived", derive: pageSpecs } },
+  { module: "src/quality/page-suite.ts", text: "thirty-seven specs", resolution: { kind: "derived", derive: pageSpecs } },
   { module: "src/quality/pins.ts", text: "eighteen blocked rows", resolution: { kind: "derived", derive: blockedRows } },
   { module: "src/quality/pins.ts", text: "two modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/planting.ts", text: "four registers", resolution: { kind: "at_the_unit" } },
@@ -359,7 +368,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
       kind: "open",
       why: "Two modules state a route total and the two count under different inclusion rules. Deriving both against one walk would silently rewrite what one of the two sentences means, so both are left open together rather than one made to agree with a walk it never meant.",
     } },
-  { module: "src/quality/route-coverage.ts", text: "thirty-six spec files", resolution: { kind: "derived", derive: pageSpecs } },
+  { module: "src/quality/route-coverage.ts", text: "thirty-seven spec files", resolution: { kind: "derived", derive: pageSpecs } },
   { module: "src/quality/scan-text.ts", text: "eight first-party modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/scan-text.ts", text: "FOUR REAL REGISTERS", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/scan-text.ts", text: "four registers", resolution: { kind: "at_the_unit" } },

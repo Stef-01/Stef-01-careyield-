@@ -24,6 +24,8 @@ import {
   gateStops,
   pathDefects,
   syntheticOnlyDefects,
+  REFUSAL_PATH,
+  refusalDefects,
 } from "./path";
 import { sweepSurface } from "@/compliance/public-surfaces";
 import { withTree } from "@/quality/planting";
@@ -187,5 +189,57 @@ describe("W309 the refusal copy is written once and passes the linter", () => {
     expect(PATH_BOUND).toMatch(/does NOT mean/);
     expect(PATH_BOUND).toContain("Routes off the path");
     expect(PATH_BOUND.length).toBeGreaterThan(400);
+  });
+});
+
+describe("W321 the refusal walk, and every marker resolved to the page that renders it", () => {
+  it("resolves every declined step to a marker its page really renders", () => {
+    expect(refusalDefects(ROOT)).toEqual([]);
+    expect(REFUSAL_PATH.length).toBeGreaterThan(3);
+  });
+
+  it("argues every refusal, because a refusal nobody explains gets removed as clutter", () => {
+    for (const step of REFUSAL_PATH) {
+      expect(step.why.length, `${step.marker} is not argued`).toBeGreaterThan(120);
+      expect(step.declines.length, `${step.marker} does not say what is declined`).toBeGreaterThan(30);
+      expect(step.route).toMatch(/^\//);
+    }
+  });
+
+  it("reports a step whose marker no page renders", () => {
+    // Driven from outside on a constructed step, because the real register resolves. The arm is the
+    // whole value: a step claiming a refusal is visible when it is not reads as coverage — W258's
+    // rule, applied to a walk rather than a citation.
+    const bogus = [
+      {
+        route: "/console/ops",
+        page: "app/console/ops/page.tsx",
+        declines: "something the page says nothing about at all, at any point",
+        marker: "no-such-marker",
+        why: "x".repeat(130),
+      },
+    ];
+    expect(refusalDefects(ROOT, bogus)).toEqual([
+      { step: "/console/ops :: no-such-marker", what: "declines something app/console/ops/page.tsx renders no marker for" },
+    ]);
+  });
+
+  it("reports a step naming a page the tree does not have", () => {
+    const gone = [
+      { route: "/x", page: "app/gone/page.tsx", declines: "x".repeat(40), marker: "silence", why: "x".repeat(130) },
+    ];
+    expect(refusalDefects(ROOT, gone)[0]!.what).toContain("names a page the tree does not have");
+  });
+
+  it("finds both marker spellings, which is most of them", () => {
+    // `data-testid="silence"` and ``data-testid={`silence-${cause}`}`` are both real, and a check
+    // that knew only the first would report every per-item refusal as unrendered.
+    const perItem = REFUSAL_PATH.filter((s) => s.marker.endsWith("-"));
+    expect(perItem.length, "no per-item marker is declared, so the second spelling is untested").toBeGreaterThan(0);
+    expect(refusalDefects(ROOT, perItem)).toEqual([]);
+  });
+
+  it("declines something at more than one route, so the walk is a walk", () => {
+    expect(new Set(REFUSAL_PATH.map((s) => s.route)).size).toBeGreaterThan(2);
   });
 });

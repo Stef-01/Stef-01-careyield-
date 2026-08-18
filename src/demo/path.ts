@@ -249,6 +249,111 @@ export function syntheticOnlyDefects(root: string, steps: readonly PathStep[] = 
  *
  * The uncomfortable half, and for this unit it is the whole point rather than a caveat.
  */
+/**
+ * A point where the PRACTICE says no, and what the screen must show when it does.
+ *
+ * W309 walks a practice that accepts everything. That is the demo, and it is half the product:
+ * every screen in this tree has a refusal state, most of them were built because a zero rendered
+ * as a measurement was the wrong answer, and NOT ONE OF THEM IS ON THE DEMO PATH. A prospect
+ * shown only the accepting walk is being shown a product that cannot be declined.
+ *
+ * `marker` IS A `data-testid`, not the copy — W309's rule, for W290's reason: an expected sentence
+ * here would be a second copy of the page's own words, and the register would need editing
+ * whenever anybody rewrote a heading.
+ */
+export interface RefusalStep {
+  route: string;
+  page: string;
+  /** What the practice or the patient declines. */
+  declines: string;
+  /** The `data-testid` the page renders when the refusal is visible. */
+  marker: string;
+  /** Why the refusal has to be SHOWN rather than absorbed. */
+  why: string;
+}
+
+/**
+ * The second walk: a practice that declines at every point the product offers one.
+ *
+ * IN THE ORDER A PRACTICE WOULD MEET THEM, and each step's refusal is rendered where the decision
+ * is made rather than summarised somewhere else. The last step is the one that matters most: with
+ * nothing sent, the answer screen has to say there is nothing to measure. A dashboard rendering
+ * zeros would be reporting a result, and there is none — W179's finding, applied to the walk.
+ */
+export const REFUSAL_PATH: readonly RefusalStep[] = [
+  {
+    route: "/console/registers",
+    page: "app/console/registers/page.tsx",
+    declines: "The practice switches a register off for itself, so nobody in it is considered.",
+    marker: "register-",
+    why: "W60 gives a practice the switch. A register turned off has to LOOK off on the page that owns it — a switch whose state is only visible in its consequences is one nobody trusts.",
+  },
+  {
+    route: "/console/ops",
+    page: "app/console/ops/page.tsx",
+    declines: "The practice pauses sending for itself, without touching anybody else's.",
+    marker: "sending-status",
+    why: "W19's per-practice pause. The status line distinguishes paused-for-this-practice from the global kill switch, because an operator reading one as the other would either escalate nothing or escalate everything.",
+  },
+  {
+    route: "/console/outreach",
+    page: "app/console/outreach/page.tsx",
+    declines: "With sending paused, the practice sees what WOULD have been sent and that none of it will be.",
+    marker: "sending-paused",
+    why: "THE STEP THAT WOULD BE EASIEST TO GET WRONG, and the one W321 found MISSING. A paused practice read this page with nothing on it saying its invitations would not go — the plan, the wording, the counts, and no answer to *will this be sent*. Blanking the page instead would have been worse: an empty outreach page reads as *nobody was eligible*, the opposite of *everybody was and you have it switched off*. The plan is still rendered and the sending is what stops.",
+  },
+  {
+    route: "/console/outreach",
+    page: "app/console/outreach/page.tsx",
+    declines: "A patient has opted out, and is withheld with the reason rather than silently dropped.",
+    marker: "withheld-row",
+    why: "W6's STOP handling, made visible. A patient removed from a list without a reason beside them is indistinguishable from a patient the rules never reached, and only one of those is somebody's decision.",
+  },
+  {
+    route: "/console/ops",
+    page: "app/console/ops/page.tsx",
+    declines: "Nothing is outstanding, and the page says WHICH nothing.",
+    marker: "silence",
+    why: "W179: *no offers outstanding* was true of a quiet week and of a feed that died on Tuesday, and those send an operator opposite ways. The refusal walk ends here because a practice that declined everything produces exactly this screen.",
+  },
+];
+
+export interface RefusalDefect {
+  step: string;
+  what: string;
+}
+
+/**
+ * The refusal walk against the tree — every marker resolved to the page that renders it.
+ *
+ * W258'S RULE, applied to a walk: a step naming a marker no page renders is a claim that a refusal
+ * is visible when it is not, and it reads as coverage. The `marker-` prefixes are matched as
+ * prefixes because several are rendered per-item (`register-${code}`, `silence-${cause}`), which
+ * is the shape those pages already had.
+ */
+export function refusalDefects(root: string, steps: readonly RefusalStep[] = REFUSAL_PATH): RefusalDefect[] {
+  const out: RefusalDefect[] = [];
+  for (const step of steps) {
+    const source = read(root, step.page);
+    if (source === null) {
+      out.push({ step: `${step.route} :: ${step.marker}`, what: `names a page the tree does not have: ${step.page}` });
+      continue;
+    }
+    // TWO SPELLINGS AND BOTH ARE REAL: `data-testid="silence"` for a fixed marker and
+    // ``data-testid={`silence-${cause}`}`` for one rendered per item. A check that knew only the
+    // first would report every per-item refusal as unrendered, which is most of them.
+    const quoted = source.includes(`data-testid="${step.marker}`);
+    const templated = source.includes("data-testid={`" + step.marker);
+    if (!quoted && !templated) {
+      out.push({
+        step: `${step.route} :: ${step.marker}`,
+        what: `declines something ${step.page} renders no marker for`,
+      });
+    }
+  }
+  return out;
+}
+
 export const PATH_BOUND =
   "A green walk here means the screens render and the refusals name their gates. It does NOT mean " +
   "the product works at a practice: every step runs on generated data, and the steps a gate stops " +
