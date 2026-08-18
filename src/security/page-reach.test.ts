@@ -207,7 +207,7 @@ describe("W271 a route reaching a dormant module fails", () => {
     // against a module every console route DOES reach must report it.
     const live = "src/console/store.ts";
     const reachedAnywhere = new Set(reach.flatMap((r) => r.files));
-    expect(reachedAnywhere.has(live)).toBe(true);
+    expect(reachedAnywhere).toContain(live);
     const woken = reach.filter((r) => r.files.includes(live)).map((r) => r.route);
     expect(woken.length).toBeGreaterThan(10);
   });

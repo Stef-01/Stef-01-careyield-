@@ -181,7 +181,7 @@ describe("W272 a practice sees its own records and no other practice's", () => {
     const mine = consoleExportFor(PATIENT, MINE, NOW);
     const wholeIds = new Set(whole.referrals.documents.map((d) => d.referralId));
     for (const document of mine.referrals.documents) {
-      expect(wholeIds.has(document.referralId)).toBe(true);
+      expect(wholeIds).toContain(document.referralId);
     }
     expect(mine.invitations.length).toBeLessThanOrEqual(whole.invitations.length);
     expect(mine.complaints.length).toBeLessThanOrEqual(whole.complaints.length);

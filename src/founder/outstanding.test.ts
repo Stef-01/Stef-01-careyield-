@@ -123,7 +123,7 @@ describe("W310 every outstanding ruling, its units, and its wait", () => {
     // to anybody. A page that omits a row is worse than no page: a reader cannot see the gap.
     const rendered = new Set(outstandingRulings(ROOT).flatMap((r) => r.releases.map((u) => u.id)));
     for (const row of blockedRows(ROOT)) {
-      expect(rendered.has(row.id), `${row.id} is blocked and the page does not show it`).toBe(true);
+      expect(rendered, `${row.id} is blocked and the page does not show it`).toContain(row.id);
     }
     expect([...rendered]).toContain("SUP-1");
     expect([...rendered]).toContain("SUP-2");

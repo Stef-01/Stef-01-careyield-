@@ -165,7 +165,7 @@ describe("W71 dedup against synthetic recall data", () => {
     );
 
     for (const item of result.suppressed) {
-      expect(coveredPatients.has(item.gap.patientId)).toBe(true);
+      expect(coveredPatients).toContain(item.gap.patientId);
     }
   });
 

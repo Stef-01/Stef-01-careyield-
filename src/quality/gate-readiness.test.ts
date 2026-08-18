@@ -168,7 +168,7 @@ describe("W261 a readiness path never reads as a route to something live", () =>
     const known = new Set(GATE_READINESS.map((e) => e.gate));
     for (const entry of GATE_READINESS) {
       for (const blocker of entry.stillBlockedBy) {
-        expect(known.has(blocker), `${entry.gate} waits on ${blocker}, which has no entry`).toBe(true);
+        expect(known, `${entry.gate} waits on ${blocker}, which has no entry`).toContain(blocker);
         expect(blocker, `${entry.gate} lists itself as its own blocker`).not.toBe(entry.gate);
       }
     }

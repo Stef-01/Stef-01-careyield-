@@ -133,7 +133,7 @@ describe("W299 the six preconditions are evaluated against the thing each claims
   it("(2) cites the two documents the rule names, by path", () => {
     for (const cited of ["docs/AUDIT-Y5.md", "docs/GATE-DOSSIER-Y5.md"]) {
       expect(DOC, `the expansion does not cite ${cited}`).toContain(cited);
-      expect(section().includes(cited), `§5i does not cite ${cited}`).toBe(true);
+      expect(section(), `§5i does not cite ${cited}`).toContain(cited);
     }
     // And the one it adds, which is where the theme actually comes from.
     expect(DOC).toContain("src/quality/hardening-q23.ts");

@@ -111,7 +111,7 @@ describe("W75 register composition", () => {
     );
     expect(layer.memberIds.size).toBeGreaterThanOrEqual(single.memberIds.size);
     // And the primary register's members are all still there.
-    for (const id of single.memberIds) expect(layer.memberIds.has(id)).toBe(true);
+    for (const id of single.memberIds) expect(layer.memberIds).toContain(id);
   });
 
   it("adding a register does not disturb the primary register's own gaps", () => {

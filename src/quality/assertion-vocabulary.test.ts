@@ -7,6 +7,9 @@
 // each near miss is planted and the scan must refuse it, and the negatives are what make the
 // positives mean anything.
 
+import { readFileSync } from "node:fs";
+import { parseCitation, type ParsedCitation } from "./citations";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   CANONICAL,
@@ -24,6 +27,13 @@ import {
   emptinessDefects,
   emptyFormsIn,
   throwSpellings,
+  CANONICAL_PRESENT,
+  NOT_A_MEMBERSHIP,
+  NOT_PRESENCE,
+  PRESENT_FORMS,
+  presenceDefects,
+  presentClaims,
+  presentFormsIn,
 } from "./assertion-vocabulary";
 import { evidenceReport } from "./empty-list-sweep";
 import { withRoot } from "./refusal-branches";
@@ -241,5 +251,80 @@ describe("W336 one way to say a thing is absent", () => {
     expect(seen, "the count spelling is invisible to the emptiness register again").toContain(
       "src/planted/e.test.ts",
     );
+  });
+});
+
+describe("W348 one way to say a thing is present", () => {
+  it("enumerates the spellings from the suite, and every one is argued", () => {
+    for (const form of PRESENT_FORMS) {
+      expect(form.why.length, `${form.id} is declared without an argument`).toBeGreaterThan(80);
+      expect(presentFormsIn(form.planted), `${form.id}'s planted example is not read as ${form.id}`).toEqual([
+        form.id,
+      ]);
+    }
+    expect(PRESENT_FORMS[0]!.id).toBe(CANONICAL_PRESENT);
+  });
+
+  it("refuses every near miss, which is what stops the conversion running past the claim", () => {
+    for (const miss of NOT_PRESENCE) {
+      expect(presentFormsIn(miss.planted), `a near miss reads as presence: ${miss.planted}`).toEqual([]);
+      expect(miss.why.length, "a near miss is refused without a reason").toBeGreaterThan(80);
+    }
+  });
+
+  it("says the whole tree now spells it one way", () => {
+    expect(presenceDefects(ROOT)).toEqual([]);
+  });
+
+  it("reads a population worth converting, so the empty list above means something", () => {
+    // W279's rule: silence is evidence only when the detector was running. A floor rather than a
+    // pin — the number moves with ordinary work, and a floor still fails if the reader goes quiet.
+    const claims = presentClaims(ROOT);
+    expect(claims.length).toBeGreaterThan(500);
+    expect(new Set(claims.map((c) => c.form))).toEqual(new Set([CANONICAL_PRESENT, "has is true"]));
+  });
+
+  it("reports a planted variant, in each of the two spellings this unit retired", () => {
+    const seen = withRoot(
+      {
+        "src/planted/p1.test.ts": 'it("t", () => { expect(known.has(id)).toBe(true); });\n',
+        "src/planted/p2.test.ts": 'it("t", () => { expect(rows.includes(row)).toBe(true); });\n',
+        "src/planted/p3.test.ts": 'it("t", () => { expect(rows).toContain(row); });\n',
+      },
+      (root) => presenceDefects(root).map((d) => d.site),
+    );
+    expect(seen.some((s) => s.startsWith("src/planted/p1.test.ts"))).toBe(true);
+    expect(seen.some((s) => s.startsWith("src/planted/p2.test.ts"))).toBe(true);
+    expect(seen.some((s) => s.startsWith("src/planted/p3.test.ts")), "the canonical form is reported").toBe(
+      false,
+    );
+  });
+
+  it("excuses a Map's `has` and checks the excuse against the tree", () => {
+    // W336's `NOT_A_COLLECTION` shape: `toContain` iterates a Map's ENTRIES, so a key check cannot
+    // be converted. Both directions — an excused site that no longer says it fails here.
+    for (const [site, why] of Object.entries(NOT_A_MEMBERSHIP)) {
+      expect(why.length, `${site} is excused without a reason`).toBeGreaterThan(80);
+      // W301: the shared parser rather than a fifth copy of the separator.
+      const parsed = parseCitation(site);
+      expect(typeof parsed, `${site} is not a citation`).not.toBe("string");
+      const { file } = parsed as ParsedCitation;
+      const text = readFileSync(path.join(ROOT, file), "utf8");
+      expect(text, `${file} no longer holds the has-spelling it is excused for`).toContain(".has(");
+    }
+    // And the excuse is doing work: with no excuses declared, the Map sites come back.
+    expect(presenceDefects(ROOT, CANONICAL_PRESENT, {}).length, "nothing was being excused").toBeGreaterThan(
+      0,
+    );
+  });
+
+  it("keeps the three claims apart, which is the whole reason they are three registers", () => {
+    // The same snippet must read as exactly one claim. A collection with an element in it is not a
+    // collection with something in it, and neither is a collection that is empty.
+    expect(presentFormsIn("expect(rows).toContain(row);")).toEqual([CANONICAL_PRESENT]);
+    expect(formsIn("expect(rows).toContain(row);")).toEqual([]);
+    expect(emptyFormsIn("expect(rows).toContain(row);")).toEqual([]);
+    expect(presentFormsIn("expect(rows.length).toBeGreaterThan(0);")).toEqual([]);
+    expect(presentFormsIn("expect(rows).toEqual([]);")).toEqual([]);
   });
 });

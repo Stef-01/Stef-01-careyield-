@@ -290,6 +290,13 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // and a quarter that is over cannot acquire new ones.
   { module: "src/quality/hardening-q26.ts", text: "FOUR FINDINGS", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q26.ts", text: "TWO ARE COPIES", resolution: { kind: "at_the_unit" } },
+  // W348: what the presence conversion found in the suite on the day it ran — how many sites spell
+  // an existential with `some`, how many Map keys cannot be converted, and how many disjunctions
+  // the first pass got wrong. History: `presenceDefects` re-derives the live population every run,
+  // so the sentences are the argument and the register is the check.
+  { module: "src/quality/assertion-vocabulary.ts", text: "68 sites", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/assertion-vocabulary.ts", text: "two sites", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/assertion-vocabulary.ts", text: "Two sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/refusal-branches.ts", text: "two entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "sixteen modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "two branches", resolution: { kind: "at_the_unit" } },

@@ -46,8 +46,8 @@ describe("W347 every fact about the outstanding position is rendered or declared
 
   it("reads the page's own source for what it names", () => {
     const names = pageNames(ROOT);
-    expect(names.has("gatesBlockingNothing")).toBe(true);
-    expect(names.has("blockedShape")).toBe(true);
+    expect(names).toContain("gatesBlockingNothing");
+    expect(names).toContain("blockedShape");
     // A name the page has never held, so the set is not simply everything.
     expect(names.has("blockedSurfaceViolations")).toBe(false);
   });

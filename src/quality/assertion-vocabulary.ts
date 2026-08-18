@@ -36,6 +36,7 @@ import path from "node:path";
 import { stripComments } from "@/security/reachability";
 import { testModules } from "./tree-walks";
 import { type Assertion, assertionsIn, enclosingTest } from "./tautology-sweep";
+import { parseCitation } from "./citations";
 
 /** A spelling of *this collection has at least one thing in it*. */
 export interface NonEmptyForm {
@@ -420,6 +421,170 @@ export function throwSpellings(root: string): string[] {
   return [...found].sort();
 }
 
+// ---------------------------------------------------------------------------------------------
+// W348: the third claim — this collection CONTAINS this element.
+// ---------------------------------------------------------------------------------------------
+
+export interface PresentForm {
+  id: string;
+  planted: string;
+  why: string;
+}
+
+/**
+ * The canonical spelling of *this collection contains this element*.
+ *
+ * `toContain` IS ALREADY WHAT THE SUITE SAYS — 1401 sites of the 1513 this claim covers — and the
+ * argument for keeping it is not the count. It is the FAILURE OUTPUT. `expect(known.has(id)).toBe(true)`
+ * fails with `expected false to be true`, which tells a reader nothing at all: not what was missing,
+ * not what the collection held. `expect(known).toContain(id)` prints both. Twenty-two of the
+ * twenty-eight `has` sites carried a hand-written message to make up for exactly that, which is the
+ * suite paying by hand for a spelling that throws the information away.
+ *
+ * AND IT WORKS ON A SET, which is the fact that made the conversion possible: `toContain` iterates
+ * anything iterable, so a `Set`'s membership is expressible. A `Map`'s is NOT — `toContain`
+ * iterates a Map's ENTRIES, so a key check cannot be converted, and those two sites are named in
+ * `NOT_A_MEMBERSHIP` rather than rewritten into a claim they do not make.
+ */
+export const CANONICAL_PRESENT = "contain x";
+
+/** Every spelling of presence, canonical first. Planted, so a form nobody uses is still refused. */
+export const PRESENT_FORMS: readonly PresentForm[] = [
+  {
+    id: CANONICAL_PRESENT,
+    planted: "expect(rows).toContain(row);",
+    why: "THE CANONICAL FORM. It names the collection and the element, so the failure prints both — and it reads on a `Set` as well as an array, which is what let the `has` sites move.",
+  },
+  {
+    id: "has is true",
+    planted: "expect(known.has(id)).toBe(true);",
+    why: "A BOOLEAN, and by the time the matcher sees it the collection and the element are gone: the failure says `expected false to be true`. Converted where the subject is a Set — which was every site but the two Maps.",
+  },
+  {
+    id: "includes is true",
+    planted: "expect(rows.includes(row)).toBe(true);",
+    why: "The same shape over an array, and the same loss: the failure says `expected false to be true` while the row that was missing and the list that lacked it are both in scope. Four sites, all converted, one of them behind a call — `section().includes(cited)` — which the first pass over the tree skipped because its subject was not a bare name.",
+  },
+];
+
+/**
+ * Presence claims that are NOT this claim, each planted and required to be refused.
+ *
+ * W292'S DISCRIMINATING PAIRS, AND THE FIRST ROW IS THE FINDING. The suite's second most common
+ * presence-shaped spelling is `some(predicate)` at 68 sites, and it is not a presence claim at all:
+ * it says an element SATISFYING A CONDITION exists, which `toContain` cannot express because there
+ * is no element to name. A conversion rule that read them as membership would have rewritten
+ * sixty-eight tests into claims they do not make.
+ */
+export const NOT_PRESENCE: readonly NearMiss[] = [
+  {
+    planted: "expect(rows.some((r) => r.id === wanted)).toBe(true);",
+    why: "A PREDICATE, not an element. The claim is that something matching exists, and the matching element is computed rather than named — `toContain` needs the value itself. Sixty-eight sites, none converted, and this is the row that stops a later reader converting them.",
+  },
+  {
+    planted: "expect(rows).toContainEqual({ id: 1 });",
+    why: "DEEP EQUALITY, and `toContain` uses identity — `expect([{a:1}]).toContain({a:1})` fails. Seven sites, each about a structure rather than a reference, and rewriting them would break every one.",
+  },
+  {
+    planted: "expect(rows).toEqual(expect.arrayContaining([a, b]));",
+    why: "A claim about SEVERAL elements at once, and about the collection's type as well. Converting it to one `toContain` per element is a different test with different failure output, which is a judgement rather than a conversion.",
+  },
+  {
+    planted: "expect(declared.has(m) || OTHER.has(m)).toBe(true);",
+    why: "A DISJUNCTION, and the near miss this unit made itself: the subject ends in `.has(m)`, so the first conversion rewrote it as `expect(declared).toContain(m) || OTHER.has(m)` — one membership asserted and the other evaluated for nothing, in a test whose whole point is that either may hold. Two sites, both in `order-regressions.test.ts`, both left as they are.",
+  },
+];
+
+/**
+ * Sites whose `.has()` is a Map's, argued one at a time.
+ *
+ * W336'S `NOT_A_COLLECTION` SHAPE, one claim over. `toContain` iterates a Map's ENTRIES — the
+ * `[key, value]` pairs — so `expect(map).toContain(key)` fails against a map that holds the key.
+ * Nothing in the source says which `has` is a Set's and which is a Map's; deciding needs types, and
+ * both directions are checked so an entry for a site that no longer says it fails.
+ */
+export const NOT_A_MEMBERSHIP: Readonly<Record<string, string>> = {
+  "src/compliance/public-surfaces.test.ts :: measured":
+    "`measured` is `new Map(RENDERED_LENGTHS.map((m) => [m.path, m]))` and the assertion asks whether a path is a KEY. `toContain` would compare the path with `[path, measurement]` pairs and fail on a map that holds it.",
+  "src/quality/route-coverage.test.ts :: specs":
+    "`specTexts(root)` returns `Map<string, string>` — spec name to its text — and the assertion asks whether a spec exists by name. Same reason: the key is not one of the values `toContain` iterates.",
+};
+
+/** Where a presence claim sits, and how it is spelled. */
+export interface PresentClaim {
+  file: string;
+  test: string;
+  form: string;
+  text: string;
+}
+
+/**
+ * The spelling a single assertion uses, or `null` when it is not this claim.
+ *
+ * THE SUBJECT DECIDES, NOT THE MATCHER. `toContain` over a string is a substring search and is
+ * refused here — which is why this returns the canonical form only for a subject that is not a
+ * quoted literal, and why the near miss above plants exactly that case.
+ */
+export function presentFormOf(a: Assertion): string | null {
+  if (a.negated) return null;
+  // A COMPOUND SUBJECT IS A COMPOUND CLAIM, and this line is here because the conversion got it
+  // wrong first: `expect(declared.has(m) || REPLAY_SHAPED.has(m)).toBe(true)` ends in `.has(m)` and
+  // the rewrite moved the second half OUTSIDE the assertion, leaving a test that asserted one
+  // membership and evaluated the other for nothing. Two sites in `order-regressions.test.ts`.
+  if (/\|\||&&/.test(a.subject)) return null;
+  if (a.matcher === "toContain") return CANONICAL_PRESENT;
+  const truthy = ["toBe", "toEqual"].includes(a.matcher) && a.expected === "true";
+  if (truthy && /\.has\([^()]*\)$/.test(a.subject)) return "has is true";
+  if (truthy && /\.includes\([^()]*\)$/.test(a.subject)) return "includes is true";
+  return null;
+}
+
+/** Every presence spelling in a snippet — the plantable half, needing no tree. */
+export function presentFormsIn(code: string): string[] {
+  return assertionsIn(code)
+    .map(presentFormOf)
+    .filter((f): f is string => f !== null);
+}
+
+/** Every presence claim in every `*.test.ts` under `src/`, with the spelling it uses. */
+export function presentClaims(root: string): PresentClaim[] {
+  const out: PresentClaim[] = [];
+  for (const file of testModules(root)) {
+    const rel = path.relative(root, file).split(path.sep).join("/");
+    const code = stripComments(readFileSync(file, "utf8"));
+    for (const a of assertionsIn(code)) {
+      const form = presentFormOf(a);
+      if (form) out.push({ file: rel, test: enclosingTest(code, a.index), form, text: a.text });
+    }
+  }
+  return out;
+}
+
+/**
+ * Every presence claim not spelled the canonical way, minus the Map sites nobody can convert.
+ *
+ * One direction, for the reason `vocabularyDefects` gives: a declared FORM with no live occurrence
+ * is the register recognising a spelling the tree does not use yet, which is what it is for.
+ */
+export function presenceDefects(
+  root: string,
+  canonical: string = CANONICAL_PRESENT,
+  excused: Readonly<Record<string, string>> = NOT_A_MEMBERSHIP,
+): VocabularyDefect[] {
+  // W301: the shared citation parser, not a fifth split of the separator.
+  const excusedFiles = new Set(
+    Object.keys(excused).flatMap((k) => {
+      const parsed = parseCitation(k);
+      return typeof parsed === "string" ? [] : [parsed.file];
+    }),
+  );
+  return presentClaims(root)
+    .filter((c) => c.form !== canonical)
+    .filter((c) => !excusedFiles.has(c.file))
+    .map((c) => ({ site: `${c.file} :: ${c.test}`, what: `says presence as \`${c.form}\`` }))
+    .sort((a, b) => a.site.localeCompare(b.site));
+}
+
 /** What a green sweep does not prove. */
 export const VOCABULARY_BOUND =
   "This covers TWO claims — a collection has at least one element, and a collection is empty — in " +
@@ -437,6 +602,14 @@ export const VOCABULARY_BOUND =
   "and emptiness keeps the LIST, because `toEqual([])` says the value is an empty array and the " +
   "count forms say only that something is zero. Reading that as an inconsistency is the mistake " +
   "this sentence exists to stop. " +
+  "W348 ADDED A THIRD CLAIM AND WITH IT THE SHARPEST LIMIT IN THIS MODULE: the canonical spelling " +
+  "of presence, `toContain`, is ALSO the spelling of a substring search, and nothing in the source " +
+  "separates them. Most `toContain` sites in this suite are text searches over a module's own " +
+  "source, so the presence population is mostly not memberships, and no rule written here can tell " +
+  "which is which without knowing whether the subject is a string — which needs types, the same " +
+  "wall `NOT_A_COLLECTION` hit at a function's arity and `NOT_A_MEMBERSHIP` hits at a Map's keys. " +
+  "What the register can honestly say is that every claim in the tree is spelled the one way, and " +
+  "not that every one of them is the same claim. " +
   "AND THE CANONICAL FORM WAS CHOSEN FOR THE SCANNERS, NOT FOR THE READER: its failure output is " +
   "`expected +0 to be greater than +0`, which names neither the list nor what was wanted, so the " +
   "assertion is only as legible as the message beside it — and nothing here requires a message. " +

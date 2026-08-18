@@ -70,7 +70,7 @@ describe("W5 invitation pool builder", () => {
     const eligibleIds = new Set(eligible.map((p) => p.id));
     const invitedIds = pool.map((i) => i.patientId);
     expect(new Set(invitedIds).size).toBe(invitedIds.length);
-    for (const id of invitedIds) expect(eligibleIds.has(id)).toBe(true);
+    for (const id of invitedIds) expect(eligibleIds).toContain(id);
     expect(pool.every((i) => i.status === "queued")).toBe(true);
   });
 

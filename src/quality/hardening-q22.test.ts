@@ -57,7 +57,7 @@ describe("W285 every finding carries a disposition and a date", () => {
   it("blames only units the ledger has", () => {
     const units = knownUnits(LEDGER);
     for (const finding of FINDINGS) {
-      expect(units.has(Number(finding.unit.slice(1))), `${finding.id} blames ${finding.unit}`).toBe(true);
+      expect(units, `${finding.id} blames ${finding.unit}`).toContain(Number(finding.unit.slice(1)));
     }
   });
 });

@@ -61,7 +61,7 @@ describe("W298 every finding is disposed, with a date and a lens", () => {
     const units = knownUnits(LEDGER);
     for (const finding of FINDINGS) {
       const n = Number(finding.unit.slice(1));
-      expect(units.has(n), `${finding.id} blames ${finding.unit}, which the ledger does not have`).toBe(true);
+      expect(units, `${finding.id} blames ${finding.unit}, which the ledger does not have`).toContain(n);
       expect(n).toBeGreaterThanOrEqual(QUARTER.first);
       expect(n).toBeLessThanOrEqual(QUARTER.last);
     }

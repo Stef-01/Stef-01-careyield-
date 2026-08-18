@@ -200,7 +200,7 @@ describe("W293 the tree, classified in both directions", () => {
     expect(UNEVIDENCED_AT_W293.length).toBeGreaterThan(100);
     const live = new Set(CLASSIFIED.map((c) => c.id));
     for (const row of UNEVIDENCED_AT_W293) {
-      expect(live.has(row), `${row} names an assertion the sweep no longer finds`).toBe(true);
+      expect(live, `${row} names an assertion the sweep no longer finds`).toContain(row);
     }
   });
 

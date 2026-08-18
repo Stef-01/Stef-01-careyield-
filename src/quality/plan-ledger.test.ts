@@ -137,8 +137,8 @@ describe("W208 the plan and the ledger describe the same build", () => {
   it("would notice a gate that the plan does not define", () => {
     // Non-vacuity for the check above: it is only worth anything if an undefined gate fails it.
     const defined = new Set(definedGates());
-    expect(defined.has("G5")).toBe(true);
-    expect(defined.has("G10")).toBe(true);
+    expect(defined).toContain("G5");
+    expect(defined).toContain("G10");
     expect(defined.has("G99")).toBe(false);
   });
 

@@ -54,8 +54,8 @@ describe("W332 the population is the quarter's own modules, derived", () => {
     // ends must be rows the ledger actually holds, or the population is over a range that is not a
     // quarter.
     const ids = new Set(parseLedgerRows(readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8")).map((r) => r.id));
-    expect(ids.has(`W${QUARTER_AT_W332.first}`)).toBe(true);
-    expect(ids.has(`W${QUARTER_AT_W332.last}`)).toBe(true);
+    expect(ids).toContain(`W${QUARTER_AT_W332.first}`);
+    expect(ids).toContain(`W${QUARTER_AT_W332.last}`);
   });
 
   it("shows what the standing sampler would have drawn, which is the reason this unit exists", () => {
@@ -157,7 +157,7 @@ describe("W332 every survivor is read, not merely listed", () => {
     const names = new Set(OPERATORS.map((o) => o.id));
     for (const survivor of SURVIVORS_AT_W332) {
       const [module, operator] = survivor.id.split(" :: ");
-      expect(names.has(operator!), `${survivor.id} names an operator W296 does not have`).toBe(true);
+      expect(names, `${survivor.id} names an operator W296 does not have`).toContain(operator!);
       expect(() => readFileSync(path.join(ROOT, module!), "utf8")).not.toThrow();
     }
   });

@@ -139,8 +139,8 @@ describe("W281 the parts, driven directly", () => {
 
   it("reads the ledger's unit ids rather than a range", () => {
     const units = knownUnits(LEDGER);
-    expect(units.has(1)).toBe(true);
-    expect(units.has(281)).toBe(true);
+    expect(units).toContain(1);
+    expect(units).toContain(281);
     expect(units.has(999), "the ledger cannot have a unit it never planned").toBe(false);
     // W285 composed this onto W263's row parser, which is STRICTER than the regex it replaced: a
     // full six-column row, not any line starting `| W<n> |`. Asserted rather than assumed, because
@@ -174,7 +174,7 @@ describe("W281 adoption is declared, because a header names an owner and not an 
     // unchanged; it had simply become legible. Without this, somebody deletes the subtraction, the
     // suite goes red, and the obvious repair is to change the header back.
     const adopted = adoptedModuleNames();
-    expect(adopted.has("src/interest/store.ts")).toBe(true);
+    expect(adopted).toContain("src/interest/store.ts");
     const stored = RECORD_CLASSES.find((c) => c.module === "src/interest/store.ts");
     expect(stored?.handling, "the module this subtraction exists for is no longer stored").toBe("stored");
   });

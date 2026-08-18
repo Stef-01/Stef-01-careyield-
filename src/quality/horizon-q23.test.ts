@@ -143,7 +143,7 @@ describe("W286 the six preconditions are evaluated against the thing each claims
   it("(2) cites the two documents the rule names, by path", () => {
     for (const cited of ["docs/AUDIT-Y5.md", "docs/GATE-DOSSIER-Y5.md"]) {
       expect(DOC, `the expansion does not cite ${cited}`).toContain(cited);
-      expect(PLAN.includes(cited), `§5h does not cite ${cited}`).toBe(true);
+      expect(PLAN, `§5h does not cite ${cited}`).toContain(cited);
     }
     // And the one it adds, which is where the theme actually comes from.
     expect(DOC).toContain("src/quality/hardening-q22.ts");
@@ -225,7 +225,7 @@ describe("W286 the theme is derived from evidence that exists", () => {
     const cited = [...RAW.matchAll(/^- \*\*(W\d+)(?:\/CR-1)?/gm)].map((m) => m[1]!);
     expect(cited.length).toBeGreaterThanOrEqual(5);
     const known = new Set(rows().map((r) => r.id));
-    for (const id of cited) expect(known.has(id), `the theme cites ${id}, which is not a row`).toBe(true);
+    for (const id of cited) expect(known, `the theme cites ${id}, which is not a row`).toContain(id);
   });
 
   it("takes its theme from a register that says what it says", () => {

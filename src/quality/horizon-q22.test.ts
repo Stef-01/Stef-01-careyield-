@@ -130,7 +130,7 @@ describe("W273 the six preconditions are evaluated against the thing each claims
   it("(2) cites the two documents the rule names, by path", () => {
     for (const cited of ["docs/AUDIT-Y5.md", "docs/GATE-DOSSIER-Y5.md"]) {
       expect(DOC, `the expansion does not cite ${cited}`).toContain(cited);
-      expect(PLAN.includes(cited), `§5g does not cite ${cited}`).toBe(true);
+      expect(PLAN, `§5g does not cite ${cited}`).toContain(cited);
     }
     // And the one it adds, which is where the theme actually comes from.
     expect(DOC).toContain("docs/HARDENING-Q21.md");

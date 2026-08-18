@@ -155,7 +155,7 @@ describe("W212 the spine-to-response translation is declared, both ways", () => 
       ALL_INTERVENTION_KINDS.flatMap((k) => [...RESPONSE_KINDS[k].advances, ...RESPONSE_KINDS[k].ends]),
     );
     for (const target of Object.values(SPINE_RESPONSE_KINDS)) {
-      expect(declared.has(target), `${target} is not a declared response kind`).toBe(true);
+      expect(declared, `${target} is not a declared response kind`).toContain(target);
     }
     for (const [kind, why] of Object.entries(SPINE_NOT_RESPONSES)) {
       expect(why.length, `${kind} is excused without a reason`).toBeGreaterThan(40);

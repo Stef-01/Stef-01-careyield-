@@ -196,7 +196,7 @@ describe("W312 the theme is derived from evidence that exists", () => {
     const { FINDINGS } = await import("./hardening-q24");
     const held = new Set(FINDINGS.map((f) => f.id));
     for (const cited of [...RAW.matchAll(/Q24-[A-Z]+-\d+/g)].map((m) => m[0])) {
-      expect(held.has(cited), `the horizon cites ${cited}, which Q24's register does not hold`).toBe(true);
+      expect(held, `the horizon cites ${cited}, which Q24's register does not hold`).toContain(cited);
     }
   });
 

@@ -57,7 +57,7 @@ describe("W254 the register is checked against the endpoint census, both directi
     const known = new Set(ENDPOINT_IDS);
     for (const definition of SCOPE_DEFINITIONS) {
       for (const id of definition.endpoints) {
-        expect(known.has(id), `${definition.scope} names ${id}, which is not an endpoint`).toBe(true);
+        expect(known, `${definition.scope} names ${id}, which is not an endpoint`).toContain(id);
       }
     }
   });

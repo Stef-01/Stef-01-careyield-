@@ -198,7 +198,7 @@ describe("W296 every survivor is read, not merely listed", () => {
     const operators = new Set(OPERATORS.map((o) => o.id));
     for (const survivor of SURVIVORS_AT_W296) {
       const [module, operator] = survivor.id.split(" :: ");
-      expect(operators.has(operator!), `${survivor.id} names no such operator`).toBe(true);
+      expect(operators, `${survivor.id} names no such operator`).toContain(operator!);
       expect(siblingSuite(ROOT, module!), `${module} has no suite to have missed it`).not.toBeNull();
     }
   });
