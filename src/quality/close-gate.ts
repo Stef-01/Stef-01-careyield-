@@ -64,6 +64,7 @@ import { endedDeclarations } from "./self-ending";
 import { CLAIMS, claimDefects } from "./prose-numbers";
 import { founderDiff } from "@/founder/outstanding";
 import { dispositionDefects } from "./deferrals";
+import { dossierDiff } from "./dossier-derived";
 import { headerViolations } from "./unit-headers";
 import { fired } from "./latent-findings";
 import { deadAnchors } from "./latent-y5";
@@ -147,6 +148,11 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
         ledgerOf(root),
         allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, W279_FINDINGS]),
       ).map((d) => `${d.finding} ${d.what}`),
+  },
+  {
+    id: "src/quality/dossier-derived.ts::dossierDiff",
+    why: "W335's regeneration of the Y5 gate dossier. Its position is derived from the ledger, so a close that changed a blocked row — or a row's attribution — would leave the document pricing a position the tree no longer holds, and the document is what a founder reads.",
+    run: (root) => dossierDiff(root).map((d) => `${d.row} ${d.what}`),
   },
   {
     id: "src/quality/bounds.ts::staleBounds",

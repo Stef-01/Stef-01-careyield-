@@ -856,6 +856,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W323's assertion vocabulary: the spellings this suite uses to say a collection has at least one element, and the one spelling it keeps. Nobody but a developer reads it. Its longest strings are the argument for each form, the argument for each near miss and `VOCABULARY_BOUND`; its inputs are the text of this tree's own test files and short planted snippets of TypeScript, and no patient, condition or appointment reason appears in any of it.",
   },
   {
+    module: "src/quality/dossier-derived.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W335's regeneration of the Y5 gate dossier's outstanding table from the ledger and §4. Nobody but a developer reads it — the DOSSIER is founder-facing and lives in `docs/`, and this module holds only the comparison. Its longest strings are the argument for the one declared fold and `DOSSIER_BOUND`; its inputs are the ledger, the plan and that document, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/quarter-mutants.ts",
     operatorCopy: [],
     notCopy:

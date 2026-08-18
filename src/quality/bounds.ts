@@ -85,6 +85,7 @@ import { CLOSE_GATE_BOUND, weldedLedgerTests } from "./close-gate";
 import { CONTROLS, INSTANT_BOUND } from "./instant";
 import { DEFERRAL_BOUND } from "./deferrals";
 import { QUARTER_MUTANT_BOUND } from "./quarter-mutants";
+import { DOSSIER_BOUND } from "./dossier-derived";
 import { REMEDY_BOUND } from "./self-defeating";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
@@ -310,6 +311,38 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "two",
         kind: "fixed_by_a_gate",
         why: "How many claims these registers normalise: non-emptiness by W323's gate and emptiness by W336's. It counts the REGISTERS this module declares — `NON_EMPTY_FORMS` and `EMPTY_FORMS` — which two units' verify gates put there, rather than anything a walk over the tree finds. A third arrives only with a third unit, whose gate would rewrite this sentence anyway.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/dossier-derived.ts",
+    name: "DOSSIER_BOUND",
+    unit: "W335",
+    text: DOSSIER_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Three limits and none is a change to this tree. The dossier's ARGUMENT — that four gates block nothing and are the four that matter, that three proposals in three years went unanswered — is a reading of the position rather than the position, and no derivation produces a reading. Whether a row is blocked on the RIGHT gate is the same judgement W310's bound states about blockers, which W311 established is inherent because a correct attribution and a mistaken one are the same text in the same column. And a cell naming an id the ledger does not hold is invisible to a reader that resolves against real rows, which is the price of being able to see `SUP-1` at all — widening it back to a shape match reintroduces the defect this unit exists to fix.",
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'ONE table', 'the one declared fold', 'only a reader' — the unit of what this register covers, not a count of anything that grows. It stays one table however many rows the position holds.",
+      },
+      {
+        word: "four",
+        kind: "unit_id",
+        why: "Inside a quotation of the dossier's own headline — 'four gates block nothing and are the four that matter'. It is that document's sentence, frozen here to say which part of it this register does NOT derive.",
+      },
+      {
+        word: "three",
+        kind: "unit_id",
+        why: "The other half of the same quotation — 'three proposals in three years went unanswered' — and the count of limits this sentence lists. Both describe the dossier's argument rather than anything this register walks.",
+      },
+      {
+        word: "two",
+        kind: "unit_id",
+        why: "'the same text in the same column' follows the pair of attributions being contrasted, a correct one and a mistaken one. A quotation of W310's illustration, not a count of rows.",
       },
     ],
   },

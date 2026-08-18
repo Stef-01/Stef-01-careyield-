@@ -80,6 +80,7 @@ import { UNEVIDENCED_AT_W293, emptyListDiff } from "./empty-list-sweep";
 import { readerDiff } from "./close-gate";
 import { instantDiff } from "./instant";
 import { dispositionDefects } from "./deferrals";
+import { OUTSTANDING_HEADING, dossierDiff } from "./dossier-derived";
 
 /**
  * Everything one module owes the registers that watch it.
@@ -122,6 +123,10 @@ const NOT_CALLABLE =
  * unit number, four hundred lines apart in different files, producing the same text — invisible
  * while the two lived apart, obvious the moment their rows became adjacent.
  */
+/** A dossier holding exactly the rows given, for W335's arms. */
+const PLANTED_DOSSIER = (rows: string) =>
+  `${OUTSTANDING_HEADING}\n\n| Decision | Units blocked | Which | Open since |\n| --- | --- | --- | --- |\n${rows}\n\ntrailing prose\n`;
+
 const LEDGER_ROW = (n: number) => `| W${n} | done | builder-A | 2026-08-14T00:00Z | abc1234 | a row |`;
 
 /** What a green manifest does not prove. */
@@ -2134,6 +2139,56 @@ export const MANIFEST: readonly ModuleEntry[] = [
       },
     },
     branches: [],
+  },
+  {
+    module: "src/quality/dossier-derived.ts",
+    census: null,
+    branches: [
+      {
+        fn: "dossierDiff",
+        branch: "no-row-for-a-live-decision",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            dossierDiff(process.cwd(), PLANTED_DOSSIER("| **G0** — nothing | 0 | none | Y1 |")).some((d) =>
+              d.what.includes("has no row for it"),
+            ),
+        },
+      },
+      {
+        fn: "dossierDiff",
+        branch: "a-row-the-ledger-blocks-nothing-on",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            dossierDiff(process.cwd(), PLANTED_DOSSIER("| **G0** — nothing | 0 | none | Y1 |")).some((d) =>
+              d.what.includes("the ledger blocks nothing on it"),
+            ),
+        },
+      },
+      {
+        fn: "dossierDiff",
+        branch: "a-unit-the-row-omits",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            dossierDiff(process.cwd(), PLANTED_DOSSIER("| **G5** — content | 8 | W161 | Y3 |")).some((d) =>
+              d.what.includes("does not name it"),
+            ),
+        },
+      },
+      {
+        fn: "dossierDiff",
+        branch: "a-count-that-disagrees-with-its-own-list",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            dossierDiff(process.cwd(), PLANTED_DOSSIER("| **G3** — sms | 5 | W174 | Y1 |")).some((d) =>
+              d.what.includes("states 5 units"),
+            ),
+        },
+      },
+    ],
   },
   {
     module: "src/quality/quarter-mutants.ts",

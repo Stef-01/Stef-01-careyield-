@@ -11,6 +11,8 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { allLedgerRows } from "./blocked-surface";
+import { unitsInCell } from "./dossier-derived";
 
 const ROOT = process.cwd();
 const read = (...parts: string[]) => readFileSync(path.join(ROOT, ...parts), "utf8");
@@ -46,16 +48,24 @@ const DOSSIER_FLAT = flat(DOSSIER);
  */
 export const Y5_LAST_UNIT = 260;
 
-interface LedgerRow {
-  id: string;
-  status: string;
-  note: string;
-}
-
-const ledgerRows = (): LedgerRow[] =>
-  [...LEDGER.matchAll(/^\| (W\d+) \| (\w+) \|(.*)$/gm)]
-    .map((m) => ({ id: m[1]!, status: m[2]!, note: m[3]! }))
-    .filter((row) => Number(row.id.slice(1)) <= Y5_LAST_UNIT);
+/**
+ * The ledger, through the SHARED parse.
+ *
+ * W335: THIS FILE KEPT ITS OWN `^\| (W\d+) \|` REGEX, which is the parse W310 found dropping
+ * `SUP-1` and `SUP-2` — two rows blocked on G5 since W89. W310 fixed `allLedgerRows` and every
+ * register that calls it; this one was not among them because it had a copy. So the document said
+ * six units under G5, this test agreed, and both were wrong by the same two rows for the same
+ * reason: a check and its subject sharing a defect agree with each other instead of with the tree.
+ *
+ * The Year 5 bound keeps a row with no unit number. `SUP-1` and `SUP-2` were blocked at W89 and are
+ * squarely inside the year this document prices; they were never excluded by the bound, only by
+ * the parse.
+ */
+const ledgerRows = () =>
+  allLedgerRows(ROOT).filter((row) => {
+    const numbered = /^W(\d+)$/.exec(row.id);
+    return numbered === null || Number(numbered[1]) <= Y5_LAST_UNIT;
+  });
 
 /** Unit ids the ledger blocks on a given gate, as the ledger itself attributes them. */
 const blockedOn = (gate: string): string[] =>
@@ -85,7 +95,11 @@ function tableAfter(heading: string): string[][] {
 }
 
 /** Unit ids named in a table cell. */
-const unitsIn = (cell: string): string[] => [...cell.matchAll(/\bW\d+\b/g)].map((m) => m[0]).sort();
+const unitsIn = (cell: string): string[] =>
+  // W335: resolved against the ledger's own ids rather than matched on a shape. `\bW\d+\b` is the
+  // other half of the same defect — it cannot see `SUP-1` in a cell any more than the row parse
+  // could see it in the ledger.
+  unitsInCell(cell, allLedgerRows(ROOT).map((r) => r.id));
 
 describe("W257 the ledger is the source, and it has something to say", () => {
   it("is bounded to Year 5, so a later year's rows cannot rewrite this document", () => {
@@ -106,15 +120,23 @@ describe("W257 the ledger is the source, and it has something to say", () => {
     expect(Math.max(...all), "the ledger has not grown, so the bound excludes nothing").toBeGreaterThan(
       Y5_LAST_UNIT,
     );
-    expect(ledgerRows().every((r) => Number(r.id.slice(1)) <= Y5_LAST_UNIT)).toBe(true);
+    // W335: a row with no unit number is inside the bound. `SUP-1` and `SUP-2` were blocked at W89
+    // and belong to the year this document prices; the old parse excluded them by accident and the
+    // bound was never what kept them out.
+    expect(
+      ledgerRows().every((r) => {
+        const numbered = /^W(\d+)$/.exec(r.id);
+        return numbered === null || Number(numbered[1]) <= Y5_LAST_UNIT;
+      }),
+    ).toBe(true);
     expect(ledgerRows().length, "the bound excluded the whole ledger").toBeGreaterThan(250);
     expect(ledgerRows().length, "the bound excluded nothing").toBeLessThan(all.length);
   });
 
   it("finds blocked rows to count, so the tables are not over nothing", () => {
     const blocked = ledgerRows().filter((r) => r.status === "blocked");
-    expect(blocked.length, "the ledger blocks nothing, so this dossier prices nothing").toBe(16);
-    expect(DOSSIER_FLAT).toContain("Sixteen ledger rows are blocked");
+    expect(blocked.length, "the ledger blocks nothing, so this dossier prices nothing").toBe(18);
+    expect(DOSSIER_FLAT).toContain("Eighteen ledger rows are blocked");
   });
 
   it("attributes every blocked row to a gate or to the one named decision", () => {
@@ -185,9 +207,14 @@ describe("W257 every outstanding decision, row by row", () => {
   it("counts G5 as the largest blocker and says it grew", () => {
     // W207 recorded four; Y5's two vertical-content units joined it. The claim is checked rather
     // than carried, because "it grew" is the kind of sentence that stops being true silently.
-    expect(blockedOn("G5")).toHaveLength(6);
+    // W335: eight, not six. Two of them were never new — `SUP-1` and `SUP-2` had been there since
+    // W89 and this test could not see them, because it read the ledger with its own copy of the
+    // parse W310 fixed.
+    expect(blockedOn("G5")).toHaveLength(8);
     expect(blockedOn("G5")).toContain("W249");
     expect(blockedOn("G5")).toContain("W251");
+    expect(blockedOn("G5")).toContain("SUP-1");
+    expect(blockedOn("G5")).toContain("SUP-2");
     expect(DOSSIER_FLAT).toContain("from four units at W207");
   });
 });

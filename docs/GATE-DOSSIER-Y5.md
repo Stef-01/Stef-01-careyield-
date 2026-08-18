@@ -7,7 +7,7 @@ this points at it.
 
 ## The finding, stated first: four gates block no unit at all, and they are the four that matter
 
-Sixteen ledger rows are blocked. Every one of them names G3, G5, G6, G8, G9, G10 or the Q17
+Eighteen ledger rows are blocked. Every one of them names G3, G5, G6, G8, G9, G10 or the Q17
 learned-ranking decision. **G1, G2, G4 and G7 block nothing** — and a founder reading a
 units-blocked table would put them last.
 
@@ -53,7 +53,7 @@ no ledger row.
 
 | Decision | Units blocked | Which | Open since |
 | --- | --- | --- | --- |
-| **G5** — clinical pathway content sign-off | 6 | W161, W162, W163, W186, W249, W251 | Y3 Q13 |
+| **G5** — clinical pathway content sign-off | 8 | W161, W162, W163, W186, W249, W251, SUP-1, SUP-2 | Y3 Q13 |
 | **G6** — public directory launch | 2 | W133, W185 | Y2, via the Ahpra review ask |
 | **G8** — third-party model processing (proposed) | 2 | W146, W147 | Y2 Q8 |
 | **G9** — third-party organisational reporting (proposed) | 2 | W202, W203 | Y3 Q12 |
@@ -62,9 +62,20 @@ no ledger row.
 | **Q17 action 1** — may patients be ordered by anything a model learns | 1 | W217 | Y5 Q17 |
 
 **G5 has been the largest single blocker for three years and has grown**, from four units at W207
-to six now: Y5's two vertical-content units (W249, W251) joined it, because W248 and W250 built
+to eight now: Y5's two vertical-content units (W249, W251) joined it, because W248 and W250 built
 the assembly machinery and left the content where it belongs. That is the machinery working as
 designed and it is also G5 costing more each year it stays shut.
+
+**W335 CORRECTED TWO ROWS THIS DOCUMENT NEVER HELD.** It said sixteen blocked rows and six under
+G5; the ledger holds eighteen and eight. `SUP-1` and `SUP-2` — cohort-level and named-patient
+specialist review, blocked on G5 since W89 — were invisible to the `^\| (W\d+) \|` parse this
+document's own test kept a private copy of, which is the parse W310 fixed everywhere it was shared.
+The document and the check agreed with each other and neither agreed with the tree. Both read the
+ledger through `allLedgerRows` now, and `src/quality/dossier-derived.ts` regenerates this table from
+the same derivation the founder's page uses, so the two can no longer drift apart quietly. **The
+largest single blocker is a third larger than this document has been saying**, which is the same
+sentence W312's horizon wrote about the same two rows one quarter earlier — in a document that could
+not reach this one.
 
 **The Q17 decision is the only one that is not a gate**, and it is the only one whose answer could
 require changing something already published — W201's ADM notice describes what the software

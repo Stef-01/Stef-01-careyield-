@@ -402,6 +402,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/quarter-mutants.ts", text: "sixty-eight mutation sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/quarter-mutants.ts", text: "Six modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/quarter-mutants.ts", text: "two sites", resolution: { kind: "not_a_tree_count" } },
+  { module: "src/quality/dossier-derived.ts", text: "two rows", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "seven re-derive their findings", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/blocked-surface.ts", text: "Eighteen rows", resolution: { kind: "derived", derive: blockedRows } },
   // W315 REMOVED THE SENTENCE THIS CLASSIFIED. Its own new bound moved the total from 22 to 23 on
