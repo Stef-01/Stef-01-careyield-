@@ -90,13 +90,21 @@ describe("W326 every ledger-reading check is watched or excused, both directions
 });
 
 describe("W326 the close is run over the tree the row will be committed into", () => {
+  // A CONSTRUCTED ROW, NOT THIS UNIT'S OWN. The first draft closed `W326` against the real ledger
+  // and every one of these passed — until W326's row was closed, at which point the row was already
+  // `done` on both sides and the difference vanished. A test keyed to the unit's own row is the
+  // class this unit is about, and `verify:close` could not see it: the assertion is welded in a
+  // `.test.ts`, which is the first clause of `CLOSE_GATE_BOUND`. Only the full suite after the
+  // close found it, which is the same way the Q25 close was found.
+  const PLANTED = "| W999 | claimed | builder-A | 2026-08-14T00:00Z | — | a planted row |";
+
   it("reports a check whose answer the close changes", () => {
     const flips: LedgerReader = {
       id: "src/planted/flip.ts::flips",
       why: "y".repeat(130),
-      run: (root) => (ledgerAt(root).includes("| W326 | done |") ? ["the row closed"] : []),
+      run: (root) => (ledgerAt(root).includes("| W999 | done |") ? ["the row closed"] : []),
     };
-    expect(breaksOnClose(ROOT, "W326", [flips]).map((b) => b.what)).toEqual(["the row closed"]);
+    expect(breaksOnClose(ROOT, "W999", [flips], PLANTED).map((b) => b.what)).toEqual(["the row closed"]);
   });
 
   it("does NOT report a check that was already failing, which is the difference that makes it usable", () => {
@@ -108,7 +116,7 @@ describe("W326 the close is run over the tree the row will be committed into", (
       why: "y".repeat(130),
       run: () => ["broken before and after"],
     };
-    expect(breaksOnClose(ROOT, "W326", [always])).toEqual([]);
+    expect(breaksOnClose(ROOT, "W999", [always], PLANTED)).toEqual([]);
   });
 
   it("plants the closing ledger where the check can see it, rather than describing it", () => {
@@ -118,11 +126,11 @@ describe("W326 the close is run over the tree the row will be committed into", (
       id: "src/planted/sha.ts::reads",
       why: "y".repeat(130),
       run: (root) => {
-        const row = ledgerAt(root).split("\n").find((l) => l.startsWith("| W326 | "))!;
+        const row = ledgerAt(root).split("\n").find((l) => l.startsWith("| W999 | "))!;
         return row.includes("0000000") ? ["the planted row carries the closing SHA"] : [];
       },
     };
-    expect(breaksOnClose(ROOT, "W326", [reads]).map((b) => b.what)).toEqual([
+    expect(breaksOnClose(ROOT, "W999", [reads], PLANTED).map((b) => b.what)).toEqual([
       "the planted row carries the closing SHA",
     ]);
   });
