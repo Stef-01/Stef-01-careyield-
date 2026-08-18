@@ -62,6 +62,7 @@ import { unreachedByUnitSuite } from "./unrun";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
 import { SHARED_PARSES, copyDefects } from "./private-copies";
+import { nameDefects } from "./typed-names";
 import { instantDiff } from "./instant";
 import { SURVIVORS_AT_W332 } from "./quarter-mutants";
 
@@ -182,7 +183,7 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     const probe = {
       module: "src/w289-probe.ts",
       name: "PROBE_BOUND" as const,
-      unit: "W9999",
+      unit: "W9999" as const,
       text: "a sentence stating seventeen of something",
       lifting: {
         kind: "remedy" as const,
@@ -235,6 +236,17 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
           run: (planted) => (existsSync(path.join(planted, "node_modules")) ? [1, 2] : [1]),
         },
       ]).length > 0
+    );
+  },
+
+  "src/quality/typed-names.ts": (root) => {
+    // W342's resolution, driven on a constructed tree so the answer is not this tree's zero: a
+    // register naming a module nothing holds must be reported, and the register with no
+    // fabrications declared must report it as unresolved rather than excuse it.
+    void root;
+    return withRoot(
+      { "src/planted/w342-drive.ts": 'export const ROWS = [{ module: "src/planted/absent-forever.ts" }];\n' },
+      (planted) => nameDefects(planted, undefined, []).some((d) => d.kind === "unresolved"),
     );
   },
 

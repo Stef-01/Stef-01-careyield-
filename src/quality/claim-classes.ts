@@ -40,12 +40,14 @@ import { vocabularyDefects } from "./assertion-vocabulary";
 import { equalityDiff } from "./self-defeating";
 import { tautologiesIn } from "./tautology-sweep";
 import { headerSubjectDefects } from "./unit-headers";
+import type { UnitId } from "./typed-names";
 
 /** The document this unit re-reads. */
 export const HORIZON = "docs/HORIZON-Q25.md";
 
 /** A unit id, as the ledger spells it. W318's type, used here for the same reason. */
-export type UnitId = `W${number}`;
+// W342: the type lives in `typed-names.ts` now — it had been written three times.
+export type { UnitId };
 
 /** A row of the horizon's unit table: the class, as the document names it. */
 export interface HorizonClass {

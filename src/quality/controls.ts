@@ -34,16 +34,18 @@ import { quarterModules } from "./quarter-mutants";
 import { uncleanMessage } from "./repository-clean";
 import { endedDeclarations } from "./self-ending";
 import { unrunDefects } from "./unrun";
+import { asUnitId, type UnitId } from "./typed-names";
 
 /** The document this unit re-reads. */
 export const HORIZON = "docs/HORIZON-Q26.md";
 
 /** A unit id, as the ledger spells it. */
-export type UnitId = `W${number}`;
+// W342: the type lives in `typed-names.ts` now — it had been written three times.
+export type { UnitId };
 
 /** A row of the horizon's unit table: the control, as the document names it. */
 export interface HorizonControl {
-  unit: string;
+  unit: UnitId;
   what: string;
 }
 
@@ -56,7 +58,12 @@ export interface HorizonControl {
  */
 export function controlsInHorizon(root: string): HorizonControl[] {
   const doc = readFileSync(path.join(root, HORIZON), "utf8");
-  return [...doc.matchAll(/^\| (W\d+) \| (.+?) \|$/gm)].map((m) => ({ unit: m[1]!, what: m[2]!.trim() }));
+  // W342: narrowed rather than cast. The regex already says the id is `W`-shaped; `asUnitId` is
+  // what makes the TYPE say it, and it throws on a row this parse should never have matched.
+  return [...doc.matchAll(/^\| (W\d+) \| (.+?) \|$/gm)].map((m) => ({
+    unit: asUnitId(m[1]!),
+    what: m[2]!.trim(),
+  }));
 }
 
 /** The document with its markers stripped, so a quoted phrase is matched as text and not as markup. */
@@ -88,7 +95,7 @@ export type Answer =
   | { kind: "not_a_control"; why: string; cites: string };
 
 export interface ControlAnswer {
-  unit: string;
+  unit: UnitId;
   answer: Answer;
 }
 
@@ -275,7 +282,7 @@ export const CONTROL_ANSWERS: readonly ControlAnswer[] = [
 
 /** One line per way the gate fails. */
 export interface ControlDefect {
-  unit: string;
+  unit: UnitId;
   what: string;
 }
 

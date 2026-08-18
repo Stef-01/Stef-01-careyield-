@@ -39,6 +39,7 @@ import { stripComments } from "@/security/reachability";
 import { blankLiterals } from "./scan-text";
 import { testModules } from "./tree-walks";
 import { assertionsIn, enclosingTest } from "./tautology-sweep";
+import type { UnitId } from "./typed-names";
 
 /**
  * The rule, stated so a reviewer can apply it to a fix this detector cannot read.
@@ -164,7 +165,7 @@ export function equalityDiff(
 export interface SelfDefeating {
   id: string;
   /** The unit whose fix it was. */
-  unit: string;
+  unit: UnitId;
   /** The defining property, in one clause — the thing the rule asks for. */
   property: string;
   defect: string;

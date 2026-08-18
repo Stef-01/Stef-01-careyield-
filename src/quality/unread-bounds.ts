@@ -168,6 +168,22 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/typed-names.ts::TYPED_NAME_BOUND",
+    condition: "a register that builds its citations with a template literal is unchecked",
+    reading: {
+      kind: "not_observable",
+      why: "A name that does not exist until the program runs cannot be read out of the program's text, and this register reads text. Evaluating the modules instead would mean importing every register in the tree to look at its values — a different unit, a heavier one, and one that trades a text scan for running code to find out what it says. The two modules that build citations this way are named in the sentence rather than left for the reader to find, which is the most a text scan can honestly do about a name it cannot see.",
+    },
+  },
+  {
+    bound: "src/quality/typed-names.ts::TYPED_NAME_BOUND",
+    condition: "a unit id behind a field nothing else in the tree declares is reported by nobody",
+    reading: {
+      kind: "not_observable",
+      why: "The typing arm compares a field name with the same field name, and a field declared once has nothing to be compared against. The alternative is a rule — every field carrying a unit id must be typed `UnitId` — which is a decision about this tree's conventions rather than a derivation from it, and a register enforcing it would be reporting a preference as a defect. What the tree can honestly say is where it disagrees with itself, and that is what this register says.",
+    },
+  },
+  {
     bound: "src/quality/private-copies.ts::PRIVATE_COPY_BOUND",
     condition: "A copy of either parse written in `scripts/`, in `e2e/`, or in a `.mts` file is invisible to it",
     reading: {

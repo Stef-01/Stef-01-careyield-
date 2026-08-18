@@ -40,7 +40,7 @@ describe("W337 Q26's gate: every control the horizon names is tied or declared",
   });
 
   it("reports a control the horizon names and nothing answers", () => {
-    const arriving = [...found(), { unit: "W399", what: "a control planned by a later quarter" }];
+    const arriving = [...found(), { unit: "W399" as const, what: "a control planned by a later quarter" }];
     expect(controlDefects(ROOT, CONTROL_ANSWERS, arriving)).toEqual([
       { unit: "W399", what: "is named in the horizon and answered nowhere" },
     ]);

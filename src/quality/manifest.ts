@@ -2217,6 +2217,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/typed-names.ts",
+    census: {
+      derives:
+        "Every name-shaped string literal a register declares — a unit id, a repo-relative module path, or a `<file>::<export>` citation — written behind a field name at paren depth zero, anywhere under `src/`.",
+      checkedAgainst:
+        "The tree itself: the ledger for a unit, the filesystem for a module, the file's text for an export. `PLANTED_NAMES` holds the fabrications a probe needs, checked in both directions.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a register naming an absent module is planted and must be reported, beside the same value handed to a call and the same value written in prose, neither of which may be",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No register in this tree names a unit, a module or an export that is not there, and no field carrying a unit id is typed `string` where the tree types its twin strictly.",
+        mutation:
+          "`nameDefects` is given a tree holding a register that names a module the tree does not hold, and must report it.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/private-copies.ts",
     census: {
       derives:

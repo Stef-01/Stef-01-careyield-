@@ -68,6 +68,7 @@ import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
 import { proseClaims } from "./prose-numbers";
 import { PRIVATE_COPY_BOUND, privateCopies } from "./private-copies";
+import { TYPED_NAME_BOUND, nameDefects } from "./typed-names";
 
 /** How a register's stated bound has been shown to be true. */
 export type Blindness =
@@ -237,6 +238,29 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
             // callable module, or the silence proves only that the walk found nothing.
             witnessSeen: source.includes("src/planted/welded.test.ts"),
             controlSeen: source.includes("src/planted/callable.ts"),
+          };
+        },
+      ),
+  },
+
+  "src/quality/typed-names.ts": {
+    kind: "demonstrated",
+    bound: TYPED_NAME_BOUND,
+    witness: "the same absent module named by a template literal, which the scan reads as no name at all",
+    control: "the same absent module written as a plain literal, which it must report",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/w342-built.ts":
+            'const dir = "src/planted";\nexport const BUILT = [{ module: `${dir}/absent-forever.ts` }];\n',
+          "src/planted/w342-plain.ts":
+            'export const PLAIN = [{ module: "src/planted/absent-forever.ts" }];\n',
+        },
+        (root) => {
+          const seen = nameDefects(root, undefined, []).map((d) => `${d.module} ${d.value}`);
+          return {
+            witnessSeen: seen.some((s) => s.startsWith("src/planted/w342-built.ts")),
+            controlSeen: seen.some((s) => s.startsWith("src/planted/w342-plain.ts")),
           };
         },
       ),

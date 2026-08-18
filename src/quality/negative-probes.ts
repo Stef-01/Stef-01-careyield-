@@ -322,6 +322,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/typed-names.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/typed-names.test.ts :: refuses a name handed to a CALL, which is how every probe in this tree fabricates one",
+      plants: "src/planted/absent-forever.ts",
+    },
+  },
+  {
     register: "src/quality/private-copies.ts",
     negative: {
       kind: "already_driven",

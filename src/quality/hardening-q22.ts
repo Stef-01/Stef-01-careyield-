@@ -60,6 +60,7 @@
 // changed, and the one citation repointed is a test-coverage claim.
 
 import { parseLedgerRows } from "./blocked-surface";
+import type { UnitId } from "./typed-names";
 
 /** The lens a finding came from. The gate names three; each one produced something. */
 export type Lens = "code-review" | "security-review" | "simplify";
@@ -73,7 +74,8 @@ export type Lens = "code-review" | "security-review" | "simplify";
  * was deferred to `W299+`, fixed by W301, and still read `deferred` seventeen units later with
  * W298's own test asserting the consolidation it describes.
  */
-export type UnitId = `W${number}`;
+// W342: the type lives in `typed-names.ts` now — it had been written three times.
+export type { UnitId };
 
 /**
  * How a finding was answered, and WHEN somebody has to look again.
@@ -96,7 +98,7 @@ export interface HardeningFinding {
   id: string;
   lens: Lens;
   /** The unit whose diff introduced it. Named, because "somewhere in the quarter" is not a finding. */
-  unit: string;
+  unit: UnitId;
   what: string;
   /** ISO date the finding was raised. */
   raisedOn: string;

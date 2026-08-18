@@ -92,7 +92,9 @@ import { QUARTER_MUTANT_BOUND } from "./quarter-mutants";
 import { DOSSIER_BOUND, dossierDiffFor } from "./dossier-derived";
 import { NAMED_CONDITIONS, UNREAD_BOUND } from "./unread-bounds";
 import { PRIVATE_COPY_BOUND, SHARED_PARSES } from "./private-copies";
+import { PLANTED_NAMES, TYPED_NAME_BOUND } from "./typed-names";
 import { REMEDY_BOUND } from "./self-defeating";
+import type { UnitId } from "./typed-names";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
   throwSpellings,
@@ -151,7 +153,7 @@ export interface StatedBound {
   /** The exported name. Two modules export `SWEEP_BOUND`, so the key is module plus name. */
   name: string;
   /** The unit that stated it — checked against the module's own header and against the ledger. */
-  unit: string;
+  unit: UnitId;
   /** The sentence itself, so the checks read what ships rather than a copy. */
   text: string;
   lifting: Lifting;
@@ -462,6 +464,33 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       },
     },
     numbers: [],
+  },
+  {
+    module: "src/quality/typed-names.ts",
+    name: "TYPED_NAME_BOUND",
+    unit: "W342",
+    text: TYPED_NAME_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the fabrications this register excuses go to none",
+      reads: "the fabrications this register excuses, for one that has stopped being a fabrication",
+      // THE SENTENCE HAS TWO CLAUSES AND ONE OF THEM MOVES. That a name assembled from parts is
+      // invisible is inherent to a text scan and inherited from W267's class. What is live is the
+      // fabrication register: it is the only part of this bound that describes a set the tree can
+      // empty, and the predicate reads it rather than restating it.
+      stillOpen: () => PLANTED_NAMES.length > 0,
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads this module's own declared fabrications, an imported constant: whether a probe still needs a name the tree does not hold is a fact about the probes rather than about any repository, so no root can be handed to it. What lifts it is the last probe losing its fabrication, which is an edit to this register.",
+      },
+    },
+    numbers: [
+      {
+        word: "Nine",
+        kind: "fixed_by_a_gate",
+        why: "How many names in this tree are declared fabrications — inputs a probe hands a detector so the detector can be watched reporting an absence. It counts `PLANTED_NAMES`, the register's own table, and the register checks that table against the tree in both directions on every run, so the number cannot drift without a row being added or going stale. The bound's own predicate reads the same table.",
+      },
+    ],
   },
   {
     module: "src/quality/private-copies.ts",

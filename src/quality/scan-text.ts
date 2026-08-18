@@ -206,6 +206,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "A fold named in prose is not a fold (W168) and a fold quoted inside a fixture is not one either (W295) — both were found the hard way, one per unit, in the same register.",
   },
   {
+    module: "src/quality/typed-names.ts",
+    prep: { comments: "subtracted", literals: "kept" },
+    why: "The subject IS the literal — `unit: \"W318\"` is the citation — so blanking literals would empty the population entirely. Comments are subtracted for the reason this register's own note gives at length: a sentence mentioning W318 is prose, and a register whose notes cite units constantly would otherwise report itself as the tree's largest citation.",
+  },
+  {
     module: "src/quality/private-copies.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "The subject is a ROW REGEX and a `readdirSync` call, both of which live inside literals — blanked, a private copy of the ledger parse is indistinguishable from a module that never touches the ledger, and this register would report a clean tree while every copy it exists to find sat in it. Comments are subtracted because a module explaining what a copy looks like is not one, and the two modules whose notes describe these parses at length are `tree-walks.ts` and this one.",

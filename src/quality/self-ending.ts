@@ -79,7 +79,7 @@ export type Rechecked =
 
 export interface EndingRegister {
   /** The unit that wrote the declarations. */
-  unit: string;
+  unit: UnitId;
   module: string;
   /** The export carrying them. */
   register: string;

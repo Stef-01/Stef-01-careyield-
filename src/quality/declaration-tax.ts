@@ -246,6 +246,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/typed-names.ts",
+    // Asks whether a register's declared names resolve. A planted register shape declares no unit,
+    // module or export name, so it owes this register nothing — an arriving module pays the census,
+    // the blind spot, the negative probe and the drive, and pays nothing here. In the population
+    // because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/private-copies.ts",
     // Asks which modules hold their own copy of a parse this tree shares. A planted register shape
     // holds neither a directory recursion nor a ledger row regex, so it owes this register nothing

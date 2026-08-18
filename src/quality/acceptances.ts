@@ -48,6 +48,7 @@ import { FINDINGS as Q23_FINDINGS } from "./hardening-q23";
 import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
 import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
 import { FINDINGS as W279_REVIEW_FINDINGS } from "./review-w279";
+import type { UnitId } from "./typed-names";
 
 /** One acceptance, flattened out of whichever register holds it. */
 export interface Acceptance {
@@ -74,7 +75,7 @@ export type Rederivation =
 
 export interface AcceptanceRegister {
   /** The unit that wrote the register. */
-  unit: string;
+  unit: UnitId;
   /** The module the register lives in, as the tree spells it. */
   module: string;
   /** The export, or the field carrying the dispositions. */
@@ -84,7 +85,7 @@ export interface AcceptanceRegister {
 }
 
 const hardeningAcceptances = (
-  unit: string,
+  unit: UnitId,
   findings: readonly HardeningFinding[],
 ): Acceptance[] =>
   findings
