@@ -32,7 +32,16 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
-const SKIP_DIRS = new Set([
+/**
+ * The directories no walk in this tree wants, in one place.
+ *
+ * EXPORTED BY W327 BECAUSE THERE WERE THREE ANSWERS TO ONE QUESTION. This set had six entries,
+ * `register-census.ts` kept its own with three, and `self-reference.ts` recursed with none — so
+ * three walks over "the tree" meant three different trees, and the one with no list answered about
+ * `node_modules`. What a walk excludes is a fact about the repository rather than about the walk,
+ * which is why it belongs here and is imported rather than restated.
+ */
+export const EXCLUDED_DIRECTORIES: ReadonlySet<string> = new Set([
   "node_modules",
   ".git",
   ".next",
@@ -40,6 +49,8 @@ const SKIP_DIRS = new Set([
   "playwright-report",
   "reports",
 ]);
+
+const SKIP_DIRS = EXCLUDED_DIRECTORIES;
 
 /** Every file under `dir`, recursively, skipping the directories no walk here wants. */
 function filesUnder(dir: string): string[] {

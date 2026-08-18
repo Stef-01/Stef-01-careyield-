@@ -28,7 +28,7 @@ import path from "node:path";
 import { findInstructionSinks } from "@/security/instruction-sinks";
 import { FIXTURES_FILE, fixtureText, fixtureToken, prepareForScan } from "./scan-text";
 import { type Plantable, withTree } from "./planting";
-import { sourceModules, typescriptFiles } from "./tree-walks";
+import { EXCLUDED_DIRECTORIES, sourceModules, typescriptFiles } from "./tree-walks";
 import { violationReporters } from "./refusal-branches";
 import { namingSites } from "./declaration-tax";
 import { treeWalkingFiles } from "./register-census";
@@ -298,6 +298,21 @@ export function splitDiff(
   };
 }
 
+/**
+ * Every file under `dir`, recursively, minus the directories no walk in this tree wants.
+ *
+ * Q24-CR-7, ANSWERED. This recursed with no exclusions at all, so it walked `node_modules` —
+ * sixty-odd thousand entries — and `statSync` sat outside the `try`, where a broken symlink throws
+ * through a bound predicate rather than being skipped. Both are fixed here rather than passed on
+ * again: W318 retargeted the finding from a range to W325, and W325 retargeted it to this unit
+ * because a walk that answers over the installed dependencies is what "which instant" means.
+ *
+ * IT USES THE SHARED LIST RATHER THAN ONE OF ITS OWN, which is the narrower point. This module
+ * deliberately does not build on the tree walks — every one of them filters on an extension list
+ * this file's own fixture extension is missing from, and that absence is the mechanism. But what a
+ * walk EXCLUDES is a fact about the repository rather than about the walk, so the directory list is
+ * imported while the extension filter stays here.
+ */
 function allFilesUnder(dir: string): string[] {
   let entries: string[];
   try {
@@ -306,8 +321,16 @@ function allFilesUnder(dir: string): string[] {
     return [];
   }
   return entries.flatMap((entry) => {
+    if (EXCLUDED_DIRECTORIES.has(entry)) return [];
     const full = path.join(dir, entry);
-    return statSync(full).isDirectory() ? allFilesUnder(full) : [full];
+    try {
+      return statSync(full).isDirectory() ? allFilesUnder(full) : [full];
+    } catch {
+      // A path `readdirSync` listed and `statSync` cannot resolve is a broken symlink. Skipping it
+      // is the only honest answer: it is not a file this tree holds, and throwing here would take
+      // `SELF_REFERENCE_BOUND.stillOpen` down with it.
+      return [];
+    }
   });
 }
 

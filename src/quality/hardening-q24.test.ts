@@ -134,16 +134,20 @@ describe("W311 the fixed findings are stale, which is how a fix is proved", () =
 });
 
 describe("W311 the findings left open are still open, so the deferral is not a fiction", () => {
-  it("Q24-CR-7: the self-reference walk still stats every entry under the root", () => {
-    // A deferred finding whose defect has quietly gone away is a register describing code that no
-    // longer exists — W258's rule, pointed the other way. If somebody fixes this, this test fails
-    // and the disposition must move to `fixed`.
+  it("Q24-CR-7: the self-reference walk is scoped now, and the disposition says so", () => {
+    // THIS TEST WAS WRITTEN TO FIRE, and it did. It asserted the defect was still there and said in
+    // its own comment that a fix must move the disposition to `fixed`. W327 scoped the walk, this
+    // failed on the same commit, and it is rewritten here as the re-derivation of the fix rather
+    // than of the defect — which is the shape W258 asks for in both directions.
     const source = read("src/quality/self-reference.ts");
     expect(source).toContain("allFilesUnder");
-    expect(source, "node_modules is excluded now, so the finding is fixed").not.toMatch(
-      /allFilesUnder[\s\S]{0,600}node_modules/,
+    expect(source, "the walk stopped excluding anything").toMatch(
+      /allFilesUnder[\s\S]{0,600}EXCLUDED_DIRECTORIES/,
     );
-    expect(finding("Q24-CR-7").disposition.kind).toBe("deferred");
+    // The other consequence: `statSync` inside a `try`, so a broken symlink is skipped rather than
+    // thrown through `SELF_REFERENCE_BOUND.stillOpen`. Driven for real in `instant.test.ts`.
+    expect(source).toMatch(/try \{\s*return statSync/);
+    expect(finding("Q24-CR-7").disposition.kind).toBe("fixed");
   });
 
   it("Q24-CR-8: the founder page still reads the documents at request time", () => {

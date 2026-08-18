@@ -77,6 +77,7 @@ import { coverageDiff } from "./route-coverage";
 import { negativeDiff } from "./negative-probes";
 import { UNEVIDENCED_AT_W293, emptyListDiff } from "./empty-list-sweep";
 import { readerDiff } from "./close-gate";
+import { instantDiff } from "./instant";
 
 /**
  * Everything one module owes the registers that watch it.
@@ -2044,6 +2045,65 @@ export const MANIFEST: readonly ModuleEntry[] = [
       },
     },
     branches: [],
+  },
+  {
+    module: "src/quality/instant.ts",
+    census: {
+      derives:
+        "Every declared control's answer over one copied tree, run twice — once quiet and once with the state a racing worker, an install or a tool would have left behind.",
+      checkedAgainst:
+        "`CONTROLS`, in both directions: a control whose answer moves and is not declared to, and a control declared to move that stood still.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a control reading the installed dependencies is planted and declared stable, beside one declared to move that never does, and each must be reported for its own reason",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No control in this tree answers differently because state outside the tree moved, except the one that is declared to and says which instant it answers at.",
+        mutation:
+          "`instantDiff` is given a planted control that reads `node_modules` and must report it.",
+      },
+    },
+    branches: [
+      {
+        fn: "instantDiff",
+        branch: "moved-and-undeclared",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            instantDiff(process.cwd(), [
+              {
+                id: "src/planted/reads.ts::reads",
+                reads: "the installed dependencies",
+                instant: "x".repeat(40),
+                cannotSee: "y".repeat(40),
+                mayMove: false,
+                run: (root) => (existsSync(path.join(root, "node_modules")) ? [1, 2] : [1]),
+              },
+            ]).length > 0,
+        },
+      },
+      {
+        fn: "instantDiff",
+        branch: "declared-and-still",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            instantDiff(process.cwd(), [
+              {
+                id: "src/planted/still.ts::still",
+                reads: "the working directory",
+                instant: "x".repeat(40),
+                cannotSee: "y".repeat(40),
+                mayMove: true,
+                run: () => [1],
+              },
+            ]).length > 0,
+        },
+      },
+    ],
   },
   {
     module: "src/quality/close-gate.ts",

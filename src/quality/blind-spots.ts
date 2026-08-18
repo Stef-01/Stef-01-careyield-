@@ -29,6 +29,8 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. Constructed trees in a temporary directory.
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { discoverSurfaces } from "@/compliance/surfaces";
 import { copySurfaceMembers } from "@/compliance/copy-y6";
 import { findInstructionSinks } from "@/security/instruction-sinks";
@@ -47,6 +49,7 @@ import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
 import { MANIFEST_BOUND, manifestDiff } from "./manifest";
 import { REMEDY_BOUND, frozenEqualities } from "./self-defeating";
 import { CLOSE_GATE_BOUND, ledgerNamingModules } from "./close-gate";
+import { CONTROLS, INSTANT_BOUND, instantDiff } from "./instant";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
   vocabularyDefects,
@@ -104,6 +107,36 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           };
         },
       ),
+  },
+
+  "src/quality/instant.ts": {
+    kind: "demonstrated",
+    bound: INSTANT_BOUND,
+    witness: "a control that cannot be driven at all, which the register carries and the sweep cannot judge",
+    control: "a control that CAN be driven and moves, which the sweep must report",
+    probe: () => {
+      const undrivable: (typeof CONTROLS)[number] = {
+        id: "src/planted/unreachable.ts::unreachable",
+        reads: "the working directory",
+        instant: "x".repeat(40),
+        cannotSee: "y".repeat(40),
+        mayMove: false,
+        run: null,
+      };
+      const moves: (typeof CONTROLS)[number] = {
+        id: "src/planted/moves.ts::moves",
+        reads: "the installed dependencies",
+        instant: "x".repeat(40),
+        cannotSee: "y".repeat(40),
+        mayMove: false,
+        run: (root) => (existsSync(join(root, "node_modules")) ? [1, 2] : [1]),
+      };
+      const seen = instantDiff(process.cwd(), [undrivable, moves]).map((d) => d.control);
+      return {
+        witnessSeen: seen.includes(undrivable.id),
+        controlSeen: seen.includes(moves.id),
+      };
+    },
   },
 
   "src/quality/close-gate.ts": {

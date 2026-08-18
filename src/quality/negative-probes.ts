@@ -322,6 +322,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/instant.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/instant.test.ts :: reports the other direction: declared to move, and standing still",
+      plants: "src/planted/never-moves.ts::frozen",
+    },
+  },
+  {
     register: "src/quality/acceptances.ts",
     negative: {
       kind: "already_driven",

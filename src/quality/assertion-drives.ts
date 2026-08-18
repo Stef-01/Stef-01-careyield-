@@ -33,7 +33,7 @@
 // FOUNDER GATE (plan §4): nothing crossed. Fabricated declared lists and temporary directories.
 
 import { diffCensus, discoverSurfaces, parseCensus } from "@/compliance/surfaces";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
 import { separatorDiff } from "./citations";
@@ -58,6 +58,7 @@ import { fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
+import { instantDiff } from "./instant";
 
 /**
  * A comparison handed an input it must reject, keyed by the register the census names.
@@ -202,6 +203,24 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // in the tree is then in the wrong spelling, so the arm that must fire is the only arm there
     // is — and the point is that the choice is an argument rather than a constant welded in.
     return vocabularyDefects(root, "not equal []").length > 100;
+  },
+
+  "src/quality/instant.ts": (root) => {
+    // W327's comparison, handed a control that reads the installed dependencies and is declared
+    // stable — which is exactly what `fixtureFiles` was before this unit. The arm that must fire is
+    // the one saying an answer moved with state outside this tree.
+    return (
+      instantDiff(root, [
+        {
+          id: "src/planted/reads-the-install.ts::everything",
+          reads: "the installed dependencies",
+          instant: "x".repeat(40),
+          cannotSee: "y".repeat(40),
+          mayMove: false,
+          run: (planted) => (existsSync(path.join(planted, "node_modules")) ? [1, 2] : [1]),
+        },
+      ]).length > 0
+    );
   },
 
   "src/quality/close-gate.ts": (root) => {

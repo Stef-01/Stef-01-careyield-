@@ -124,9 +124,12 @@ export interface TreeDerivedRegister {
 
 /** W267's census, one entry per module — declared in W305's manifest and re-exported here. */
 import { TREE_DERIVED_REGISTERS } from "./manifest";
+import { EXCLUDED_DIRECTORIES } from "./tree-walks";
 export { TREE_DERIVED_REGISTERS };
 
-const SKIP_DIRS = new Set(["node_modules", ".next", ".git"]);
+// W327: the shared list rather than a third copy. This one held three entries where `tree-walks`
+// held six, so `treeWalkingFiles` and every walk beside it disagreed about what the tree is.
+const SKIP_DIRS = EXCLUDED_DIRECTORIES;
 
 /**
  * Every file under `root` that walks the tree.

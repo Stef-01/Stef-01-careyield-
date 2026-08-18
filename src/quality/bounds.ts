@@ -77,6 +77,7 @@ import { FOUNDER_BOUND } from "@/founder/outstanding";
 import { HARDENING_BOUND as HARDENING_Q24_BOUND } from "./hardening-q24";
 import { CLOSING_BOUND } from "./closing-state";
 import { CLOSE_GATE_BOUND, weldedLedgerTests } from "./close-gate";
+import { CONTROLS, INSTANT_BOUND } from "./instant";
 import { REMEDY_BOUND } from "./self-defeating";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
@@ -219,6 +220,38 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'This covers ONE claim' and 'this unit normalised one' — the unit of the sentence, not a count of anything in the tree. It stays one however many spellings the register grows, which is the distinction W297's own entry draws for 'One assertion per register, driven once'.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/instant.ts",
+    name: "INSTANT_BOUND",
+    unit: "W327",
+    text: INSTANT_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the disturbance grows and says so",
+      reads: "the register, for a control nobody can drive",
+      // The bound's sharpest clause is that the control this unit most wanted to drive cannot be:
+      // a detector reading the repository is demonstrated only by writing to the repository. It
+      // stops being true the day every declared control carries a probe — at which point the
+      // register is a set of demonstrations rather than a set of declarations.
+      stillOpen: () => CONTROLS.some((c) => c.run === null),
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads W327's own declared register, an imported constant: whether a control can be driven is a property of how the control is written rather than of any tree, so no root can be handed to it. What would lift it is a later unit — W328 holds the one row that is undrivable today — making the repository-reading detector demonstrable without writing to the repository, which is an edit to that detector rather than a change to any tree this could be pointed at.",
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'The disturbance is ONE state' and 'the one control this unit most wanted to drive' — the unit of the mechanism and a pointer at a single row, neither counting anything that grows. The disturbance stays one however many controls arrive.",
+      },
+      {
+        word: "two",
+        kind: "rate",
+        why: "'the order two workers finish in' — an illustration of the race, with no pair of workers in this tree it refers to. It stays two however many vitest runs in parallel, because two is what a race takes.",
       },
     ],
   },
