@@ -164,10 +164,12 @@ describe("W329 the unit reads what it inherits, before the close rather than aft
     expect(deferredIn(ALL)).toEqual([]);
     // And the resolver still works, driven on a fabricated deferral rather than on a live one.
     expect(inheritedBy("W334", [...ALL, deferredTo("W334", "PROBE")])).toEqual(["PROBE"]);
+    // `done` rather than `claimed`: the first draft pinned the row's IN-FLIGHT state and went red
+    // the moment W334 closed it — a check keyed to a status its own unit was about to change,
+    // which is W315's class pointed the other way. What matters durably is that the unit was
+    // built, because an empty deferral list means nothing if nobody did the work.
     const row = parseLedgerRows(LEDGER).find((r) => r.id === "W334");
-    expect(row?.status, "W334 is not a row anybody built, so the answer above proves nothing").toBe(
-      "claimed",
-    );
+    expect(row?.status, "W334 is not a row anybody built, so the answer above proves nothing").toBe("done");
   });
 
   it("states what it does not cover", () => {
