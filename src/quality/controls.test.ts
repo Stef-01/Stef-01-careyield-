@@ -7,6 +7,9 @@
 // resolve nothing, report nothing, stay green through a quarter of controls going quiet.
 
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { parseLedgerRows } from "./blocked-surface";
 import { CONTROLS } from "./instant";
 import {
   CONTROL_ANSWERS,
@@ -109,6 +112,26 @@ describe("W337 Q26's gate: every control the horizon names is tied or declared",
     expect(controlDefects(ROOT, stale, [{ unit: "W336", what: "x" }])).toEqual([
       { unit: "W336", what: "waits on W1, which has landed" },
     ]);
+
+    // W349 ADDED THE SECOND CASE, AND A MUTANT IS WHY. The arm above drives `pending` with a `by`
+    // naming a row the ledger has CLOSED, and one case cannot tell a correct lookup from any lookup
+    // that happens to land on a done row: flip `===` to `!==` in `find((r) => r.id === answer.by)`
+    // and the search returns the first row with a DIFFERENT id, which in this ledger is also done,
+    // so the arm reports the same sentence and the suite sees nothing. W332 recorded exactly this
+    // survivor in `claim-classes.ts`, wrote the remedy — drive it again with a row that is NOT done
+    // and require silence — and left it for W331, which did not apply it. W337 then wrote this
+    // module on the same pattern and the hole came with it. A pair separates them: under the mutant
+    // the second lookup lands on some other row that IS done and speaks.
+    const open = parseLedgerRows(readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8")).find(
+      (r) => r.status !== "done",
+    )!;
+    const waiting: ControlAnswer[] = [
+      { unit: "W336", answer: { kind: "pending", by: open.id as `W${number}`, why: "x".repeat(80) } },
+    ];
+    expect(
+      controlDefects(ROOT, waiting, [{ unit: "W336", what: "x" }]),
+      "a control waiting on a row that has NOT landed was reported as expired",
+    ).toEqual([]);
   });
 
   it("reports an argument quoting a sentence the horizon does not hold", () => {

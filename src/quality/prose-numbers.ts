@@ -327,6 +327,12 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // W346: what the fourth walk found on the day it ran — how many pages carry the notice and how
   // many routes the console has. History: `waitingDefects` re-derives the walk on every run, and
   // the route figure is the scale the walk is being measured against rather than a claim about it.
+  // W349: what the Q26 sweep found on the day it ran — the size of the quarter's population and
+  // the part of it the harness can reach. History: `populationDefects` re-derives both on every
+  // run and the difference between them is asserted against `EXCLUDED_AT_W349`, so the sentences
+  // are the finding and the derivations are the check.
+  { module: "src/quality/quarter-mutants-q26.ts", text: "eleven modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/quarter-mutants-q26.ts", text: "ten modules", resolution: { kind: "at_the_unit" } },
   { module: "src/console/waiting.ts", text: "two routes", resolution: { kind: "at_the_unit" } },
   { module: "src/demo/path.ts", text: "two routes", resolution: { kind: "at_the_unit" } },
   { module: "src/demo/path.ts", text: "twenty routes", resolution: { kind: "at_the_unit" } },

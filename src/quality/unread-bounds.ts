@@ -407,6 +407,15 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/quarter-mutants-q26.ts::Q26_MUTANT_BOUND",
+    condition: "nothing checks that excusing them was right",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/quarter-mutants-q26.ts::populationDefects",
+      how: "PARTLY, AND THE HALF IT READS IS THE HALF THAT ROTS. The condition is that a module can be excused from the sweep for a reason nobody tests. `populationDefects` resolves each excusal against the tree — a row pleading that its suite runs the sweep must name a suite that really imports the runner, and a row pleading no sibling suite must name a module that really has none — so an excusal cannot outlive the fact it rests on. What stays unread is whether excusing a module was the right call at all, which is a judgement about how to spend a sweep rather than a property of the tree, and the bound says so in the same sentence. Recorded as read rather than not-observable because the arm that exists is the one that would have caught `runs_the_sweep` becoming the cheap way to shorten any slow run.",
+    },
+  },
+  {
     bound: "src/console/waiting.ts::WAITING_BOUND",
     condition: "EMPTY IS THE PAGE'S OWN WORD AND NOTHING CHECKS IT",
     reading: {

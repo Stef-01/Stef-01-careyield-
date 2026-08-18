@@ -210,6 +210,34 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/quarter-mutants-q26.ts",
+    name: "QUARTER_AT_W349",
+    classification: {
+      kind: "range_bound",
+      why: "The quarter this unit swept, bounding its own population from the first line — `QUARTER_AT_W332`'s shape and its argument, one quarter on. It is a pair of ledger row ids rather than a count, and the suite resolves both ends against the ledger, so a mistyped range fails rather than silently measuring a different quarter.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q26.ts",
+    name: "EXCLUDED_AT_W349",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a module the quarter added gaining or losing a sibling suite, or a suite becoming a mutation run",
+      whyStopping:
+        "A NAMED ROW PER MODULE THE SWEEP CANNOT REACH, each resolved against the tree: the self-referential one must name a suite that really runs the sweep, and the suiteless one must really have no sibling. Neither direction can be satisfied by retyping a digit, which is W304's line. A module joining the excluded set is a module the sweep stopped measuring, and it has to be READ before its row can be written; a module leaving means somebody gave it a suite, which is the event this register exists to notice rather than tolerate.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q26.ts",
+    name: "SURVIVORS_AT_W349",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a mutant surviving that did not before, or a suite improving until one is caught",
+      whyStopping:
+        "`SURVIVORS_AT_W332`'s class, one quarter on and for its reasons: a named list of the mutants the quarter's own suites did not catch, each with its kind and its argument. A new survivor is a change nothing in this tree noticed; a survivor leaving means somebody's test got better and the register should say so. W349 is itself the case for the second half — the run found three and one was the hole W332 recorded in another module and nobody closed.",
+    },
+  },
+  {
     module: "src/quality/unasked-facts.ts",
     name: "UNASKED_AT_W340",
     classification: {

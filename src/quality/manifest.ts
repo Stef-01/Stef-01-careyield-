@@ -455,6 +455,16 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/quarter-mutants-q26.ts",
+    // Derives its population from a walk it does not perform: `quarterModules` walks and
+    // `siblingSuite` resolves, and this module reads the answers. W267's census holds the file that
+    // does the walking rather than every caller of it, and a row here would be a declaration
+    // nothing re-derives — `quarter-mutants.ts`'s own row carries the derivation. It is in the
+    // manifest because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/unasked-facts.ts",
     census: {
       derives:

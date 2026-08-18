@@ -103,6 +103,7 @@ describe("W301 a fifth implementation cannot arrive quietly", () => {
     expect(Object.keys(SEPARATOR_NOT_A_CITATION).sort()).toEqual([
       "src/quality/mutation-sampling.test.ts",
       "src/quality/order-regressions.test.ts",
+      "src/quality/quarter-mutants-q26.test.ts",
       "src/quality/quarter-mutants.test.ts",
     ]);
     for (const [file, why] of Object.entries(SEPARATOR_NOT_A_CITATION)) {
@@ -119,6 +120,7 @@ describe("W301 a fifth implementation cannot arrive quietly", () => {
     expect(diff.undeclared).toEqual([
       "src/quality/mutation-sampling.test.ts",
       "src/quality/order-regressions.test.ts",
+      "src/quality/quarter-mutants-q26.test.ts",
       "src/quality/quarter-mutants.test.ts",
     ]);
   });

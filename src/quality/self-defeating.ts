@@ -128,6 +128,14 @@ export const ARGUED_EQUALITIES: readonly ArguedEquality[] = [
     why: "The same shape as W296's row below and right for the same reason: a NAMED LIST of surviving mutants, each with a kind and an argument. A new survivor over the quarter's modules cannot be absorbed by editing a total — it has to be described, and describing it means reading the change nothing noticed. That is exactly what the frozen-number shape allows and this does not.",
   },
   {
+    id: "src/quality/quarter-mutants-q26.test.ts :: catches every mutant but the ones this register names :: SURVIVORS_AT_W349",
+    why: "W332's row above, one quarter on and right for its reason: a NAMED LIST of surviving mutants, each with a kind and an argument. A new survivor over Q26's modules cannot be absorbed by editing a total — it has to be described, and describing it means reading the change nothing noticed. W349 is the case in point: the run found three, and one of them was a hole W332 had already described in another module.",
+  },
+  {
+    id: "src/quality/quarter-mutants-q26.test.ts :: is smaller than what the quarter added, and says by how much :: EXCLUDED_AT_W349",
+    why: "The difference between what a quarter added and what this harness swept, checked against a NAMED LIST of the modules it cannot reach rather than against a number. A module dropping out of the sweep is the event the assertion is for, and it cannot be absorbed by editing a count: the row has to say which module and why, and `populationDefects` then resolves that reason against the tree.",
+  },
+  {
     id: "src/quality/mutation-sampling.test.ts :: catches all but the survivors this register names :: SURVIVORS_AT_W296",
     why: "A named list of surviving mutants, each with a kind and an argument. A new survivor cannot be absorbed by editing a total — it has to be described — which is precisely what the frozen-number shape allows and this does not.",
   },

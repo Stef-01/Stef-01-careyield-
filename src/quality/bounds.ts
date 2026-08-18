@@ -56,6 +56,7 @@ import { HATCH_BOUND } from "./escape-hatches";
 import { UNASKED_BOUND } from "./unasked-facts";
 import { PAGE_FACT_BOUND } from "./founder-page-facts";
 import { WAITING_BOUND } from "@/console/waiting";
+import { Q26_MUTANT_BOUND } from "./quarter-mutants-q26";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -401,6 +402,73 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The pages a module answering emptiness for the console would have to re-derive, quoted from W334's trade rather than measured here — that walk names four and this sentence borrows the figure to say what the trade costs. History about a closed decision, which is why quoting it is safe.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/quarter-mutants-q26.ts",
+    name: "Q26_MUTANT_BOUND",
+    unit: "W349",
+    text: Q26_MUTANT_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "one because sweeping it runs the sweep, one because the walk that builds mutants could not find its suite",
+      reads: "`quarter-mutants-q26.ts`, for an excluded module the population has taken back",
+      // NOT `inherent`, and the difference from W332's entry is real. Its limits are about what
+      // five textual operators can be, which no change to this tree lifts. THIS one's first clause
+      // is about the modules the harness cannot reach today, and both exclusions are the kind of
+      // thing a unit removes: give `setup-gaps.ts` a sibling suite and it rejoins the population;
+      // measure `quarter-mutants.ts` with something that is not itself and it rejoins too. The
+      // predicate reads the register for an empty exclusion list, because the day it is empty this
+      // sentence is describing a sweep that reaches everything the quarter added.
+      stillOpen: (root) =>
+        /EXCLUDED_AT_W349: readonly Excluded\[\] = \[\s*\{/.test(
+          readFileSync(path.join(root, "src/quality/quarter-mutants-q26.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        // The tree where somebody has reached both: the register declares nothing out of bounds.
+        files: {
+          "src/quality/quarter-mutants-q26.ts":
+            "// W349: Q26's own modules, mutated.\nexport const EXCLUDED_AT_W349: readonly Excluded[] = [];\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one because sweeping it runs the sweep, one because…' and 'a module whose header names the wrong unit' — the unit of the enumeration rather than a count of anything that grows. It stays one per reason however many modules land under each.",
+      },
+      {
+        word: "two",
+        kind: "unit_id",
+        why: "The modules W349 found outside the sweep, fixed at the unit that found them and re-derived by `populationDefects` on every run against `EXCLUDED_AT_W349`. History about a measurement that has happened; a third would be a third unit's finding and its own sentence.",
+      },
+      {
+        word: "five",
+        kind: "fixed_by_a_gate",
+        why: "W296's operator set, which this unit runs rather than defines. It is five because that register says five, and the sentence's point is that whatever the number is, it is not the mutation space — the same borrowing `QUARTER_MUTANT_BOUND` makes one quarter back.",
+      },
+      {
+        word: "eleven",
+        kind: "unit_id",
+        why: "The modules Q26 added, as at W349 and derived by `quarterModules` over the range. Quoted to make the ratio argument against Q25's six; the derivation is checked in the suite, so the sentence cannot drift from it.",
+      },
+      {
+        word: "six",
+        kind: "unit_id",
+        why: "The modules Q25 added, quoted from `QUARTER_AT_W332`'s own run so the two quarters can be compared. History about a closed measurement, which is why quoting it is safe and re-deriving it would say the same thing.",
+      },
+      {
+        word: "thirteen",
+        kind: "fixed_by_a_gate",
+        why: "The size of Q26, which the horizon fixed before the quarter began. Not a measurement: a quarter is thirteen units because the plan laid thirteen rows, and `QUARTER_AT_W349` resolves both ends against the ledger.",
+      },
+      {
+        word: "four",
+        kind: "unit_id",
+        why: "What W296's standing sampler drew from this population when W349 measured it — the figure the bound's last clause is about. `sampledShare` re-derives it in the suite, which is what keeps the comparison honest rather than the sentence.",
       },
     ],
   },

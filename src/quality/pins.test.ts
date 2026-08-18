@@ -22,6 +22,7 @@ import {
 } from "./pins";
 import { REVIEWED_AT_W345 } from "./escape-hatches";
 import { UNASKED_AT_W340 } from "./unasked-facts";
+import { EXCLUDED_AT_W349, SURVIVORS_AT_W349 } from "./quarter-mutants-q26";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { withPlantedIn } from "./planting";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
@@ -89,9 +90,11 @@ describe("W290 the live pins, and why live is not the defect", () => {
     const live = PINS.filter((p) => p.classification.kind === "live_by_design");
     expect(live.map((p) => p.name).sort()).toEqual([
       "BLOCKED_AT_W263",
+      "EXCLUDED_AT_W349",
       "REVIEWED_AT_W345",
       "SURVIVORS_AT_W296",
       "SURVIVORS_AT_W332",
+      "SURVIVORS_AT_W349",
       "UNASKED_AT_W340",
       "UNEVIDENCED_AT_W293",
       "UNPROVEN_AT_W290",
@@ -118,6 +121,10 @@ describe("W290 the live pins, and why live is not the defect", () => {
     // so neither direction can be satisfied by retyping a digit.
     expect(REVIEWED_AT_W345.every((r) => r.id.includes("::"))).toBe(true);
     expect(UNASKED_AT_W340.every((f) => /^src\/.+\.ts::[A-Za-z0-9_]+$/.test(f.id))).toBe(true);
+    // W349's two are the same class one quarter on, and both are named lists rather than figures:
+    // a module the sweep cannot reach, and a mutant its suite did not catch.
+    expect(EXCLUDED_AT_W349.every((e) => e.module.endsWith(".ts"))).toBe(true);
+    expect(SURVIVORS_AT_W349.every((s) => s.id.includes(" :: "))).toBe(true);
   });
 
   it("makes each argue for interrupting somebody, not merely declare itself live", () => {
