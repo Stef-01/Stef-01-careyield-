@@ -748,6 +748,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "`SECOND_READING_BOUND` is reviewer-facing — it argues what a unit-number marker cannot see, and names the stored snapshot this deliberately does not keep. Everything else here is a unit id read off the ledger. The copy is four sentences addressed to the founder about build status, and the state each one belongs to is the whole point: a first reading and a quiet stretch need opposite words.",
   },
   {
+    module: "src/quality/claim-classes.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W324's gate is reviewer-facing: unit ids, module paths, exported names, and the argument for each class the horizon plans. The longest strings on it are QUOTATIONS from a planning document, carried so an argument can be checked against the sentence it rests on. Nothing here renders and no practice sees it.",
+  },
+  {
     module: "src/quality/prose-numbers.ts",
     operatorCopy: [],
     notCopy:

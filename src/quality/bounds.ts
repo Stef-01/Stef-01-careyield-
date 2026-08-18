@@ -65,6 +65,7 @@ import { SCAN_BOUND, fixtureText } from "./scan-text";
 import { SELF_REFERENCE_BOUND, fixtureFiles } from "./self-reference";
 import { CLAIMS, PROSE_BOUND, proseClaims } from "./prose-numbers";
 import { SECOND_READING_BOUND, sinceReading } from "@/founder/second-reading";
+import { CLAIM_CLASS_BOUND } from "./claim-classes";
 import { DEMO_PATH, PATH_BOUND, gateStops } from "@/demo/path";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
 import { CITATION_BOUND } from "./citations";
@@ -151,6 +152,17 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for. W306 added the missing half of the predicate's own check — a bound carrying a constructed tree is driven in the state where its remedy EXISTS, rather than only in the state where it does not — and that is narrower than it reads too: the tree is a fixture written here, so what it shows is that the predicate reads a tree, not that it would recognise the remedy as somebody else will actually build it. The predicates declared to derive nothing from a tree are checked only for refusing to budge, which is weaker again.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/claim-classes.ts",
+    name: "CLAIM_CLASS_BOUND",
+    unit: "W324",
+    text: CLAIM_CLASS_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Two limits, and the first is what makes this gate cheap enough to run at all. A driven answer hands a check the smallest input that should make it speak, so what it proves is that the check speaks — not that it would speak about this tree. Closing that would mean re-running every register against the real tree from inside the gate, which is what the suite already is; a gate that repeats the suite is not a second reading of anything, it is the suite with a longer name. The second is that an argument here is anchored to a sentence in a planning document, and whether that sentence argues what the answer says it argues is a judgement no check makes. Both follow from the gate being a READING between a document and the checks rather than a re-derivation of either, which is the only thing in this tree that reads across that seam. Neither is a state of the tree that some later unit could change.",
+    },
+    numbers: [],
+  },
   {
     module: "src/quality/self-defeating.ts",
     name: "REMEDY_BOUND",
