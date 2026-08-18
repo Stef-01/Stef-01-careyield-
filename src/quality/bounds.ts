@@ -96,6 +96,7 @@ import { PRIVATE_COPY_BOUND, SHARED_PARSES } from "./private-copies";
 import { PLANTED_NAMES, TYPED_NAME_BOUND } from "./typed-names";
 import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SELF } from "./hardening-q26";
 import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
+import { HORIZON_CLAIM_BOUND, Q27_CLAIMS } from "./horizon-claims";
 import { REMEDY_BOUND } from "./self-defeating";
 import type { UnitId } from "./typed-names";
 import {
@@ -494,6 +495,44 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       },
     },
     numbers: [],
+  },
+  {
+    module: "src/quality/horizon-claims.ts",
+    name: "HORIZON_CLAIM_BOUND",
+    unit: "W350",
+    text: HORIZON_CLAIM_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a claim written plainly is invisible here",
+      reads: "the register itself, for a claim it has classified as unread",
+      // THE LIFTABLE CLAUSE IS THE `unread` ARM. That the population is the document's bold, and
+      // that a resolved citation is not a read one, are properties of a text scan and of citation
+      // itself — W258's limit, which no derivation reaches. What moves is the four claims nothing
+      // reads: each says why today, and the day the last of them becomes checkable this sentence
+      // is describing a register that has moved.
+      stillOpen: () => Q27_CLAIMS.some((c) => c.reading.kind === "unread"),
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads this module's own declared classification, an imported constant: whether a claim is read by anything is a judgement somebody wrote down after looking, so no root can be handed to it, and what lifts it is an edit to `Q27_CLAIMS` rather than a change to any repository.",
+      },
+    },
+    numbers: [
+      {
+        word: "three",
+        kind: "unit_id",
+        why: "How many times this tree has refused to scan prose for claims — W168's folds named in comments, W288's assertions quoted in fixtures, W295's patterns quoted in a bound. History about decisions already taken, each recorded in the unit that took it, and the sentence cites them as precedent rather than counting anything live.",
+      },
+      {
+        word: "Four",
+        kind: "unit_id",
+        why: "How many claims are classified `unread` today, which is `unreadClaims().length` and this register's own table. The bound's predicate reads the same arm, so the sentence and the check move together, and the suite names them rather than counting them.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'resolving to `text.includes(\"/\")` and passing for a quarter' — one instance of a shape rather than a count of anything the tree holds. It stays one however many citations the register resolves.",
+      },
+    ],
   },
   {
     module: "src/quality/timelines.ts",

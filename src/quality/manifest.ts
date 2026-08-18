@@ -2237,6 +2237,11 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/horizon-claims.ts",
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/hardening-q26.test.ts",
     census: {
       derives:

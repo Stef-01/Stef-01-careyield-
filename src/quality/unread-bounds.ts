@@ -168,6 +168,22 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/horizon-claims.ts::HORIZON_CLAIM_BOUND",
+    condition: "a claim written plainly is invisible here",
+    reading: {
+      kind: "not_observable",
+      why: "Reading every sentence of a planning document would mean deciding which prose is a claim about the tree, which is a judgement rather than a derivation — the class this tree has refused three times, in W168's folds named in comments, W288's assertions quoted in fixtures and W295's patterns quoted inside a bound. What the register uses instead is the AUTHOR'S OWN emphasis, so the population is chosen by whoever wrote the document rather than by whoever audits it, and a plain claim somebody wants read gets bolded rather than argued about.",
+    },
+  },
+  {
+    bound: "src/quality/horizon-claims.ts::HORIZON_CLAIM_BOUND",
+    condition: "nothing here notices the day one of them becomes checkable",
+    reading: {
+      kind: "not_observable",
+      why: "A claim moves from `unread` to checkable when somebody writes a check that reads it, and no derivation can notice a check that does not exist yet — it would have to know which future assertion answers which sentence. What the tree does instead is put the review on a clock the plan already runs: the next quarter's expansion re-reads this gate, which is the same posture W294 takes with an acceptance's review date rather than a watcher.",
+    },
+  },
+  {
     bound: "src/quality/timelines.ts::TIMELINE_BOUND",
     condition: "a sentence claiming an order and never declared here is unread",
     reading: {

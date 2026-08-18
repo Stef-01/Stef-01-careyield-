@@ -892,6 +892,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W339's register of the conditions this tree's own bounds name and nothing reads. Nobody but a developer reads it. Its longest strings are `UNREAD_RULE`, the argument for each condition and `UNREAD_BOUND`; its inputs are the tree's stated bounds and its own source files, and no patient, condition or appointment reason appears in any of it — the word `condition` here means a state of the repository, not anything clinical.",
   },
   {
+    module: "src/quality/horizon-claims.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W350's gate for Q27: every claim the horizon document emphasises, classified as read by a named check, unread with its reason, or a statement about the plan rather than the tree. Nobody but a developer reads it — the HORIZON is founder-facing and lives in `docs/`, and this module holds only the classification. Its longest strings are the quoted claims, the argument for each and `HORIZON_CLAIM_BOUND`; its inputs are that document and this tree's own check names, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/timelines.ts",
     operatorCopy: [],
     notCopy:
