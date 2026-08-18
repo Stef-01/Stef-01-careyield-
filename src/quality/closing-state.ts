@@ -31,7 +31,7 @@
 // FOUNDER GATE (plan §4): nothing crossed. This reads the ledger, the plan and the tree's own
 // bounds, and plants a rewritten ledger into a temporary copy.
 
-import { readFileSync } from "node:fs";
+import { readFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { parseLedgerRows } from "./blocked-surface";
 import { STATED_BOUNDS, type StatedBound, staleBounds } from "./bounds";
@@ -155,10 +155,17 @@ export function boundsStaleOnClose(
   unit: string,
   bounds: readonly StatedBound[] = STATED_BOUNDS,
 ): string[] {
+  // W331: removed here rather than left to the process sweep. This copies the WHOLE tree per call
+  // and `closeGateDefects` calls it once per unit in flight, so a long run would hold several
+  // hundred megabytes it has finished with. The sweep in `copyTree` is the backstop, not the plan.
   const copy = copyTree(root);
-  return withPlantedIn(copy, { "BUILD-STATE.md": ledger }, () =>
-    staleBounds(copy, bounds).map((d) => `${unit} closing makes ${d.bound} stale: ${d.what}`),
-  );
+  try {
+    return withPlantedIn(copy, { "BUILD-STATE.md": ledger }, () =>
+      staleBounds(copy, bounds).map((d) => `${unit} closing makes ${d.bound} stale: ${d.what}`),
+    );
+  } finally {
+    rmSync(copy, { recursive: true, force: true });
+  }
 }
 
 /**

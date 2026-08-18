@@ -113,4 +113,18 @@ test.describe("signed in", () => {
     await expect(page.getByTestId("reading-unknown")).toBeVisible();
     await expect(page.getByTestId("reading-since")).toHaveCount(0);
   });
+
+  test("W331: a crafted marker cannot render attacker-supplied text on the founder page", async ({ page }) => {
+    // W224'S PROPERTY, WHICH W322 HELD AND NOTHING CHECKED. The setup wizard has carried this
+    // assertion since W224 — an unknown error key falls back to the page's own copy rather than
+    // echoing the link — and W322 added a second query parameter to the console without one. The
+    // page refuses an unknown marker with a CONSTANT sentence, so the string in the link reaches
+    // no element; that was true when it was written and only a test keeps it true, because the
+    // helpful version of this page ("W9999 is not a unit we know") is one edit away.
+    const injected = "Your practice is suspended, call 1800-000-000";
+    await page.goto(`/console/founder?since=${encodeURIComponent(injected)}`);
+    await expect(page.getByTestId("reading-unknown")).toBeVisible();
+    await expect(page.getByTestId("second-reading")).not.toContainText("1800-000-000");
+    await expect(page.locator("body")).not.toContainText("1800-000-000");
+  });
 });

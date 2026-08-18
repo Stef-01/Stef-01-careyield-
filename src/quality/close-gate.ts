@@ -59,6 +59,7 @@ import { PLACEHOLDER_SHA, closeRow, unitsInFlight } from "./closing-state";
 import { blockedSurfaceViolations } from "./blocked-surface";
 import { staleBounds } from "./bounds";
 import { classDefects } from "./claim-classes";
+import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
 import { endedDeclarations } from "./self-ending";
 import { CLAIMS, claimDefects } from "./prose-numbers";
 import { founderDiff } from "@/founder/outstanding";
@@ -116,6 +117,12 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
     id: "src/quality/claim-classes.ts::classDefects",
     why: "W324'S GATE, AND THE REASON THIS UNIT EXISTS. Its `pending` arm reads the ledger for the unit it waits on and fails the moment that row says `done`. It did, at the Q25 close, one commit after a green gate.",
     run: (root) => classDefects(root).map((d) => `${d.unit} ${d.what}`),
+  },
+  {
+    id: "src/quality/hardening-q25.ts::FINDINGS",
+    why: "W331's pass, whose deferrals point at W334 and W336. It is here as its own reader rather than folded into the aggregate above BECAUSE folding it in would not have named the module: `readerDiff` keys on the module in a reader's id, so a register whose findings are checked through somebody else's reader reads as unwatched — which is how W326 reported this one the day it was written.",
+    run: (root) =>
+      overdueDispositions(ledgerOf(root), Q25_FINDINGS, CLOSE_GATE_TODAY).map((d) => `${d.finding} ${d.what}`),
   },
   {
     id: "src/quality/self-ending.ts::endedDeclarations",

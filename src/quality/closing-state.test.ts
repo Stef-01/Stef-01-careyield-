@@ -7,7 +7,7 @@
 // asserted the live tree is clean would prove that the defects are gone and nothing about whether
 // the check would notice them coming back.
 
-import { readFileSync } from "node:fs";
+import { readFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -183,10 +183,15 @@ describe("W315 the tree's own closing state", () => {
     // A copy of the repository rather than a constructed root, because `bounds-not-stale` runs real
     // predicates and needs a real tree.
     const copy = copyTree(ROOT);
-    const claimed = `${LEDGER}\n| W999 | claimed | builder-B | 2026-08-17T00:00Z | — | a note the plan does not state |`;
-    const found = withPlantedIn(copy, { "BUILD-STATE.md": claimed }, () => closingDefects(copy, "notasha"));
-    expect(found.length, "a bad SHA closes cleanly, so nothing is being checked").toBeGreaterThan(0);
-    expect(found.join(" "), "the planted row in flight is not reported").toContain("W999");
+    try {
+      const claimed = `${LEDGER}\n| W999 | claimed | builder-B | 2026-08-17T00:00Z | — | a note the plan does not state |`;
+      const found = withPlantedIn(copy, { "BUILD-STATE.md": claimed }, () => closingDefects(copy, "notasha"));
+      expect(found.length, "a bad SHA closes cleanly, so nothing is being checked").toBeGreaterThan(0);
+      expect(found.join(" "), "the planted row in flight is not reported").toContain("W999");
+    } finally {
+      // W331: the copy is the size of the repository and this test made one per run, unremoved.
+      rmSync(copy, { recursive: true, force: true });
+    }
   });
 
   it("uses a placeholder that is shaped like a hash and is not one", () => {

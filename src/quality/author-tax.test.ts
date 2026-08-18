@@ -8,7 +8,8 @@
 // the better instrument had to be shown DISAGREEING with the old one, over the same population, in
 // both directions — because an instrument that only ever reads lower is a discount, not a measure.
 
-import { describe, expect, it } from "vitest";
+import { rmSync } from "node:fs";
+import { afterAll, describe, expect, it } from "vitest";
 import {
   AUTHOR_TAX_AT_W313,
   MOVED_SINCE_W308,
@@ -30,6 +31,11 @@ import { copyTree, withPlantedIn, withTree } from "./planting";
 const ROOT = process.cwd();
 // One copy for the whole file: every measurement below plants into it and removes what it planted.
 const COPY = copyTree(ROOT);
+
+// W331: the contract `copyTree` states — the caller removes it, and `afterAll` is the usual place.
+// This file did not, and neither did three others; the build box was holding hundreds of copies.
+// `copyTree` now sweeps at process exit as a backstop, and the backstop is not the plan.
+afterAll(() => rmSync(COPY, { recursive: true, force: true }));
 const PLANTED = "src/planted/w313-probe.ts";
 const withShape = <T,>(shape: (typeof SHAPES)[number], probe: () => T): T =>
   withPlantedIn(COPY, { [PLANTED]: SHAPE_BODIES[shape] }, probe);
@@ -140,14 +146,18 @@ describe("W313 the file instrument is not vacuous", () => {
   });
 
   it("counts a file once however many registers send an author to it", () => {
-    // Constructed rather than measured, because the real tree's sharing is what the unit is FOR and
-    // a property proved only on the case it was written for is a property proved once.
-    const homes = [
-      { register: "src/compliance/copy-y6.ts", files: ["src/x.ts"], why: "x" },
-      { register: "src/quality/bounds.ts", files: ["src/x.ts"], why: "x" },
-    ];
-    const files = new Set(homes.flatMap((h) => h.files));
-    expect([...files]).toEqual(["src/x.ts"]);
+    // W331: THIS TEST USED TO ASSERT THAT `Set` DEDUPLICATES. It built a local set from a local
+    // list and checked the set had one entry — true of every JavaScript that has ever run, and
+    // `editSites`, the function whose deduplication is the unit's whole claim, was never called.
+    // The claim is about the instrument, so the instrument is what is driven: two registers whose
+    // declaration homes name the SAME file, both reporting a planted module, counted once.
+    const shared = "src/quality/manifest.ts";
+    const homes = DECLARATION_HOMES.filter((h) => h.files.includes(shared));
+    expect(homes.length, "no two registers share a declaration file, so nothing is being deduped").toBeGreaterThan(1);
+    const sites = withShape("a_full_register", () => editSites(COPY, PLANTED));
+    expect(sites.filter((f) => f === shared), `${shared} is counted once per register that names it`).toEqual([
+      shared,
+    ]);
   });
 });
 
@@ -157,6 +167,13 @@ describe("W313 what the better instrument still does not measure", () => {
     expect(home.why).toMatch(/W305/);
     // A census entry is four sentences and a manifest row for a bare module is three lines, and
     // both count as one file. The instrument is better, not right, and the tree says so.
-    expect(withTree({ "src/planted/x.ts": "// W1: x\nexport const x = 1;\n" }, () => true)).toBe(true);
+    // W331: the line here used to be `expect(withTree({...}, () => true)).toBe(true)` — the only
+    // executable assertion in the test, and it asserts that `true` is `true`. What the sentence
+    // above it claims is checkable: a census entry and a bare manifest row both count as one file,
+    // so the two shapes cost the same by this instrument and differently by any honest reading.
+    const bare = withShape("plain", () => editSites(COPY, PLANTED)).length;
+    const full = withShape("a_full_register", () => editSites(COPY, PLANTED)).length;
+    expect(full, "the instrument cannot tell a full register from a bare module at all").toBeGreaterThan(bare);
+    expect(bare, "a bare module costs nothing, so there is no instrument here").toBeGreaterThan(0);
   });
 });

@@ -236,6 +236,7 @@ export function enclosingTest(code: string, index: number): string {
  * inputs a register exists to report.
  */
 const PRESERVING_OPS = Object.keys(LENGTH_PRESERVING).join("|");
+const NOT_PRESERVING_OPS = Object.keys(NOT_LENGTH_PRESERVING).join("|");
 
 /**
  * `const ys = xs.map(f)` — the one hop this sweep follows, and it follows exactly one.
@@ -245,22 +246,57 @@ const PRESERVING_OPS = Object.keys(LENGTH_PRESERVING).join("|");
  * tracking assignments through a file, which is a type-checker's job; following none would make the
  * shape decidable only in a form nobody uses. The bound says where the line is drawn.
  */
-function preservingBindings(code: string): Map<string, string> {
-  const out = new Map<string, string>();
+interface Binding {
+  name: string;
+  /** The collection the operation was handed. */
+  from: string;
+  /** False for `filter` and the others that can shorten — a REBINDING that invalidates an earlier one. */
+  preserving: boolean;
+  /** Offset of the declaration, so an assertion resolves against what was in scope before it. */
+  index: number;
+}
+
+/**
+ * Every binding of a name to an array operation, in order, preserving or not.
+ *
+ * W331: THIS USED TO BE A FLAT LAST-WRITE-WINS MAP OVER THE WHOLE FILE, and it produced a false
+ * positive — the worst kind this sweep can produce, because acting on one means deleting a real
+ * assertion. A name bound to `xs.map(f)` in one test and rebound to `xs.filter(g)` in a later one
+ * kept the first binding: `filter` is not a preserving op, so it never overwrote, and the later
+ * test's `expect(rows.length).toBe(xs.length)` — a REAL claim about a filter — was reported as a
+ * tautology. Two things fix it together and neither alone: the non-preserving rebindings are
+ * recorded too, so they can shadow; and resolution is positional, so an assertion sees only what
+ * was bound before it. Still no scope analysis, which is what `SWEEP_BOUND` says: a name bound
+ * inside a block and read after it resolves to the inner binding.
+ */
+function preservingBindings(code: string): Binding[] {
+  const out: Binding[] = [];
   const re = new RegExp(
-    `\\b(?:const|let)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:await\\s+)?([A-Za-z_$][\\w$.]*)\\.(?:${PRESERVING_OPS})\\(`,
+    `\\b(?:const|let)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:await\\s+)?([A-Za-z_$][\\w$.]*)\\.(${PRESERVING_OPS}|${NOT_PRESERVING_OPS})\\(`,
     "g",
   );
-  for (const m of code.matchAll(re)) out.set(m[1]!, m[2]!);
+  for (const m of code.matchAll(re)) {
+    out.push({
+      name: m[1]!,
+      from: m[2]!,
+      preserving: m[3]! in LENGTH_PRESERVING,
+      index: m.index ?? 0,
+    });
+  }
   return out;
 }
 
 /** The collection an expression's length comes from, if a length-preserving operation produced it. */
-function preservedFrom(expression: string, bindings: Map<string, string>): string | null {
+function preservedFrom(expression: string, bindings: readonly Binding[], at: number): string | null {
   const bare = expression.replace(/\.length$/, "");
   const direct = new RegExp(`^([A-Za-z_$][\\w$.]*)\\.(?:${PRESERVING_OPS})\\(`).exec(bare);
   if (direct) return direct[1]!;
-  return /^[A-Za-z_$][\w$]*$/.test(bare) ? (bindings.get(bare) ?? null) : null;
+  if (!/^[A-Za-z_$][\w$]*$/.test(bare)) return null;
+  // The NEAREST PRECEDING binding, preserving or not. A `filter` rebinding resolves to null and
+  // the assertion stands, which is the whole of what the flat map got wrong.
+  const seen = bindings.filter((b) => b.name === bare && b.index < at);
+  const last = seen[seen.length - 1];
+  return last && last.preserving ? last.from : null;
 }
 
 export function tautologiesIn(file: string, source: string): Tautology[] {
@@ -304,7 +340,7 @@ export function tautologiesIn(file: string, source: string): Tautology[] {
         (a.matcher === "toHaveLength"
           ? !a.subject.endsWith(".length")
           : ["toBe", "toEqual", "toStrictEqual"].includes(a.matcher) && a.subject.endsWith(".length")) &&
-        preservedFrom(a.subject, bindings) === expectedOf
+        preservedFrom(a.subject, bindings, a.index) === expectedOf
       ) {
         return "length_preserved_by_the_operation";
       }

@@ -31,6 +31,7 @@ import { blockedRows, blockersIn, parseLedgerRows } from "./blocked-surface";
 import { STATED_BOUNDS } from "./bounds";
 import { CLASS_ANSWERS } from "./claim-classes";
 import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
+import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
 import { FINDINGS as Q22_FINDINGS, type HardeningFinding, type UnitId } from "./hardening-q22";
 import { FINDINGS as W279_FINDINGS } from "./review-w279";
 import { prepareForScan } from "./scan-text";
@@ -109,6 +110,17 @@ export const ENDING_REGISTERS: readonly EndingRegister[] = [
       kind: "ended_there_too",
       check: "overdueDispositions",
       why: "W318 reads the same deferrals against the same ledger, and should: a finding's own register is where somebody looking at the finding will be. What is added here is that the deferral is read BESIDE the other things this tree is waiting on, and that a register dropping its own check is visible from outside it.",
+    },
+  },
+  {
+    unit: "W331",
+    module: "src/quality/hardening-q25.ts",
+    register: "FINDINGS",
+    entries: () => deferrals("W331", Q25_FINDINGS),
+    rechecked: {
+      kind: "ended_there_too",
+      check: "overdueDispositions",
+      why: "Q25's pass, arriving one firing after this register was written and reported by it as unregistered on the first run — which is the both-directions arm doing exactly what it is for. Its two deferrals point at W334 and W336, units of this quarter that have not been built.",
     },
   },
   {

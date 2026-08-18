@@ -298,14 +298,16 @@ function headerOf(source: string): string {
  * whole budget rewriting other people's prose. What each row buys instead is that the citation is
  * SEEN: a new one arrives failing, and a declaration for a citation somebody has since attributed
  * fails too, so the list can only shrink by somebody improving a header.
+ *
+ * W331: THREE ENTRIES LEFT WHEN THE OWNERSHIP MAP STOPPED GUESSING. Their names — `SHIPPED_TRIGGERS`,
+ * `WHAT_THIS_DOES_NOT_PROVE`, `SHIPPED_DISCLOSURES` — are each exported by more than one module, so
+ * the citation was never resolvable and the declaration was excusing an attribution nobody could
+ * make. They come back the day one of the duplicate exports goes.
  */
 export const FOREIGN_CITATIONS: readonly string[] = [
   "src/api/refusals.ts::API_REFUSAL_COPY",
   "src/compliance/cdss-boundary.ts::EDUCATION_COPY_MODULES",
   "src/console/zero-states.ts::SILENCE_COPY",
-  "src/education/triggers.ts::SHIPPED_TRIGGERS",
-  "src/interop/conformance.ts::WHAT_THIS_DOES_NOT_PROVE",
-  "src/interop/console.ts::SHIPPED_DISCLOSURES",
   "src/interop/disclosure-ledger.ts::PROPOSED_DISCLOSURE_LOG",
   "src/pathways/registry.ts::SHIPPED_ATTESTATIONS",
   "src/pathways/registry.ts::SHIPPED_PATHWAYS",
@@ -350,14 +352,29 @@ export function headerSubjectDefects(
   declared: readonly string[] = FOREIGN_CITATIONS,
   files: readonly string[] = sourceModules(root),
 ): HeaderSubjectDefect[] {
-  const owner = new Map<string, string>();
+  // W331: A NAME MORE THAN ONE MODULE EXPORTS HAS NO OWNER HERE, and the map used to be
+  // last-write-wins, so it named whichever module the walk happened to see last. Fourteen names in
+  // this tree are exported twice or more — `QUARTER`, `FINDINGS` and `SELF_REVIEWED` once per
+  // hardening register, `SWEEP_BOUND` and `VOCABULARY_BOUND` by two modules each — and the failure
+  // it produced was live: writing `hardening-q25.ts` moved ownership of `SELF_REVIEWED` off
+  // `hardening-q24.ts`, and W311's header was reported for citing its OWN constant as foreign. The
+  // register recording this defect caused it. Silence on an ambiguous name is the honest answer:
+  // reporting one owner out of several is a guess, and the arm that reports the AMBIGUITY as a
+  // defect in its own right is a design question about what a header should say when two modules
+  // own a name, which this pass is not the place to settle.
+  const owners = new Map<string, Set<string>>();
   const read = new Map<string, string>();
   for (const file of files) {
     const rel = path.relative(root, file).split(path.sep).join("/");
     const source = readFileSync(file, "utf8");
     read.set(rel, source);
-    for (const name of screamingExports(source)) owner.set(name, rel);
+    for (const name of screamingExports(source)) {
+      owners.set(name, (owners.get(name) ?? new Set()).add(rel));
+    }
   }
+  const owner = new Map<string, string>(
+    [...owners].flatMap(([name, homes]) => (homes.size === 1 ? [[name, [...homes][0]!] as const] : [])),
+  );
   const out: HeaderSubjectDefect[] = [];
   const seen = new Set<string>();
   for (const [rel, source] of read) {

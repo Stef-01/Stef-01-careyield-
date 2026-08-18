@@ -67,6 +67,7 @@ import { CLAIMS, PROSE_BOUND, proseClaims } from "./prose-numbers";
 import { SECOND_READING_BOUND, sinceReading } from "@/founder/second-reading";
 import { CLAIM_CLASS_BOUND } from "./claim-classes";
 import { CLEAN_BOUND } from "./repository-clean";
+import { Q25_HARDENING_BOUND } from "./hardening-q25";
 import { ENDING_BOUND } from "./self-ending";
 import { DEMO_PATH, PATH_BOUND, gateStops } from "@/demo/path";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
@@ -161,6 +162,38 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for. W306 added the missing half of the predicate's own check — a bound carrying a constructed tree is driven in the state where its remedy EXISTS, rather than only in the state where it does not — and that is narrower than it reads too: the tree is a fixture written here, so what it shows is that the predicate reads a tree, not that it would recognise the remedy as somebody else will actually build it. The predicates declared to derive nothing from a tree are checked only for refusing to budge, which is weaker again.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/hardening-q25.ts",
+    name: "Q25_HARDENING_BOUND",
+    unit: "W331",
+    text: Q25_HARDENING_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "One quarter read by one reader, and the reader wrote six of its units. Nothing this tree can build changes that: independence is a property of WHO reads, and the loop has the builders it has — a second session reading the same quarter would be a different pass, not a lifting of this sentence. The uneven lenses follow from the quarter's content rather than from the pass's effort, since a quarter that adds one page and one query parameter gives a security lens one page and one query parameter. And the last clause is a warning against a comparison, not a limit somebody could remove: a finding count measures how hard a quarter was read at least as much as how well it was built, which is why the record carries the findings and not a total.",
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'One quarter read by one reader' — the unit of the sentence rather than a count of anything in the tree. It stays one however many findings the pass records.",
+      },
+      {
+        word: "six",
+        kind: "unit_id",
+        why: "How many of the quarter's units this reader wrote, which `SELF_REVIEWED` holds by name and this register's suite checks against `REVIEWED_UNITS`. History: the authorship of W313–W325 cannot change, so the number is fixed at the quarter rather than derived from a tree that moves.",
+      },
+      {
+        word: "thirteen",
+        kind: "fixed_by_a_gate",
+        why: "The size of Q25, which `QUARTER` states as a range and the horizon fixed before the quarter began. Not a measurement: a quarter is thirteen units because the plan laid thirteen rows.",
+      },
+      {
+        word: "eleven",
+        kind: "unit_id",
+        why: "Q24's finding count, quoted from that quarter's own pass to make the point that a total is not a comparison. History about a closed register, which is exactly why quoting it is safe and re-deriving it would be pointless.",
+      },
+    ],
+  },
   {
     module: "src/quality/self-ending.ts",
     name: "ENDING_BOUND",

@@ -208,6 +208,3 @@ export const REMEDY_BOUND =
   "lists, W304's register counts — inherits the same ceiling and none of them says so. What the " +
   "sweep buys is that a recurring shape stops recurring; what the rule buys is that a reviewer has " +
   "the question written down.";
-  "what the rule buys is that a reviewer has the question written down.";
-  "shape stops recurring; what the rule buys is that a reviewer has the question written down.";
-  "sample of one quarter read by one reader.";

@@ -212,7 +212,14 @@ export const PROSE_BOUND =
   "filed as history when it was meant as a live count is a mistake nothing here will catch.";
 
 // ---------------------------------------------------------------------------------------------
-// The derivations. Each answers one question a walk can answer, and is used by the rows below.
+// The derivations. Each answers one question a walk can answer, and each is used by a row below.
+//
+// W331: five of these were used by NO row and referenced nowhere — `modulesStatingABound`,
+// `foldModules`, `fullRegisterTax`, `exportedWalks`, `textScanningModules`. The sentence above
+// them said they were used by the rows below, `noUnusedLocals` is off, and so a paragraph of dead
+// tree-walking code sat inside the register whose whole subject is prose that says something the
+// tree does not. Removed rather than wired up: a derivation exists to answer a claim, and there
+// was no claim.
 // ---------------------------------------------------------------------------------------------
 
 const blockedRows = (root: string): number =>
@@ -220,31 +227,10 @@ const blockedRows = (root: string): number =>
     (r) => r.status === "blocked",
   ).length;
 
-/** Distinct modules exporting a `*_BOUND`, read off the tree rather than off W297's register. */
-const modulesStatingABound = (root: string): number =>
-  new Set(
-    sourceModules(root)
-      .filter((f) => /export const [A-Z0-9_]*BOUND\b/.test(readFileSync(f, "utf8")))
-      .map((f) => path.relative(root, f)),
-  ).size;
-
 const acceptanceRegisters = (): number => ACCEPTANCE_REGISTERS.length;
 const acceptedTautologies = (): number => ACCEPTED_TAUTOLOGIES.length;
-const foldModules = (root: string): number => discoverFoldSites(root).length;
 const pageSpecs = (root: string): number => pageSpecFiles(root).length;
-const fullRegisterTax = (): number => TAX_AT_W308.a_full_register;
 const q24Findings = (): number => HARDENING_Q24_FINDINGS.length;
-
-/** Exported walks in `tree-walks.ts` — the module whose header counts them. */
-const exportedWalks = (root: string): number =>
-  [...readFileSync(path.join(root, "src/quality/tree-walks.ts"), "utf8").matchAll(/^export function /gm)]
-    .length;
-
-/** Modules that prepare source text for a scan, which is what `scan-text.ts`'s header counts. */
-const textScanningModules = (root: string): number =>
-  sourceModules(root).filter((f) =>
-    /\b(prepareForScan|stripComments|blankLiterals)\s*\(/.test(readFileSync(f, "utf8")),
-  ).length;
 
 /**
  * Every numeric claim this tree's prose makes, classified.
@@ -255,6 +241,37 @@ const textScanningModules = (root: string): number =>
  * already wrong when it read them.
  */
 export const CLAIMS: readonly DeclaredClaim[] = [
+  {
+    module: "src/quality/hardening-q25.ts",
+    text: "426 copies",
+    // The same measurement as `planting.ts`'s, quoted in the pass that made it. History: the leak
+    // is closed, so the tree can never agree with the number again, and that is the point of it.
+    resolution: { kind: "at_the_unit" },
+  },
+  {
+    module: "src/quality/hardening-q25.ts",
+    text: "Six of the findings",
+    // How many of W331's findings share one shape. A statement about a fixed record — the findings
+    // are the ones the pass raised and no later unit adds to them — so it is history, not a count
+    // of the tree. `FINDINGS` is what a reader checks it against, and the suite reads that list.
+    resolution: { kind: "at_the_unit" },
+  },
+  {
+    module: "src/quality/unit-headers.ts",
+    text: "THREE ENTRIES",
+    // How many declarations left `FOREIGN_CITATIONS` when W331 stopped the ownership map guessing.
+    // What the unit DID, not what the list now holds: the list moves whenever a header improves.
+    resolution: { kind: "at_the_unit" },
+  },
+  {
+    module: "src/quality/planting.ts",
+    text: "426 copies",
+    // What W331's review MEASURED on the build box, not what the tree holds: the number of leaked
+    // `/tmp/tree-*` directories at the moment the leak was found. It is the evidence for the fix
+    // and it is history — the leak is closed, so the tree can never agree with it again, and a
+    // derivation that tried would be counting a state this repository does not contain.
+    resolution: { kind: "at_the_unit" },
+  },
   { module: "src/capacity/copy-lint.ts", text: "five modules", resolution: { kind: "at_the_unit" } },
   { module: "src/compliance/cdss-boundary.ts", text: "nine modules", resolution: { kind: "at_the_unit" } },
   { module: "src/compliance/cdss-boundary.ts", text: "six files", resolution: { kind: "at_the_unit" } },
@@ -298,7 +315,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/privacy/erasure-y5.ts", text: "thirty-seven modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "five registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "Five registers", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/acceptances.ts", text: "nine registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
+  { module: "src/quality/acceptances.ts", text: "ten registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
   { module: "src/quality/assertion-vocabulary.ts", text: "fifty-two sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/close-gate.ts", text: "four modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "six entries", resolution: { kind: "at_the_unit" } },

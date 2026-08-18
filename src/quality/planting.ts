@@ -155,8 +155,29 @@ export interface CopyOptions {
  * is the only function here that hands back a path — what it hands back is a temp directory, so the
  * thing the gate calls impossible is planting into the REPOSITORY, not holding a copy.
  */
+/**
+ * Copies made this process, removed when it exits.
+ *
+ * W331's finding, and the number is why it is a sweep rather than a note. `copyTree`'s contract
+ * says the caller removes it and `afterAll` is the usual place — and four callers did not, one of
+ * them copying the whole tree PER CALL. The build box was holding 426 copies and 3.6 GB of `/tmp`.
+ * A contract that four of its callers get wrong is a contract the harness should keep instead:
+ * W303's own words are that a probe left behind by an interrupted run is made impossible rather
+ * than cleaned up, and the same argument applies one level up. Callers that already remove their
+ * copy still should — this frees during the run, the sweep only catches what is left.
+ */
+const copies: string[] = [];
+let sweeping = false;
+
 export function copyTree(root: string, options: CopyOptions = {}): string {
   const copy = mkdtempSync(path.join(tmpdir(), "tree-"));
+  copies.push(copy);
+  if (!sweeping) {
+    sweeping = true;
+    process.once("exit", () => {
+      for (const dir of copies) rmSync(dir, { recursive: true, force: true });
+    });
+  }
   for (const dir of options.directories ?? COPIED_DIRECTORIES) {
     try {
       cpSync(path.join(root, dir), path.join(copy, dir), { recursive: true });
