@@ -79,7 +79,7 @@ import { negativeDiff } from "./negative-probes";
 import { UNEVIDENCED_AT_W293, emptyListDiff } from "./empty-list-sweep";
 import { readerDiff } from "./close-gate";
 import { instantDiff } from "./instant";
-import { dispositionDefects } from "./deferrals";
+import { dispositionDefects, registerDiff } from "./deferrals";
 import { OUTSTANDING_HEADING, dossierDiff } from "./dossier-derived";
 
 /**
@@ -2360,8 +2360,43 @@ export const MANIFEST: readonly ModuleEntry[] = [
   },
   {
     module: "src/quality/deferrals.ts",
-    census: null,
-    branches: [],
+    census: {
+      derives:
+        "W343: every module in the tree whose name is a hardening pass's and which exports a `FINDINGS` register — the passes whose findings the clock has to collect.",
+      checkedAgainst:
+        "`COLLECTED_HARDENING_REGISTERS`, the names the callers of `allHardeningFindings` collect, in both directions: a pass the tree holds and nobody collects fails, and a collected name the tree no longer holds fails too.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a hardening register is planted in a copied tree beside a module with the same name shape and no findings, and only the first may be reported",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No hardening pass records findings that the deferral clock and W318's overdue arm never see.",
+        mutation:
+          "`registerDiff` is given the collected list with one pass removed and must report that pass as uncollected.",
+      },
+    },
+    branches: [
+      {
+        fn: "registerDiff",
+        branch: "uncollected",
+        reach: {
+          kind: "driven",
+          drive: () => registerDiff(process.cwd(), []).uncollected.length > 0,
+        },
+      },
+      {
+        fn: "registerDiff",
+        branch: "stale",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            registerDiff(process.cwd(), ["src/quality/hardening-q99.ts"]).stale.length > 0,
+        },
+      },
+    ],
   },
   {
     module: "src/quality/instant.ts",

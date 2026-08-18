@@ -14,18 +14,24 @@ import {
   type UnitStanding,
   citedUnits,
   dispositionDefects,
+  hardeningRegisterModules,
   inheritedBy,
+  registerDiff,
 } from "./deferrals";
 import { type HardeningFinding, allHardeningFindings, overdueDispositions } from "./hardening-q22";
 import { FINDINGS as Q22_FINDINGS } from "./hardening-q22";
 import { FINDINGS as Q23_FINDINGS } from "./hardening-q23";
 import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
 import { FINDINGS as W279_FINDINGS } from "./review-w279";
+import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
+import { FINDINGS as Q26_FINDINGS } from "./hardening-q26";
 import { parseLedgerRows } from "./blocked-surface";
+import { COLLECTED_HARDENING_REGISTERS } from "./hardening-q22";
+import { withTree } from "./planting";
 
 const ROOT = process.cwd();
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
-const ALL = allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, W279_FINDINGS]);
+const ALL = allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, Q25_FINDINGS, Q26_FINDINGS, W279_FINDINGS]);
 
 /** A finding with the disposition under test and nothing else that matters. */
 const deferredTo = (by: `W${number}`, id = "PLANTED-1"): HardeningFinding => ({
@@ -170,6 +176,35 @@ describe("W329 the unit reads what it inherits, before the close rather than aft
     // built, because an empty deferral list means nothing if nobody did the work.
     const row = parseLedgerRows(LEDGER).find((r) => r.id === "W334");
     expect(row?.status, "W334 is not a row anybody built, so the answer above proves nothing").toBe("done");
+  });
+
+  it("collects every hardening register the tree holds, both directions", () => {
+    // W343 ANSWERING W339'S OWED CONDITION, and the condition was TRUE when it came to be answered:
+    // four call sites each wrote `[Q22, Q23, Q24, W279]` by hand while the tree held six registers,
+    // so Q25's pass and Q26's own were outside this clock and W318's for two quarters.
+    expect(registerDiff(ROOT, [...COLLECTED_HARDENING_REGISTERS])).toEqual({ uncollected: [], stale: [] });
+    // Non-vacuity: the arm that matters is the one that fires when a pass forgets to add itself.
+    const forgot = registerDiff(ROOT, COLLECTED_HARDENING_REGISTERS.filter((m) => !m.endsWith("q26.ts")));
+    expect(forgot.uncollected, "a pass nobody collects is invisible again").toEqual([
+      "src/quality/hardening-q26.ts",
+    ]);
+    expect(registerDiff(ROOT, [...COLLECTED_HARDENING_REGISTERS, "src/quality/hardening-q99.ts"]).stale).toEqual(
+      ["src/quality/hardening-q99.ts"],
+    );
+  });
+
+  it("finds a hardening register that ARRIVES, which is what the collectors have to keep up with", () => {
+    const found = withTree(
+      {
+        "src/quality/hardening-q99.ts": "export const FINDINGS = [];\n",
+        "src/quality/hardening-q98.ts": "export const NOTES = [];\n",
+      },
+      (root) => hardeningRegisterModules(root),
+    );
+    expect(found, "a pass that records findings is not seen").toContain("src/quality/hardening-q99.ts");
+    expect(found, "a module with the name and no findings is counted anyway").not.toContain(
+      "src/quality/hardening-q98.ts",
+    );
   });
 
   it("states what it does not cover", () => {

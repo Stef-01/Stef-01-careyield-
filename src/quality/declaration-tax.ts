@@ -246,6 +246,13 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/deferrals.ts",
+    // Asks which hardening passes the clock collects. A planted register shape is not a hardening
+    // pass and records no findings, so it owes this register nothing. In the population because the
+    // census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/typed-names.ts",
     // Asks whether a register's declared names resolve. A planted register shape declares no unit,
     // module or export name, so it owes this register nothing — an arriving module pays the census,

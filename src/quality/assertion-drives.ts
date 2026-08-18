@@ -63,6 +63,7 @@ import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
 import { SHARED_PARSES, copyDefects } from "./private-copies";
 import { nameDefects } from "./typed-names";
+import { registerDiff } from "./deferrals";
 import { instantDiff } from "./instant";
 import { SURVIVORS_AT_W332 } from "./quarter-mutants";
 
@@ -237,6 +238,12 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
         },
       ]).length > 0
     );
+  },
+
+  "src/quality/deferrals.ts": (root) => {
+    // W343's comparison with nothing collected, which is the state where every hardening pass in
+    // the tree is outside the clock — the sentence `DEFERRAL_BOUND` carried for two quarters.
+    return registerDiff(root, []).uncollected.length > 0;
   },
 
   "src/quality/typed-names.ts": (root) => {

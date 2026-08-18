@@ -32,8 +32,11 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. This reads the ledger and the tree's own findings.
 
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { parseLedgerRows } from "./blocked-surface";
 import type { HardeningFinding } from "./hardening-q22";
+import { typescriptFiles } from "./tree-walks";
 
 /** Where a cited unit stands in the ledger, at the moment this runs. */
 export type UnitStanding = "landed" | "in_flight" | "waiting" | "blocked" | "absent";
@@ -161,6 +164,49 @@ export function dispositionDefects(
 }
 
 /** What a green register does not prove. */
+/**
+ * Every module in the tree that records hardening findings, derived from the tree.
+ *
+ * W343 ANSWERS W339'S OWED CONDITION, and the condition was live when it came to answer it: the
+ * four places that call `allHardeningFindings` each hand in the same hand-written list of four
+ * registers, and by W343 the tree held SIX. Q25's pass and Q26's own were invisible to the clock
+ * that reads deferrals and to W318's overdue arm — the exact sentence `DEFERRAL_BOUND` had been
+ * carrying since W329, in a register nobody had compared with the tree.
+ *
+ * A module counts when its name is a hardening pass's and it exports a `FINDINGS` register. Derived
+ * rather than listed, because a list of the lists is the thing that went stale.
+ */
+export function hardeningRegisterModules(root: string): string[] {
+  return typescriptFiles(root)
+    .map((file) => path.relative(root, file).split(path.sep).join("/"))
+    .filter((module) => /^src\/quality\/(hardening-q\d+|review-w\d+)\.ts$/.test(module))
+    .filter((module) => readFileSync(path.join(root, module), "utf8").includes("export const FINDINGS"))
+    .sort();
+}
+
+/** A hardening register the collected findings do not include, or one that has gone. */
+export interface RegisterDiff {
+  /** A pass whose findings never reach `allHardeningFindings` — the bound's own third clause. */
+  uncollected: string[];
+  /** A declared register the tree no longer holds. */
+  stale: string[];
+}
+
+/**
+ * The registers a caller collects, against the registers the tree holds, in both directions.
+ *
+ * Takes the collected modules by name rather than the findings themselves: a finding array carries
+ * no address, so comparing the arrays could only ever count them, and W290's rule applies — a NAMED
+ * list moves deliberately and a count moves by accident.
+ */
+export function registerDiff(root: string, collected: readonly string[]): RegisterDiff {
+  const held = hardeningRegisterModules(root);
+  return {
+    uncollected: held.filter((m) => !collected.includes(m)).sort(),
+    stale: collected.filter((m) => !held.includes(m)).sort(),
+  };
+}
+
 export const DEFERRAL_BOUND =
   "It resolves the unit a disposition NAMES and says where that unit stands. It cannot say whether " +
   "the unit is the right one: a finding about the founder's page deferred to a unit about ledger " +
@@ -172,5 +218,9 @@ export const DEFERRAL_BOUND =
   "from W318 one commit later at the close. Making it fail would break a tree for work not yet " +
   "done, so what stands between a deferral and a builder who ignores it is `verify:close`, which " +
   "runs W318's arm over the closing ledger. THIRD, IT READS THE REGISTERS IT IS HANDED. A hardening " +
-  "pass whose findings never reach `allHardeningFindings` is invisible here, exactly as it is to " +
-  "W318, and both inherit that from the same argument list.";
+  "pass whose findings never reach `allHardeningFindings` was invisible here, exactly as it was to " +
+  "W318, and both inherited that from the same argument list — which is how Q25's and Q26's passes " +
+  "sat outside the clock for two quarters. W343 reads it: `registerDiff` compares the modules a " +
+  "caller collects with the hardening registers the tree HOLDS, both directions, so a pass that " +
+  "forgets to add itself fails rather than going quiet. What stays unread is the sentence's first " +
+  "clause, which no derivation can reach.";

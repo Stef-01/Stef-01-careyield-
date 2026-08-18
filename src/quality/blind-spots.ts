@@ -69,6 +69,7 @@ import { splitSites } from "./self-reference";
 import { proseClaims } from "./prose-numbers";
 import { PRIVATE_COPY_BOUND, privateCopies } from "./private-copies";
 import { TYPED_NAME_BOUND, nameDefects } from "./typed-names";
+import { DEFERRAL_BOUND, hardeningRegisterModules } from "./deferrals";
 
 /** How a register's stated bound has been shown to be true. */
 export type Blindness =
@@ -238,6 +239,27 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
             // callable module, or the silence proves only that the walk found nothing.
             witnessSeen: source.includes("src/planted/welded.test.ts"),
             controlSeen: source.includes("src/planted/callable.ts"),
+          };
+        },
+      ),
+  },
+
+  "src/quality/deferrals.ts": {
+    kind: "demonstrated",
+    bound: DEFERRAL_BOUND,
+    witness: "a module named like a hardening pass that records no findings",
+    control: "a module named like one that does, which the walk must report",
+    probe: () =>
+      withRoot(
+        {
+          "src/quality/hardening-q98.ts": "export const NOTES = [];\n",
+          "src/quality/hardening-q99.ts": "export const FINDINGS = [];\n",
+        },
+        (root) => {
+          const seen = hardeningRegisterModules(root);
+          return {
+            witnessSeen: seen.includes("src/quality/hardening-q98.ts"),
+            controlSeen: seen.includes("src/quality/hardening-q99.ts"),
           };
         },
       ),

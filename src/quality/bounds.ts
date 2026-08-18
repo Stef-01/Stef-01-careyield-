@@ -657,6 +657,11 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         kind: "rate",
         why: "'deferred to a unit about something else', 'only a reader who understands both', 'W318's arm', 'one commit later' — the sentence uses `one` for a single instance of a shape rather than as a count of anything the tree holds. It stays one however many dispositions arrive, because it is the unit of the illustration.",
       },
+      {
+        word: "two",
+        kind: "unit_id",
+        why: "How long Q25's and Q26's passes sat outside this clock before W343 read the sentence against what the callers actually collected — two quarters, which is history about a gap that is now closed. `registerDiff` compares the collected registers with the ones the tree holds on every run, so the sentence cannot go stale again without failing.",
+      },
     ],
   },
   {

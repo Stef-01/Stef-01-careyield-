@@ -238,11 +238,11 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
   },
   {
     bound: "src/quality/deferrals.ts::DEFERRAL_BOUND",
-    condition: "A hardening pass whose findings never reach `allHardeningFindings` is invisible here",
+    condition: "A hardening pass whose findings never reach `allHardeningFindings` was invisible here",
     reading: {
-      kind: "owed",
-      by: "W343",
-      why: "RE-POINTED AT W340'S CLOSE, WHICH IS THIS REGISTER'S CONTROL FIRING. W339 read the condition as W340's subject — a hardening register nobody passes in has zero readers — and W340 landed without answering it, because its population is `reachableFromApp`'s: a hardening register is not on a request-serving path, so it falls outside that register entirely and its own bound says so in the clause about the larger half of the tree. The machinery W340 built does reach this — `namedImports` and `resolveFirstParty` count readers of any export anywhere — so the condition is observable and the answer is a different population rather than a different technique. W343 is Q26's hardening pass, which is where a finding register that composes into nothing is read, and it has not landed.",
+      kind: "read_by",
+      check: "src/quality/deferrals.ts::registerDiff",
+      how: "W343 ANSWERED IT, AND THE CONDITION WAS TRUE WHEN IT DID. The sentence had been carried since W329 while four call sites each hand-wrote the same list of four registers — so Q25's pass and Q26's own never reached this clock or W318's, for two quarters, in the register that states the risk. `registerDiff` compares the modules a caller collects with the hardening registers the tree HOLDS, in both directions, and the collected names live once beside the collector. What is still unread is the sentence's first clause, that a deferral can name the wrong unit and resolve perfectly, which no derivation can reach.",
     },
   },
   {

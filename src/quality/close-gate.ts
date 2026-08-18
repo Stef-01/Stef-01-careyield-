@@ -78,6 +78,7 @@ import {
 import { FINDINGS as Q23_FINDINGS } from "./hardening-q23";
 import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
 import { FINDINGS as W279_FINDINGS } from "./review-w279";
+import { FINDINGS as Q26_FINDINGS } from "./hardening-q26";
 
 /** The ledger's parse entry points. A module naming one of these reads the ledger. */
 export const LEDGER_PRIMITIVES = [
@@ -142,7 +143,7 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
     run: (root) =>
       overdueDispositions(
         ledgerOf(root),
-        allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, W279_FINDINGS]),
+        allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, Q25_FINDINGS, Q26_FINDINGS, W279_FINDINGS]),
         CLOSE_GATE_TODAY,
       ).map((d) => `${d.finding} ${d.what}`),
   },
@@ -152,7 +153,7 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
     run: (root) =>
       dispositionDefects(
         ledgerOf(root),
-        allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, W279_FINDINGS]),
+        allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, Q25_FINDINGS, Q26_FINDINGS, W279_FINDINGS]),
       ).map((d) => `${d.finding} ${d.what}`),
   },
   {

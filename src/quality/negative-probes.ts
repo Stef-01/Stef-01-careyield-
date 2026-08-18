@@ -322,6 +322,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/deferrals.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/deferrals.test.ts :: finds a hardening register that ARRIVES, which is what the collectors have to keep up with",
+      plants: "src/quality/hardening-q98.ts",
+    },
+  },
+  {
     register: "src/quality/typed-names.ts",
     negative: {
       kind: "already_driven",

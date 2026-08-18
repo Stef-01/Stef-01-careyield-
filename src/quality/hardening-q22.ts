@@ -270,6 +270,24 @@ export function allHardeningFindings(
   return registers.flat();
 }
 
+/**
+ * The modules whose findings the callers of `allHardeningFindings` collect.
+ *
+ * W343: THE ARGUMENT LIST WAS COPIED FOUR TIMES AND HAD BEEN WRONG FOR TWO QUARTERS. Every caller
+ * wrote `[Q22, Q23, Q24, W279]` by hand, so Q25's pass and Q26's own never reached the clock that
+ * reads deferrals — the third clause of `DEFERRAL_BOUND`, live in the register that states it. The
+ * names live here, beside the collector, and `registerDiff` compares them with the hardening
+ * registers the tree actually holds.
+ */
+export const COLLECTED_HARDENING_REGISTERS: readonly string[] = [
+  "src/quality/hardening-q22.ts",
+  "src/quality/hardening-q23.ts",
+  "src/quality/hardening-q24.ts",
+  "src/quality/hardening-q25.ts",
+  "src/quality/hardening-q26.ts",
+  "src/quality/review-w279.ts",
+];
+
 export interface OverdueDisposition {
   finding: string;
   what: string;
