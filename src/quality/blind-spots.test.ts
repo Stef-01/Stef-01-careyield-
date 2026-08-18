@@ -139,7 +139,12 @@ describe("W295 a stated bound is planted, and the register stays silent", () => 
     // W317 attempted a witness for its own bound, found the fixture was REPORTED rather than
     // missed, and recorded the attempt as `undemonstrated` instead of shipping a witness that
     // refutes the sentence it was meant to support.
-    expect(ofKind("undemonstrated").length).toBeLessThanOrEqual(38);
+    //
+    // W345 RATCHETED IT BACK DOWN TO 35, which is what a ceiling is for. Three entries were behind
+    // `NOT_CALLABLE` while their module exported a detector taking a root; each is now demonstrated
+    // by a plant, and leaving the ceiling at 38 would have left room for them to drift back without
+    // anybody writing a reason.
+    expect(ofKind("undemonstrated").length).toBeLessThanOrEqual(35);
     expect(falseBounds(Object.fromEntries(ofKind("undemonstrated")))).toEqual([]);
   });
 });

@@ -22,10 +22,13 @@
 // run is silent about by construction. W292 plants a negative to show a detector is not too broad;
 // this plants a negative the detector is ADMITTED to miss, and requires the admission to be true.
 //
-// SOME ARE DEMONSTRATED AND MOST ARE NOT, and the split is W289's structural one: a
-// register whose detector is not callable from outside cannot be given a witness. Each undemonstrated
-// entry says so and states its bound anyway, because a bound nobody wrote down is worse than one
-// nobody has planted.
+// SOME ARE DEMONSTRATED AND MOST ARE NOT, and there are TWO reasons rather than one. W289's is
+// structural: a register whose detector is not callable from outside cannot be given a witness.
+// W345 found the second by re-reading the first — this register demonstrates by SILENCE, so a bound
+// about what a detector reports WRONGLY cannot be demonstrated here however callable it is, because
+// planting its witness produces a hit and a hit is read as a refutation. Each undemonstrated entry
+// names which of the two it is and states its bound anyway, because a bound nobody wrote down is
+// worse than one nobody has planted.
 //
 // FOUNDER GATE (plan §4): nothing crossed. Constructed trees in a temporary directory.
 
@@ -34,7 +37,10 @@ import { join } from "node:path";
 import { discoverSurfaces } from "@/compliance/surfaces";
 import { copySurfaceMembers } from "@/compliance/copy-y6";
 import { findInstructionSinks } from "@/security/instruction-sinks";
+import { reachableFrom } from "@/security/reachability";
+import { diffReach } from "@/security/page-reach";
 import { TREE_DERIVED_REGISTERS, treeWalkingFiles } from "./register-census";
+import { textFiles } from "./tree-walks";
 import { discoverFoldSites } from "./order-independence";
 import { headerViolations } from "./unit-headers";
 import { pageSuiteViolations } from "./page-suite";
@@ -82,9 +88,29 @@ export type Blindness =
   /** The detector is not callable from outside, so no witness can be handed to it. */
   | { kind: "undemonstrated"; bound: string; whyNotPlantable: string };
 
-/** Same sentence for the same defect — W267's posture for its unproven walks. */
-const NOT_CALLABLE =
+/**
+ * Same sentence for the same defect — W267's posture for its unproven walks.
+ *
+ * EXPORTED SINCE W345, because it is a CLAIM ABOUT THE TREE and not a shrug: it says the module
+ * exports no detector taking a root, so no witness can be handed in. That is derivable, and nine
+ * entries were using it while their module had gained exactly such an export. A shared sentence is
+ * a convenience until it becomes the thing nobody re-reads.
+ */
+export const NOT_CALLABLE =
   "The detector and its comparison both live inside this register's own `.test.ts`, which exports nothing, so there is no way to hand it a witness from here. W289's remedy applies unchanged: export the scan from a module taking a root, and the bound below becomes a two-line plant.";
+
+/**
+ * The OTHER reason a bound goes undemonstrated, and W345 is where it got its own sentence.
+ *
+ * THE SHAPE ABOVE DEMONSTRATES ONLY ONE OF THE TWO ERRORS. A witness is planted and SILENCE proves
+ * the bound — so a bound about what a register FAILS TO REPORT can be demonstrated here and a bound
+ * about what it reports WRONGLY cannot, because the planted witness comes back as a hit and a hit
+ * is this register's word for refuted. Two entries sat behind `NOT_CALLABLE` for this reason while
+ * their detectors were callable the whole time; both were driven at W345 and both returned their
+ * witness exactly as their own bound says they would.
+ */
+export const NOT_A_SILENCE =
+  "The bound is about a FALSE POSITIVE — the register reporting something real as a defect — and this register demonstrates by silence, so planting the witness produces a hit and a hit is read here as a refutation rather than as a demonstration. The detector is callable and the witness plants cleanly: what is missing is an arm that demonstrates a bound by NOISE, which is a change to `Blindness` rather than to the module below, and it is a change W345 declined to make inside a re-reading.";
 
 const LEDGER_ROW = "| W1 | done | builder-A | 2026-08-14T00:00Z | abc1234 | a row |";
 
@@ -693,24 +719,60 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
       "A witness would be a declaration that got cheaper without moving, and 'cheaper' is a judgement about how much writing a reader has to do rather than a property a planted module can carry. Fabricating one would be writing the answer into the fixture, which is the detector W279 refused to tune. `TAX_BOUND` says the same thing in the register's own words.",
   },
   "src/security/reachability.ts": {
-    kind: "undemonstrated",
+    kind: "demonstrated",
     bound:
       "Reach follows STATIC imports. A module pulled in by a dynamic `import()` inside a function body, or by a string path assembled at runtime, is reachable from a request and unreachable from this walk — which is the one direction that matters, because it is how a dormant module wakes up unnoticed.",
-    whyNotPlantable: NOT_CALLABLE,
+    witness: "a module a planted page reaches ONLY through an `await import()` inside its body",
+    control: "one the same page reaches through a static import at the top of the file",
+    probe: () =>
+      withRoot(
+        {
+          "app/planted/page.tsx":
+            'import { statik } from "@/planted/statik";\nexport default async function P() { const { dyn } = await import("@/planted/dyn"); return statik + dyn; }\n',
+          "src/planted/statik.ts": "export const statik = 1;\n",
+          "src/planted/dyn.ts": "export const dyn = 2;\n",
+        },
+        (root) => {
+          const { files } = reachableFrom(root, [join(root, "app", "planted", "page.tsx")]);
+          return {
+            witnessSeen: files.includes("src/planted/dyn.ts"),
+            controlSeen: files.includes("src/planted/statik.ts"),
+          };
+        },
+      ),
   },
 
   "src/quality/route-coverage.ts": {
     kind: "undemonstrated",
     bound:
       "A spec opens a route when its text contains the path as a literal. A spec navigating with a computed path — a base URL joined to a fragment, or a path read from a fixture — covers the route and is invisible here, so the route reads as uncovered rather than as covered by something unreadable.",
-    whyNotPlantable: NOT_CALLABLE,
+    whyNotPlantable: NOT_A_SILENCE,
   },
 
   "src/security/page-reach.ts": {
-    kind: "undemonstrated",
+    kind: "demonstrated",
     bound:
-      "Route classes are matched by path. A route added inside an existing class's directory inherits that class's allowance without anybody deciding it should, so the register cannot tell a considered membership from an accidental one.",
-    whyNotPlantable: NOT_CALLABLE,
+      "An allowance is a CLASS-WIDE upper bound, so a route reaching an area some OTHER route in its class needs is inside the allowance and nothing asks whether this one had a reason to. `unusedAllowance` catches an area no route in the class uses and `doubleClaimed` catches two classes wanting the same route; nothing catches a route quietly widening its own reach into ground the class already holds. W345 REPLACED THE PREVIOUS SENTENCE, which said a route added inside an existing class's directory inherits that class's allowance without anybody deciding it should. Planting one showed it comes back `unclassified`: the classes name their routes rather than matching by path, and adding a route to a class IS somebody deciding. That sentence sat behind `NOT_CALLABLE` from the day it was written, where nothing could contradict it.",
+    witness: "a console route reaching `messaging`, which the class allows because OTHER console routes need it",
+    control: "a console route reaching `docx`, which the class allows nobody",
+    probe: () =>
+      withRoot(
+        {
+          "app/console/page.tsx":
+            'import { m } from "@/messaging/planted";\nexport default function P() { return m; }\n',
+          "app/console/ops/page.tsx":
+            'import { d } from "@/docx/planted";\nexport default function P() { return d; }\n',
+          "src/messaging/planted.ts": "export const m = 1;\n",
+          "src/docx/planted.ts": "export const d = 1;\n",
+        },
+        (root) => {
+          const outside = diffReach(root).outsideAllowance;
+          return {
+            witnessSeen: outside.some((o) => o.route === "/console"),
+            controlSeen: outside.some((o) => o.route === "/console/ops" && o.area === "docx"),
+          };
+        },
+      ),
   },
 
   "src/quality/latent-y5.ts": {
@@ -728,17 +790,32 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
   },
 
   "src/quality/tree-walks.ts": {
-    kind: "undemonstrated",
+    kind: "demonstrated",
     bound:
       "It holds the walks and no declared list, so its blind spot is the union of its callers': a file the shared recursion skips — anything under `node_modules`, `.next`, `test-results`, `playwright-report` or `reports` — is invisible to every register built on it at once.",
-    whyNotPlantable: NOT_CALLABLE,
+    witness: "a text file under `reports/`, one of the excluded directories, which the walk must not return",
+    control: "the same file under `docs/`, which it must — the pair is driven through `textFiles`, whose root IS the repository, because `sourceModules` walks only `src/` and would have been silent about a file under `reports/` for the wrong reason entirely",
+    probe: () =>
+      withRoot(
+        {
+          "reports/skipped.md": "skipped\n",
+          "docs/kept.md": "kept\n",
+        },
+        (root) => {
+          const walked = textFiles(root).map((f) => f.slice(root.length + 1));
+          return {
+            witnessSeen: walked.includes("reports/skipped.md"),
+            controlSeen: walked.includes("docs/kept.md"),
+          };
+        },
+      ),
   },
 
   "src/quality/empty-list-sweep.ts": {
     kind: "undemonstrated",
     bound:
       "A witness is recognised by the shapes W293 enumerated. An assertion whose non-emptiness is established three lines earlier, in a helper, or by a fixture's own construction has a witness the sweep cannot read, so it reports a real assertion as unevidenced.",
-    whyNotPlantable: NOT_CALLABLE,
+    whyNotPlantable: NOT_A_SILENCE,
   },
 
   "src/quality/register-census.test.ts": {

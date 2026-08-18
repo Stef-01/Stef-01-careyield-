@@ -436,6 +436,17 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/escape-hatches.ts",
+    // Reads three registers and, for the one claim that is about the tree, opens the files those
+    // registers NAME. It walks nothing: `callableDetectorsBorrowingTheSentence` iterates
+    // `BLIND_SPOTS` and joins each key to the root, so a module the registers do not mention is
+    // invisible to it by construction rather than by a walk that missed it. W267's census does not
+    // hold it and a row there would be a declaration nothing re-derives. It is here because it
+    // states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/unrun.ts",
     census: {
       derives:

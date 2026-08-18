@@ -20,6 +20,7 @@ import {
   pinDiff,
   pinsInTree,
 } from "./pins";
+import { hatchDefects } from "./escape-hatches";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { withPlantedIn } from "./planting";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
@@ -87,6 +88,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
     const live = PINS.filter((p) => p.classification.kind === "live_by_design");
     expect(live.map((p) => p.name).sort()).toEqual([
       "BLOCKED_AT_W263",
+      "REVIEWED_AT_W345",
       "SURVIVORS_AT_W296",
       "SURVIVORS_AT_W332",
       "UNEVIDENCED_AT_W293",
@@ -103,6 +105,10 @@ describe("W290 the live pins, and why live is not the defect", () => {
     // its suite does not notice, and a module with no suite that could.
     expect(untestedModules(ROOT)).toEqual([...UNTESTED_AT_W296]);
     expect(SURVIVORS_AT_W296.length).toBeGreaterThan(0);
+    // W345's is the sixth, and its event is a declaration that a check cannot be made to fail
+    // arriving in any of the three registers that hold them — or leaving, because a conversion has
+    // to say which way it went.
+    expect(hatchDefects(ROOT)).toEqual([]);
   });
 
   it("makes each argue for interrupting somebody, not merely declare itself live", () => {

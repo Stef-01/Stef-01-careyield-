@@ -413,6 +413,7 @@ export const NOT_A_DECISION: Readonly<Record<string, string>> = {
   "src/privacy/privacy.ts": "Access, export and erasure. Executed when somebody asks, never on the software's initiative.",
   "src/privacy/record-classes.ts": "W106's register of where patient identity can live.",
   "src/privacy/store.ts": "Storage for access, correction and erasure requests and how they were answered. A record of what people asked for.",
+  "src/quality/escape-hatches.ts": "W345's re-reading of every declaration in the tree that says a check cannot be made to fail. It reads registers and source text, takes no patient as input and decides nothing about anybody. Engineering.",
   "src/quality/order-regressions.ts": "W178's corpus of past order-dependence defects. Engineering.",
   "src/quality/ranker-behaviour.ts":
     "W283's behavioural probe for MATCH-1, and it is reached by this register for the best possible reason: it reads `chronicCare`, which is the exact attribute this notice's *never automated* list says no ordering uses. It decides nothing about anybody. It takes no patient as input — it CONSTRUCTS four synthetic ones, identical in every field, hands them to a sort function, flips the flag on one, and reports whether the returned order moved. Its output is two booleans about a FUNCTION, never a verdict about a person, and the four fixtures have no name, no condition and no appointment. What it exists for is the other side of this notice: MATCH-1 records that the live invitation ranker orders on `chronicCare` while this page publishes that nothing does, and until W283 that finding was anchored to the TEXT of a comparison in one file — three ordinary refactors from going quiet with the contradiction still standing. A probe that watches the ranker's behaviour cannot be silenced by a rename.",
@@ -475,7 +476,7 @@ export interface NoticeRevision {
 }
 
 export const NOTICE_REVISION: NoticeRevision = {
-  reviewedOn: "13 August 2026",
+  reviewedOn: "18 August 2026",
   // W262 added `src/quality/g1-rehearsal.ts` to the ruled-out half and this control fired, which
   // is it working: a module joined the classified set under a stated review date. The notice was
   // re-read rather than the number bumped — the addition is a module ruled OUT (a rehearsal that
@@ -511,9 +512,17 @@ export const NOTICE_REVISION: NoticeRevision = {
   // which is the detector working rather than a false positive, and the right answer is to say why
   // that is not a decision rather than to narrow the scan until it stops asking. The published text
   // stays at fifteen decisions.
-  reviewedAt: "W296",
+  //
+  // W345 MOVED IT A SIXTH TIME, and the module joining the ruled-out half is the ESCAPE-HATCH
+  // RE-READING. Re-read rather than bumped. Nothing published changed: it takes no patient as
+  // input, its inputs are three of this tree's own registers and the text of the modules those
+  // registers NAME, and its outputs are module paths, exported constant names and arguments about
+  // what a check can be made to fail on. It reaches this register the same way the sampler does —
+  // through what it reads about modules that do decide things about people — which is the detector
+  // working rather than a false positive. The published text stays at fifteen decisions.
+  reviewedAt: "W345",
   decisionsAtReview: 15,
-  modulesAtReview: 102,
+  modulesAtReview: 103,
 };
 
 /** The line the page renders. Composed, so the page cannot state a date the register disagrees with. */

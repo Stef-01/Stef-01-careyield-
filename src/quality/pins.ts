@@ -210,6 +210,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/escape-hatches.ts",
+    name: "REVIEWED_AT_W345",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a hatch arriving in any of the three registers, or one of these being converted",
+      whyStopping:
+        "A NAMED ROW PER HATCH with the verdict that re-read it, checked against the derived population in both directions, so neither can be satisfied by retyping a digit — the property W304 draws the line on. A hatch arriving is a declaration that a check cannot be made to fail, and this tree's whole finding about them is that nobody goes back: it has to be READ before it can be written down. A hatch leaving means somebody converted it and the row recording the conversion has to say which way. Both are events worth stopping a build for.",
+    },
+  },
+  {
     module: "src/quality/horizon-q27.test.ts",
     name: "Q27_HORIZON_LAST_UNIT",
     classification: {

@@ -52,6 +52,7 @@ import { sourceModules, pageSpecFiles } from "./tree-walks";
 import { headerUnit, knownUnits } from "./unit-headers";
 import { ACCEPTANCE_REGISTERS, ACCEPTANCE_BOUND } from "./acceptances";
 import { BLIND_SPOTS, BLIND_SPOT_BOUND } from "./blind-spots";
+import { HATCH_BOUND } from "./escape-hatches";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -276,6 +277,57 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       },
     },
     numbers: [],
+  },
+  {
+    module: "src/quality/escape-hatches.ts",
+    name: "HATCH_BOUND",
+    unit: "W345",
+    text: HATCH_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a `Blindness` arm that demonstrates a bound by NOISE rather than by silence",
+      reads: "`blind-spots.ts`, for the arm that would let a false-positive bound be planted against",
+      // NOT `inherent`, AND W311'S WARNING IS WHY. Three quarters of this sentence really are about
+      // judgements nothing derives, and the temptation was to file the whole thing under the kind
+      // that can never go stale. But the half W345 actually discovered names a remedy somebody can
+      // build: two entries plead `NOT_A_SILENCE` because W295 demonstrates by silence and their
+      // bounds are about false positives, and an arm asserting the witness IS reported would settle
+      // both. The day that arm exists this sentence is describing a tree that has moved on.
+      stillOpen: (root) =>
+        !/kind: "demonstrated_by_noise"/.test(
+          readFileSync(path.join(root, "src/quality/blind-spots.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        // The tree where somebody has written it: the arm declared beside the two that exist.
+        files: {
+          "src/quality/blind-spots.ts":
+            '// W295: what a green suite does not prove.\nexport type Blindness = { kind: "demonstrated_by_noise"; bound: string };\n',
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'One of the four reasons is checkable' and 'somebody looking again' — the unit of the sentence rather than a count of anything the tree holds. It stays one however many hatches the population grows to.",
+      },
+      {
+        word: "four",
+        kind: "fixed_by_a_gate",
+        why: "The arms of `HatchKind`, which this module declares and does not measure. It is four because the type says four, and a fifth arrives only with a fifth arm, whose unit would rewrite this sentence anyway.",
+      },
+      {
+        word: "three",
+        kind: "fixed_by_a_gate",
+        why: "The same union minus the one arm a scan can contradict, so it follows from `HatchKind` by subtraction rather than from any walk. It moves only when the type does.",
+      },
+      {
+        word: "two",
+        kind: "unit_id",
+        why: "The entries W345 reclassified `NOT_A_SILENCE`, fixed at the unit that reclassified them. History about a reading that has happened, which is why quoting it is safe; a third would be a third unit's finding and its own sentence.",
+      },
+    ],
   },
   {
     module: "src/quality/repository-clean.ts",

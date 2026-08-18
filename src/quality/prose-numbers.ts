@@ -289,6 +289,16 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // any of them falsifies nothing, which is what `at_the_unit` is for. Q25-CR-5 was deferred
   // rather than fixed precisely because this list would arrive all at once and each row needed
   // somebody who could argue it; they are argued together because they share one argument.
+  // W345: what the escape-hatch re-reading found on the day it ran — how many entries shared the
+  // borrowed sentence, how many of their modules had outgrown it, and how many bounds converted.
+  // History, and the same argument as the rows above: `hatchDefects` re-derives the population on
+  // every run, so the sentences are the finding and the derivation is the check. The blind-spot row
+  // is the same sentence from the other side, in the register the re-reading corrected.
+  { module: "src/quality/blind-spots.ts", text: "Two entries", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/bounds.ts", text: "two entries", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/escape-hatches.ts", text: "Thirty-three entries", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/escape-hatches.ts", text: "five of their modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/escape-hatches.ts", text: "two bounds", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/record-classes.ts", text: "Six modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/assertion-vocabulary.ts", text: "664 sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/blocked-surface.ts", text: "sixteen rows", resolution: { kind: "at_the_unit" } },
