@@ -75,6 +75,7 @@ import { MANIFEST_BOUND } from "./manifest";
 import { FOUNDER_BOUND } from "@/founder/outstanding";
 import { HARDENING_BOUND as HARDENING_Q24_BOUND } from "./hardening-q24";
 import { CLOSING_BOUND } from "./closing-state";
+import { CLOSE_GATE_BOUND, weldedLedgerTests } from "./close-gate";
 import { REMEDY_BOUND } from "./self-defeating";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
@@ -206,6 +207,40 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'This covers ONE claim' and 'this unit normalised one' — the unit of the sentence, not a count of anything in the tree. It stays one however many spellings the register grows, which is the distinction W297's own entry draws for 'One assertion per register, driven once'.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/close-gate.ts",
+    name: "CLOSE_GATE_BOUND",
+    unit: "W326",
+    text: CLOSE_GATE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "export the comparison from a module that takes its inputs",
+      reads: "the tree, for a `.test.ts` that reads the ledger and exports nothing for this to call",
+      // The bound's first clause is the one with a remedy somebody can build, and it is W289's,
+      // unchanged since W315 stated it. It stops being true the day no test file reads the ledger
+      // with its comparison welded inside it — at which point every ledger-dependent check is
+      // callable and the close reaches all of them.
+      stillOpen: (root) => weldedLedgerTests(root).length > 0,
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/only.test.ts": 'it("t", () => { expect(1).toBe(1); });\n',
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "unit_id",
+        why: "'the Q25 close broke one of those too' — the horizon test whose done count and wait figures answered differently on either side of its own close. A quotation of what happened at a particular close, not a count of anything the tree holds now.",
+      },
+      {
+        word: "two",
+        kind: "rate",
+        why: "'it compares TWO RUNS and not two truths' — the shape of the mechanism, which is two runs however many readers the register grows. It stays two.",
       },
     ],
   },

@@ -46,6 +46,7 @@ import { PLANTING_BOUND, planterDiff } from "./planting";
 import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
 import { MANIFEST_BOUND, manifestDiff } from "./manifest";
 import { REMEDY_BOUND, frozenEqualities } from "./self-defeating";
+import { CLOSE_GATE_BOUND, ledgerNamingModules } from "./close-gate";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
   vocabularyDefects,
@@ -100,6 +101,32 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/close-gate.ts": {
+    kind: "demonstrated",
+    bound: CLOSE_GATE_BOUND,
+    witness: "a `.test.ts` that reads the ledger, whose comparison the close cannot call",
+    control: "a source module that reads it, which the close CAN call and must therefore see",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/welded.test.ts":
+            'import { parseLedgerRows } from "@/quality/blocked-surface";\nit("t", () => { expect(parseLedgerRows("")).toEqual([]); });\n',
+          "src/planted/callable.ts":
+            'import { parseLedgerRows } from "@/quality/blocked-surface";\nexport const rows = (t: string) => parseLedgerRows(t);\n',
+        },
+        (root) => {
+          const source = ledgerNamingModules(root);
+          return {
+            // The bound is about what `ledgerNamingModules` — the register the close runs from —
+            // can see. It must NOT see the welded test, which is the limit, and it must see the
+            // callable module, or the silence proves only that the walk found nothing.
+            witnessSeen: source.includes("src/planted/welded.test.ts"),
+            controlSeen: source.includes("src/planted/callable.ts"),
           };
         },
       ),

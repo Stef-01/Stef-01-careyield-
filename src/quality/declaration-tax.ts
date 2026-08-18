@@ -222,6 +222,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/close-gate.ts",
+    // Asks which modules read the ledger. A planted module names no ledger primitive and opens no
+    // ledger, so it owes this register nothing — an arriving module pays the census, the blind
+    // spot, the negative probe and the drive, and pays nothing here. In the population because the
+    // census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/prose-numbers.ts",
     // Demands a classification of any module whose header states a numeric claim. A planted module
     // carries no such claim in any of the five shapes, so it owes this register nothing — and the

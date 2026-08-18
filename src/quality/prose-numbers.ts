@@ -300,6 +300,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/acceptances.ts", text: "Five registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "nine registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
   { module: "src/quality/assertion-vocabulary.ts", text: "fifty-two sites", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/close-gate.ts", text: "four modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "seven re-derive their findings", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/blocked-surface.ts", text: "Eighteen rows", resolution: { kind: "derived", derive: blockedRows } },
   // W315 REMOVED THE SENTENCE THIS CLASSIFIED. Its own new bound moved the total from 22 to 23 on

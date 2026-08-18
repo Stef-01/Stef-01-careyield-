@@ -57,6 +57,7 @@ import { unacceptedTautologies } from "./tautology-sweep";
 import { fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
 import { vocabularyDefects } from "./assertion-vocabulary";
+import { readerDiff } from "./close-gate";
 
 /**
  * A comparison handed an input it must reject, keyed by the register the census names.
@@ -201,6 +202,13 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // in the tree is then in the wrong spelling, so the arm that must fire is the only arm there
     // is — and the point is that the choice is an argument rather than a constant welded in.
     return vocabularyDefects(root, "not equal []").length > 100;
+  },
+
+  "src/quality/close-gate.ts": (root) => {
+    // W326's comparison with both registers emptied, which is the state where every ledger-reading
+    // module in the tree is unwatched. The arm that must fire is the one saying a module reads the
+    // ledger and no closing check knows.
+    return readerDiff(root, [], []).unwatched.length > 0;
   },
 
   "src/quality/prose-numbers.ts": (root) => {

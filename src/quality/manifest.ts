@@ -76,6 +76,7 @@ import { SELF_SCANNING, SPLIT_EXCEPTIONS, holderDiff, splitDiff, splitSites } fr
 import { coverageDiff } from "./route-coverage";
 import { negativeDiff } from "./negative-probes";
 import { UNEVIDENCED_AT_W293, emptyListDiff } from "./empty-list-sweep";
+import { readerDiff } from "./close-gate";
 
 /**
  * Everything one module owes the registers that watch it.
@@ -2035,6 +2036,46 @@ export const MANIFEST: readonly ModuleEntry[] = [
       },
     },
     branches: [],
+  },
+  {
+    module: "src/quality/close-gate.ts",
+    census: {
+      derives:
+        "Every first-party source module naming one of the ledger's parse entry points — `parseLedgerRows`, `allLedgerRows`, `blockedRows` — or opening `BUILD-STATE.md` itself.",
+      checkedAgainst:
+        "`LEDGER_READERS` and `NOT_A_CLOSING_CHECK` together, in both directions: a ledger-reading module is watched at the close or excused in writing.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a check whose answer changes when the row closes is planted beside one that reports the same before and after, and only the first may be reported",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No module reads the ledger without the close either running it or saying in writing why a close cannot break it.",
+        mutation:
+          "`readerDiff` is given an empty register and must report every ledger-naming module the tree holds.",
+      },
+    },
+    branches: [
+      {
+        fn: "readerDiff",
+        branch: "unwatched",
+        reach: {
+          kind: "driven",
+          drive: () => readerDiff(process.cwd(), [], []).unwatched.length > 0,
+        },
+      },
+      {
+        fn: "readerDiff",
+        branch: "stale",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            readerDiff(process.cwd(), [], [{ module: "src/quality/gone.ts", why: "x" }]).stale.length > 0,
+        },
+      },
+    ],
   },
   {
     module: "src/quality/closing-state.ts",

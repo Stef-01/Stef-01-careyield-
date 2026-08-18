@@ -313,6 +313,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/close-gate.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/close-gate.test.ts :: does NOT report a check that was already failing, which is the difference that makes it usable",
+      plants: "broken before and after",
+    },
+  },
+  {
     register: "src/quality/acceptances.ts",
     negative: {
       kind: "already_driven",

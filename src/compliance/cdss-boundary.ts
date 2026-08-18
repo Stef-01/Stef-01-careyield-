@@ -826,6 +826,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W323's assertion vocabulary: the spellings this suite uses to say a collection has at least one element, and the one spelling it keeps. Nobody but a developer reads it. Its longest strings are the argument for each form, the argument for each near miss and `VOCABULARY_BOUND`; its inputs are the text of this tree's own test files and short planted snippets of TypeScript, and no patient, condition or appointment reason appears in any of it.",
   },
   {
+    module: "src/quality/close-gate.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W326's closing gate: the ledger-reading checks, run against the row as it will be committed. Nobody but a developer reads it. Its longest strings are the argument for each watched check, the argument for each excused module and `CLOSE_GATE_BOUND`; its inputs are this tree's own ledger, plan and source files, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/closing-state.ts",
     operatorCopy: [],
     notCopy:
