@@ -709,6 +709,45 @@ number and counting controls measured the wrong thing. **Q25 adds no blocked row
 - **W324** The claim classes re-read — this quarter's gate → verify: every class named in `docs/HORIZON-Q25.md` either driven by a check that exists or declared unprovable with its reason; a class named and neither driven nor declared fails.
 - **W325** **QUARTER CLOSE.** Q26 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
 
+## 5k. Year 7 — Q26 (W326–W338)
+
+Expanded by W325 on 2026-08-18 under the §6 horizon rule, from `docs/AUDIT-Y5.md` and
+`docs/GATE-DOSSIER-Y5.md` — and from `src/quality/claim-classes.ts` and the Q25 ledger rows, which
+are newer than both and are where the theme comes from. **One quarter, not a year.** See
+`docs/HORIZON-Q26.md` for the rule's six preconditions evaluated one at a time, and for the gate
+position recorded at this expansion.
+
+**Q26 — when the check runs.** Q25 met its gate: every claim class its horizon named is driven by a
+check that speaks or argued away against the document's own words. What the quarter produced beside
+its gate is one shape seen five times. W315 built the instrument for *the gate runs before the row
+is written* and the gap took another unit anyway — W323's close fired W324's `pending` arm and left
+`main` red for a firing, because the close happens after the gate and the instrument was not run at
+the close. W318 found three deferrals aimed at ranges nothing evaluates, one of them answered
+seventeen units earlier and still reading `deferred`. W322 fixed a plant that wrote into the
+repository other workers were walking, and the residue came back under a green gate — its two
+detectors are correct and **order-dependent inside a single run**. W323 found a register making a
+false claim about its own mechanism, which only a mutation pass a builder chose to run would catch.
+And W324's `pending` arm is the counter-example: the one declaration tied to an EVENT rather than to
+a run, and it fired on the exact firing it named. The common shape is that **a control here answers
+at the moment a builder happens to run it, and several are about moments the suite never occupies.**
+Every Q26 unit ties a control to the event it concerns, or states which instant it answers at and
+what that instant cannot see. The gate is not a number, for the reason Q24's was wrong and Q25's
+replacement worked. **Q26 adds no blocked row.**
+
+- **W326** The close inside the gate → verify: the ledger row a unit will commit is present in the tree its gate runs over, run as a step of the close rather than as a check about one, driven on the Q25 close that left `main` red after its own gate had passed.
+- **W327** [P] Order-dependent checks: which instant a control answers at → verify: every check whose answer depends on repository state at the moment it runs enumerated, each driven in isolation and inside a full run, and a planted order-dependent check reported.
+- **W328** The plant that survived W322 → verify: whatever still writes `src/planted/` into the repository identified by instrumentation and reproduced deliberately, with PLANT-1 disposed on evidence rather than on quiet runs.
+- **W329** [P] A deferral answered where it points → verify: every deferred disposition re-read at the unit it names, driven on one whose unit has already landed and one whose unit has not.
+- **W330** [P] Declarations that end themselves → verify: every declaration whose truth depends on a future event names that event, W324's `pending` arm generalised, and a planted declaration whose event has passed reported.
+- **W331** Q25's hardening pass, which the quarter did not run → verify: `code-review`, `security-review` and `simplify` over W313–W325; every finding disposed with a clock per W318; the pass's own bound stated.
+- **W332** [P] The survivors register re-derived over the quarter's modules → verify: W296's sampling run over every module Q25 added, each survivor named with its kind and its argument, and a planted survivor reported.
+- **W333** [P] What a green suite does not run → verify: every module with no sibling suite and every branch declared unreachable re-derived and NAMED rather than counted, and a planted unreached branch reported.
+- **W334** [P] The demo path's third scenario: a practice set up wrong → verify: one spec walking a practice whose setup is incomplete, every unfinished step named where an operator would look for it, and no founder gate crossed.
+- **W335** The gate dossier derived rather than written → verify: the outstanding position regenerated from the ledger and §4, every disagreement with `docs/GATE-DOSSIER-Y5.md` reported, and a planted stale dossier line reported.
+- **W336** [P] One way to say a thing is absent → verify: W323's shape applied to the emptiness claim — the spellings enumerated from the suite, one chosen, the rest converted, a planted variant reported, and `VOCABULARY_BOUND`'s predicate shown to have gone false.
+- **W337** The controls re-read — this quarter's gate → verify: every control named in `docs/HORIZON-Q26.md` either runs at the event it concerns or declares the instant it answers at with what that instant cannot see; a control named and neither tied nor declared fails.
+- **W338** **QUARTER CLOSE.** Q27 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
 ## 6. Horizon rule (supersedes the five-year expansion rule, W260)
 
 **The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,

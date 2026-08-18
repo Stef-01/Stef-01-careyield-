@@ -192,6 +192,14 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/horizon-q26.test.ts",
+    name: "Q26_HORIZON_LAST_UNIT",
+    classification: {
+      kind: "range_bound",
+      why: "The same bound for Q26, carried forward by W325 — the sixth horizon to bound itself from its first line. It is what lets a test read the LIVE ledger and still describe the moment its document priced, which is this quarter's own subject: the figures are as-at because the instant a check answers at has to be written down rather than assumed.",
+    },
+  },
+  {
     module: "src/quality/horizon-q25.test.ts",
     name: "Q25_HORIZON_LAST_UNIT",
     classification: {
