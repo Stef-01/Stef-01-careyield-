@@ -251,8 +251,28 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     unit: "W330",
     text: ENDING_BOUND,
     lifting: {
-      kind: "inherent",
-      why: "The sentence is about a vocabulary. This finds a wait where the wait is a TYPED discriminant in an object literal, and a wait written as a sentence in a header is invisible to it — which is not a gap a later unit closes by widening this scan, because reading prose for an event is W314's machinery pointed at a different vocabulary and is a unit of its own. Widening the discriminant list would not touch it either: prose has no discriminant to add. The second clause is a judgement rather than a derivation — whether a deferred finding still matters after its unit landed is exactly what the person the report wakes is for — and no check can be written that decides it, which is why the report names what to look at and stops.",
+      kind: "remedy",
+      remedy: "W314's machinery pointed at a different vocabulary",
+      reads: "`self-ending.ts`, for a derivation that reads a wait written as PROSE rather than as a discriminant",
+      // W337 RECLASSIFIED THIS, AND THE REASON IS THE REGISTER ABOVE IT. W297 refuses to let the
+      // no-remedy kind become the majority — `inherent` can never go stale, which is exactly what
+      // makes it the cheap answer — and it fired when the two kinds reached parity. Re-reading
+      // this entry, the bound's own text NAMES a remedy: reading prose for an event, which is a
+      // unit rather than a widening. A remedy named in the sentence and classified as no-remedy in
+      // the register is the register disagreeing with the bound it holds, and the bound was right.
+      // The second clause — whether a finding still matters after its unit lands — really is a
+      // judgement, and it stays in the text as the part no remedy reaches.
+      stillOpen: (root) =>
+        !/export function proseWaits\b/.test(readFileSync(path.join(root, "src/quality/self-ending.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        // The tree where somebody has written it: a derivation that takes prose and returns the
+        // waits in it. With that present the sentence is describing a gap the tree has closed.
+        files: {
+          "src/quality/self-ending.ts":
+            "// W330: the waits, including the ones written as sentences.\nexport function proseWaits(): string[] {\n  return [];\n}\n",
+        },
+      },
     },
     numbers: [],
   },
