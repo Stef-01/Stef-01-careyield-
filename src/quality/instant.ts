@@ -41,9 +41,8 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. Everything is planted into a temporary copy.
 
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
-import path from "node:path";
-import { copyTree } from "./planting";
+import { rmSync } from "node:fs";
+import { type Plantable, copyTree, withPlantedIn } from "./planting";
 import {
   exportedResetters,
   modulesWithNoUnitHeader,
@@ -106,14 +105,17 @@ export interface Control {
  * ONE DISTURBANCE FOR EVERY CONTROL, rather than one tailored to each. A per-control disturbance is
  * a detector tuned until it agrees with its author: the question is whether the answer depends on
  * state outside this tree, and the honest way to ask it is to add that state once and look.
+ *
+ * A `Plantable` RATHER THAN A FUNCTION THAT WRITES, which W328 is the reason for. The first draft
+ * called `writeFileSync` itself and landed in `planterDiff`'s undeclared list on the same firing
+ * that widened it past test files. Going through `withPlantedIn` is not an exemption granted: the
+ * raw write stops existing, and the probe cannot outlive its scope.
  */
-export function disturb(root: string): void {
-  mkdirSync(path.join(root, "node_modules/a-dependency"), { recursive: true });
-  writeFileSync(path.join(root, "node_modules/a-dependency/shipped.fixtures"), "=== a ===\nb\n");
-  writeFileSync(path.join(root, "node_modules/a-dependency/shipped.ts"), "export const x = 1;\n");
-  mkdirSync(path.join(root, "coverage"), { recursive: true });
-  writeFileSync(path.join(root, "coverage/report.ts"), "export const y = 1;\n");
-}
+export const DISTURBANCE: Plantable = {
+  "node_modules/a-dependency/shipped.fixtures": "=== a ===\nb\n",
+  "node_modules/a-dependency/shipped.ts": "export const x = 1;\n",
+  "coverage/report.ts": "export const y = 1;\n",
+};
 
 export const CONTROLS: readonly Control[] = [
   {
@@ -242,25 +244,26 @@ export function instantDiff(root: string, controls: readonly Control[] = CONTROL
   const copy = copyTree(root);
   try {
     const quiet = new Map(drivable.map((c) => [c.id, c.run!(copy).length]));
-    disturb(copy);
-    const out: Instability[] = [];
-    for (const control of drivable) {
-      const before = quiet.get(control.id)!;
-      const after = control.run!(copy).length;
-      if (after !== before && !control.mayMove) {
-        out.push({
-          control: control.id,
-          what: `answers ${before} quiet and ${after} disturbed, and is not declared to move`,
-        });
+    return withPlantedIn(copy, DISTURBANCE, () => {
+      const out: Instability[] = [];
+      for (const control of drivable) {
+        const before = quiet.get(control.id)!;
+        const after = control.run!(copy).length;
+        if (after !== before && !control.mayMove) {
+          out.push({
+            control: control.id,
+            what: `answers ${before} quiet and ${after} disturbed, and is not declared to move`,
+          });
+        }
+        if (after === before && control.mayMove) {
+          out.push({
+            control: control.id,
+            what: `is declared to move with the shared state and did not, at ${after}`,
+          });
+        }
       }
-      if (after === before && control.mayMove) {
-        out.push({
-          control: control.id,
-          what: `is declared to move with the shared state and did not, at ${after}`,
-        });
-      }
-    }
-    return out.sort((a, b) => `${a.control}${a.what}`.localeCompare(`${b.control}${b.what}`));
+      return out.sort((a, b) => `${a.control}${a.what}`.localeCompare(`${b.control}${b.what}`));
+    });
   } finally {
     rmSync(copy, { recursive: true, force: true });
   }

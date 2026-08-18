@@ -8,18 +8,18 @@
 // state a racing worker would have created is planted instead, so the difference is deterministic
 // and the answer is the same on every machine.
 
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, symlinkSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   CONTROLS,
   type Control,
+  DISTURBANCE,
   INSTANT_BOUND,
   SHARED_STATE,
-  disturb,
   instantDiff,
 } from "./instant";
-import { copyTree } from "./planting";
+import { copyTree, withPlantedIn } from "./planting";
 import { fixtureFiles } from "./self-reference";
 import { STATED_BOUNDS } from "./bounds";
 
@@ -71,12 +71,15 @@ describe("W327 no control answers differently because the shared state moved", (
 
   it("is not vacuous: the disturbance really lands, and the tree really has controls to drive", () => {
     // A disturbance that wrote nothing would report every control stable, which is the reading that
-    // makes this whole register worthless.
+    // makes this whole register worthless. Planted through the harness, so the probe cannot outlive
+    // its scope — asserted here too, because W303's whole subject is a plant that does.
     inCopy((copy) => {
       expect(existsSync(path.join(copy, "node_modules"))).toBe(false);
-      disturb(copy);
-      expect(existsSync(path.join(copy, "node_modules/a-dependency/shipped.fixtures"))).toBe(true);
-      expect(existsSync(path.join(copy, "coverage/report.ts"))).toBe(true);
+      withPlantedIn(copy, DISTURBANCE, () => {
+        expect(existsSync(path.join(copy, "node_modules/a-dependency/shipped.fixtures"))).toBe(true);
+        expect(existsSync(path.join(copy, "coverage/report.ts"))).toBe(true);
+      });
+      expect(existsSync(path.join(copy, "node_modules/a-dependency/shipped.fixtures"))).toBe(false);
     });
     expect(CONTROLS.filter((c) => c.run !== null).length).toBeGreaterThan(8);
   });
@@ -88,9 +91,9 @@ describe("W327 Q24-CR-7: the walk that answered about the installed dependencies
     // no exclusions, so this planted file was returned and the count went from one to two.
     inCopy((copy) => {
       const before = fixtureFiles(copy);
-      mkdirSync(path.join(copy, "node_modules/a-dependency"), { recursive: true });
-      writeFileSync(path.join(copy, "node_modules/a-dependency/shipped.fixtures"), "=== a ===\nb\n");
-      expect(fixtureFiles(copy), "an install still reaches the fixture sweep").toEqual(before);
+      withPlantedIn(copy, { "node_modules/a-dependency/shipped.fixtures": "=== a ===\nb\n" }, () => {
+        expect(fixtureFiles(copy), "an install still reaches the fixture sweep").toEqual(before);
+      });
     });
   });
 
@@ -99,10 +102,11 @@ describe("W327 Q24-CR-7: the walk that answered about the installed dependencies
     // mechanism: the sweep for a SECOND fixture file is what holds `SELF_REFERENCE_BOUND` down.
     inCopy((copy) => {
       const before = fixtureFiles(copy);
-      writeFileSync(path.join(copy, "src/quality/second.fixtures"), "=== a ===\nb\n");
-      expect(fixtureFiles(copy).length, "the sweep stopped seeing first-party fixture files").toBe(
-        before.length + 1,
-      );
+      withPlantedIn(copy, { "src/quality/second.fixtures": "=== a ===\nb\n" }, () => {
+        expect(fixtureFiles(copy).length, "the sweep stopped seeing first-party fixture files").toBe(
+          before.length + 1,
+        );
+      });
     });
   });
 
@@ -114,17 +118,17 @@ describe("W327 Q24-CR-7: the walk that answered about the installed dependencies
     const stillOpen = bound.lifting.stillOpen;
     inCopy((copy) => {
       expect(stillOpen(copy), "the bound is not open on an undisturbed copy").toBe(true);
-      mkdirSync(path.join(copy, "node_modules/a-dependency"), { recursive: true });
-      writeFileSync(path.join(copy, "node_modules/a-dependency/shipped.fixtures"), "=== a ===\nb\n");
-      expect(stillOpen(copy), "a dependency lifted a stated bound").toBe(true);
-      writeFileSync(path.join(copy, "src/quality/second.fixtures"), "=== a ===\nb\n");
-      expect(stillOpen(copy), "a real second fixture file no longer lifts it").toBe(false);
+      withPlantedIn(copy, { "node_modules/a-dependency/shipped.fixtures": "=== a ===\nb\n" }, () => {
+        expect(stillOpen(copy), "a dependency lifted a stated bound").toBe(true);
+        withPlantedIn(copy, { "src/quality/second.fixtures": "=== a ===\nb\n" }, () => {
+          expect(stillOpen(copy), "a real second fixture file no longer lifts it").toBe(false);
+        });
+      });
     });
   });
 
   it("survives a broken symlink, which used to throw through the bound predicate", () => {
     inCopy((copy) => {
-      const { symlinkSync } = require("node:fs") as typeof import("node:fs");
       symlinkSync(path.join(copy, "src/nothing-here"), path.join(copy, "src/dangling.ts"));
       expect(() => fixtureFiles(copy)).not.toThrow();
     });
@@ -140,7 +144,7 @@ describe("W327 the register says what it is", () => {
         expect(existsSync(path.join(ROOT, module!)), `${control.id} names no module`).toBe(true);
         continue;
       }
-      const body = require("node:fs").readFileSync(path.join(ROOT, module!), "utf8") as string;
+      const body = readFileSync(path.join(ROOT, module!), "utf8");
       expect(
         new RegExp(`export (function|const) ${name}\\b`).test(body),
         `${control.id} names an export ${module} does not have`,
