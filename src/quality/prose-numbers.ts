@@ -285,6 +285,11 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // W342: how many times the tree had written `UnitId` when this unit consolidated it. History,
   // and the consolidation is the check: a fourth copy would be a fourth definition somebody wrote.
   { module: "src/quality/typed-names.ts", text: "three registers", resolution: { kind: "at_the_unit" } },
+  // W343: what the pass found on the day it read the quarter. History in the ordinary sense — the
+  // findings are in `FINDINGS`, the suite compares their number with Q25's rather than pinning it,
+  // and a quarter that is over cannot acquire new ones.
+  { module: "src/quality/hardening-q26.ts", text: "FOUR FINDINGS", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/hardening-q26.ts", text: "TWO ARE COPIES", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/refusal-branches.ts", text: "two entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "sixteen modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "two branches", resolution: { kind: "at_the_unit" } },
@@ -419,7 +424,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/privacy/erasure-y5.ts", text: "thirty-seven modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "five registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "Five registers", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/acceptances.ts", text: "ten registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
+  { module: "src/quality/acceptances.ts", text: "eleven registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
   { module: "src/quality/assertion-vocabulary.ts", text: "fifty-two sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/close-gate.ts", text: "four modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "six entries", resolution: { kind: "at_the_unit" } },

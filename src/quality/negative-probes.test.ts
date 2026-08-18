@@ -363,6 +363,7 @@ describe("W292 every proved walk has a negative, and the register says which kin
     // cannot be exempted by writing the exemption here.
     const exempt = NEGATIVE_PROBES.filter((p) => p.negative.kind === "no_detector_of_its_own");
     expect(exempt.map((p) => p.register).sort()).toEqual([
+      "src/quality/hardening-q26.test.ts",
       "src/quality/negative-probes.test.ts",
       "src/quality/page-suite.test.ts",
       "src/quality/private-copies.test.ts",

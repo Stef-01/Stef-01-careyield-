@@ -151,7 +151,12 @@ describe("W295 a stated bound is planted, and the register stays silent", () => 
     // behind `NOT_CALLABLE` for the reason that sentence states rather than for a bound nobody
     // tried to demonstrate. The register it proves is demonstrated in the same commit, so the
     // count moved by one and the demonstrated count moved by one with it.
-    expect(ofKind("undemonstrated").length).toBeLessThanOrEqual(36);
+    //
+    // W343 RAISED IT TO 37, for the same reason W341 raised it to 36 and with the same evidence:
+    // `hardening-q26.test.ts` is a PROVING file — it copies the tree to show a copy carries its
+    // maker's pid — and it joins the others behind `NOT_CALLABLE` rather than behind a bound
+    // nobody tried to demonstrate.
+    expect(ofKind("undemonstrated").length).toBeLessThanOrEqual(37);
     expect(falseBounds(Object.fromEntries(ofKind("undemonstrated")))).toEqual([]);
   });
 });

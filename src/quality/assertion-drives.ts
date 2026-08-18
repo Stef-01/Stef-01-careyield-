@@ -469,6 +469,7 @@ export function resolveBranch(
  * skipped directory asserts nothing else.
  */
 export const ASSERTS_NOTHING: readonly string[] = [
+  "src/quality/hardening-q26.test.ts",
   "src/quality/page-suite.test.ts",
   "src/quality/private-copies.test.ts",
   "src/quality/register-census.test.ts",

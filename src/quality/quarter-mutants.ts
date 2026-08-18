@@ -51,12 +51,26 @@ import {
  */
 export const QUARTER_AT_W332 = { first: 313, last: 325 } as const;
 
-/** Every module whose header names a unit in the range — the modules the quarter ADDED. */
-export function quarterModules(
-  root: string,
-  first: number = QUARTER_AT_W332.first,
-  last: number = QUARTER_AT_W332.last,
-): string[] {
+/** A closed range of units, the shape `QUARTER_AT_W332` already has. */
+export interface UnitRange {
+  first: number;
+  last: number;
+}
+
+/**
+ * Every module whose header names a unit in the range — the modules the quarter ADDED.
+ *
+ * ONE ARGUMENT RATHER THAN TWO, AND W343 FOUND OUT WHY BY GETTING IT WRONG. The signature took
+ * `(root, first, last)` and this module exports the range as an OBJECT, so the natural call —
+ * handing it `QUARTER_AT_W332`, or any `{ first, last }` — compiled under a looser call site and
+ * every comparison against an object became `false`. Nothing threw: the function returned EVERY
+ * module in the tree, and `quarterMutants` built on it would have mutated the whole repository
+ * while reporting a quarter. A population that fails OPEN is the worst way for a register to be
+ * wrong, and the fix is the one W342 used at its own parse boundary: make the shape the caller
+ * already has the shape the function takes.
+ */
+export function quarterModules(root: string, range: UnitRange = QUARTER_AT_W332): string[] {
+  const { first, last } = range;
   const out: string[] = [];
   for (const file of sourceModules(root)) {
     const unit = headerUnit(readFileSync(file, "utf8"));

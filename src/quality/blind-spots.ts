@@ -176,7 +176,7 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           "src/planted/outside.ts": "// W200: a module an older unit added.\nimport path from \"node:path\";\nexport const b = path;\n",
         },
         (root) => {
-          const found = quarterModules(root, 313, 325);
+          const found = quarterModules(root, { first: 313, last: 325 });
           return {
             // The bound says this measures only the modules a QUARTER ADDED, and that a quarter of
             // extensions is barely measured. The witness is the module it must not reach.
@@ -892,6 +892,13 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
     kind: "undemonstrated",
     bound:
       "It plants files in front of other registers' walks and asserts nothing of its own, so its blind spot is that a walk it does not plant against is unproved and looks exactly like one that is.",
+    whyNotPlantable: NOT_CALLABLE,
+  },
+
+  "src/quality/hardening-q26.test.ts": {
+    kind: "undemonstrated",
+    bound:
+      "The same shape as the other proving files: it copies the tree to show a copy carries its maker's pid and asserts nothing else, so a sweep defect that survives both the owned and the foreign case is invisible to it.",
     whyNotPlantable: NOT_CALLABLE,
   },
 

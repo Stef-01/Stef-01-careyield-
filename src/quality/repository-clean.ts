@@ -49,6 +49,28 @@ export const ARTEFACTS: readonly Artefact[] = [
   },
 ];
 
+/**
+ * The name a tree copy carries so its maker can be told from anybody else's.
+ *
+ * W343: OWNERSHIP IS THE PID, NOT THE CLOCK. The teardown swept every `/tmp/tree-*` inside this
+ * run's time window, which excludes a copy made before the run and NOTHING ELSE — so a sibling
+ * session starting later had all of its live copies inside the window and this deleted them under
+ * it. Overlapping sessions are the normal state of this tree; the ledger is the lock because of it.
+ */
+export const treeCopyPrefix = (pid: number): string => `tree-${pid}-`;
+
+/**
+ * The temp-directory entries a process may remove: the ones it made.
+ *
+ * TAKES THE ENTRIES RATHER THAN READING THEM, which is W289's remedy and W328's constraint at the
+ * same time: a `readdirSync` in this module would make W267's census classify it as a tree walker,
+ * which it is not — it would be reading the system temp directory. Handed a list, the rule is a
+ * comparison somebody can drive, and the harness keeps the reading and the mtime window.
+ */
+export function ownedCopies(entries: readonly string[], pid: number): string[] {
+  return entries.filter((entry) => entry.startsWith(treeCopyPrefix(pid))).sort();
+}
+
 /** Which artefacts the repository holds RIGHT NOW. The instant is the parameter, not the answer. */
 export function artefactsPresent(root: string, artefacts: readonly Artefact[] = ARTEFACTS): string[] {
   return artefacts.filter((a) => existsSync(path.join(root, a.where))).map((a) => a.where).sort();

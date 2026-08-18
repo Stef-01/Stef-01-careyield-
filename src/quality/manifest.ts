@@ -2217,6 +2217,32 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/hardening-q26.ts",
+    census: null,
+    branches: [],
+  },
+  {
+    module: "src/quality/hardening-q26.test.ts",
+    census: {
+      derives:
+        "A copy of this tree, made to prove that a copy carries its maker's pid — the one fact W343's security finding turns on.",
+      checkedAgainst:
+        "Nothing of its own. It is a member because W282's widened detector counts deriving through the planting harness, and the pass that found the sweep's ownership defect cannot exempt itself from the census.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "it IS the proof: a copy this process made must be sweepable by it, and a copy stamped with another pid must not be, however new",
+      },
+      assertion: {
+        kind: "carries_no_assertion",
+        claim:
+          "None of its own. What it asserts belongs to `hardening-q26.ts` and to `repository-clean.ts`, which carry their own entries.",
+        why: "Same shape as `page-suite.test.ts` and `private-copies.test.ts`: a prover rather than a register.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/typed-names.ts",
     census: {
       derives:

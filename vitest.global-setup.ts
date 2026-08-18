@@ -10,7 +10,7 @@
 import { existsSync, readdirSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { uncleanMessage } from "./src/quality/repository-clean";
+import { ownedCopies, uncleanMessage } from "./src/quality/repository-clean";
 
 /**
  * Temporary tree copies this run left behind, removed.
@@ -26,12 +26,17 @@ import { uncleanMessage } from "./src/quality/repository-clean";
  * it reads the system temp directory, and a census row saying otherwise would be a declaration that
  * misdescribes its subject. This is harness plumbing about `/tmp`, not a property of the repository.
  *
- * `since` is the run's start, so a copy belonging to a DIFFERENT run in the same container is left
- * alone. Removing every `tree-*` unconditionally would delete a concurrent suite's tree under it.
+ * OWNERSHIP IS THE PID, NOT THE CLOCK, and W343 found the difference by reading this sentence
+ * against what the code does. `since` is the run's START, so it excludes a copy made BEFORE this
+ * run and nothing else: a sibling session that begins later — normal here, where two builders run
+ * `pnpm verify` at once — has every one of its live copies inside this run's window, and this swept
+ * them out from under it. The symptom is an `ENOENT` in the other session's suite on a path it
+ * created itself, which is the flake W313 chased for a different cause. `copyTree` now stamps the
+ * maker's pid into the name and this removes only its own; the window stays as a second condition,
+ * because a pid is reused eventually and a directory older than this run is not this run's.
  */
 function sweepTreeCopies(since: number): void {
-  for (const entry of readdirSync(tmpdir())) {
-    if (!entry.startsWith("tree-")) continue;
+  for (const entry of ownedCopies(readdirSync(tmpdir()), process.pid)) {
     const full = path.join(tmpdir(), entry);
     try {
       if (statSync(full).mtimeMs >= since) rmSync(full, { recursive: true, force: true });

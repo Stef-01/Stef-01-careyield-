@@ -340,6 +340,13 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/hardening-q26.test.ts",
+    negative: {
+      kind: "no_detector_of_its_own",
+      why: "It is W343's proving file — it makes a tree copy to show the copy carries its maker's pid, and derives nothing of its own. The discriminating pair for the rule itself is the foreign-pid case inside that same test.",
+    },
+  },
+  {
     register: "src/quality/private-copies.test.ts",
     negative: {
       kind: "no_detector_of_its_own",

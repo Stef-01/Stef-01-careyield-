@@ -93,6 +93,7 @@ import { DOSSIER_BOUND, dossierDiffFor } from "./dossier-derived";
 import { NAMED_CONDITIONS, UNREAD_BOUND } from "./unread-bounds";
 import { PRIVATE_COPY_BOUND, SHARED_PARSES } from "./private-copies";
 import { PLANTED_NAMES, TYPED_NAME_BOUND } from "./typed-names";
+import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SELF } from "./hardening-q26";
 import { REMEDY_BOUND } from "./self-defeating";
 import type { UnitId } from "./typed-names";
 import {
@@ -464,6 +465,63 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       },
     },
     numbers: [],
+  },
+  {
+    module: "src/quality/hardening-q26.ts",
+    name: "Q26_HARDENING_BOUND",
+    unit: "W343",
+    text: Q26_HARDENING_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "The same limit W331 stated and for the same reason: independence is a property of WHO reads, and the loop has the builders it has — a second session reading Q26 would be a different pass rather than a lifting of this sentence. The uneven lenses follow from the quarter's content, since a quarter whose product surface is one amber notice gives a security lens one amber notice. And the last clause is a warning against a comparison rather than a limit somebody could remove: a finding count says how hard a quarter was read at least as much as how well it was built, which is why the record carries the findings and not a total.",
+    },
+    numbers: [
+      {
+        word: "One",
+        kind: "rate",
+        why: "'One quarter read by one reader' — the unit of the sentence rather than a count of anything the tree holds. It stays one however many findings the pass records.",
+      },
+      {
+        word: "SEVEN",
+        kind: "unit_id",
+        why: "How many of Q26's thirteen units this reader wrote, which `SELF_REVIEWED` holds by name and this pass's suite checks against `REVIEWED_UNITS`. History: the authorship of W326–W338 cannot change, so the number is fixed at the quarter rather than derived from a tree that moves.",
+      },
+      {
+        word: "four",
+        kind: "unit_id",
+        why: "How many findings this pass recorded, which is a fact about the pass rather than about the tree — and the sentence's own point is that the number measures reading as much as building. `FINDINGS` holds them and the suite compares the count with Q25's rather than pinning either.",
+      },
+      {
+        word: "ten",
+        kind: "unit_id",
+        why: "How many findings Q25's pass recorded, cited here for the comparison the sentence makes. It is that register's history and cannot move: `hardening-q25.ts` is closed, and the suite reads `FINDINGS.length` from it rather than trusting this word.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one console notice', 'one child-process runner', 'one deletion sweep', 'one amber notice' — the unit of what the security lens had to read rather than a count of anything derived. Each stays one however many registers the quarter added.",
+      },
+      {
+        word: "two",
+        kind: "unit_id",
+        why: "How many duplications the simplify lens found — `UnitId` written a third time and the seventh copy of the ledger row parse — which are two of the four rows in `FINDINGS` and are checked there rather than counted here.",
+      },
+      {
+        word: "six",
+        kind: "unit_id",
+        why: "How many of Q25's thirteen units its own reader wrote, cited here for the comparison this sentence makes with the pass before it. History about a closed pass: `hardening-q25.ts` holds those units by name in its own `SELF_REVIEWED` and cannot acquire more.",
+      },
+      {
+        word: "eleven",
+        kind: "unit_id",
+        why: "How many registers Q26 added, the number the sentence declines to judge. It is history about a closed quarter: the modules are the ones `quarterModules` returns for W326–W338, and the pass's point is that whether there should have been fewer is a judgement about the plan rather than a derivation.",
+      },
+      {
+        word: "thirteen",
+        kind: "fixed_by_a_gate",
+        why: "The horizon rule's quarter length, fixed by plan §6 at one quarter of thirteen units. `REVIEWED_UNITS` holds thirteen entries and the suite checks that against `QUARTER.last - QUARTER.first + 1`.",
+      },
+    ],
   },
   {
     module: "src/quality/typed-names.ts",

@@ -212,7 +212,7 @@ export const CONTROL_ANSWERS: readonly ControlAnswer[] = [
       // WRITTEN AS `pending` AND EXPIRED BEFORE THIS UNIT'S FIRST FULL RUN. builder-B closed W332
       // while this gate was being written, and the arm reported it on the drive — the second time
       // the mechanism W324 wrote and W330 generalised has fired in the tree rather than in a test.
-      fires: (root) => quarterModules(root, 333, 333).includes("src/quality/unrun.ts"),
+      fires: (root) => quarterModules(root, { first: 333, last: 333 }).includes("src/quality/unrun.ts"),
     },
   }),
   declareAnswer({

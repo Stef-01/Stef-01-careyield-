@@ -170,7 +170,13 @@ const copies: string[] = [];
 let sweeping = false;
 
 export function copyTree(root: string, options: CopyOptions = {}): string {
-  const copy = mkdtempSync(path.join(tmpdir(), "tree-"));
+  // W343: THE NAME CARRIES ITS OWNER. The run-level sweep used to take every `tree-*` whose mtime
+  // fell inside the run's window, which is not ownership: a sibling loop session — normal in this
+  // tree, where two builders run `pnpm verify` at once — starts AFTER this run does, so all of its
+  // live copies sit inside the window and were deleted under it. A pid is the cheapest true
+  // statement of who made a directory, and worker threads share the process's, which is exactly the
+  // set the teardown may remove.
+  const copy = mkdtempSync(path.join(tmpdir(), `tree-${process.pid}-`));
   copies.push(copy);
   if (!sweeping) {
     sweeping = true;

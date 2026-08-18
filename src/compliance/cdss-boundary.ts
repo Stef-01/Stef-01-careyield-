@@ -886,6 +886,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W339's register of the conditions this tree's own bounds name and nothing reads. Nobody but a developer reads it. Its longest strings are `UNREAD_RULE`, the argument for each condition and `UNREAD_BOUND`; its inputs are the tree's stated bounds and its own source files, and no patient, condition or appointment reason appears in any of it — the word `condition` here means a state of the repository, not anything clinical.",
   },
   {
+    module: "src/quality/hardening-q26.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W343's hardening pass over Q26 — four findings, each with the unit whose diff introduced it and a disposition carrying a clock. Nobody but a developer reads it. Its longest strings are the finding texts, their evidence and `Q26_HARDENING_BOUND`; its inputs are this repository's own diffs and registers, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/typed-names.ts",
     operatorCopy: [],
     notCopy:

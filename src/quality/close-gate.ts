@@ -235,6 +235,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
     why: "It COPIES `BUILD-STATE.md` into a constructed tree — `COPIED_FILES` names it because four registers read the ledger — and copying a file is not reading a row. Without this the planted trees below would have no ledger at all.",
   },
   {
+    module: "src/quality/hardening-q26.ts",
+    why: "It parses a ledger it is HANDED — `unaccountedUnitsFor` takes the text — to ask which units in one past quarter this pass never read. A row closing today cannot change which units Q326–Q338 held, and the range is pinned to a quarter that is over. Same standing as the three hardening registers before it.",
+  },
+  {
     module: "src/quality/typed-names.ts",
     why: "It reads the ledger to resolve a unit id — `allLedgerRows`, once per name — and a row closing changes a row's STATUS, never which ids exist. The one event that could break it is a row being deleted, which W168 forbids and `ledger-integrity.test.ts` checks. Excused because a close cannot move what it reads, not because it does not read.",
   },
