@@ -202,6 +202,11 @@ export const REVIEWED_AT_W345: readonly Review[] = [
   { id: "bounds::src/quality/controls.ts::CONTROL_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/declaration-tax.ts::TAX_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/deferrals.ts::DEFERRAL_BOUND", verdict: { kind: "still_correct" } },
+  // W342: back to `inherent` because its one liftable clause was LIFTED, which is the opposite of
+  // the drift this register watches for. W338 typed it `remedy` for the clause about an id-shaped
+  // token nothing reads; `unknownIdsInCell` reads it now, and what is left — the dossier's prose,
+  // and a row blocked on the wrong gate — is judgement rather than a check somebody could write.
+  { id: "bounds::src/quality/dossier-derived.ts::DOSSIER_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/founder-page-facts.ts::PAGE_FACT_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/hardening-q23.ts::HARDENING_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/hardening-q24.ts::HARDENING_BOUND", verdict: { kind: "still_correct" } },

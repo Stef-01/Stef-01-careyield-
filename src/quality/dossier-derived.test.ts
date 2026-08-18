@@ -90,10 +90,15 @@ describe("W335 the arms, each driven on a planted document", () => {
   it("reports a unit the row names and the ledger does not block on it", () => {
     const invented = table(live().replace("| 1 | W174 |", "| 1 | W174, W999 |"));
     expect(invented, "the planted id did not land").toContain("W999");
-    // `W999` is not a ledger row at all, so the cell reader cannot resolve it — which is itself the
-    // arm working: a row can only name units that exist, and an invented one reads as a count that
-    // disagrees with its own list.
-    expect(dossierDiff(ROOT, invented)).toEqual([]);
+    // W342 CLOSED THIS. `W999` is not a ledger row at all, so the cell reader — which resolves
+    // against the ledger's own ids, the only way `SUP-1` is visible — matches nothing, and until
+    // W342 the invented id was reported by nobody. That silence was `DOSSIER_BOUND`'s stated price
+    // and W339 recorded it as a condition owed to this unit; `unknownIdsInCell` reads the same cell
+    // for the SHAPE and answers it. This assertion used to be `toEqual([])` and the change is the
+    // promise being kept.
+    expect(dossierDiff(ROOT, invented)).toEqual([
+      { row: "G3", what: "names W999 and the ledger holds no such row" },
+    ]);
     const real = table(live().replace("| 1 | W174 |", "| 1 | W174, W185 |"));
     expect(dossierDiff(ROOT, real)).toEqual([
       { row: "G3", what: "names W185, which the ledger does not block on it" },

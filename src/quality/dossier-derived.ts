@@ -64,6 +64,8 @@ export interface DossierRow {
   count: string;
   /** The ids the "Which" cell names, resolved against the ledger's own ids. */
   units: string[];
+  /** The "Which" cell as written, so a token that resolves to nothing can still be seen. */
+  which: string;
 }
 
 /** Every id the ledger holds, so a cell is read against real rows rather than a guessed shape. */
@@ -74,6 +76,28 @@ function ledgerIds(root: string): string[] {
 /** The ids a cell names — matched against known ids, which is how `SUP-1` is seen at all. */
 export function unitsInCell(cell: string, known: readonly string[]): string[] {
   return known.filter((id) => new RegExp(`(^|[^\\w-])${id}([^\\w-]|$)`).test(cell)).sort();
+}
+
+/**
+ * Tokens in a cell that are SHAPED like a row id and are not one.
+ *
+ * W342 ANSWERS W339'S OWED CONDITION, and the condition is `DOSSIER_BOUND`'s own sentence: the
+ * cell reader above resolves against the ledger's ids, which is the only way `SUP-1` is visible at
+ * all — and the price W335 stated is that a cell naming an id the ledger does not hold matches
+ * nothing and is reported by nobody. A row that invented a unit AND adjusted its count would have
+ * passed. This reads the same cell for the shape instead, so an id nothing answers is a defect
+ * rather than a silence.
+ *
+ * TWO SHAPES, because the ledger holds two: the week-unit `W342` — the shape `isUnitId` types —
+ * and the supplementary rows W310 made visible, which are letters, a hyphen and a number. A single
+ * letter followed by a digit is NOT an id here: `G5` and `Q9` are a gate and a decision, and they
+ * are what these cells are about.
+ */
+export function unknownIdsInCell(cell: string, known: readonly string[]): string[] {
+  const ids = new Set(known);
+  return [...new Set([...cell.matchAll(/\b(W\d+|[A-Z]{2,}-\d+)\b/g)].map((m) => m[1]!))]
+    .filter((token) => !ids.has(token))
+    .sort();
 }
 
 /** The outstanding table, parsed. */
@@ -98,6 +122,7 @@ export function dossierRows(
         decision: (cells[0] ?? "").replace(/\*/g, "").trim(),
         count: cells[1] ?? "",
         units: unitsInCell(cells[2] ?? "", known),
+        which: cells[2] ?? "",
       });
     } else if (started && line.trim() === "") break;
   }
@@ -145,6 +170,11 @@ export function dossierDiff(
       });
     }
     const row = rowFor(rows, ruling.blocker, folds);
+    if (row !== undefined) {
+      for (const token of unknownIdsInCell(row.which, known)) {
+        out.push({ row: ruling.blocker, what: `names ${token} and the ledger holds no such row` });
+      }
+    }
     if (row === undefined) {
       out.push({ row: ruling.blocker, what: "is outstanding and the dossier's table has no row for it" });
       continue;
@@ -214,9 +244,13 @@ export function blockedSinceTheDossier(root: string, lastUnit: number): string[]
 export function dossierDiffFor(root: string): DossierDefect[] {
   void root;
   const known = ["W174"];
-  return unitsInCell("W174, W999", known).includes("W999")
-    ? [{ row: "-", what: "an id the ledger does not hold is reported after all" }]
-    : [];
+  // W342: the same probe, against the reader that answers it. It reported nothing while the cell
+  // was read only for ids the ledger holds; it reports the phantom now, which is the fix
+  // re-derived rather than recorded — W258's shape, and the reason this predicate survives the
+  // bound it was written to keep open.
+  return unknownIdsInCell("W174, W999", known).includes("W999")
+    ? []
+    : [{ row: "-", what: "an id-shaped token that resolves to no row is invisible again" }];
 }
 
 /** What a green comparison does not prove. */
@@ -232,12 +266,12 @@ export const DOSSIER_BOUND =
   "CANNOT TELL A RIGHT ATTRIBUTION FROM A WRONG ONE. A row blocked on the wrong gate resolves " +
   "perfectly and prices the wrong decision, which is the limit W310's bound states about blockers " +
   "and the reason that one is `inherent` rather than waiting on a remedy. FOURTH, AND FOUND BY " +
-  "DRIVING IT: a cell naming an id the ledger does not hold is INVISIBLE here. The reader resolves " +
+  "DRIVING IT: a cell naming an id the ledger does not hold WAS invisible here. The reader resolves " +
   "against real rows — which is how `SUP-1` is seen at all, and the whole reason the shape-matching " +
-  "version was wrong — so an invented `W999` in a row is not reported as a phantom, only as a count " +
-  "that disagrees with its own list. A row that both invented a unit and adjusted its own count to " +
-  "match would pass. THAT ONE HAS A REMEDY AND THIS SENTENCE OWES IT: reporting a token that is " +
-  "id-shaped and resolves to no row is a check somebody can write, beside the resolving reader " +
-  "rather than instead of it, and until it exists this bound stays open. W297's register found the " +
-  "mis-typing before a reader did — the no-remedy kind reached parity with the remedy-bearing one " +
-  "and its ratio guard fired, which is W311's warning arriving from the other side.";
+  "version was wrong — so an invented `W999` in a row was reported as nothing at all, and a row " +
+  "that both invented a unit and adjusted its own count to match would have passed. W342 CLOSED " +
+  "IT, on the sentence's own terms: `unknownIdsInCell` reads the same cell for the SHAPE, beside " +
+  "the resolving reader rather than instead of it. What that leaves is the third limit and nothing " +
+  "further this tree can build — a row naming a real unit under the wrong gate resolves perfectly " +
+  "and prices the wrong decision — which is why this sentence is now `inherent` where W338 re-typed " +
+  "it `remedy` for the clause W342 has since answered.";

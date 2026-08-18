@@ -526,20 +526,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     unit: "W335",
     text: DOSSIER_BOUND,
     lifting: {
-      kind: "remedy",
-      remedy: "reporting a token that is id-shaped and resolves to no row",
-      reads: "the register itself, given a table row naming an id the ledger does not hold",
-      // W338 RE-TYPED THIS. It shipped `inherent` on three clauses, two of which really are — the
-      // dossier's argument is a reading rather than the position, and a wrong attribution is the
-      // judgement W310's bound states. The third is not: a cell naming `W999` goes unreported, and
-      // a check for an id-shaped token that resolves to nothing is a thing somebody can write. The
-      // ratio guard caught it before a reader did.
-      stillOpen: (root) =>
-        dossierDiffFor(root).length === 0,
-      lifted: {
-        kind: "derived_without_a_tree",
-        why: "It hands the register a table row naming an id the ledger does not hold and asks whether anything is reported. The answer is a property of the reader rather than of any tree — the row is a string this line holds — so no root changes it, and what would lift it is the check being written rather than a file appearing anywhere.",
-      },
+      kind: "inherent",
+      why: "Three clauses, and the fourth is gone because W342 built it. What remains cannot be lifted by anything this tree could write: the dossier's PROSE is a reading of the position rather than the position, so deriving it would mean deriving a judgement; the as-at half is already checked by `blockedSinceTheDossier` rather than bounded; and a row blocked on the WRONG gate resolves perfectly and prices the wrong decision, which is the limit W310 states about blockers and the same judgement one level up. W338 re-typed this sentence from `inherent` to `remedy` because one clause named a check somebody could write — `unknownIdsInCell` is that check, and with it written the sentence is back to naming only what a derivation cannot decide. The predicate that guarded the clause survives as its re-derivation in `dossierDiffFor`, so the fix going away is a failure rather than a silence.",
     },
     numbers: [
       {

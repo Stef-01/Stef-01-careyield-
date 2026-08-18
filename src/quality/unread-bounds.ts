@@ -229,11 +229,11 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
   },
   {
     bound: "src/quality/dossier-derived.ts::DOSSIER_BOUND",
-    condition: "a cell naming an id the ledger does not hold is INVISIBLE here",
+    condition: "a cell naming an id the ledger does not hold WAS invisible here",
     reading: {
-      kind: "owed",
-      by: "W342",
-      why: "W342 resolves every register field that names a unit, a module or an export against the tree, which is this condition one level up. W338 already re-typed this bound from `inherent` to `remedy` for it, so the promise is made in two places and the unit is one that must answer it.",
+      kind: "read_by",
+      check: "src/quality/dossier-derived.ts::unknownIdsInCell",
+      how: "W342 ANSWERED IT, which is what an `owed` row is for. The cell is read twice now: once against the ledger's own ids, which is how `SUP-1` is visible at all, and once for the SHAPE, so a token that resolves to no row is reported instead of matching nothing. W339 recorded the promise, the row close made the clock fire when W342 landed without it, and the check went in rather than the promise being re-pointed at a later unit.",
     },
   },
   {
