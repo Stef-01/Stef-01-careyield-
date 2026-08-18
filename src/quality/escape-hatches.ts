@@ -209,6 +209,11 @@ export const REVIEWED_AT_W345: readonly Review[] = [
   // token nothing reads; `unknownIdsInCell` reads it now, and what is left — the dossier's prose,
   // and a row blocked on the wrong gate — is judgement rather than a check somebody could write.
   { id: "bounds::src/quality/dossier-derived.ts::DOSSIER_BOUND", verdict: { kind: "still_correct" } },
+  // W350: `inherent` on arrival, because its one liftable clause was LIFTED — W337's predicate had
+  // been written to notice `proseWaits` by name and went false the moment it existed. What is left
+  // is a wait with no unit id in it, which needs a reading of what an event is rather than a
+  // resolution of a name: a judgement over arbitrary prose, not a check somebody could write.
+  { id: "bounds::src/quality/self-ending.ts::ENDING_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/founder-page-facts.ts::PAGE_FACT_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/hardening-q23.ts::HARDENING_BOUND", verdict: { kind: "still_correct" } },
   // W343: `inherent` on arrival and read on arrival, which is the only honest way a pass adds a

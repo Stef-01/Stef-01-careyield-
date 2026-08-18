@@ -263,28 +263,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     unit: "W330",
     text: ENDING_BOUND,
     lifting: {
-      kind: "remedy",
-      remedy: "W314's machinery pointed at a different vocabulary",
-      reads: "`self-ending.ts`, for a derivation that reads a wait written as PROSE rather than as a discriminant",
-      // W337 RECLASSIFIED THIS, AND THE REASON IS THE REGISTER ABOVE IT. W297 refuses to let the
-      // no-remedy kind become the majority — `inherent` can never go stale, which is exactly what
-      // makes it the cheap answer — and it fired when the two kinds reached parity. Re-reading
-      // this entry, the bound's own text NAMES a remedy: reading prose for an event, which is a
-      // unit rather than a widening. A remedy named in the sentence and classified as no-remedy in
-      // the register is the register disagreeing with the bound it holds, and the bound was right.
-      // The second clause — whether a finding still matters after its unit lands — really is a
-      // judgement, and it stays in the text as the part no remedy reaches.
-      stillOpen: (root) =>
-        !/export function proseWaits\b/.test(readFileSync(path.join(root, "src/quality/self-ending.ts"), "utf8")),
-      lifted: {
-        kind: "constructed_tree",
-        // The tree where somebody has written it: a derivation that takes prose and returns the
-        // waits in it. With that present the sentence is describing a gap the tree has closed.
-        files: {
-          "src/quality/self-ending.ts":
-            "// W330: the waits, including the ones written as sentences.\nexport function proseWaits(): string[] {\n  return [];\n}\n",
-        },
-      },
+      kind: "inherent",
+      why: "W350 BUILT THE REMEDY THIS ENTRY NAMED, and W337's predicate had been written to notice: it went false the moment `self-ending.ts` exported `proseWaits`, which is the shape a lifted bound is supposed to have. What is left cannot be lifted by anything this tree could write. A wait with no unit id in it — *while G5 is unruled*, *until somebody writes the remedy* — needs a reading of what counts as an event rather than a resolution of a name, which is a judgement over arbitrary prose; and whether a deferred finding still matters after its unit landed is the same kind of judgement one layer up. The register reports that somebody must look and stops there, which is what the sentence now says.",
     },
     numbers: [],
   },
@@ -550,19 +530,32 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the vocabulary grows and says so",
-      reads: "the register itself, for a condition owed to a unit that has not read it yet",
-      // The sentence's first clause is the W267 class and has no predicate. The one with teeth is
-      // that `not_observable` is an argument rather than a derivation and is the majority — which
-      // stops being the shape of the register the day every row either names a check or names a
-      // unit that owes one. Rows are `owed` today; when the last of them is read, this
-      // sentence is describing a register that has moved.
-      stillOpen: () => NAMED_CONDITIONS.some((c) => c.reading.kind === "owed"),
+      reads: "the register itself, for a condition nothing could report",
+      // THE CLOCK THIS ENTRY WATCHED RAN OUT BY BEING ANSWERED. W339 pointed it at the `owed` arm;
+      // W342, W343 and W350 each read one of the three, so that arm is empty and could no longer
+      // go stale. The clause that is still live is the one the sentence spends most of its length
+      // on: `not_observable` is an argument rather than a derivation AND IS THE MAJORITY, which
+      // stops describing this register the day every row names a check. W297's ratio guard is the
+      // reason this was re-read rather than typed `inherent` — two bounds converting at once put
+      // the no-remedy kind at parity, and the guard fired before a reader did, again.
+      stillOpen: () => NAMED_CONDITIONS.some((c) => c.reading.kind === "not_observable"),
       lifted: {
         kind: "derived_without_a_tree",
-        why: "It reads W339's own declared register, an imported constant: whether a condition is owed to a unit is a classification somebody wrote down rather than anything a walk finds, so no root can be handed to it. What lifts it is a later unit reading the last owed condition, which is an edit to this register rather than a change to any tree.",
+        why: "It reads W339's own declared register, an imported constant: whether a condition could be reported by reading this repository is a classification somebody argued rather than anything a walk finds, so no root can be handed to it. What lifts it is a later unit reading the last unobservable condition, which is an edit to this register rather than a change to any tree.",
       },
     },
-    numbers: [],
+    numbers: [
+      {
+        word: "Three",
+        kind: "unit_id",
+        why: "How many conditions this register owed to a later unit when W339 wrote it. History about a register that has moved: the rows are in `NAMED_CONDITIONS` and the arm is empty now, which the bound's own predicate no longer watches because there is nothing left there to watch.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'W342 read one, W350 read another' — one condition each, the unit of the sentence rather than a count of anything the tree holds. It stays one however many conditions a later unit reads.",
+      },
+    ],
   },
   {
     module: "src/quality/horizon-claims.ts",

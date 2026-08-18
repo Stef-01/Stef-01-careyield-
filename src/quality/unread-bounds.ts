@@ -279,11 +279,11 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
   },
   {
     bound: "src/quality/self-ending.ts::ENDING_BOUND",
-    condition: "a sentence in a header saying a thing holds until some unit lands is still a declaration with an event in it and still nothing reads it",
+    condition: "What is left is the wait with no unit id in it",
     reading: {
-      kind: "owed",
-      by: "W350",
-      why: "A wait written in prose is a claim in prose, which is what W350 re-reads: every claim the horizon makes about a fact the tree holds, read by a check or declared unread. W318 typed the FIELD and left the paragraph, and this is the paragraph.",
+      kind: "read_by",
+      check: "src/quality/self-ending.ts::proseWaits",
+      how: "W350 ANSWERED THE HALF THAT HAD A REMEDY rather than re-pointing it, which is what an `owed` row is for: `proseWaits` resolves every `until W<n>` in a first-party module's comments against the ledger, and the tree holds one live wait — `registers/store.test.ts` on W56, since Year 1. What the row now reads is the REMAINDER the rewritten bound states: a wait with no unit id in it, which `proseWaits` cannot resolve because there is no name to resolve. The register reports the ones it can and the sentence keeps the ones it cannot, which is the honest split rather than a promise.",
     },
   },
   {
@@ -501,4 +501,9 @@ export const UNREAD_BOUND =
   "retires a real specification and nothing here can tell. What the register does buy is that the " +
   "sentence and the answer sit beside each other, so a gap the tree closes leaves a row saying " +
   "somebody reads it rather than a paragraph still claiming nobody does — which W339 found to be " +
-  "the case for several of them on the day it was written.";
+  "the case for several of them on the day it was written. AND THE `owed` ARM IS EMPTY NOW. Three " +
+  "conditions were promised to a later unit when this register was written; W342 read one, W350 " +
+  "read another and the third was answered by the unit it named. What is left is every row either " +
+  "naming a check or arguing that nothing could report it, which is the state the register was " +
+  "built to reach and also the state in which its own liveness comes from the argument in each " +
+  "row rather than from a clock.";

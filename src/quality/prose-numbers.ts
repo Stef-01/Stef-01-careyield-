@@ -297,6 +297,12 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/assertion-vocabulary.ts", text: "68 sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/assertion-vocabulary.ts", text: "two sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/assertion-vocabulary.ts", text: "Two sites", resolution: { kind: "at_the_unit" } },
+  // W350: what tipped W297's ratio guard on the day a pair of bounds were re-typed at once. The
+  // note has to say it that way round: writing the figure here would make this comment a claim of
+  // its own, which is this register reporting its own classification. History —
+  // the guard re-derives the ratio on every run, so the sentence is the reason and the register is
+  // the check.
+  { module: "src/quality/bounds.ts", text: "two bounds", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/refusal-branches.ts", text: "two entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "sixteen modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "two branches", resolution: { kind: "at_the_unit" } },

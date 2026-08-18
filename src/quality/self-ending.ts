@@ -415,16 +415,106 @@ export function endingDiff(
 }
 
 /** What this does not prove. */
+/** One newline, named so a scan of this file for a split does not read a literal here. */
+const NEWLINE = "\n";
+
+/** A wait written as a sentence rather than as a typed discriminant. */
+export interface ProseWait {
+  /** Repo-relative, posix separators. */
+  module: string;
+  /** The unit the sentence waits on. */
+  unit: UnitId;
+  /** The sentence, trimmed to what a reader needs. */
+  says: string;
+}
+
+/**
+ * Sentences in prose saying a thing holds until some unit lands, where that unit has NOT landed.
+ *
+ * W350 ANSWERED W339'S OWED CONDITION, and this is it. `ENDING_BOUND` said the scan finds a wait
+ * only where the wait is a typed discriminant, and that a sentence in a header saying a thing holds
+ * until some unit lands is still a declaration with an event in it and still nothing reads it. This
+ * reads them: every `until W<n>` in a first-party module's COMMENTS, resolved against the ledger.
+ *
+ * A LANDED UNIT MAKES THE SENTENCE HISTORY, which is why the filter is the ledger rather than the
+ * phrasing. `until W281 retired that pin` is a note about the past and most of these sentences are;
+ * a wait on a unit that is still OPEN is a promise nobody is watching, and the tree holds one —
+ * `registers/store.test.ts` has waited on W56 since Year 1, and W56 is `in-progress` to this day.
+ *
+ * A FIXTURE IS NOT A COMMENT. W330's own probe carries a planted header saying a thing holds
+ * pending a four-digit unit that will never exist, and the line it sits on begins with a quote
+ * rather than a slash — so the scan does not read it, and no exemption had to be written. THIS
+ * PARAGRAPH IS WHY THE SENTENCE IS PHRASED THAT WAY: the first draft quoted the fixture verbatim
+ * and the register reported its own note, which is the collision W295 shipped and W307 wrote a
+ * rule against. A scan whose prose quotes its own subject finds itself.
+ */
+export function proseWaits(root: string, ledger: string = readFileSync(path.join(root, "BUILD-STATE.md"), "utf8")): ProseWait[] {
+  const status = new Map(parseLedgerRows(ledger).map((r) => [r.id, r.status]));
+  const found: ProseWait[] = [];
+  for (const file of typescriptFiles(root)) {
+    const module = path.relative(root, file).split(path.sep).join("/");
+    const text = readFileSync(file, "utf8");
+    // COMMENTS ONLY, and the inverse of every other scan here: the subject IS the prose, so the
+    // lines that are code are the ones to drop.
+    for (const line of text.split(NEWLINE)) {
+      const comment = /^\s*(?:\/\/|\*)\s?(.*)$/.exec(line)?.[1];
+      if (comment === undefined) continue;
+      for (const m of comment.matchAll(/until (W\d+)\b/g)) {
+        const unit = m[1] as UnitId;
+        if (status.get(unit) === "done") continue;
+        found.push({ module, unit, says: comment.trim().slice(0, 160) });
+      }
+    }
+  }
+  return found.sort((a, b) => `${a.module}${a.unit}`.localeCompare(`${b.module}${b.unit}`));
+}
+
+/**
+ * The prose waits this tree knowingly holds, argued.
+ *
+ * Both directions, W102's shape: a wait that stops being written fails here, and a new one arrives
+ * undeclared. The point is not to forbid the sentence — it is that a promise with an event in it
+ * should be somewhere a check can see, and until somebody moves one, the register names it.
+ */
+export const DECLARED_PROSE_WAITS: Readonly<Record<string, string>> = {
+  "src/registers/store.test.ts::W56":
+    "The oldest wait in the tree, and a real one: the register store keeps a placeholder catalogue until W56 is unblocked, and W56 has been `in-progress` since Year 1 because it waits on a founder value the loop cannot supply. Moving it into a typed declaration would say the same thing in a place a check can read, which is a unit rather than a sentence — and until then this register is what reads it.",
+};
+
+export interface ProseWaitDefect {
+  wait: string;
+  what: string;
+}
+
+/** The tree's prose waits against the declarations, in both directions. */
+export function proseWaitDefects(
+  root: string,
+  declared: Readonly<Record<string, string>> = DECLARED_PROSE_WAITS,
+  waits: readonly ProseWait[] = proseWaits(root),
+): ProseWaitDefect[] {
+  const live = new Set(waits.map((w) => `${w.module}::${w.unit}`));
+  const out: ProseWaitDefect[] = [];
+  for (const key of live) {
+    if (!(key in declared)) out.push({ wait: key, what: "waits on a unit that has not landed, in prose nobody declared" });
+  }
+  for (const key of Object.keys(declared)) {
+    if (!live.has(key)) out.push({ wait: key, what: "is declared and the tree no longer says it, or the unit has landed" });
+  }
+  return out.sort((a, b) => a.wait.localeCompare(b.wait));
+}
+
 export const ENDING_BOUND =
   "The derivation finds a declaration that waits only where the wait is a TYPED discriminant — " +
   "`kind: \"deferred\"` or `kind: \"pending\"` in an object literal. A wait written as prose is " +
   "invisible to it, and prose is how the worst instance of this was written: Q23-SIMP-1 said " +
   "`W299+`, a range, in a field that took any string, and it outlived its answer by most of a " +
   "quarter precisely because nothing could read it. W318 closed that particular door by typing the " +
-  "field, so the class is narrower than it was — but a sentence in a header saying a thing holds " +
-  "until some unit lands is still a declaration with an event in it and still nothing reads it. " +
-  "What would find those is a reading of prose against the ledger, which is W314's machinery " +
-  "pointed at a different vocabulary and is a unit rather than a widening of this scan. Nor does " +
+  "field, so the class is narrower than it was — and W350 narrowed it again: `proseWaits` reads " +
+  "every `until W<n>` in a first-party module's comments against the ledger, so a sentence waiting " +
+  "on a unit that has not landed is reported rather than sitting in a header. What is left is the " +
+  "wait with no unit id in it — *while G5 is unruled*, *until somebody writes the remedy* — which " +
+  "needs a reading of what an event IS rather than a resolution of a name, and that is a judgement " +
+  "over arbitrary prose rather than a widening of this scan. Nor does " +
   "ending a declaration say what should replace it: this reports that somebody must look, names " +
   "what they are looking at, and stops there, because whether a deferred finding still matters " +
   "after its unit landed is a judgement and not a derivation.";
