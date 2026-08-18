@@ -66,7 +66,7 @@ import { acceptanceCarryingModules } from "./acceptances";
 import { violationReporters } from "./refusal-branches";
 import { mutantsIn } from "./mutation-sampling";
 import { CITATION_BOUND, separatorDiff } from "./citations";
-import { PLANTING_BOUND, planterDiff, withTree } from "./planting";
+import { PLANTING_BOUND, copyTree, planterDiff, withTree } from "./planting";
 import { COUNT_BOUND, countDiff, registerSizeAssertions } from "./register-counts";
 import { SCAN_SITES, blankLiterals, fixtureDiff, fixtureText, scanSiteDiff } from "./scan-text";
 import { fallibleDiff } from "./review-w279";
@@ -137,6 +137,21 @@ export const MANIFEST_BOUND =
   "here would be one that could never say anything. And W308 re-measures whether the tax moved.";
 
 /** Everything the four registers below are derived from: one row per module, and nothing twice. */
+/**
+ * A tree of its own for the drivers that PLANT, made once and shared.
+ *
+ * `homeDiff` plants a probe module into whatever tree it is handed, so handing it `process.cwd()`
+ * wrote into the repository while other test workers were walking it — the `ENOENT` on a path the
+ * failing suite had never heard of, seen twice before it was pinned. `withPlantedIn` now refuses a
+ * root inside the repository outright, so these drivers need somewhere else to write. Lazy because
+ * most runs drive no branch at all, and shared because a copy costs about a second.
+ */
+let plantableTreeCache: string | null = null;
+function plantableTree(): string {
+  plantableTreeCache ??= copyTree(process.cwd());
+  return plantableTreeCache;
+}
+
 export const MANIFEST: readonly ModuleEntry[] = [
   {
     module: "src/compliance/copy-y6.ts",
@@ -500,7 +515,7 @@ export const MANIFEST: readonly ModuleEntry[] = [
           kind: "driven",
           drive: () =>
             homeDiff(
-              process.cwd(),
+              plantableTree(),
               DECLARATION_HOMES.filter((h) => h.register !== "src/quality/bounds.ts"),
             ).unhomed.length > 0,
         },
@@ -511,7 +526,7 @@ export const MANIFEST: readonly ModuleEntry[] = [
         reach: {
           kind: "driven",
           drive: () =>
-            homeDiff(process.cwd(), [
+            homeDiff(plantableTree(), [
               ...DECLARATION_HOMES,
               { register: "src/quality/not-a-register.ts", files: [], why: "x" },
             ]).stale.length > 0,
@@ -523,7 +538,7 @@ export const MANIFEST: readonly ModuleEntry[] = [
         reach: {
           kind: "driven",
           drive: () =>
-            homeDiff(process.cwd(), [
+            homeDiff(plantableTree(), [
               ...DECLARATION_HOMES,
               { register: "src/quality/bounds.ts", files: ["src/quality/gone.ts"], why: "x" },
             ]).missing.length > 0,

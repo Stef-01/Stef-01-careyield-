@@ -128,12 +128,18 @@ export const LATENT_FINDINGS: readonly LatentFinding[] = [
   declareFinding({
     id: "PLANT-1",
     what:
-      "A test plants into the REAL `src/` tree rather than into a copy, and the fingerprint it leaves is the directory: `withPlantedIn` removes the file it wrote and not the `src/planted/` folder that had to be created for it. While the file exists, any other test file walking `src/` in a parallel worker can list it and then fail to open it — which is how `record-classes.test.ts` and `stores.test.ts` have each died once with ENOENT on `src/planted/w313-probe.ts`, in runs where every file passes in isolation. The predicate is the directory rather than the race, because a race cannot be asserted and its residue can.",
+      "Three of W308's manifest branch-drivers called `homeDiff(process.cwd(), …)`, and `homeDiff` PLANTS — so driving a branch wrote `src/planted/w313-probe.ts` into the repository while other test workers were walking it. A worker listing `src/` could see the probe and then fail to open it a moment after the `finally` removed it: `record-classes.test.ts` and `stores.test.ts` each died once with ENOENT on a path their own suite had never heard of, in runs where every file passed in isolation. It read as a flake for two firings because the file that loses the race is whichever one is walking. The residue was the fingerprint, not the defect: `withPlantedIn` removed the file it wrote and left the folder that had to be created for it, which is what made the race assertable at all. Found by writing the predicate and watching it fire.",
     recordedBy: "W322",
     triggerStatement:
       "The real tree holds a `src/planted/` directory. Nothing in this repository should: every planting harness writes into a temporary copy, so the folder existing at all means some run wrote into the tree it was reading.",
     trigger: () => existsSync(path.join(ROOT, "src/planted")),
-    status: "open",
+    // Closed in the firing that recorded it, which is unusual enough to say why it is still here.
+    // The cause is gone — `withPlantedIn` now refuses a root inside the repository, so the drivers
+    // plant into a copy of their own — and the record is what makes two firings of an unexplained
+    // ENOENT legible to whoever meets the third. The live guard moved to `planting.test.ts`, where
+    // it belongs: the refusal is a check a healthy tree runs, not a defect awaiting its day.
+    status: "closed",
+    closedBy: "W322",
   }),
   declareFinding({
     id: "REPORTER-1",

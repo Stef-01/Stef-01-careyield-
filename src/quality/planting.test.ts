@@ -23,6 +23,49 @@ import { withRoot } from "./refusal-branches";
 
 const ROOT = process.cwd();
 
+describe("W322 a plant cannot land in the repository, because other workers walk it", () => {
+  it("refuses a root inside the repository, naming the copy as the fix", () => {
+    // THE DEFECT THIS REPLACES was three manifest branch-drivers calling `homeDiff(process.cwd())`.
+    // `homeDiff` plants, so driving a branch wrote a probe module into the tree every other test
+    // worker was walking; two suites died once each with ENOENT on a path they had never heard of,
+    // in runs where every file passed alone. Scoping the cleanup was never going to help — the file
+    // exists for as long as the probe runs, and that is the whole window.
+    expect(() => withPlantedIn(ROOT, { "src/planted/w322-probe.ts": "export const x = 1;\n" }, () => 1)).toThrow(
+      "refuses to plant into the repository",
+    );
+    expect(() => withPlantedIn(path.join(ROOT, "src"), {}, () => 1)).toThrow("copyTree");
+  });
+
+  it("plants nothing, so the refusal is not merely a message", () => {
+    // A refusal that threw AFTER writing would leave exactly the residue this is about.
+    try {
+      withPlantedIn(ROOT, { "src/planted/w322-probe.ts": "export const x = 1;\n" }, () => 1);
+    } catch {
+      // The throw is the point; what it left behind is what is asserted.
+    }
+    expect(existsSync(path.join(ROOT, "src/planted")), "the refusal wrote before it refused").toBe(false);
+  });
+
+  it("leaves the repository holding no planted directory at all", () => {
+    // The residue check, kept live. `withPlantedIn` creates the parent directory it writes into and
+    // removes only the file, so a folder here is the fingerprint of a plant that reached the tree —
+    // by this harness or by any future one that bypasses it.
+    expect(existsSync(path.join(ROOT, "src/planted")), "something planted into the repository").toBe(false);
+  });
+
+  it("still plants into a copy, which is the tree the refusal points at", () => {
+    const copy = copyTree(ROOT, { directories: ["src"] });
+    try {
+      const planted = withPlantedIn(copy, { "src/planted/w322-probe.ts": "export const x = 1;\n" }, () =>
+        existsSync(path.join(copy, "src/planted/w322-probe.ts")),
+      );
+      expect(planted, "the refusal caught a copy, which would make every planting suite unrunnable").toBe(true);
+    } finally {
+      rmSync(copy, { recursive: true, force: true });
+    }
+  });
+});
+
 describe("W303 a probe cannot outlive its scope, even when the probe throws", () => {
   it("removes what it planted after a probe that throws", () => {
     // THE GATE'S OWN WORDS, DRIVEN. This is the case the deleted helpers got wrong: ten call sites

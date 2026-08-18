@@ -82,6 +82,31 @@ export function withTree<T>(files: Plantable, probe: (root: string) => T): T {
 }
 
 /**
+ * Refuse to plant into the repository itself.
+ *
+ * THE RESIDUE WAS NEVER THE BUG. `withPlantedIn` removes the files it wrote, so a plant into the
+ * real tree looked harmless and left only an empty `src/planted/` behind. What it actually did was
+ * write into a tree OTHER TEST WORKERS ARE WALKING: a register in another file listed the probe
+ * module and then read it a moment after the `finally` removed it, and failed with `ENOENT` on a
+ * path nothing in its own suite had ever heard of. It read as a flake for two firings — the failing
+ * file was different each time, because the file that loses the race is whichever one is walking.
+ *
+ * A copy costs a second and cannot be raced. Every site that planted into `process.cwd()` was a
+ * manifest branch-driver reaching for the nearest tree; there is now no nearest tree to reach for.
+ */
+function refuseTheRepository(root: string): void {
+  const repository = process.cwd();
+  const resolved = path.resolve(root);
+  if (resolved === repository || resolved.startsWith(repository + path.sep)) {
+    throw new Error(
+      `withPlantedIn refuses to plant into the repository (${path.relative(repository, resolved) || "."}): ` +
+        "other test workers walk this tree and will read a probe that is about to be deleted. " +
+        "Plant into `copyTree(root)` instead.",
+    );
+  }
+}
+
+/**
  * Plant into a tree that already exists, and remove exactly what was planted.
  *
  * THE `finally` IS THE POINT. Ten call sites used to plant, assert, and remove on the next line, so
@@ -89,6 +114,7 @@ export function withTree<T>(files: Plantable, probe: (root: string) => T): T {
  * with a probe in it. There is no unscoped version of this function to reach for.
  */
 export function withPlantedIn<T>(root: string, files: Plantable, probe: () => T): T {
+  refuseTheRepository(root);
   const written = write(root, files);
   try {
     return probe();
