@@ -86,7 +86,7 @@ import { CLOSE_GATE_BOUND, weldedLedgerTests } from "./close-gate";
 import { CONTROLS, INSTANT_BOUND } from "./instant";
 import { DEFERRAL_BOUND } from "./deferrals";
 import { QUARTER_MUTANT_BOUND } from "./quarter-mutants";
-import { DOSSIER_BOUND } from "./dossier-derived";
+import { DOSSIER_BOUND, dossierDiffFor } from "./dossier-derived";
 import { REMEDY_BOUND } from "./self-defeating";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
@@ -332,8 +332,20 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     unit: "W335",
     text: DOSSIER_BOUND,
     lifting: {
-      kind: "inherent",
-      why: "Three limits and none is a change to this tree. The dossier's ARGUMENT — that four gates block nothing and are the four that matter, that three proposals in three years went unanswered — is a reading of the position rather than the position, and no derivation produces a reading. Whether a row is blocked on the RIGHT gate is the same judgement W310's bound states about blockers, which W311 established is inherent because a correct attribution and a mistaken one are the same text in the same column. And a cell naming an id the ledger does not hold is invisible to a reader that resolves against real rows, which is the price of being able to see `SUP-1` at all — widening it back to a shape match reintroduces the defect this unit exists to fix.",
+      kind: "remedy",
+      remedy: "reporting a token that is id-shaped and resolves to no row",
+      reads: "the register itself, given a table row naming an id the ledger does not hold",
+      // W338 RE-TYPED THIS. It shipped `inherent` on three clauses, two of which really are — the
+      // dossier's argument is a reading rather than the position, and a wrong attribution is the
+      // judgement W310's bound states. The third is not: a cell naming `W999` goes unreported, and
+      // a check for an id-shaped token that resolves to nothing is a thing somebody can write. The
+      // ratio guard caught it before a reader did.
+      stillOpen: (root) =>
+        dossierDiffFor(root).length === 0,
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It hands the register a table row naming an id the ledger does not hold and asks whether anything is reported. The answer is a property of the reader rather than of any tree — the row is a string this line holds — so no root changes it, and what would lift it is the check being written rather than a file appearing anywhere.",
+      },
     },
     numbers: [
       {

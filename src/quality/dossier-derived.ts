@@ -198,6 +198,27 @@ export function blockedSinceTheDossier(root: string, lastUnit: number): string[]
     .sort();
 }
 
+/**
+ * Whether a row naming an id the ledger does not hold still goes unreported.
+ *
+ * `DOSSIER_BOUND`'s own predicate, exported because W297 requires a bound to carry one and W289
+ * requires it to be callable. It reads the CELL READER rather than the document: `unitsInCell`
+ * resolves against known rows, so a token outside that list is not seen as a unit at all. Empty
+ * means the blind spot is still there — which is what the sentence says — and when somebody writes
+ * the id-shaped-token check this stops being empty and the bound goes stale.
+ *
+ * IT TAKES NO TREE AND MUST NOT. W306 drives every predicate against a bare root and a full one,
+ * and the first draft read the dossier off disk: on an empty tree it threw `ENOENT` through a bound
+ * predicate, which is Q24-CR-7's shape exactly, one quarter after that finding was fixed.
+ */
+export function dossierDiffFor(root: string): DossierDefect[] {
+  void root;
+  const known = ["W174"];
+  return unitsInCell("W174, W999", known).includes("W999")
+    ? [{ row: "-", what: "an id the ledger does not hold is reported after all" }]
+    : [];
+}
+
 /** What a green comparison does not prove. */
 export const DOSSIER_BOUND =
   "It regenerates ONE table — the outstanding position, decision by decision and unit by unit. " +
@@ -215,4 +236,8 @@ export const DOSSIER_BOUND =
   "against real rows — which is how `SUP-1` is seen at all, and the whole reason the shape-matching " +
   "version was wrong — so an invented `W999` in a row is not reported as a phantom, only as a count " +
   "that disagrees with its own list. A row that both invented a unit and adjusted its own count to " +
-  "match would pass.";
+  "match would pass. THAT ONE HAS A REMEDY AND THIS SENTENCE OWES IT: reporting a token that is " +
+  "id-shaped and resolves to no row is a check somebody can write, beside the resolving reader " +
+  "rather than instead of it, and until it exists this bound stays open. W297's register found the " +
+  "mis-typing before a reader did — the no-remedy kind reached parity with the remedy-bearing one " +
+  "and its ratio guard fired, which is W311's warning arriving from the other side.";

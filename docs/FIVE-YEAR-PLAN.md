@@ -748,6 +748,44 @@ replacement worked. **Q26 adds no blocked row.**
 - **W337** The controls re-read — this quarter's gate → verify: every control named in `docs/HORIZON-Q26.md` either runs at the event it concerns or declares the instant it answers at with what that instant cannot see; a control named and neither tied nor declared fails.
 - **W338** **QUARTER CLOSE.** Q27 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
 
+## 5l. Year 7 — Q27 (W339–W351)
+
+Expanded by W338 on 2026-08-18 under the §6 horizon rule, from `docs/AUDIT-Y5.md` and
+`docs/GATE-DOSSIER-Y5.md` — the dossier newly trustworthy, because W335 found it understating the
+largest blocker — and from `src/quality/hardening-q25.ts`, which is newer than both and is where
+the theme comes from. **One quarter, not a year.** See `docs/HORIZON-Q27.md` for the rule's six
+preconditions evaluated one at a time, and for the gate position recorded at this expansion.
+
+**Q27 — what the tree already knows.** Q26 asked WHEN a control answers and the quarter answered
+it. What it kept finding on the way is something else, six times in six registers. W331 found **two
+bounds that had predicted their own failures**: `PLANTING_BOUND` said in writing that a suite
+forgetting its `afterAll` leaks a temporary directory and *no register reads it*, and four callers
+had forgotten — 426 copies and 3.6 GB of `/tmp`. It was the second quarter running where a stated
+bound named a way in and something walked through it. W334 found `setupReadiness` able to say which
+setup step a practice has not finished since the wizard was built, with **exactly one surface ever
+asking it**. W335 found a founder-facing document and its own test each keeping a private copy of a
+parse W310 had fixed everywhere it was shared. W333 found twelve of sixteen "untested" modules
+tested, because the register asked about a sibling file rather than about reachability. W329 found
+a citation nobody had resolved, in a field typed `string` beside a twin W318 had already typed
+`UnitId`. The common shape is that **the tree derives a fact, states it or computes it, and nothing
+reads it** — and every one of these was cheaper to find than to build and had been true for at
+least a quarter. Every Q27 unit takes such a fact and makes something read it. The gate is not a
+number, for the reason Q24's was wrong and its two replacements worked. **Q27 adds no blocked row.**
+
+- **W339** Bounds that name a failure nothing reads → verify: every stated bound's sentence read for a condition it names and no register checks, each one either given a check or declared unreadable with its reason, and the two W331 found driven as a pair.
+- **W340** [P] A derived fact with exactly one reader → verify: every exported derivation counted by the modules that call it, the single-reader ones named rather than counted, and a fact the product computes and no surface asks for reported.
+- **W341** [P] The private copy of a shared parse → verify: every module holding its own copy of a walk or parse the tree shares enumerated, each either using the shared one or declaring why, and a planted private copy reported.
+- **W342** [P] Typed citations: a field that names a unit, a module or an export → verify: every register field carrying such a name resolved against the tree, a field typed loosely beside a twin typed strictly reported, and a planted unresolvable field reported.
+- **W343** Q26's hardening pass → verify: `code-review`, `security-review` and `simplify` over W326–W338; every finding disposed with a clock per W318; the pass's own bound stated.
+- **W344** [P] When the condition actually held → verify: a finding's timeline reconstructed from the ledger and the commit record rather than assumed, driven on W328's premise error, and a claim about when something started reported when the record disagrees.
+- **W345** [P] The escape hatches re-read → verify: every `inherent`, `never_derived`, `unobservable` and `undemonstrated` declaration re-read against what the tree can observe today, each still-correct one left with its argument and each one the tree has outgrown converted.
+- **W346** [P] The console's day two: a practice that finished setup and is waiting → verify: one spec walking a practice whose setup is complete and whose first cycle has not run, every waiting state named where an operator would look, and no founder gate crossed.
+- **W347** [P] The founder's page says what the tree already knows → verify: every derived fact about the outstanding position that the page could show and does not, enumerated and either rendered or declared, with the G5 correction visible.
+- **W348** [P] One way to say a thing is present → verify: W323's and W336's shape applied to the presence claim — the spellings enumerated from the suite, one chosen with its argument, the rest converted, and a planted variant reported.
+- **W349** The survivors register over Q26's modules → verify: W332's full run over every module Q26 added, each survivor named with its kind and its argument, and the sampler's share of that population measured.
+- **W350** The claims re-read — this quarter's gate → verify: every claim `docs/HORIZON-Q27.md` makes about a fact the tree holds either read by a check that exists or declared unread with its reason; a claim named and neither read nor declared fails.
+- **W351** **QUARTER CLOSE.** Q28 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
 ## 6. Horizon rule (supersedes the five-year expansion rule, W260)
 
 **The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,

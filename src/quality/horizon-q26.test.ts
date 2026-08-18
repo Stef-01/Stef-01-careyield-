@@ -116,7 +116,14 @@ describe("W325 the document reads the ledger it claims to read", () => {
     expect(asAtHorizon()).toHaveLength(Q26_HORIZON_LAST_UNIT);
     expect(DOC).toContain(`${Q26_HORIZON_LAST_UNIT} week-units`);
     expect(DOC).toContain(`${Q26_HORIZON_LAST_UNIT + Q26.length} after it`);
-    expect(rows()).toHaveLength(Q26_HORIZON_LAST_UNIT + Q26.length);
+    // W338: SCOPED, NOT TOTAL. This asserted the whole ledger's size, which is true of one
+    // quarter and of no quarter after it — the shelf life W312 wrote the rule about, copied
+    // forward twice before anybody noticed. What the expansion did is lay down thirteen rows,
+    // and that stays true however many quarters follow.
+    expect(
+      rows().filter((r) => r.n <= Q26_HORIZON_LAST_UNIT + Q26.length),
+      "the expansion did not lay down its rows",
+    ).toHaveLength(Q26_HORIZON_LAST_UNIT + Q26.length);
   });
 
   it("states the blocked count the ledger actually holds, week-units and not", () => {

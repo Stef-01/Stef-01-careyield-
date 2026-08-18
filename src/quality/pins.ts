@@ -210,6 +210,14 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/horizon-q27.test.ts",
+    name: "Q27_HORIZON_LAST_UNIT",
+    classification: {
+      kind: "range_bound",
+      why: "The same bound for Q27, carried forward by W338 — the seventh horizon to bound itself from its first line. This one also freezes a moment with somebody else's row open in it: W337 was `claimed` in a sibling session, so the bound alone is not enough and `IN_FLIGHT_AT_EXPANSION` names the row the document did not price.",
+    },
+  },
+  {
     module: "src/quality/horizon-q26.test.ts",
     name: "Q26_HORIZON_LAST_UNIT",
     classification: {
