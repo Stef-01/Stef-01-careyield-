@@ -44,8 +44,8 @@ describe("W349 the population is Q26's own modules, minus the two the harness ca
 
   it("takes its range from the ledger rather than trusting the constant", () => {
     const ids = new Set(parseLedgerRows(readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8")).map((r) => r.id));
-    expect(ids.has(`W${QUARTER_AT_W349.first}`)).toBe(true);
-    expect(ids.has(`W${QUARTER_AT_W349.last}`)).toBe(true);
+    expect([...ids]).toContain(`W${QUARTER_AT_W349.first}`);
+    expect([...ids]).toContain(`W${QUARTER_AT_W349.last}`);
   });
 
   it("is smaller than what the quarter added, and says by how much", () => {
@@ -152,7 +152,7 @@ describe("W349 every survivor names its kind and its argument", () => {
     const names = new Set(OPERATORS.map((o) => o.id));
     for (const survivor of SURVIVORS_AT_W349) {
       const [module, operator] = survivor.id.split(" :: ");
-      expect(names.has(operator!), `${survivor.id} names an operator W296 does not have`).toBe(true);
+      expect([...names], `${survivor.id} names an operator W296 does not have`).toContain(operator!);
       expect(q26Population(ROOT), `${survivor.id} is not in the population`).toContain(module!);
       const why = survivor.reason.kind === "uncaught" ? survivor.reason.remedy : survivor.reason.why;
       expect(why.length, `${survivor.id} is recorded without an argument`).toBeGreaterThan(120);

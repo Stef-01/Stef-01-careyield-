@@ -210,6 +210,14 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/horizon-q28.test.ts",
+    name: "Q28_HORIZON_LAST_UNIT",
+    classification: {
+      kind: "range_bound",
+      why: "The last unit the ledger held when Q28's horizon was written, which is what makes every figure in that document a claim about a MOMENT rather than a live count. It is a floor with a ceiling: rows above it are the expansion's own and are excluded on purpose, so the document says what it said on the day. `Q27_HORIZON_LAST_UNIT`'s classification, one quarter on.",
+    },
+  },
+  {
     module: "src/quality/quarter-mutants-q26.ts",
     name: "QUARTER_AT_W349",
     classification: {

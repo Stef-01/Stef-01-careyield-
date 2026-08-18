@@ -786,6 +786,48 @@ number, for the reason Q24's was wrong and its two replacements worked. **Q27 ad
 - **W350** The claims re-read — this quarter's gate → verify: every claim `docs/HORIZON-Q27.md` makes about a fact the tree holds either read by a check that exists or declared unread with its reason; a claim named and neither read nor declared fails.
 - **W351** **QUARTER CLOSE.** Q28 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
 
+## 5m. Year 7 — Q28 (W352–W364)
+
+Expanded by W351 on 2026-08-18 under the §6 horizon rule, from `docs/AUDIT-Y5.md` and
+`docs/GATE-DOSSIER-Y5.md` — and from the Q27 ledger rows and `src/quality/quarter-mutants-q26.ts`,
+which are newer than both and are where the theme comes from. **One quarter, not a year.** See
+`docs/HORIZON-Q28.md` for the rule's six preconditions evaluated one at a time, and for the gate
+position recorded at this expansion.
+
+**Q28 — which way it fails.** Q27 asked that every fact the tree already derives be read by
+something, and its units landed. What the quarter kept finding on the way is that **every defect it
+found failed toward looking correct.** W345 found a bound that had never been true —
+`page-reach.ts` claimed a route inherits a class's allowance by living in its directory, and
+planting one returns it `unclassified` — sitting behind `NOT_CALLABLE`, a shared excuse that was
+itself false, because an unfalsifiable excuse is where a false claim goes to be safe. W340's first
+derivation reported **thirty-five unread facts where the answer was seventy-one**, because it
+counted a mention as a reader; the error moved the number toward a healthier tree. W349's
+population **failed open** — `quarterModules` in the pre-W342 shape dropped its arguments, every
+comparison went false, and it returned 295 modules rather than the quarter's eleven, which reads as
+a bigger answer rather than an error; W343 had already recorded that exact failure mode. W349 also
+found a survivor whose remedy W332 wrote down and nobody applied, so the same hole arrived in a
+second module. W335 found a document and its own test sharing a private parse, both saying sixteen
+where the tree said eighteen — the smaller number, the one nobody queries. The common shape is that
+each check's failure mode was to look correct, and a check that fails loudly is worth less than it
+appears if the way it actually breaks is quietly. Every Q28 unit establishes which direction a
+check, a derivation or a declaration fails in, and where that direction is toward looking correct,
+makes it loud. The gate is not a number, for the reason Q24's was wrong and its three replacements
+worked. **Q28 adds no blocked row.**
+
+- **W352** Which way each register fails: for every register in W267's census, the direction its failure moves in — loud, or toward looking correct — derived where it can be and argued where it cannot → verify: every census member classified; a register whose declared direction its own suite contradicts fails; a planted register with no direction reported.
+- **W353** [P] The superset failure: a derivation whose wrong answer is bigger than its right one → verify: every exported derivation taking a population enumerated with what it returns when handed nothing it understands; one that widens rather than throws is reported; W349's `quarterModules` mis-call reproduced as the driven case.
+- **W354** [P] The flattering number: every figure this tree derives, with the direction an error moves it → verify: each derived count classified as failing high, low or loudly, resolved against the derivation; a count whose error direction nobody declared fails; W340's thirty-five driven as the worked example.
+- **W355** [P] A default that hides a mistake: default parameters that turn a wrong call into a plausible answer → verify: every exported function with a defaulted register or range parameter enumerated, each either argued safe or reported; a planted call omitting the argument must be distinguishable from one supplying it.
+- **W356** [P] An excuse nothing can contradict: W345's finding generalised past `NOT_CALLABLE` → verify: every shared reason-string in this tree's registers enumerated with whether anything can falsify it; an unfalsifiable excuse used by more than one entry is reported with what would settle it.
+- **W357** [P] A remedy written and never applied → verify: every remedy any register names, resolved against the tree for whether it was built; W332's `claim-classes.ts` survivor driven as the case that recurred; a remedy recorded as though recording it were the fix fails.
+- **W358** [P] The premise a walk never checked → verify: every e2e spec whose setup claims a state asserts that state before walking; W346's day-two premise driven as the case; a spec that walks a state it never established is reported.
+- **W359** [P] Two specs sharing a store → verify: the stores each e2e spec's premise depends on enumerated and reset by it rather than by file order; a planted spec reading another's residue is reported; W346's suite-only failure driven as the case.
+- **W360** Q27's hardening pass → verify: `code-review`, `security-review` and `simplify` over W339–W351; every finding disposed with a clock per W318; the pass's own bound stated.
+- **W361** [P] The console says which of its zeroes is a measurement → verify: every zero a console page renders classified as measured, waiting or unasked, each resolved against what the page derives it from; a zero rendered with no class reported; no founder gate crossed.
+- **W362** The survivors register over Q27's modules → verify: W349's run over every module Q27 added, each survivor named with its kind and its argument, the modules the harness cannot reach declared and resolved, and the sampler's share of that population measured.
+- **W363** The failure directions re-read — this quarter's gate → verify: every check `docs/HORIZON-Q28.md` names either declares the direction it fails in or is shown failing loudly; a check named and neither declared nor shown fails.
+- **W364** **QUARTER CLOSE.** Q29 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
 ## 6. Horizon rule (supersedes the five-year expansion rule, W260)
 
 **The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,
