@@ -119,7 +119,7 @@ describe("W324 Q25's gate: every claim class the horizon names is answered", () 
       if (answer.kind !== "driven") continue;
       expect(answer.reports(ROOT), `${unit}: ${answer.check} says nothing when driven on ${answer.how}`).toBe(true);
     }
-    expect(driven.map((d) => d.unit)).toEqual(["W313", "W314", "W315", "W316", "W317", "W318", "W319", "W320"]);
+    expect(driven.map((d) => d.unit)).toEqual(["W313", "W314", "W315", "W316", "W317", "W318", "W319", "W320", "W323"]);
   });
 
   it("says what it does not prove, including the gap its own fabrications leave", () => {

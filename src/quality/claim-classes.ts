@@ -36,6 +36,7 @@ import { CLOSING_CHECKS } from "./closing-state";
 import { TAX_AT_W300, taxDiff } from "./declaration-tax";
 import { overdueDispositions } from "./hardening-q22";
 import { claimDefects } from "./prose-numbers";
+import { vocabularyDefects } from "./assertion-vocabulary";
 import { equalityDiff } from "./self-defeating";
 import { tautologiesIn } from "./tautology-sweep";
 import { headerSubjectDefects } from "./unit-headers";
@@ -246,10 +247,15 @@ export const CLASS_ANSWERS: readonly ClassAnswer[] = [
   declareAnswer({
     unit: "W323",
     answer: {
-      kind: "pending",
-      by: "W323",
-      why:
-        "One way to say a list is non-empty is a genuine claim class and its unit is in flight in a sibling session. Declaring it answered before it lands would be the thing this quarter is named after. This arm ends itself: the day the ledger closes that row, the answer must become a driven one or this gate fails.",
+      kind: "driven",
+      module: "src/quality/assertion-vocabulary.ts",
+      check: "vocabularyDefects",
+      // WRITTEN AS `pending` AND EXPIRED ONE FIRING LATER, in the tree rather than in a test. The
+      // arm said the answer must become a driven one the day the ledger closed W323's row; a
+      // sibling session closed it, and this gate went red on the next pull for exactly that reason.
+      // Recorded here because a clock that has been seen running is worth more than one argued.
+      how: "the live suite against a canonical spelling that is not the one this tree chose, so every site is a site in the wrong form",
+      reports: (root) => vocabularyDefects(root, "count >= 1").length > 0,
     },
   }),
   declareAnswer({
