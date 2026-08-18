@@ -55,6 +55,7 @@ import { coherenceViolations } from "@/tenancy/fixture-coherence";
 import { censusDiff, treeWalkingFiles } from "./register-census";
 import { boundsInTree } from "./bounds";
 import { DECLARATION_HOMES, TAX_AT_W300, homeDiff, taxDiff } from "./declaration-tax";
+import { ENDING_REGISTERS, endingDiff } from "./self-ending";
 import { BLIND_SPOTS, boundDiff } from "./blind-spots";
 import { discoverFoldSites } from "./order-independence";
 import { headerViolations } from "./unit-headers";
@@ -405,6 +406,50 @@ export const MANIFEST: readonly ModuleEntry[] = [
     // nothing re-derives. It is here because it states a bound.
     census: null,
     branches: [],
+  },
+  {
+    module: "src/quality/self-ending.ts",
+    census: {
+      derives:
+        "Every module under `src/` that CONSTRUCTS a declaration keyed to a future event — the discriminants `deferred`, `pending` and `remedy` in an object literal, read through W302's preparation with literals kept, because the marker is itself a literal.",
+      checkedAgainst:
+        "W330's `ENDING_REGISTERS` plus `WAIT_FIXTURES`, in both directions: a module spelling a wait that no register holds fails, and a register or fixture naming a module that has stopped spelling one fails.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module constructing a wait is planted in a constructed root beside one that only COMPARES against the same discriminant, and only the first may be reported",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every declaration in this tree that is true only until something happens names the event, and the event is one something can read.",
+        mutation:
+          "A register is dropped from the list and its module must be reported as unregistered; a register naming a module the tree does not hold must be reported as stale.",
+      },
+    },
+    branches: [
+      {
+        fn: "endingDiff",
+        branch: "unregistered",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            endingDiff(
+              process.cwd(),
+              ENDING_REGISTERS.filter((r) => r.module !== "src/quality/hardening-q22.ts"),
+            ).unregistered.length > 0,
+        },
+      },
+      {
+        fn: "endingDiff",
+        branch: "stale",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            endingDiff(process.cwd(), ENDING_REGISTERS, { "src/quality/gone.ts": "x" }).stale.length > 0,
+        },
+      },
+    ],
   },
   {
     module: "src/quality/repository-clean.ts",

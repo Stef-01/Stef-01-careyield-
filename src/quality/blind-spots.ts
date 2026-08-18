@@ -45,6 +45,7 @@ import { violationReporters, withRoot } from "./refusal-branches";
 import { mutantsIn } from "./mutation-sampling";
 import { CITATION_BOUND, separatorDiff } from "./citations";
 import { PLANTING_BOUND, planterDiff } from "./planting";
+import { ENDING_BOUND, waitingModules } from "./self-ending";
 import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
 import { MANIFEST_BOUND, manifestDiff } from "./manifest";
 import { REMEDY_BOUND, frozenEqualities } from "./self-defeating";
@@ -559,6 +560,28 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
       "It resolves a bound's unit, remedy and numbers against the sentence and the tree, so it cannot see whether the sentence is a FAIR description of the limit. A bound naming a real remedy for half of what the remedy would fix resolves cleanly here and understates the limit anyway — which is the shape `BOUNDS_BOUND` names and hands to a reader.",
     whyNotPlantable:
       "A witness would be a bound that resolves and is unfair, and unfairness is a judgement about prose rather than a property a plant can carry. Fabricating one would be writing the answer into the fixture, which is the detector W279 refused to tune. Stating it is what can be done from inside, and the quarterly hardening pass is where a reader looks.",
+  },
+  "src/quality/self-ending.ts": {
+    kind: "demonstrated",
+    bound: ENDING_BOUND,
+    witness: "a wait written as a sentence in a header, which no discriminant marks",
+    control: "the same wait spelled as a typed discriminant, which the scan must report",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/prose-wait.ts":
+            "// W1: this holds until W9999 lands, at which point somebody looks again.\nexport const x = 1;\n",
+          "src/planted/typed-wait.ts":
+            'export const y = { disposition: { kind: "deferred", why: "x", by: "W9999" } };\n',
+        },
+        (root) => {
+          const found = waitingModules(root);
+          return {
+            witnessSeen: found.includes("src/planted/prose-wait.ts"),
+            controlSeen: found.includes("src/planted/typed-wait.ts"),
+          };
+        },
+      ),
   },
   "src/quality/prose-numbers.ts": {
     kind: "demonstrated",

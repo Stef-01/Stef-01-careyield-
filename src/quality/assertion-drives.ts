@@ -56,6 +56,7 @@ import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptan
 import { unacceptedTautologies } from "./tautology-sweep";
 import { fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
+import { endingDiff } from "./self-ending";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
 import { instantDiff } from "./instant";
@@ -228,6 +229,55 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // module in the tree is unwatched. The arm that must fire is the one saying a module reads the
     // ledger and no closing check knows.
     return readerDiff(root, [], []).unwatched.length > 0;
+  },
+
+  "src/quality/self-ending.ts": (root) => {
+    // W330's comparison, driven in both directions against a register of exactly one wait. The
+    // planted module spells one and no register holds it, so `unregistered` must fire; declaring
+    // the module must silence it; and a register naming a module the tree does not hold must fire
+    // the other arm. Driven rather than described, because a diff that only ever returns two empty
+    // lists is indistinguishable from one that reads nothing.
+    void root;
+    return withRoot(
+      {
+        "src/planted/w289-wait.ts":
+          'export const x = { disposition: { kind: "deferred", why: "y", by: "W1" } };\n',
+      },
+      (planted) => {
+        const none = endingDiff(planted, [], {});
+        const declared = endingDiff(
+          planted,
+          [
+            {
+              unit: "W330",
+              module: "src/planted/w289-wait.ts",
+              register: "x",
+              entries: () => [],
+              rechecked: { kind: "ended_here" },
+            },
+          ],
+          {},
+        );
+        const gone = endingDiff(
+          planted,
+          [
+            {
+              unit: "W330",
+              module: "src/planted/w289-absent.ts",
+              register: "x",
+              entries: () => [],
+              rechecked: { kind: "ended_here" },
+            },
+          ],
+          {},
+        );
+        return (
+          none.unregistered.includes("src/planted/w289-wait.ts") &&
+          declared.unregistered.length === 0 &&
+          gone.stale.includes("src/planted/w289-absent.ts")
+        );
+      },
+    );
   },
 
   "src/quality/prose-numbers.ts": (root) => {

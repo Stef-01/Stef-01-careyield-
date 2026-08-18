@@ -140,6 +140,7 @@ const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/founder/second-reading.ts": () => import("@/founder/second-reading"),
   "src/quality/claim-classes.ts": () => import("@/quality/claim-classes"),
   "src/quality/repository-clean.ts": () => import("@/quality/repository-clean"),
+  "src/quality/self-ending.ts": () => import("@/quality/self-ending"),
   "src/quality/prose-numbers.ts": () => import("@/quality/prose-numbers"),
   "src/quality/self-reference.ts": () => import("@/quality/self-reference"),
   "src/quality/register-census.ts": () => import("@/quality/register-census"),

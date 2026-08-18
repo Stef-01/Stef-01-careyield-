@@ -748,6 +748,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "`SECOND_READING_BOUND` is reviewer-facing — it argues what a unit-number marker cannot see, and names the stored snapshot this deliberately does not keep. Everything else here is a unit id read off the ledger. The copy is four sentences addressed to the founder about build status, and the state each one belongs to is the whole point: a first reading and a quiet stretch need opposite words.",
   },
   {
+    module: "src/quality/self-ending.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W330's register is reviewer-facing: unit ids, gate ids, module paths, and the argument for each thing this tree is waiting on. `endedDeclarations` composes a sentence, but its reader is whoever is looking at a failed build, and what it names is a declaration in the source rather than anything a practice or a patient meets. Nothing here renders.",
+  },
+  {
     module: "src/quality/repository-clean.ts",
     operatorCopy: [],
     notCopy:

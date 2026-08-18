@@ -67,6 +67,7 @@ import { CLAIMS, PROSE_BOUND, proseClaims } from "./prose-numbers";
 import { SECOND_READING_BOUND, sinceReading } from "@/founder/second-reading";
 import { CLAIM_CLASS_BOUND } from "./claim-classes";
 import { CLEAN_BOUND } from "./repository-clean";
+import { ENDING_BOUND } from "./self-ending";
 import { DEMO_PATH, PATH_BOUND, gateStops } from "@/demo/path";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
 import { CITATION_BOUND } from "./citations";
@@ -159,6 +160,17 @@ export const BOUNDS_BOUND =
   "This resolves a bound's unit, its remedy and its numbers. It does not check that the sentence is TRUE: `stillOpen` re-derives that the named remedy has not been built, which is a different claim from the bound being an accurate description of what the register misses. W295 is where that half lives, by planting a witness, and it reaches only the registers whose detector is callable from outside. So a bound can be resolved here, demonstrated there, and still understate the limit — and the shape most likely to do that is a bound whose remedy is real but whose sentence describes only part of what the remedy would fix. The remedy for that is a reader, which is what the quarterly hardening pass is for. W306 added the missing half of the predicate's own check — a bound carrying a constructed tree is driven in the state where its remedy EXISTS, rather than only in the state where it does not — and that is narrower than it reads too: the tree is a fixture written here, so what it shows is that the predicate reads a tree, not that it would recognise the remedy as somebody else will actually build it. The predicates declared to derive nothing from a tree are checked only for refusing to budge, which is weaker again.";
 
 export const STATED_BOUNDS: readonly StatedBound[] = [
+  {
+    module: "src/quality/self-ending.ts",
+    name: "ENDING_BOUND",
+    unit: "W330",
+    text: ENDING_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "The sentence is about a vocabulary. This finds a wait where the wait is a TYPED discriminant in an object literal, and a wait written as a sentence in a header is invisible to it — which is not a gap a later unit closes by widening this scan, because reading prose for an event is W314's machinery pointed at a different vocabulary and is a unit of its own. Widening the discriminant list would not touch it either: prose has no discriminant to add. The second clause is a judgement rather than a derivation — whether a deferred finding still matters after its unit landed is exactly what the person the report wakes is for — and no check can be written that decides it, which is why the report names what to look at and stops.",
+    },
+    numbers: [],
+  },
   {
     module: "src/quality/repository-clean.ts",
     name: "CLEAN_BOUND",

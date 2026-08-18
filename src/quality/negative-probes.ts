@@ -349,6 +349,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/self-ending.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/self-ending.test.ts :: tells a wait being CONSTRUCTED from one being read",
+      plants: 'if (d.kind === "deferred") return true;',
+    },
+  },
+  {
     register: "src/quality/self-reference.ts",
     negative: {
       kind: "already_driven",

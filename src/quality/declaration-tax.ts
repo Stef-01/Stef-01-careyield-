@@ -245,6 +245,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/self-ending.ts",
+    // Asks whether a module CONSTRUCTS a declaration keyed to a future event. A planted module
+    // spells no wait, so it owes this register nothing on arrival — and a module that does spell
+    // one is not an ordinary arrival but a register of waits, which is the point. In the population
+    // because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/self-reference.ts",
     // Asks about modules that assemble a literal from fragments, which a planted module does not do.
     // It demands nothing of an arriving module, and is in the population because the census holds it.
