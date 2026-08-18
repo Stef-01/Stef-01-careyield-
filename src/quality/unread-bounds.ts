@@ -391,6 +391,14 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/console/waiting.ts::WAITING_BOUND",
+    condition: "EMPTY IS THE PAGE'S OWN WORD AND NOTHING CHECKS IT",
+    reading: {
+      kind: "not_observable",
+      why: "The condition is a page that computes its rows, renders none, and passes `empty: false` — so the notice stays silent on exactly the screen it exists for. Reporting it means knowing what the page RENDERED, which is a browser rather than a wider scan: `e2e/waiting-path.spec.ts` does it for the two routes the walk names, by requiring the notice on a practice it has just driven into that state, and can say nothing about a page nobody put in the walk. So no export reports it and none could — a register that ran every console page to compare a prop against the DOM would be the e2e suite with a different name, which is the class `PATH_BOUND` already states one register over. The narrower half is chosen rather than missing: `WAITING_BOUND` argues why the page answers for its own emptiness, and the alternative re-derives four screens' worth of state to tell each of them what it already knows.",
+    },
+  },
+  {
     bound: "src/quality/unread-bounds.ts::UNREAD_BOUND",
     condition: "a bound naming a gap in words this vocabulary does not hold is outside this register",
     reading: {

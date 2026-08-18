@@ -317,6 +317,12 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // figure in every document before W335, and the page rendered its whole blocked count as a single
   // number. History, and `blockedShape` re-derives the split on every render, so the sentences are
   // the finding and the derivation is the check.
+  // W346: what the fourth walk found on the day it ran — how many pages carry the notice and how
+  // many routes the console has. History: `waitingDefects` re-derives the walk on every run, and
+  // the route figure is the scale the walk is being measured against rather than a claim about it.
+  { module: "src/console/waiting.ts", text: "two routes", resolution: { kind: "at_the_unit" } },
+  { module: "src/demo/path.ts", text: "two routes", resolution: { kind: "at_the_unit" } },
+  { module: "src/demo/path.ts", text: "twenty routes", resolution: { kind: "at_the_unit" } },
   { module: "src/founder/outstanding.ts", text: "six rows", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/founder-page-facts.ts", text: "six rows", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/founder-page-facts.ts", text: "eighteen rows", resolution: { kind: "at_the_unit" } },
@@ -351,8 +357,8 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // specs` and reported one number nobody classified beside one the tree no longer said. A
   // hyphenated compound is a vocabulary gap in the scanner, and until somebody closes it the
   // honest move is to write the number in a form the scanner reads as one thing.
-  { module: "src/quality/page-suite.ts", text: "38 specs", resolution: { kind: "derived", derive: pageSpecs } },
-  { module: "src/quality/route-coverage.ts", text: "38 spec files", resolution: { kind: "derived", derive: pageSpecs } },
+  { module: "src/quality/page-suite.ts", text: "39 specs", resolution: { kind: "derived", derive: pageSpecs } },
+  { module: "src/quality/route-coverage.ts", text: "39 spec files", resolution: { kind: "derived", derive: pageSpecs } },
   {
     module: "src/quality/hardening-q25.ts",
     text: "426 copies",

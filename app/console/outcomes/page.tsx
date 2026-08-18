@@ -35,8 +35,9 @@ import {
 import { OUTCOME_VERDICT_COPY, summarise, type OutcomeVerdict } from "@/outcomes/model";
 import { sentEventsFor } from "@/referrals/store";
 import { authorize } from "@/tenancy/tenancy";
+import { setupReadiness } from "@/console/store";
 import { requirePractice } from "../guard";
-import { ConsoleShell } from "../ui";
+import { ConsoleShell, Waiting } from "../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -70,6 +71,7 @@ export default async function OutcomesPage() {
 
   return (
     <ConsoleShell email={email}>
+      <Waiting readiness={setupReadiness(record)} empty={summary.total === 0} cycle="referrals_recorded" />
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">Outcomes</h1>

@@ -760,6 +760,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W331's pass is reviewer-facing: unit ids, module paths, what each finding is and what was done about it. The longest strings on it are arguments addressed to whoever reads the quarter next, and nothing here renders or reaches a practice.",
   },
   {
+    module: "src/console/waiting.ts",
+    operatorCopy: ["WAITING_COPY"],
+    notCopy:
+      "`CYCLES` and `waitingFor` are the mechanism: one union member and a two-line predicate. Everything an operator reads is in `WAITING_COPY`, which is on the surface — it is shown to a practice on four console routes and has to pass the same linting as every other sentence the product says.",
+  },
+  {
     module: "src/quality/founder-page-facts.ts",
     operatorCopy: [],
     notCopy:

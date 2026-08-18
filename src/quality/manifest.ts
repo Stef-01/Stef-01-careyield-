@@ -436,6 +436,16 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/console/waiting.ts",
+    // A predicate and a copy table: it walks nothing and derives nothing from the tree — the page
+    // hands it a readiness and its own emptiness, which is the trade `WAITING_BOUND` argues. W267's
+    // census does not hold it and a row there would be a declaration nothing re-derives. It is here
+    // because it states a bound. What checks the pages is `waitingDefects` in `src/demo/path.ts`,
+    // which does read source, and its census row carries that.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/founder-page-facts.ts",
     // Reads the modules `POSITION_MODULES` names and the founder page, rather than walking
     // anything: the population is a list because nothing joins those files but their subject, and

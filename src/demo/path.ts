@@ -30,6 +30,7 @@
 
 import { readFileSync } from "node:fs";
 import { PREREQUISITES, type Prerequisite } from "@/console/setup-gaps";
+import { CYCLES, type Cycle } from "@/console/waiting";
 import path from "node:path";
 import { liveConnectionsPermitted } from "@/interop/credentials";
 import { discoverSurfaces } from "@/compliance/surfaces";
@@ -444,6 +445,148 @@ export function unfinishedDefects(
     }
     if (!source.includes("<SetupGaps")) {
       out.push({ step: id, what: `is in the walk and ${step.page} renders no setup notice` });
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------------------------
+// W346: the fourth scenario — a practice that finished setting up, on the morning after.
+// ---------------------------------------------------------------------------------------------
+
+/** A page a finished practice lands on before the first cycle has filled it. */
+export interface WaitingStep {
+  route: string;
+  page: string;
+  /** The cycle this page's contents are downstream of. */
+  cycle: Cycle;
+  /** The expression the page passes as its own emptiness, quoted so a reader can find it. */
+  emptyWhen: string;
+  /** Why an operator would be on this page on day two. */
+  why: string;
+}
+
+/**
+ * The fourth walk: everything is finished, nothing has run, and every screen is still empty.
+ *
+ * W309'S WALK GOES ALL THE WAY, W321'S DECLINES AT EVERY OFFER, W334'S NEVER FINISHES. This one is
+ * the morning after the wizard — the one state where the product is entirely correct and looks
+ * exactly like the one where it is not. Somebody who has just spent twenty minutes on setup and
+ * opens a blank register page has no way to tell *the first run has not happened* from *we looked
+ * and there is nobody*, and those two conclusions send them to opposite places.
+ *
+ * TWO PAGES, AND THE PAIR WAS FOUND BY WALKING RATHER THAN BY READING. The first draft of this
+ * register named `/console/registers`, `/console/outreach` and `/console/capacity` on the
+ * reasonable-sounding argument that a practice with no cycle behind it has no registers, no
+ * invitations and no diary. Driving a real practice through the whole wizard and then opening
+ * those three showed all of them FULL: they are computed from the synthetic set this tree ships
+ * rather than from anything the practice has done. What is actually empty the morning after is the
+ * referral record, in two places. `WAITING_ELSEWHERE` below carries the pages that are empty and
+ * say so in their own words, so a walk over two routes cannot read as a claim about a console with
+ * twenty.
+ */
+export const WAITING_PATH: readonly WaitingStep[] = [
+  {
+    route: "/console/referrals",
+    page: "app/console/referrals/page.tsx",
+    cycle: "referrals_recorded",
+    emptyWhen: "sent.length === 0 && received.length === 0",
+    why: "The record of what this practice has referred and what has been referred to it. On day two both halves are empty, and an empty referral list reads as a practice that refers nobody rather than as one that has not started — which is the opposite conclusion about how the practice works.",
+  },
+  {
+    route: "/console/outcomes",
+    page: "app/console/outcomes/page.tsx",
+    cycle: "referrals_recorded",
+    emptyWhen: "summary.total === 0",
+    why: "What the record says happened to the referrals this practice wrote. It is empty for the same reason and one step further on, and it is named alongside the referral list rather than folded into it because the same absence reaching two screens is what makes it look like a product fault rather than a state.",
+  },
+];
+
+/** A wait a page names in its OWN words, rather than through `<Waiting>`. */
+export interface WaitingElsewhere {
+  route: string;
+  page: string;
+  /** The `data-testid` that page renders for it, resolved against the source. */
+  marker: string;
+  /** What that page says, and why this notice would be worse. */
+  why: string;
+}
+
+/**
+ * The waits the console names somewhere other than `<Waiting>`.
+ *
+ * `/console/capacity` IS IN NEITHER LIST AND THAT IS DELIBERATE. It holds a `no_diary_recorded`
+ * state with a *what would settle it* list, which is the practice-system wait named better than
+ * this unit would name it — but the seeded practice HAS a diary, so the state does not render on
+ * day two and a row here asserting it does would be a claim nothing could walk. The honest place
+ * for that argument is this paragraph, not a row.
+ *
+ * WITHOUT THESE ROWS THE WALK WOULD READ AS COVERAGE. Two pages carrying the notice, out of a
+ * console with twenty routes, is a claim about two pages — and the gate asks that every waiting
+ * state be named where an operator would look, which is a claim about the console. These are the
+ * states that are named and not by this unit, resolved against the marker the page really renders
+ * so the row cannot outlive the copy it is describing.
+ */
+export const WAITING_ELSEWHERE: readonly WaitingElsewhere[] = [
+  {
+    route: "/console/education",
+    page: "app/console/education/page.tsx",
+    marker: "library-empty",
+    why: "It is empty on day two and says so in its own words, naming the library rather than a cycle — which is right, because what fills it is somebody signing off material rather than a run of anything, and G5 is what stands between this practice and that. A notice telling an operator to wait would be describing a wait that no cycle ends.",
+  },
+  {
+    route: "/console/dashboard",
+    page: "app/console/dashboard/page.tsx",
+    marker: "incrementality-answer",
+    why: "It is never empty, and that is the honest reason rather than an oversight: its figures come from this tree's synthetic run rather than from the practice, and the marker it renders says exactly that — simulated weeks over synthetic patients. A notice telling a finished practice to wait for its own first cycle would be describing a screen that is not about them.",
+  },
+];
+
+export interface WaitingDefect {
+  step: string;
+  what: string;
+}
+
+/**
+ * The fourth walk against the tree, in three directions.
+ *
+ * THE THIRD IS THE ONE THAT KEEPS THE COUNT HONEST. A page in the walk must render the notice; a
+ * cycle named must be one `waiting.ts` has; and a page in `WAITING_ELSEWHERE` must still render the
+ * marker its row says it does — because a row excusing a page from this notice on the grounds that
+ * it says the thing itself is worth exactly as much as that page still saying it.
+ */
+export function waitingDefects(
+  root: string,
+  steps: readonly WaitingStep[] = WAITING_PATH,
+  elsewhere: readonly WaitingElsewhere[] = WAITING_ELSEWHERE,
+): WaitingDefect[] {
+  const out: WaitingDefect[] = [];
+  for (const step of steps) {
+    const id = `${step.route} :: ${step.cycle}`;
+    if (!CYCLES.includes(step.cycle)) {
+      out.push({ step: id, what: `names ${step.cycle}, which is not a cycle the console shows` });
+    }
+    const source = read(root, step.page);
+    if (source === null) {
+      out.push({ step: id, what: `names a page the tree does not have: ${step.page}` });
+      continue;
+    }
+    if (!source.includes("<Waiting")) {
+      out.push({ step: id, what: `is in the walk and ${step.page} renders no waiting notice` });
+    }
+    if (!source.includes(step.emptyWhen)) {
+      out.push({ step: id, what: `says the page is empty when \`${step.emptyWhen}\`, and ${step.page} does not say that` });
+    }
+  }
+  for (const row of elsewhere) {
+    const id = `${row.route} :: ${row.marker}`;
+    const source = read(root, row.page);
+    if (source === null) {
+      out.push({ step: id, what: `names a page the tree does not have: ${row.page}` });
+      continue;
+    }
+    if (!source.includes(`data-testid="${row.marker}"`)) {
+      out.push({ step: id, what: `is excused because ${row.page} names the wait itself, and it renders no ${row.marker}` });
     }
   }
   return out;

@@ -55,6 +55,7 @@ import { BLIND_SPOTS, BLIND_SPOT_BOUND } from "./blind-spots";
 import { HATCH_BOUND } from "./escape-hatches";
 import { UNASKED_BOUND } from "./unasked-facts";
 import { PAGE_FACT_BOUND } from "./founder-page-facts";
+import { WAITING_BOUND } from "@/console/waiting";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -372,6 +373,33 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "three",
         kind: "fixed_by_a_gate",
         why: "The modules in `POSITION_MODULES`, which this register declares and does not measure. It is three because the list says three, and the sentence's point is that whatever the number is, nothing derives it — a fourth arrives with the unit that adds it and rewrites this sentence.",
+      },
+    ],
+  },
+  {
+    module: "src/console/waiting.ts",
+    name: "WAITING_BOUND",
+    unit: "W346",
+    text: WAITING_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Three limits and none of them is a state of the tree. The page passes its own emptiness, and a module that worked it out instead would be re-deriving four screens' worth of state to tell each of them what it has already computed — W334 made the same trade and `SETUP_GAP_BOUND` argues it, so closing this one means undoing a design rather than building a check. Which cycle a page's contents come from is a reading of what the page renders, made by whoever wired it up, and no derivation over source text returns it. And the last is a founder gate rather than a gap: telling a practice whose first read is due tonight from one whose connection was never configured needs a live connection, which G1 gates — so the thing that would lift it is a ruling, and a ruling is not a change to this tree. W311 established that mis-typing a limit as a deferred remedy is how `never_derived` becomes the easy answer, so each is named rather than pointed at a unit nobody would write.",
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one door the register cannot watch', 'shows one' — the unit of the sentence rather than a count of anything the tree holds. It stays one however many pages ask for the notice.",
+      },
+      {
+        word: "two",
+        kind: "fixed_by_a_gate",
+        why: "The notices an empty console can show, which W334 and this unit put there rather than anything measuring. It is two because two units wrote one each, and a third arrives with the unit that writes it and rewrites this sentence.",
+      },
+      {
+        word: "four",
+        kind: "unit_id",
+        why: "The pages a module answering emptiness for the console would have to re-derive, quoted from W334's trade rather than measured here — that walk names four and this sentence borrows the figure to say what the trade costs. History about a closed decision, which is why quoting it is safe.",
       },
     ],
   },

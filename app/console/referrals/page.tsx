@@ -33,8 +33,9 @@ import { RETURN_OUTCOME_COPY } from "@/referrals/return-report";
 import { actsFor, eventsFor, returnFor, sentBy, sentTo } from "@/referrals/store";
 import { describeOutstanding, trackReferral } from "@/referrals/tracking";
 import { authorize } from "@/tenancy/tenancy";
+import { setupReadiness } from "@/console/store";
 import { requirePractice } from "../guard";
-import { ConsoleShell, primaryButtonClass } from "../ui";
+import { ConsoleShell, Waiting, primaryButtonClass } from "../ui";
 import { answerReferral } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -92,6 +93,11 @@ export default async function ReferralsPage({
 
   return (
     <ConsoleShell email={email}>
+      <Waiting
+        readiness={setupReadiness(record)}
+        empty={sent.length === 0 && received.length === 0}
+        cycle="referrals_recorded"
+      />
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">Referrals</h1>

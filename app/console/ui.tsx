@@ -5,6 +5,7 @@ import { DemoNavigator } from "../demo-navigator";
 import Link from "next/link";
 import { isMeherrStaff } from "@/tenancy/staff";
 import { SETUP_GAP_COPY, unmetSteps } from "@/console/setup-gaps";
+import { type Cycle, WAITING_COPY, waitingFor } from "@/console/waiting";
 import type { SetupReadiness } from "@/console/store";
 
 /**
@@ -114,6 +115,39 @@ export function SetupGaps({ readiness }: { readiness: SetupReadiness }) {
           </li>
         ))}
       </ul>
+    </section>
+  );
+}
+
+/**
+ * W346: what a FINISHED practice is told while its console is still empty.
+ *
+ * Beside `<SetupGaps>` rather than inside it, and the two never both render: `waitingFor` returns
+ * null while setup is unfinished, so the amber notice above owns that state and this one owns the
+ * morning after. The page passes its own emptiness because the page is the only thing that knows
+ * it — `WAITING_BOUND` says what that costs.
+ */
+export function Waiting({
+  readiness,
+  empty,
+  cycle,
+}: {
+  readiness: SetupReadiness;
+  empty: boolean;
+  cycle: Cycle;
+}) {
+  const waiting = waitingFor(readiness, { empty, cycle });
+  if (waiting === null) return null;
+  return (
+    <section
+      data-testid="waiting"
+      data-cycle={waiting}
+      className="mb-6 rounded border border-stone-300 bg-stone-50 p-4"
+    >
+      <p className="text-sm font-medium text-stone-800" data-testid={`waiting-${waiting}`}>
+        {WAITING_COPY[waiting].headline}
+      </p>
+      <p className="mt-1 text-sm text-stone-600">{WAITING_COPY[waiting].detail}</p>
     </section>
   );
 }

@@ -14,6 +14,7 @@
 
 import { describe, expect, it } from "vitest";
 import { SETUP_GAP_BOUND, SETUP_GAP_COPY, PREREQUISITES, unmetSteps } from "@/console/setup-gaps";
+import { CYCLES } from "@/console/waiting";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import {
@@ -26,7 +27,8 @@ import {
   pathDefects,
   syntheticOnlyDefects,
   REFUSAL_PATH,
-  refusalDefects, UNFINISHED_PATH, unfinishedDefects } from "./path";
+  refusalDefects, UNFINISHED_PATH, unfinishedDefects,
+  WAITING_PATH, WAITING_ELSEWHERE, waitingDefects } from "./path";
 import { sweepSurface } from "@/compliance/public-surfaces";
 import { withTree } from "@/quality/planting";
 
@@ -241,6 +243,68 @@ describe("W321 the refusal walk, and every marker resolved to the page that rend
 
   it("declines something at more than one route, so the walk is a walk", () => {
     expect(new Set(REFUSAL_PATH.map((s) => s.route)).size).toBeGreaterThan(2);
+  });
+});
+
+describe("W346 the fourth walk: a finished practice on the morning after", () => {
+  it("passes, over the pages the console actually serves", () => {
+    expect(waitingDefects(ROOT)).toEqual([]);
+  });
+
+  it("names a cycle the console shows, and a page that renders the notice", () => {
+    expect(WAITING_PATH.length).toBeGreaterThan(1);
+    for (const step of WAITING_PATH) {
+      expect(CYCLES, `${step.route} names a cycle nothing shows`).toContain(step.cycle);
+      expect(step.why.length, `${step.route} says nothing about why an operator is there`).toBeGreaterThan(80);
+    }
+    // Every cycle the console can show is covered, so no cycle carries copy nothing renders.
+    expect([...new Set(WAITING_PATH.map((s) => s.cycle))].sort()).toEqual([...CYCLES].sort());
+    // And it bites in more than one place, which is why the walk names pages rather than cycles.
+    expect(new Set(WAITING_PATH.map((s) => s.route)).size).toBeGreaterThan(1);
+  });
+
+  it("reports a page in the walk that renders no waiting notice", () => {
+    // The page keeps the emptiness expression it really holds, so what this reports is the missing
+    // NOTICE and nothing else — a probe that moved both would not tell the two arms apart.
+    const invented = [
+      { ...WAITING_PATH[0]!, page: "app/console/case-mix/page.tsx", emptyWhen: "registers.length === 0" },
+    ];
+    expect(waitingDefects(ROOT, invented, [])).toEqual([
+      {
+        step: `${WAITING_PATH[0]!.route} :: ${WAITING_PATH[0]!.cycle}`,
+        what: "is in the walk and app/console/case-mix/page.tsx renders no waiting notice",
+      },
+    ]);
+  });
+
+  it("reports a step whose emptiness expression the page does not hold", () => {
+    const drifted = [{ ...WAITING_PATH[0]!, emptyWhen: "rows.length === 0" }];
+    expect(waitingDefects(ROOT, drifted, [])).toEqual([
+      {
+        step: `${WAITING_PATH[0]!.route} :: ${WAITING_PATH[0]!.cycle}`,
+        what: `says the page is empty when \`rows.length === 0\`, and ${WAITING_PATH[0]!.page} does not say that`,
+      },
+    ]);
+  });
+
+  it("reports a page excused because it names the wait itself, that no longer does", () => {
+    const stale = [{ ...WAITING_ELSEWHERE[0]!, marker: "capacity-no-diary-gone" }];
+    expect(waitingDefects(ROOT, [], stale)).toEqual([
+      {
+        step: `${WAITING_ELSEWHERE[0]!.route} :: capacity-no-diary-gone`,
+        what: `is excused because ${WAITING_ELSEWHERE[0]!.page} names the wait itself, and it renders no capacity-no-diary-gone`,
+      },
+    ]);
+  });
+
+  it("names what the other pages say instead, so two pages do not read as coverage", () => {
+    expect(WAITING_ELSEWHERE.length).toBeGreaterThan(1);
+    for (const row of WAITING_ELSEWHERE) {
+      expect(row.why.length, `${row.route} is excused without an argument`).toBeGreaterThan(120);
+    }
+    // No page is in both lists, which would be the register excusing what it also requires.
+    const walked = new Set(WAITING_PATH.map((s) => s.route));
+    expect(WAITING_ELSEWHERE.filter((r) => walked.has(r.route))).toEqual([]);
   });
 });
 
