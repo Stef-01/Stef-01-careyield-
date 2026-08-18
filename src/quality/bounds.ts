@@ -54,6 +54,7 @@ import { ACCEPTANCE_REGISTERS, ACCEPTANCE_BOUND } from "./acceptances";
 import { BLIND_SPOTS, BLIND_SPOT_BOUND } from "./blind-spots";
 import { HATCH_BOUND } from "./escape-hatches";
 import { UNASKED_BOUND } from "./unasked-facts";
+import { PAGE_FACT_BOUND } from "./founder-page-facts";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -345,6 +346,28 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'one level up', 'one register over', 'a second register' — the unit of the comparison rather than a count of anything the tree holds. It stays one however many facts the population grows to, which is the distinction W297's own entry draws for 'One assertion per register, driven once'.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/founder-page-facts.ts",
+    name: "PAGE_FACT_BOUND",
+    unit: "W347",
+    text: PAGE_FACT_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "THE FIRST DRAFT CLAIMED A REMEDY AND W306'S DRIVER REFUSED IT ON THE SPOT. The predicate said the bound stays open while `e2e/founder.spec.ts` does not walk the sections this unit added — and the same unit added those walks, so the sentence was describing a tree that had moved before it was committed. W306's plant fired within a minute of the entry being written, which is the register working. What the sentence is actually about cannot be lifted by any spec: a source scan asking whether a page NAMES a derivation cannot know whether a reader sees the answer, and a browser walk is a different instrument answering a different question rather than a widening of this one. Adding the walks did not make this register's `rendered` mean more; it added a second check beside it, and the day the spec stops walking a section this register still says the page names the call. The population is the second limit and it is the same kind of claim: `POSITION_MODULES` is a list because nothing but the subject joins those three files, and no derivation over the tree returns membership. And the third is a judgement outright — whether a `declared` reason is a good one is a reader disagreeing, which is what W310 says about a blocker being the right blocker.",
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'a call whose result is assigned and never printed', 'one at the top of the page', 'a reader disagreeing' — the unit of the illustration rather than a count of anything the tree holds. It stays one however many facts the register classifies.",
+      },
+      {
+        word: "three",
+        kind: "fixed_by_a_gate",
+        why: "The modules in `POSITION_MODULES`, which this register declares and does not measure. It is three because the list says three, and the sentence's point is that whatever the number is, nothing derives it — a fourth arrives with the unit that adds it and rewrites this sentence.",
       },
     ],
   },

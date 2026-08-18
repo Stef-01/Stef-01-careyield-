@@ -436,6 +436,15 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/founder-page-facts.ts",
+    // Reads the modules `POSITION_MODULES` names and the founder page, rather than walking
+    // anything: the population is a list because nothing joins those files but their subject, and
+    // the module says so where a reader meets it. W267's census does not hold it and a row there
+    // would be a declaration nothing re-derives. It is here because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/unasked-facts.ts",
     census: {
       derives:

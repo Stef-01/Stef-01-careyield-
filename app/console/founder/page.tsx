@@ -9,9 +9,13 @@
 
 import {
   FOUNDER_COPY,
+  blockedShape,
   builtSurface,
+  founderDiff,
+  gatesBlockingNothing,
   outstandingRulings,
 } from "@/founder/outstanding";
+import { RELEASE_PATHS, answerableByTheLoop } from "@/quality/blocked-surface";
 import { SECOND_READING_COPY, sinceReading } from "@/founder/second-reading";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -38,6 +42,12 @@ export default async function FounderPage({
   const root = process.cwd();
   const built = builtSurface(root);
   const rulings = outstandingRulings(root);
+  // W347: four things the tree already derived and this page did not show.
+  const unblocking = gatesBlockingNothing(root);
+  const shape = blockedShape(root);
+  const diff = founderDiff(root);
+  const disagreements = Object.values(diff).flat();
+  const loopAnswers = answerableByTheLoop(RELEASE_PATHS);
   const since = (await searchParams).since;
   const reading = sinceReading(root, since ? { lastUnit: since } : null);
 
@@ -89,11 +99,29 @@ export default async function FounderPage({
             <dd className="text-sm text-stone-500">{built.latestAt}</dd>
           </div>
         </dl>
+
+        {/* W347: the figure above is over every blocked ROW, and two of them are not week-units.
+            The G5 correction read from the other end — a reader seeing one number cannot tell. */}
+        <div className="flex flex-col gap-2" data-testid="blocked-shape">
+          <h3 className="text-sm font-medium text-stone-700">{FOUNDER_COPY.shapeHeading}</h3>
+          <p className="text-stone-600">{FOUNDER_COPY.shapeNote}</p>
+          <p className="text-stone-700 tabular-nums" data-testid="shape-weeks">
+            Week-units: {shape.weekUnits.length} ({shape.weekUnits.join(", ") || "none"})
+          </p>
+          <p className="text-stone-700 tabular-nums" data-testid="shape-other">
+            Other rows: {shape.otherRows.length} ({shape.otherRows.join(", ") || "none"})
+          </p>
+        </div>
       </section>
 
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold tracking-tight">{FOUNDER_COPY.blockedHeading}</h2>
-        <p className="text-stone-600">{FOUNDER_COPY.noDecider}</p>
+        {/* W347: the claim was typed while `answerableByTheLoop` derived it and nothing read the
+            derivation. Rendered, so the page cannot say the loop decides nothing while a path
+            names it. */}
+        <p className="text-stone-600" data-testid="who-decides-claim">
+          {loopAnswers.length === 0 ? FOUNDER_COPY.noDecider : FOUNDER_COPY.loopAnswersSome}
+        </p>
 
         <ol className="flex flex-col gap-6">
           {rulings.map((ruling) => (
@@ -138,6 +166,44 @@ export default async function FounderPage({
             </li>
           ))}
         </ol>
+      </section>
+
+      {/* W347: the gates with NO rows behind them. A page organised by what is waiting cannot show
+          these — there is nothing queued to list — and the plan has named them in prose at every
+          horizon for six quarters without the founder's own page ever saying so. */}
+      <section className="flex flex-col gap-4" data-testid="blocks-nothing">
+        <h2 className="text-xl font-semibold tracking-tight">{FOUNDER_COPY.nothingBlockedHeading}</h2>
+        <p className="text-stone-600">{FOUNDER_COPY.nothingBlockedIntro}</p>
+        <ul className="flex flex-col gap-3">
+          {unblocking.map((gate) => (
+            <li
+              key={gate.id}
+              className="flex flex-col gap-1 rounded-lg border border-stone-200 p-4"
+              data-testid="blocks-nothing-row"
+            >
+              <p className="font-semibold tracking-tight">{gate.id}</p>
+              <p className="text-stone-700">{gate.text}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* W347: `founderDiff` has checked this page against its two documents since W310 and the
+          page never showed the answer. Its own bound says a founder reading a page that is missing
+          a row cannot know it is missing; now the page says whether anything is missing. */}
+      <section className="flex flex-col gap-3" data-testid="agreement">
+        <h2 className="text-xl font-semibold tracking-tight">{FOUNDER_COPY.agreementHeading}</h2>
+        {disagreements.length === 0 ? (
+          <p className="text-stone-600" data-testid="agreement-clean">{FOUNDER_COPY.agrees}</p>
+        ) : (
+          <ul className="flex flex-col gap-1" data-testid="agreement-dirty">
+            {disagreements.map((item) => (
+              <li key={item} className="text-stone-700">
+                {item}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </main>
   );

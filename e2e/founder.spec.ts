@@ -32,6 +32,73 @@ test.describe("signed in", () => {
     await page.waitForURL(/\/console$/);
   });
 
+  // W347: the four things the tree derived and the page did not show. Each is read from the served
+  // HTML and cross-checked against the two documents by a different route than the page takes —
+  // a section that rendered an empty list, or a hard-coded one, fails these.
+  test("names the outstanding gates that block nothing, which the waiting list cannot show", async ({ page }) => {
+    const plan = readFileSync("docs/FIVE-YEAR-PLAN.md", "utf8");
+    const ledger = readFileSync("BUILD-STATE.md", "utf8");
+    const defined = [...plan.matchAll(/^- \*\*(G\d+)\*\* — (.*)$/gm)]
+      .filter((m) => !m[2]!.includes("CLEARED"))
+      .map((m) => m[1]!);
+    const blocking = new Set(
+      ledger
+        .split("\n")
+        .filter((l) => / \| blocked \| /.test(l))
+        .flatMap((l) => [...l.matchAll(/FOUNDER GATE (G\d+)/g)].map((m) => m[1]!)),
+    );
+    const idle = defined.filter((g) => !blocking.has(g));
+    expect(idle.length).toBeGreaterThan(2);
+
+    await page.goto("/console/founder");
+    const section = page.getByTestId("blocks-nothing");
+    await expect(section).toBeVisible();
+    await expect(section.getByTestId("blocks-nothing-row")).toHaveCount(idle.length);
+    for (const gate of idle) {
+      await expect(section.getByText(gate, { exact: true })).toBeVisible();
+    }
+    // And nothing that IS blocking may appear here, which is the arm a section listing every gate
+    // would pass.
+    for (const gate of blocking) {
+      await expect(section.getByText(gate, { exact: true })).toHaveCount(0);
+    }
+  });
+
+  test("splits the waiting figure into week-units and the rows that are not, which is the G5 correction", async ({ page }) => {
+    const ledger = readFileSync("BUILD-STATE.md", "utf8");
+    const blocked = ledger
+      .split("\n")
+      .filter((l) => / \| blocked \| /.test(l))
+      .map((l) => l.split("|")[1]!.trim());
+    const weeks = blocked.filter((id) => /^W\d+$/.test(id));
+    const others = blocked.filter((id) => !/^W\d+$/.test(id));
+    // The correction itself: there ARE rows in the figure that are not week-units.
+    expect(others.length).toBeGreaterThan(0);
+
+    await page.goto("/console/founder");
+    const shape = page.getByTestId("blocked-shape");
+    await expect(shape.getByTestId("shape-weeks")).toContainText(`Week-units: ${weeks.length}`);
+    await expect(shape.getByTestId("shape-other")).toContainText(`Other rows: ${others.length}`);
+    for (const id of others) {
+      await expect(shape.getByTestId("shape-other")).toContainText(id);
+    }
+  });
+
+  test("says whether it agrees with the two documents it renders", async ({ page }) => {
+    await page.goto("/console/founder");
+    const agreement = page.getByTestId("agreement");
+    await expect(agreement).toBeVisible();
+    // The tree is clean, so the clean branch is what a reader sees — and the dirty one must not be
+    // rendered at the same time, which a section printing both would do.
+    await expect(agreement.getByTestId("agreement-clean")).toBeVisible();
+    await expect(agreement.getByTestId("agreement-dirty")).toHaveCount(0);
+  });
+
+  test("derives the claim that no ruling names the loop rather than asserting it", async ({ page }) => {
+    await page.goto("/console/founder");
+    await expect(page.getByTestId("who-decides-claim")).toContainText("does not answer any of these");
+  });
+
   test("names every gate the ledger is actually blocked on", async ({ page }) => {
     // Read from the ledger here rather than from the module, so the test and the page arrive at
     // the list by different routes. A page rendering a written list fails this the day a row moves.

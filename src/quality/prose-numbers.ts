@@ -305,6 +305,13 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/escape-hatches.ts", text: "Thirty-three entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/escape-hatches.ts", text: "five of their modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/escape-hatches.ts", text: "two bounds", resolution: { kind: "at_the_unit" } },
+  // W347: the G5 correction as the founder page inherited it. The largest blocker read a smaller
+  // figure in every document before W335, and the page rendered its whole blocked count as a single
+  // number. History, and `blockedShape` re-derives the split on every render, so the sentences are
+  // the finding and the derivation is the check.
+  { module: "src/founder/outstanding.ts", text: "six rows", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/founder-page-facts.ts", text: "six rows", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/founder-page-facts.ts", text: "eighteen rows", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/record-classes.ts", text: "Six modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/assertion-vocabulary.ts", text: "664 sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/blocked-surface.ts", text: "sixteen rows", resolution: { kind: "at_the_unit" } },

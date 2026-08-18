@@ -202,6 +202,7 @@ export const REVIEWED_AT_W345: readonly Review[] = [
   { id: "bounds::src/quality/controls.ts::CONTROL_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/declaration-tax.ts::TAX_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/deferrals.ts::DEFERRAL_BOUND", verdict: { kind: "still_correct" } },
+  { id: "bounds::src/quality/founder-page-facts.ts::PAGE_FACT_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/hardening-q23.ts::HARDENING_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/hardening-q24.ts::HARDENING_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/hardening-q25.ts::Q25_HARDENING_BOUND", verdict: { kind: "still_correct" } },

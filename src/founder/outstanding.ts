@@ -270,6 +270,50 @@ export function founderDiff(root: string, paths: readonly ReleasePath[] = RELEAS
 }
 
 /**
+ * W347: the standing gates that block NO ledger row.
+ *
+ * THE PLAN HAS SAID THIS IN PROSE AT EVERY HORIZON FOR SIX QUARTERS — *G1, G2, G4 and G7 block
+ * nothing, and they are what stand between this tree and a patient* — and the page a founder opens
+ * has never shown it. A gate with rows behind it argues for itself: the page lists what a ruling
+ * releases and the number rises. A gate with no rows behind it is invisible on a page organised by
+ * what is waiting, and it is the more consequential half, because the reason it blocks nothing is
+ * that nobody built anything that needs it.
+ *
+ * Derived from the same two documents as everything else: §4's gates minus the ones a release path
+ * names. Cleared gates are dropped — G0 is answered and answered is not the same as unblocking.
+ */
+export function gatesBlockingNothing(root: string, paths: readonly ReleasePath[] = RELEASE_PATHS): Gate[] {
+  const blocking = new Set(paths.map((p) => p.blocker));
+  return parseGates(readFileSync(path.join(root, "docs/FIVE-YEAR-PLAN.md"), "utf8")).filter(
+    (g) => g.status !== "cleared" && !blocking.has(g.id),
+  );
+}
+
+/** How the blocked count divides: week-units, and the rows that are not week-units. */
+export interface BlockedShape {
+  weekUnits: string[];
+  otherRows: string[];
+}
+
+/**
+ * W347: what the blocked figure is made of.
+ *
+ * THE G5 CORRECTION, RENDERED. Until W335 every document in this tree said G5 blocked six rows; it
+ * blocks eight, and the two it had been missing are `SUP-1` and `SUP-2` — support rows that a
+ * parse the gate dossier and its own test each kept a private copy of could not see. The page
+ * inherited the same shape from the other end: it renders `blocked` as a single number under a
+ * heading that says *Units*, and two of the eighteen are not units. A founder reading eighteen
+ * cannot tell which sixteen are weeks of work and which two are something else.
+ */
+export function blockedShape(root: string): BlockedShape {
+  const blocked = allLedgerRows(root).filter((r) => r.status === "blocked");
+  return {
+    weekUnits: blocked.filter((r) => /^W\d+$/.test(r.id)).map((r) => r.id).sort(),
+    otherRows: blocked.filter((r) => !/^W\d+$/.test(r.id)).map((r) => r.id).sort(),
+  };
+}
+
+/**
  * Every sentence the page writes for itself, so the copy linters have something to read.
  *
  * The rest of the page is quotation — §4's sentences and the ledger's notes, rendered as they are
@@ -284,6 +328,20 @@ export const FOUNDER_COPY = {
   releasesHeading: "What this ruling releases",
   noDecider:
     "The build loop does not answer any of these. Each one names who decides, and none of them names a builder.",
+  // W347: the sentence above was TYPED while `answerableByTheLoop` derived the same claim and
+  // nothing read it. The page now renders the derivation and falls back to this only when the
+  // derivation agrees; when it does not, the second sentence is what a reader sees.
+  loopAnswersSome:
+    "One or more of the rulings below names the build loop as its decider. That is a defect in the release paths rather than a decision the loop may take, and it is shown here rather than hidden.",
+  nothingBlockedHeading: "Rulings that block nothing",
+  nothingBlockedIntro:
+    "These are outstanding and no queued work waits on them, because nothing has been built that needs them yet. A page organised by what is waiting would never show them, and they are the ones that stand between this build and its first real use.",
+  shapeHeading: "What the waiting figure is made of",
+  shapeNote:
+    "The figure above counts every blocked row in the ledger, and not all of them are week-units. Until W335 the documents in this tree reported the largest blocker as smaller than it is, because two support rows were invisible to the parse that counted it.",
+  agreementHeading: "Does this page agree with the documents",
+  agrees:
+    "Every blocked row in the ledger is shown above, every ruling has a sentence behind it from section 4, no ruling shown has already been answered, and nothing shown is already built.",
   waitStanding: "Outstanding since the plan was written.",
   waitProposed: "Proposed by the unit named, and unanswered since.",
   noClinical:

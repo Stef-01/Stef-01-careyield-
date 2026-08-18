@@ -20,8 +20,8 @@ import {
   pinDiff,
   pinsInTree,
 } from "./pins";
-import { hatchDefects } from "./escape-hatches";
-import { unaskedDefects } from "./unasked-facts";
+import { REVIEWED_AT_W345 } from "./escape-hatches";
+import { UNASKED_AT_W340 } from "./unasked-facts";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { withPlantedIn } from "./planting";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
@@ -110,10 +110,14 @@ describe("W290 the live pins, and why live is not the defect", () => {
     // W345's is the sixth, and its event is a declaration that a check cannot be made to fail
     // arriving in any of the three registers that hold them — or leaving, because a conversion has
     // to say which way it went.
-    expect(hatchDefects(ROOT)).toEqual([]);
-    // W340's is the seventh, and its event is a derivation arriving on the served surface with
-    // nothing importing it — or one of the seventy-one finally getting the screen that asks.
-    expect(unaskedDefects(ROOT)).toEqual([]);
+    // W345's and W340's are the sixth and seventh, and each is driven against the whole tree in
+    // its OWN suite — `escape-hatches.test.ts` and `unasked-facts.test.ts`. Re-deriving both here
+    // is the duplication W301 spent a unit removing, and it is not free: each is a walk of every
+    // module in the tree, in a file eleven other assertions already read. What belongs here is the
+    // property this describe block is about — that the pin is a named list rather than a figure,
+    // so neither direction can be satisfied by retyping a digit.
+    expect(REVIEWED_AT_W345.every((r) => r.id.includes("::"))).toBe(true);
+    expect(UNASKED_AT_W340.every((f) => /^src\/.+\.ts::[A-Za-z0-9_]+$/.test(f.id))).toBe(true);
   });
 
   it("makes each argue for interrupting somebody, not merely declare itself live", () => {

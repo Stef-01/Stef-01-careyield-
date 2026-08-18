@@ -275,6 +275,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
     why: "W305's declaration point. It names the ledger inside THIS register's census row — the sentence describing what `ledgerNamingModules` walks — so the mention is a description of this module rather than a read of a row. Excused explicitly because a register that quietly skipped the file describing it is the omission W305 exists to stop.",
   },
   {
+    module: "src/quality/founder-page-facts.ts",
+    why: "W347's classification of the outstanding position. It names `parseLedgerRows` and `allLedgerRows` inside the IDS of the facts it classifies — `src/quality/blocked-surface.ts::allLedgerRows` is a row key, not a call — and it opens no ledger: what it reads is the founder page's source and the three modules' exports. Same class as `quarter-mutants.ts` above, and the same reason the scan keeps literals.",
+  },
+  {
     module: "src/founder/second-reading.ts",
     why: "W322's diff of what changed since the founder last looked. Its answer is SUPPOSED to move when a row closes — that is the feature — so reporting the movement as breakage would make the check unusable at exactly the moment it is for.",
   },
