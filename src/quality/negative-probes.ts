@@ -358,6 +358,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/unrun.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/unrun.test.ts :: finds a module in a constructed tree that no test reaches",
+      plants: "src/seen.ts",
+    },
+  },
+  {
     register: "src/quality/self-ending.ts",
     negative: {
       kind: "already_driven",

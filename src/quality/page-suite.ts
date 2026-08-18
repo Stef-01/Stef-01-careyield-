@@ -136,22 +136,37 @@ export interface PageSuiteCoverage {
  * A spec added and not excluded is RUN, which is the safe default and the opposite of how the
  * suite behaved before this unit: membership used to be whatever the script happened to match.
  */
-export function pageSuiteCoverage(root: string): PageSuiteCoverage {
+export function pageSuiteCoverage(
+  root: string,
+  excluded: Readonly<Record<string, string>> = EXCLUDED_SPECS,
+): PageSuiteCoverage {
   const specs = pageSpecFiles(root);
-  const declared = Object.keys(EXCLUDED_SPECS);
+  const declared = Object.keys(excluded);
   return {
-    run: specs.filter((s) => !(s in EXCLUDED_SPECS)),
-    excluded: specs.filter((s) => s in EXCLUDED_SPECS).sort(),
+    run: specs.filter((s) => !(s in excluded)),
+    excluded: specs.filter((s) => s in excluded).sort(),
     stale: declared.filter((s) => !specs.includes(s)).sort(),
-    unreasoned: declared.filter((s) => (EXCLUDED_SPECS[s] ?? "").trim().length < 40).sort(),
+    unreasoned: declared.filter((s) => (excluded[s] ?? "").trim().length < 40).sort(),
   };
 }
 
-/** Everything wrong with the gate's coverage of the rendered surface, as one list. */
-export function pageSuiteViolations(root: string): string[] {
+/**
+ * Everything wrong with the gate's coverage of the rendered surface, as one list.
+ *
+ * W333 GAVE IT THE PARAMETER ITS OWN UNREACHABILITY NOTE ASKED FOR. Two arms here were declared
+ * `unreached` in W291's register, and both fixtures said the same thing: `EXCLUDED_SPECS` is a
+ * module constant, so a stale or unreasoned exclusion cannot be constructed from outside, and the
+ * remedy is to take it as an argument exactly as `blockedSurfaceViolations` takes its budget. The
+ * note was written at W255 and was still true three quarters later — a branch nobody could reach,
+ * with the two-line fix for reaching it sitting in the declaration.
+ */
+export function pageSuiteViolations(
+  root: string,
+  excluded: Readonly<Record<string, string>> = EXCLUDED_SPECS,
+): string[] {
   const pkg = readFileSync(path.join(root, "package.json"), "utf8");
   const config = readFileSync(path.join(root, "playwright.config.ts"), "utf8");
-  const coverage = pageSuiteCoverage(root);
+  const coverage = pageSuiteCoverage(root, excluded);
   const out: string[] = [];
   if (!verifyRunsPageSuite(pkg)) out.push(`${VERIFY_SCRIPT} does not chain \`pnpm ${E2E_SCRIPT}\``);
   if (coverage.run.length === 0) out.push("the gate runs no spec at all");

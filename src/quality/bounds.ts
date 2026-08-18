@@ -71,6 +71,7 @@ import { CLEAN_BOUND } from "./repository-clean";
 import { SETUP_GAP_BOUND } from "@/console/setup-gaps";
 import { Q25_HARDENING_BOUND } from "./hardening-q25";
 import { ENDING_BOUND } from "./self-ending";
+import { UNRUN_BOUND } from "./unrun";
 import { DEMO_PATH, PATH_BOUND, gateStops } from "@/demo/path";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
 import { CITATION_BOUND } from "./citations";
@@ -219,6 +220,17 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         why: "Q24's finding count, quoted from that quarter's own pass to make the point that a total is not a comparison. History about a closed register, which is exactly why quoting it is safe and re-deriving it would be pointless.",
       },
     ],
+  },
+  {
+    module: "src/quality/unrun.ts",
+    name: "UNRUN_BOUND",
+    unit: "W333",
+    text: UNRUN_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Reached is not run, and closing that gap means measuring EXECUTION rather than imports — coverage instrumentation, which is a different instrument answering a different question and produces exactly the totals W304 spent a unit removing. Nothing this register could grow into would make an import walk answer whether a line ran. The specifier limits are narrower and could be widened one syntax at a time, but the sentence would still be true of whatever the next one misses, which is the class W267 states about `readdirSync`. And the branch half is limited by what W291 has DECLARED unreachable: a branch nobody has noticed cannot be reported by a register whose population is the declarations, and noticing is a reading rather than a derivation.",
+    },
+    numbers: [],
   },
   {
     module: "src/quality/self-ending.ts",

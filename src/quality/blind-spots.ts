@@ -46,6 +46,7 @@ import { mutantsIn } from "./mutation-sampling";
 import { CITATION_BOUND, separatorDiff } from "./citations";
 import { PLANTING_BOUND, planterDiff } from "./planting";
 import { ENDING_BOUND, waitingModules } from "./self-ending";
+import { UNRUN_BOUND, unreachedByUnitSuite } from "./unrun";
 import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
 import { MANIFEST_BOUND, manifestDiff } from "./manifest";
 import { REMEDY_BOUND, frozenEqualities } from "./self-defeating";
@@ -584,6 +585,32 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
       "It resolves a bound's unit, remedy and numbers against the sentence and the tree, so it cannot see whether the sentence is a FAIR description of the limit. A bound naming a real remedy for half of what the remedy would fix resolves cleanly here and understates the limit anyway — which is the shape `BOUNDS_BOUND` names and hands to a reader.",
     whyNotPlantable:
       "A witness would be a bound that resolves and is unfair, and unfairness is a judgement about prose rather than a property a plant can carry. Fabricating one would be writing the answer into the fixture, which is the detector W279 refused to tune. Stating it is what can be done from inside, and the quarterly hardening pass is where a reader looks.",
+  },
+  "src/quality/unrun.ts": {
+    kind: "demonstrated",
+    bound: UNRUN_BOUND,
+    witness: "a module reached only by a dynamic import written with a relative specifier",
+    control: "the same module reached by an ordinary static import, which the walk must follow",
+    probe: () =>
+      withRoot(
+        {
+          "src/hidden.ts": "export const hidden = 1;\n",
+          "src/shown.ts": "export const shown = 2;\n",
+          "src/a.test.ts": 'it("t", async () => { await import("./hidden"); });\n',
+          "src/b.test.ts": 'import { shown } from "./shown";\nit("t", () => { expect(shown).toBe(2); });\n',
+        },
+        (root) => {
+          // SEEN MEANS THE WALK FOLLOWED THE EDGE, not that the register listed the module. A
+          // module the walk reaches is absent from the unreached list, so the polarity is the
+          // negation — which is worth writing down, because the first draft had it the other way
+          // round and read as a register seeing exactly what its bound says it cannot.
+          const unreached = unreachedByUnitSuite(root);
+          return {
+            witnessSeen: !unreached.includes("src/hidden.ts"),
+            controlSeen: !unreached.includes("src/shown.ts"),
+          };
+        },
+      ),
   },
   "src/quality/self-ending.ts": {
     kind: "demonstrated",

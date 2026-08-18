@@ -45,7 +45,7 @@ import { coverageByBand } from "@/compliance/copy-y6";
 import { diffFoldRegister, discoverFoldSites } from "./order-independence";
 import { undeclaredInstructionSinks } from "@/security/instruction-sinks";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
-import { REFUSAL_BRANCHES, driveBranches, withRoot } from "./refusal-branches";
+import { REFUSAL_BRANCHES, type RefusalBranch, driveBranches, withRoot } from "./refusal-branches";
 import { anchorCoverage, deadAnchors } from "./latent-y5";
 import { LATENT_FINDINGS, fired } from "./latent-findings";
 import { pinDiff } from "./pins";
@@ -57,6 +57,7 @@ import { unacceptedTautologies } from "./tautology-sweep";
 import { fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
 import { endingDiff } from "./self-ending";
+import { unreachedByUnitSuite } from "./unrun";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
 import { instantDiff } from "./instant";
@@ -242,6 +243,24 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     return readerDiff(root, [], []).unwatched.length > 0;
   },
 
+  "src/quality/unrun.ts": (root) => {
+    // W333's comparison, driven in a constructed tree so the answer is not this tree's two. One
+    // module a test imports and one nothing imports: only the second may be reported, and a
+    // declaration for it must silence the register.
+    void root;
+    return withRoot(
+      {
+        "src/orphan.ts": "export const orphan = 1;\n",
+        "src/seen.ts": "export const seen = 2;\n",
+        "src/seen.test.ts": 'import { seen } from "./seen";\nit("t", () => { expect(seen).toBe(2); });\n',
+      },
+      (planted) => {
+        const found = unreachedByUnitSuite(planted);
+        return found.length === 1 && found[0] === "src/orphan.ts";
+      },
+    );
+  },
+
   "src/quality/self-ending.ts": (root) => {
     // W330's comparison, driven in both directions against a register of exactly one wait. The
     // planted module spells one and no register holds it, so `unregistered` must fire; declaring
@@ -386,8 +405,11 @@ export function drivenRegisters(): string[] {
  * RESOLVED, NOT RECORDED. A citation that names a branch W291 does not have, or names one W291
  * itself lists as unreachable, is worth nothing and says so here rather than reading as coverage.
  */
-export function resolveBranch(id: string): { drive: () => boolean } | string {
-  const branch = REFUSAL_BRANCHES.find((b) => `${b.module}::${b.fn}::${b.branch}` === id);
+export function resolveBranch(
+  id: string,
+  branches: readonly RefusalBranch[] = REFUSAL_BRANCHES,
+): { drive: () => boolean } | string {
+  const branch = branches.find((b) => `${b.module}::${b.fn}::${b.branch}` === id);
   if (!branch) return `${id}: cited, and W291 has no such branch`;
   if (branch.reach.kind !== "driven") return `${id}: cited, and W291 lists it as unreachable`;
   return { drive: branch.reach.drive };

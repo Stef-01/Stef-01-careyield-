@@ -49,6 +49,28 @@ const PROSE_LITERAL = /["'`][^"'`\n]*?(?:[A-Za-z]+ ){4,}[^"'`\n]*?["'`]/g;
 
 const COMPOSING_SIGNATURE = /^export function ([A-Za-z0-9_]+)\([^)]*\):\s*string(?:\[\])?\b/;
 
+/**
+ * The same signature when it is WRAPPED across lines, which W333 found it silently was.
+ *
+ * `pageSuiteViolations` composes copy and had been in this register for three quarters. W333 gave
+ * it a second parameter, its signature wrapped, and it left the population — not because it had
+ * stopped composing but because the pattern reads one line. A function that gains an argument is
+ * an ordinary event, and a copy-linting register that stops watching a function when it does is
+ * one that will be watching less every quarter without ever saying so.
+ *
+ * The join stops at the line holding the closing bracket, so a body is never read as a signature.
+ */
+function signatureAt(lines: readonly string[], index: number): string | null {
+  const first = lines[index] ?? "";
+  if (!/^export function [A-Za-z0-9_]+\(/.test(first)) return null;
+  let joined = first;
+  for (let i = index + 1; i < lines.length && !joined.includes("): "); i += 1) {
+    joined += ` ${(lines[i] ?? "").trim()}`;
+    if (i - index > 12) break;
+  }
+  return joined.replace(/\s+/g, " ");
+}
+
 export interface ComposingFunction {
   module: string;
   fn: string;
@@ -75,7 +97,7 @@ export function composingFunctions(root: string): ComposingFunction[] {
   for (const surface of OPERATOR_COPY_SURFACES) {
     const lines = readFileSync(path.join(root, surface.module), "utf8").split("\n");
     lines.forEach((line, index) => {
-      const match = COMPOSING_SIGNATURE.exec(line);
+      const match = COMPOSING_SIGNATURE.exec(line) ?? COMPOSING_SIGNATURE.exec(signatureAt(lines, index) ?? "");
       if (!match) return;
       const body = bodyOf(lines, index);
       PROSE_LITERAL.lastIndex = 0;
@@ -110,6 +132,17 @@ export interface ComposedSite {
  * automatically something a practice reads. Both directions against `composingFunctions`.
  */
 export const COMPOSED_COPY_SITES: readonly ComposedSite[] = [
+  // W333: SIX FUNCTIONS THAT HAD LEFT THIS REGISTER'S SIGHT WITHOUT LEAVING THE TREE. The
+  // signature pattern read one line, so a function whose parameter list wrapped stopped being
+  // found — an ordinary thing to happen the day somebody adds an argument, and one that made this
+  // register watch less every quarter without ever saying so. `pageSuiteViolations` left it in
+  // this very unit, which is how it was noticed.
+  { module: "src/outcomes/escalation-monitor.ts", fn: "renderEscalationMonitor", composes: "The escalation monitor's report, read by a practice: which responses are still waiting and how long each has been. Operator copy, and the sentences carry a duration, which is why the linter has to see them." },
+  { module: "src/quality/blocked-surface.ts", fn: "blockedSurfaceViolations", composes: "One line per way the ledger's blocked surface disagrees with the plan's gates. Developer-facing — the reader is whoever the failed build woke — and the sentences name a unit and a gate rather than describing a rule." },
+  { module: "src/quality/negative-probes.ts", fn: "unresolvedCitations", composes: "One line per citation that no longer resolves to the test it names. Developer-facing, and it quotes the assertion text, so the copy linter reads a sentence somebody else wrote rather than one this module composed." },
+  { module: "src/quality/self-ending.ts", fn: "unreadableEndings", composes: "One line per declaration waiting on an event nothing could ever read. Developer-facing: it names the declaration and what it waits for, because the remedy is to point it at something the tree holds." },
+  { module: "src/sim/fleet-y5.ts", fn: "checkY5FleetBudgets", composes: "One line per fleet budget the year-five simulation exceeded, naming the budget and both figures. Developer-facing, and the numbers in it are measured rather than written." },
+  { module: "src/verticals/scale.ts", fn: "checkVerticalScaleBudgets", composes: "The same shape for the vertical scale budgets. Developer-facing, and it exists so a budget that moves says which one and by how much rather than that something is over." },
   { module: "src/capacity/backtest.ts", fn: "renderScore", composes: "What a backtest scored, for a practice manager reading whether the forecast held up." },
   { module: "src/capacity/console.ts", fn: "renderReading", composes: "One session's recorded reading, including the sessions the record cannot answer for." },
   { module: "src/capacity/copy-lint.ts", fn: "renderCompliantCapacityCopy", composes: "The reference wording capacity copy is linted against — copy about copy, and read by whoever writes the next surface." },

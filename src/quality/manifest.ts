@@ -423,6 +423,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/unrun.ts",
+    census: {
+      derives:
+        "Every module under `src/` that no `*.test.ts` can reach, following static imports from every test file plus the `import(\"@/…\")` edges the shared walk does not.",
+      checkedAgainst:
+        "W333's `UNRUN_MODULES`, in three directions: a module nothing reaches and nothing argues fails, an argued module the suite has since caught up with fails, and an entry claiming a page runs it when `reachableFromApp` says no page does fails.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a constructed tree holding one module a test imports and one nothing imports, where only the second may be reported",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every module this suite cannot execute is named, with who does run it and what a suite would add.",
+        mutation:
+          "A declaration is dropped and its module must be reported; a declaration is added for a module the suite reaches and must be reported the other way.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/self-ending.ts",
     census: {
       derives:
@@ -1593,18 +1615,25 @@ export const MANIFEST: readonly ModuleEntry[] = [
         fn: "pageSuiteViolations",
         branch: "excluded_spec_is_stale",
         reach: {
-          kind: "unreached",
-          fixture:
-            "`EXCLUDED_SPECS` is a module constant rather than an argument, so a stale exclusion cannot be constructed from outside — the only way to reach this arm is to delete a spec the register excludes, which is a change to the tree rather than a fixture. Give `pageSuiteViolations` an `excluded` parameter defaulting to the constant, exactly as `blockedSurfaceViolations` takes its budget and `coverageDiff` its declared list, and this becomes a two-line drive.",
+          kind: "driven",
+          // W333 took the parameter this branch's own unreachability note asked for, at W255.
+          drive: () =>
+            pageSuiteViolations(process.cwd(), { "e2e/never-written.spec.ts": "x".repeat(60) }).some((v) =>
+              v.includes("is excluded and does not exist"),
+            ),
         },
       },
       {
         fn: "pageSuiteViolations",
         branch: "excluded_without_a_reason",
         reach: {
-          kind: "unreached",
-          fixture:
-            "The same shape as the stale arm above and the same one-line remedy: `EXCLUDED_SPECS` is read from module scope, so an exclusion with a short reason cannot be supplied by a caller. Parameterise it and this arm is reachable with a one-entry map.",
+          kind: "driven",
+          // The same parameter reaches both, which is why the note said two lines rather than one
+          // unit: an exclusion whose reason is too short to be a reason.
+          drive: () =>
+            pageSuiteViolations(process.cwd(), { "e2e/founder.spec.ts": "no" }).some((v) =>
+              v.includes("is excluded without a reason"),
+            ),
         },
       },
     ],

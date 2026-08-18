@@ -14,6 +14,7 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:f
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { OPERATOR_COPY_SURFACES } from "./cdss-boundary";
 import {
   ACCEPTED_COMPOSED_FINDINGS,
   COMPOSED_COPY_SITES,
@@ -21,8 +22,7 @@ import {
   REFUSED_COMPOSED_SHAPES,
   composingFunctions,
   proseLiteralsIn,
-  unacceptedComposed,
-} from "./composed-copy";
+  unacceptedComposed,  } from "./composed-copy";
 import { lintEducationCopy } from "@/education/advice-lint";
 import { orderingBasis } from "@/directory/search";
 import { describeAsk } from "@/outcomes/dashboard";
@@ -71,7 +71,18 @@ describe("W278 the composing functions are found, not listed", () => {
     const composing = new Set(composingFunctions(ROOT).map(key));
     expect(composing.has("src/directory/disclosure.ts::declaredFields")).toBe(false);
     expect(composing.has("src/quality/tree-walks.ts::sourceModules")).toBe(false);
-    expect(composing.size).toBeLessThan(30);
+    // W333: DERIVED RATHER THAN PINNED. This was `toBeLessThan(30)` and it moved the moment the
+    // detector stopped missing wrapped signatures — a ceiling somebody bumps is the shape W304
+    // spent a unit removing. The property is that the word count DISCRIMINATES: strictly fewer
+    // functions compose prose than return a string at all, over the same surfaces.
+    const stringReturning = OPERATOR_COPY_SURFACES.flatMap((surface) =>
+      [...readFileSync(path.join(ROOT, surface.module), "utf8").matchAll(/^export function ([A-Za-z0-9_]+)\(/gm)].map(
+        (m) => `${surface.module}::${m[1]!}`,
+      ),
+    );
+    expect(stringReturning.length, "the population is empty, so the comparison says nothing").toBeGreaterThan(
+      composing.size,
+    );
   });
 });
 

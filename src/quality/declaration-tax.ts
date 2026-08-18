@@ -253,6 +253,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/unrun.ts",
+    // Asks which modules no test file can reach. A planted module arrives with no test importing
+    // it, so it WOULD be reported — but the demand is on the arriving module's author only when
+    // the register holds a declaration for it, and a plant is not declared. It demands nothing on
+    // arrival and is in the population because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/self-ending.ts",
     // Asks whether a module CONSTRUCTS a declaration keyed to a future event. A planted module
     // spells no wait, so it owes this register nothing on arrival — and a module that does spell

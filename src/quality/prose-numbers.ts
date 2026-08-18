@@ -273,6 +273,14 @@ const q24Findings = (): number => HARDENING_Q24_FINDINGS.length;
  * already wrong when it read them.
  */
 export const CLAIMS: readonly DeclaredClaim[] = [
+  // W333: what its header found when it was written — the size of the list it replaces, the
+  // branches it closed, and the modules the unit suite cannot reach. History: the register below
+  // re-derives all three on every run, so the sentences are the argument and the derivations are
+  // the check, which is the division `at_the_unit` exists to record.
+  { module: "src/quality/unrun.ts", text: "sixteen modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/unrun.ts", text: "two branches", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/unrun.ts", text: "two modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/unrun.ts", text: "TWO modules", resolution: { kind: "at_the_unit" } },
   // W336: TWENTY CLAIMS THAT ARRIVED WHEN THE PROSE SURFACE BECAME THE COMMENTS. Answering
   // Q25-CR-5 narrowed the header away from "the whole file" — which had been reading string
   // literals as prose — and in the same move widened the surface to every `//` note, wherever it

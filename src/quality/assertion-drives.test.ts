@@ -129,7 +129,20 @@ describe("W289 a cited drive is resolved and called, never recorded", () => {
     // Both failure modes of a citation, driven. The second is the subtle one: an id that resolves
     // to a branch W291 itself lists as unreachable is a proof nobody has run either.
     expect(resolveBranch("src/nowhere.ts::fn::arm")).toContain("no such branch");
-    expect(resolveBranch("src/quality/page-suite.ts::pageSuiteViolations::excluded_spec_is_stale")).toContain(
+    // W333: DRIVEN ON A PLANTED BRANCH. This used to cite `pageSuiteViolations::excluded_spec_is_stale`,
+    // which W291 really did call unreachable — until W333 gave that register the parameter its own
+    // fixture note asked for, at which point the tree held no unreachable branch and the arm had
+    // nothing to resolve. A check that depends on the tree still being wrong somewhere is a check
+    // that gets deleted the day somebody fixes it.
+    const planted = [
+      {
+        module: "src/planted/w333.ts",
+        fn: "probe",
+        branch: "an_arm_nobody_can_construct",
+        reach: { kind: "unreached" as const, fixture: "the parameter it does not take" },
+      },
+    ];
+    expect(resolveBranch("src/planted/w333.ts::probe::an_arm_nobody_can_construct", planted)).toContain(
       "unreachable",
     );
   });

@@ -26,6 +26,14 @@ const ROOT = process.cwd();
 const id = (b: { module: string; fn: string; branch: string }) => `${b.module}::${b.fn}::${b.branch}`;
 const names = (root: string) => violationReporters(root).map((r) => `${r.module}::${r.fn}`);
 
+/** A branch nobody can construct, for the arms that must be driven on one rather than on this tree. */
+const PLANTED_UNREACHED: RefusalBranch = {
+  module: "src/planted/w333.ts",
+  fn: "probe",
+  branch: "an_arm_nobody_can_construct",
+  reach: { kind: "unreached", fixture: "the parameter it does not take" },
+};
+
 describe("W291 the register covers the tree's violation reporters, both directions", () => {
   it("names every reporter the tree has, and none it does not", () => {
     const found = new Set(names(ROOT));
@@ -92,9 +100,16 @@ describe("W291 every drivable branch is driven, and fires", () => {
     // branches, which is an ordinary event — so the property is stated as the RATIO the unit
     // actually cares about: everything is driven except the branches declared undrivable.
     const driven = REFUSAL_BRANCHES.filter((b) => b.reach.kind === "driven");
-    const undrivable = REFUSAL_BRANCHES.filter((b) => b.reach.kind !== "driven");
-    expect(driven.length + undrivable.length).toBe(REFUSAL_BRANCHES.length);
-    expect(undrivable).toHaveLength(2);
+    expect(driven.length + REFUSAL_BRANCHES.filter((b) => b.reach.kind !== "driven").length).toBe(
+      REFUSAL_BRANCHES.length,
+    );
+    // W333: EVERY BRANCH IS DRIVEN NOW. The two that were not were both `pageSuiteViolations`,
+    // both for the same reason, and both fixtures said the remedy was a parameter — which W333
+    // took. The arm is still checked, on a planted branch, in the test below.
+    // W293: evidenced before it is asserted empty — the same filter over a list that HAS one.
+    const undrivableIn = (bs: readonly RefusalBranch[]) => bs.filter((b) => b.reach.kind !== "driven");
+    expect(undrivableIn([...REFUSAL_BRANCHES, PLANTED_UNREACHED])).toHaveLength(1);
+    expect(undrivableIn(REFUSAL_BRANCHES)).toEqual([]);
     expect(driven.length).toBeGreaterThanOrEqual(22);
     // Non-vacuity: if none were drivable, "nothing failed to fire" would be trivially true.
     expect(report.didNotFire.length + driven.length).toBeGreaterThan(15);
@@ -130,14 +145,21 @@ describe("W291 every drivable branch is driven, and fires", () => {
 describe("W291 an unreachable branch names the fixture that would reach it", () => {
   const report = driveBranches();
 
-  it("reports exactly the two nobody can construct today", () => {
-    // Both are `pageSuiteViolations`, and both for the same structural reason: `EXCLUDED_SPECS` is
-    // a module constant rather than an argument, so a caller cannot supply a stale or unreasoned
-    // exclusion. Pinned so the number cannot grow quietly.
-    expect(report.unreached).toEqual([
-      "src/quality/page-suite.ts::pageSuiteViolations::excluded_spec_is_stale",
-      "src/quality/page-suite.ts::pageSuiteViolations::excluded_without_a_reason",
+  it("reports a PLANTED unreached branch, and none in this tree", () => {
+    // W333'S GATE, and the shape is the point. This used to pin the two `pageSuiteViolations`
+    // arms by name — correct while they existed, and a check that says nothing the day somebody
+    // fixes them. The live claim is that the tree holds NONE; the arm that reports one is driven
+    // on a branch constructed here, so it goes on working whether or not the tree ever has one.
+    const unreachedIn = (bs: readonly RefusalBranch[]) => driveBranches(bs).unreached;
+    expect(unreachedIn([PLANTED_UNREACHED])).toEqual([
+      "src/planted/w333.ts::probe::an_arm_nobody_can_construct",
     ]);
+    expect(unreachedIn(REFUSAL_BRANCHES)).toEqual([]);
+    // And a planted unreached branch is not ALSO counted as one that failed to fire, which would
+    // report the same branch twice for opposite reasons.
+    const failedIn = (bs: readonly RefusalBranch[]) => driveBranches(bs).didNotFire;
+    expect(failedIn([{ ...PLANTED_UNREACHED, reach: { kind: "driven", drive: () => false } }])).toHaveLength(1);
+    expect(failedIn([PLANTED_UNREACHED])).toEqual([]);
   });
 
   it("gives each one a remedy rather than a shrug", () => {
