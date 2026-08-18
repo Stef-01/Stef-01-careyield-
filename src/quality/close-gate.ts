@@ -247,6 +247,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
     why: "The same, for Q24's register. Named separately rather than folded into the line above, because two registers excused by one sentence is the shape where the second stops being read — and Q24's is the register the Q25 close actually fired against.",
   },
   {
+    module: "src/quality/quarter-mutants.ts",
+    why: "W332's survivor register. It names `parseLedgerRows` inside a survivor's ID — the line of source a mutant changed, quoted so a reader can see which change went unnoticed. A citation of code, not a call: this module runs mutants against suites and never opens the ledger. Same class as `blind-spots.ts` below, and the same reason the scan keeps literals: the ledger's own path only ever appears AS one.",
+  },
+  {
     module: "src/quality/blind-spots.ts",
     why: "W295's witnesses. It names `parseLedgerRows` inside the PLANTED SOURCE of the probe that demonstrates this register's own bound — a string literal it writes into a constructed tree, not a call it makes. The derivation strips comments and not literals, which is deliberate: the ledger's own path only ever appears AS a literal, so blanking them would hide every real reader to hide this one.",
   },

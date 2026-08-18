@@ -322,6 +322,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/quarter-mutants.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/quarter-mutants.test.ts :: reports nothing when the suite goes red, which is what caught means",
+      plants: "the suite failed",
+    },
+  },
+  {
     register: "src/quality/instant.ts",
     negative: {
       kind: "already_driven",

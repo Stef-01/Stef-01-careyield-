@@ -2107,6 +2107,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/quarter-mutants.ts",
+    census: {
+      derives:
+        "Every mutation site in every module whose header names a unit in one quarter's range — the modules that quarter ADDED — run one at a time against that module's own suite inside a copied tree.",
+      checkedAgainst:
+        "`SURVIVORS_AT_W332`, through W296's `samplingReport`, in both directions: a mutant nothing caught and nothing explains, and a declared survivor the suite now catches.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "the runner is handed a suite that throws and one that does not, over a module held in a map rather than on disk, and only the second may be reported",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every change these five operators can make to a module Q25 added is caught by that module's own suite, except the two named here with their kind and their argument.",
+        mutation:
+          "`samplingReport` is given a survivor this register does not name, and its `unexplained` arm must report it.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/deferrals.ts",
     census: null,
     branches: [],

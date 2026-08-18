@@ -8,7 +8,7 @@
 // firing after. So the derivation is proved by CHANGING THE SOURCES in a copied tree — a gate that
 // is not in this plan, a unit this ledger does not block — and requiring the output to move.
 
-import { readFileSync } from "node:fs";
+import { readFileSync, rmSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   FOUNDER_BOUND,
@@ -59,10 +59,17 @@ describe("W310 the page is derived from the two documents, not written", () => {
     // THE UNIT. A hand-written page passes every other test in this file on the day it is written.
     // This one plants a different §4 into a copy of the tree and requires the wait to change: the
     // gate's origin is read from the plan, so a gate proposed later has waited less.
+    // W332: removed, in W331's idiom. This file made two copies of the repository per run and
+    // removed neither — two sites W331's sweep of the same defect did not reach.
     const copy = copyTree(ROOT);
-    const early = withPlantedIn(copy, { "docs/FIVE-YEAR-PLAN.md": PLANTED_PLAN }, () =>
-      parseGates(PLANTED_PLAN),
-    );
+    let early: ReturnType<typeof parseGates>;
+    try {
+      early = withPlantedIn(copy, { "docs/FIVE-YEAR-PLAN.md": PLANTED_PLAN }, () =>
+        parseGates(PLANTED_PLAN),
+      );
+    } finally {
+      rmSync(copy, { recursive: true, force: true });
+    }
     const late = PLANTED_PLAN.replace("PROPOSED at W104", "PROPOSED at W300");
     const rows = parseLedgerRows(
       ["| W1 | done | b | 2026-08-08T07:05Z | abc1234 | a row |", "| W104 | done | b | 2026-08-10T08:40Z | def5678 | a row |", "| W300 | done | b | 2026-08-17T10:10Z | 9012abc | a row |"].join("\n"),
@@ -261,9 +268,14 @@ describe("W310 the three ways a rendered page goes wrong", () => {
       "## 5. Year 1 weekly ledger",
     ].join("\n");
     const copy = copyTree(ROOT);
-    const found = withPlantedIn(copy, { "docs/FIVE-YEAR-PLAN.md": plan }, () =>
-      founderDiff(copy).clearedButBlocking,
-    );
+    let found: string[];
+    try {
+      found = withPlantedIn(copy, { "docs/FIVE-YEAR-PLAN.md": plan }, () =>
+        founderDiff(copy).clearedButBlocking,
+      );
+    } finally {
+      rmSync(copy, { recursive: true, force: true });
+    }
     expect(found).toContain(blocker);
   });
 });

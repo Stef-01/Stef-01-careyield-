@@ -60,6 +60,7 @@ import { endingDiff } from "./self-ending";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
 import { instantDiff } from "./instant";
+import { SURVIVORS_AT_W332 } from "./quarter-mutants";
 
 /**
  * A comparison handed an input it must reject, keyed by the register the census names.
@@ -204,6 +205,16 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // in the tree is then in the wrong spelling, so the arm that must fire is the only arm there
     // is — and the point is that the choice is an argument rather than a constant welded in.
     return vocabularyDefects(root, "not equal []").length > 100;
+  },
+
+  "src/quality/quarter-mutants.ts": (root) => {
+    // W332's register, read through W296's reporter: a survivor the run found and this register
+    // does not name. The arm that must fire is `unexplained` — a change nothing in the quarter's
+    // own suites noticed and nobody has written down.
+    void root;
+    return (
+      samplingReport(["src/planted/x.ts :: and-to-or :: a && b"], [], SURVIVORS_AT_W332).unexplained.length > 0
+    );
   },
 
   "src/quality/instant.ts": (root) => {

@@ -222,6 +222,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/quarter-mutants.ts",
+    // Asks which mutants a quarter's own suites miss. A planted module names no unit in any
+    // quarter's range and has no sibling suite, so it is outside this population entirely — an
+    // arriving module pays the census, the blind spot, the negative probe and the drive, and pays
+    // nothing here. In the population because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/instant.ts",
     // Asks whether a declared control's answer moves with state outside the tree. A planted module
     // is not a declared control, so it owes this register nothing — an arriving module pays the

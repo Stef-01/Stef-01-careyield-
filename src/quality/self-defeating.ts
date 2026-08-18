@@ -123,6 +123,10 @@ export const ARGUED_EQUALITIES: readonly ArguedEquality[] = [
     why: "The same shape: a module arriving with no sibling suite is named here or the build stops, and naming it is a decision rather than a digit. W296's whole argument is that a module the sampler cannot reach must be visible, so an equality is the control.",
   },
   {
+    id: "src/quality/quarter-mutants.test.ts :: catches every mutant but the ones this register names :: SURVIVORS_AT_W332",
+    why: "The same shape as W296's row below and right for the same reason: a NAMED LIST of surviving mutants, each with a kind and an argument. A new survivor over the quarter's modules cannot be absorbed by editing a total — it has to be described, and describing it means reading the change nothing noticed. That is exactly what the frozen-number shape allows and this does not.",
+  },
+  {
     id: "src/quality/mutation-sampling.test.ts :: catches all but the survivors this register names :: SURVIVORS_AT_W296",
     why: "A named list of surviving mutants, each with a kind and an argument. A new survivor cannot be absorbed by editing a total — it has to be described — which is precisely what the frozen-number shape allows and this does not.",
   },

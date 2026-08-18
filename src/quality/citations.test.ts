@@ -99,10 +99,11 @@ describe("W301 a fifth implementation cannot arrive quietly", () => {
     expect(separatorDiff(ROOT)).toEqual({ undeclared: [], stale: [] });
   });
 
-  it("declares the two that split an id rather than a citation, with the reason", () => {
+  it("declares each file that splits an id rather than a citation, with the reason", () => {
     expect(Object.keys(SEPARATOR_NOT_A_CITATION).sort()).toEqual([
       "src/quality/mutation-sampling.test.ts",
       "src/quality/order-regressions.test.ts",
+      "src/quality/quarter-mutants.test.ts",
     ]);
     for (const [file, why] of Object.entries(SEPARATOR_NOT_A_CITATION)) {
       expect(why.length, `${file} is exempted without a reason`).toBeGreaterThan(80);
@@ -118,6 +119,7 @@ describe("W301 a fifth implementation cannot arrive quietly", () => {
     expect(diff.undeclared).toEqual([
       "src/quality/mutation-sampling.test.ts",
       "src/quality/order-regressions.test.ts",
+      "src/quality/quarter-mutants.test.ts",
     ]);
   });
 

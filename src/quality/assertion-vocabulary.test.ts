@@ -16,7 +16,15 @@ import {
   emptinessSpellings,
   formsIn,
   nonEmptyClaims,
-  vocabularyDefects, CANONICAL_EMPTY, EMPTY_FORMS, NOT_A_COLLECTION, NOT_EMPTINESS, emptinessDefects, emptyFormsIn } from "./assertion-vocabulary";
+  vocabularyDefects,
+  CANONICAL_EMPTY,
+  EMPTY_FORMS,
+  NOT_A_COLLECTION,
+  NOT_EMPTINESS,
+  emptinessDefects,
+  emptyFormsIn,
+  throwSpellings,
+} from "./assertion-vocabulary";
 import { evidenceReport } from "./empty-list-sweep";
 import { withRoot } from "./refusal-branches";
 
@@ -114,6 +122,46 @@ describe("W323 one way to say a list is non-empty", () => {
     // spelling-by-spelling drives above are what keep the derivation honest afterwards: a scan
     // that had stopped reading two of the three forms would report the same single answer.
     expect(emptinessSpellings(ROOT)).toEqual(["equal []"]);
+  });
+
+  it("refuses the near misses of the OPPOSITE claim too, which nothing drove until W332", () => {
+    // W332 RAN EVERY MUTANT IN THIS MODULE AND THREE SURVIVED, all in `emptinessSpellings` and all
+    // the same shape: an `&&` in one of its three branches flipped to `||` and every planted input
+    // gave the same answer. The positives were driven one spelling at a time and the NEGATIVES were
+    // never driven at all — so each branch's second condition was load-bearing and unasserted.
+    const only = (body: string) =>
+      withRoot({ "src/planted/e.test.ts": `it("t", () => { ${body} });\n` }, (root) =>
+        emptinessSpellings(root),
+      );
+    // A count with a matcher that is not an equality: the canonical NON-empty form, and reading it
+    // as an emptiness claim would invert the whole register.
+    expect(only("expect(xs.length).toBeGreaterThan(0);")).toEqual([]);
+    // A count compared by equality to something that is not zero.
+    expect(only("expect(xs.length).toBe(3);")).toEqual([]);
+    // `toHaveLength` against a length that is not zero.
+    expect(only("expect(xs).toHaveLength(3);")).toEqual([]);
+    // An equality against a non-empty array literal.
+    expect(only("expect(xs).toEqual([1]);")).toEqual([]);
+    // And a matcher that is not `toHaveLength` against zero, which the second branch must refuse
+    // on the MATCHER rather than on the expected value.
+    expect(only("expect(xs).toBe(0);")).toEqual([]);
+  });
+
+  it("reads the two spellings of `throws` apart, which W336's predicate turns on", () => {
+    // W332 RAN EVERY MUTANT IN THIS MODULE AND FOUND `throwSpellings` UNDRIVEN. W336 added it to
+    // give `VOCABULARY_BOUND` a live predicate once emptiness was normalised, and nothing exercised
+    // it — so flipping `=== ""` to `!== ""`, which swaps the two spellings for each other, changed
+    // no answer any test read. The bound's own frontier was resting on an unasserted branch.
+    const only = (body: string) =>
+      withRoot({ "src/planted/t.test.ts": `it("t", () => { ${body} });\n` }, (root) =>
+        throwSpellings(root),
+      );
+    expect(only("expect(() => f()).toThrow();")).toEqual(["throws at all"]);
+    expect(only('expect(() => f()).toThrow("boom");')).toEqual(["throws with a message"]);
+    // A negated throw is a claim that nothing is thrown, which is neither spelling.
+    expect(only("expect(() => f()).not.toThrow();")).toEqual([]);
+    // And an assertion that is not about throwing at all.
+    expect(only("expect(f()).toBe(1);")).toEqual([]);
   });
 
   it("states what it does not cover, and moved when its remedy was built", () => {

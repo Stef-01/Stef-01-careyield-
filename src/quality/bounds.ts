@@ -83,6 +83,7 @@ import { CLOSING_BOUND } from "./closing-state";
 import { CLOSE_GATE_BOUND, weldedLedgerTests } from "./close-gate";
 import { CONTROLS, INSTANT_BOUND } from "./instant";
 import { DEFERRAL_BOUND } from "./deferrals";
+import { QUARTER_MUTANT_BOUND } from "./quarter-mutants";
 import { REMEDY_BOUND } from "./self-defeating";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
@@ -297,6 +298,38 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "two",
         kind: "fixed_by_a_gate",
         why: "How many claims these registers normalise: non-emptiness by W323's gate and emptiness by W336's. It counts the REGISTERS this module declares — `NON_EMPTY_FORMS` and `EMPTY_FORMS` — which two units' verify gates put there, rather than anything a walk over the tree finds. A third arrives only with a third unit, whose gate would rewrite this sentence anyway.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/quarter-mutants.ts",
+    name: "QUARTER_MUTANT_BOUND",
+    unit: "W332",
+    text: QUARTER_MUTANT_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Three limits, none of them a change to this tree. The operator set is five textual flips and widening it is a different measurement rather than a lifting of this sentence — whatever the set, a module can hold a hole none of its members reaches. The population is the modules a quarter ADDED, and a quarter that mostly extends existing registers is measured barely more than before: that is a fact about how quarters are built, not a state a predicate could read. And a caught mutant means some assertion noticed, not that the assertion was about the thing that changed, which no run can distinguish. W311 established that mis-typing a limit as a deferred remedy is how `never_derived` becomes the easy answer, so each of these is named rather than pointed at a unit nobody would write.",
+    },
+    numbers: [
+      {
+        word: "five",
+        kind: "fixed_by_a_gate",
+        why: "W296's operator set, which this unit runs rather than defines. It is five because that register says five, and the sentence's point is that whatever the number is, it is not the mutation space.",
+      },
+      {
+        word: "six",
+        kind: "unit_id",
+        why: "'Q25 added six for thirteen units' — a measurement of one quarter, frozen in the record of what this unit found. It describes a Tuesday rather than the tree, and a later quarter adding a different number leaves it true.",
+      },
+      {
+        word: "thirteen",
+        kind: "fixed_by_a_gate",
+        why: "The size of a quarter, which the §6 horizon rule fixes at thirteen units per expansion. It is not a count of anything this register walks and it moves only if the rule does.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'ONE quarter's modules' and 'over one quarter' — the unit of the measurement, not a count. It stays one however many quarters are measured this way.",
       },
     ],
   },

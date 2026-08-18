@@ -51,6 +51,7 @@ import { MANIFEST_BOUND, manifestDiff } from "./manifest";
 import { REMEDY_BOUND, frozenEqualities } from "./self-defeating";
 import { CLOSE_GATE_BOUND, ledgerNamingModules } from "./close-gate";
 import { CONTROLS, INSTANT_BOUND, instantDiff } from "./instant";
+import { QUARTER_MUTANT_BOUND, quarterModules } from "./quarter-mutants";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
   vocabularyDefects,
@@ -105,6 +106,29 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/quarter-mutants.ts": {
+    kind: "demonstrated",
+    bound: QUARTER_MUTANT_BOUND,
+    witness: "a module whose header names a unit OUTSIDE the quarter, which the population must not hold",
+    control: "one whose header names a unit inside it, which the population must",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/inside.ts": "// W320: a module the quarter added.\nimport path from \"node:path\";\nexport const a = path;\n",
+          "src/planted/outside.ts": "// W200: a module an older unit added.\nimport path from \"node:path\";\nexport const b = path;\n",
+        },
+        (root) => {
+          const found = quarterModules(root, 313, 325);
+          return {
+            // The bound says this measures only the modules a QUARTER ADDED, and that a quarter of
+            // extensions is barely measured. The witness is the module it must not reach.
+            witnessSeen: found.includes("src/planted/outside.ts"),
+            controlSeen: found.includes("src/planted/inside.ts"),
           };
         },
       ),

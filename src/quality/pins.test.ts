@@ -88,6 +88,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
     expect(live.map((p) => p.name).sort()).toEqual([
       "BLOCKED_AT_W263",
       "SURVIVORS_AT_W296",
+      "SURVIVORS_AT_W332",
       "UNEVIDENCED_AT_W293",
       "UNPROVEN_AT_W290",
       "UNTESTED_AT_W296",

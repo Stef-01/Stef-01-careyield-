@@ -192,6 +192,24 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/quarter-mutants.ts",
+    name: "QUARTER_AT_W332",
+    classification: {
+      kind: "range_bound",
+      why: "The quarter this unit measured, bounding its own population from the first line — the same shape every horizon test uses. It is a pair of ledger row ids rather than a count, and the suite resolves both ends against the ledger, so a mistyped range fails rather than silently measuring a different quarter.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants.ts",
+    name: "SURVIVORS_AT_W332",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a mutant surviving that did not before, or a suite improving until one is caught",
+      whyStopping:
+        "A NAMED LIST of the mutants the quarter's own suites did not catch, each with its kind and its argument, so neither direction can be satisfied by retyping a digit — which is the property W304 draws the line on. A new survivor is a change nothing in this tree noticed and it has to be READ before it can be written down; a survivor leaving means somebody's test got better and the register should say so. Both are events worth stopping a build for, which is what the class is for.",
+    },
+  },
+  {
     module: "src/quality/horizon-q26.test.ts",
     name: "Q26_HORIZON_LAST_UNIT",
     classification: {
