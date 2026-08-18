@@ -23,12 +23,13 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. Constructed trees in a temporary directory.
 
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { findInstructionSinks } from "@/security/instruction-sinks";
 import { FIXTURES_FILE, fixtureText, fixtureToken, prepareForScan } from "./scan-text";
 import { type Plantable, withTree } from "./planting";
-import { EXCLUDED_DIRECTORIES, sourceModules, typescriptFiles } from "./tree-walks";
+import { privateCopies } from "./private-copies";
+import { filesUnder, sourceModules, typescriptFiles } from "./tree-walks";
 import { violationReporters } from "./refusal-branches";
 import { namingSites } from "./declaration-tax";
 import { treeWalkingFiles } from "./register-census";
@@ -137,6 +138,16 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/self-reference.test.ts"],
     why:
       "THIS REGISTER'S OWN SWEEP, and it is subject to itself for W201's reason. Its fixture is a split literal, so a probe written inline would make the sweep report the file that proves it works — the register answering its own question with the answer it wants.",
+  },
+  {
+    detector: "src/quality/private-copies.ts::privateCopies",
+    sees: (root) => privateCopies(root).map((c) => `${c.file} ${c.parse}`),
+    plant: { "src/planted/w341-walk.ts": fixtureText("private-tree-recursion") },
+    marker: "planted/w341-walk",
+    holdersAppear: "never",
+    holders: ["src/quality/private-copies.ts", "src/quality/private-copies.test.ts"],
+    why:
+      "W341's detector looks for a module holding its own copy of a shared parse, and the markers it looks for ARE such a copy in miniature. Written inline they would make this register the largest private copy in the tree by its own measure — the collision W295 shipped, W298 found twice, and this file exists to stop.",
   },
 ];
 
@@ -313,26 +324,11 @@ export function splitDiff(
  * walk EXCLUDES is a fact about the repository rather than about the walk, so the directory list is
  * imported while the extension filter stays here.
  */
-function allFilesUnder(dir: string): string[] {
-  let entries: string[];
-  try {
-    entries = readdirSync(dir).sort();
-  } catch {
-    return [];
-  }
-  return entries.flatMap((entry) => {
-    if (EXCLUDED_DIRECTORIES.has(entry)) return [];
-    const full = path.join(dir, entry);
-    try {
-      return statSync(full).isDirectory() ? allFilesUnder(full) : [full];
-    } catch {
-      // A path `readdirSync` listed and `statSync` cannot resolve is a broken symlink. Skipping it
-      // is the only honest answer: it is not a file this tree holds, and throwing here would take
-      // `SELF_REFERENCE_BOUND.stillOpen` down with it.
-      return [];
-    }
-  });
-}
+// W341: THE SHARED RECURSION, which this module had to copy because it was private. The argument
+// below still holds — the tree WALKS all filter on an extension list this file's fixture extension
+// is missing from — but the recursion under them filters nothing, and that is what was wanted. The
+// broken-symlink guard this copy carried went home with it.
+const allFilesUnder = filesUnder;
 
 /**
  * Files with the fixture extension, anywhere under the root.

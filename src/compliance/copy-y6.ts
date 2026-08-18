@@ -55,9 +55,10 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. This reads module headers and counts them.
 
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { Y4_FIRST_UNIT } from "./cdss-boundary";
+import { sourceModules } from "@/quality/tree-walks";
 
 /** The first unit of Y6. Y5 ran W209–W260; Q21 is W261–W273. */
 export const Y6_FIRST_UNIT = 261;
@@ -114,23 +115,15 @@ export const YEAR_BANDS: readonly YearBand[] = [
 /** Every non-test module under `root/src`, with the unit its own header claims. */
 export function modulesWithUnits(root: string): Array<{ module: string; unit: number | null }> {
   const src = path.join(root, "src");
-  const out: Array<{ module: string; unit: number | null }> = [];
-  const walk = (dir: string) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        walk(full);
-        continue;
-      }
-      if (!entry.name.endsWith(".ts") || entry.name.endsWith(".test.ts")) continue;
-      const header = readFileSync(full, "utf8").split("\n")[0]?.match(/^\/\/ W(\d+)/);
-      out.push({
-        module: `src/${path.relative(src, full).split(path.sep).join("/")}`,
-        unit: header ? Number(header[1]) : null,
-      });
-    }
-  };
-  walk(src);
+  // W341: the shared walk. This copy asked the same question `sourceModules` answers and carried
+  // no skip list at all, so what it called "the tree" depended on what happened to be lying in it.
+  const out = sourceModules(root).map((full) => {
+    const header = readFileSync(full, "utf8").split("\n")[0]?.match(/^\/\/ W(\d+)/);
+    return {
+      module: `src/${path.relative(src, full).split(path.sep).join("/")}`,
+      unit: header ? Number(header[1]) : null,
+    };
+  });
   return out.sort((a, b) => a.module.localeCompare(b.module));
 }
 

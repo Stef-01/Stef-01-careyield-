@@ -37,14 +37,14 @@
 // the check worthless. So the both-directions half is a habit, not a control, and saying so is
 // better than a scan that would pass over a note nobody read.
 
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { REFUSAL_BRANCHES, violationReporters } from "./refusal-branches";
 import path from "node:path";
 import { resetStore } from "@/booking/store";
 import { rankCandidates } from "@/engine/pool";
 import { reachableFromApp } from "@/security/reachability";
 import { observesClinicalAttribute } from "./ranker-behaviour";
-import { dossierTestFiles, modulesWithNoUnitHeader as walkModulesWithNoUnitHeader } from "./tree-walks";
+import { dossierTestFiles, modulesWithNoUnitHeader as walkModulesWithNoUnitHeader, sourceModules } from "./tree-walks";
 
 const ROOT = path.resolve(__dirname, "../..");
 const SRC = path.join(ROOT, "src");
@@ -87,23 +87,18 @@ export function declareFinding(finding: LatentFinding): LatentFinding {
   return finding;
 }
 
-/** Every non-test module in `src/`, with its text. */
+/**
+ * Every non-test module in `src/`, with its text.
+ *
+ * W341: the shared walk rather than a private copy of it. This was its own recursion, welded to a
+ * module-level `SRC` — the shape W282 moved seven walks out of, written again afterwards, which is
+ * what a shared walk nobody reaches for costs.
+ */
 function sourceFiles(): Array<{ module: string; text: string }> {
-  const out: Array<{ module: string; text: string }> = [];
-  const walk = (dir: string) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (entry.name.endsWith(".ts") && !entry.name.endsWith(".test.ts")) {
-        out.push({
-          module: `src/${path.relative(SRC, full).split(path.sep).join("/")}`,
-          text: readFileSync(full, "utf8"),
-        });
-      }
-    }
-  };
-  walk(SRC);
-  return out;
+  return sourceModules(ROOT).map((full) => ({
+    module: `src/${path.relative(SRC, full).split(path.sep).join("/")}`,
+    text: readFileSync(full, "utf8"),
+  }));
 }
 
 /** Modules with no `// W<n>` header. W200's Y4 census cannot see them. */

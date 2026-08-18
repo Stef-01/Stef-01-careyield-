@@ -246,6 +246,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/private-copies.ts",
+    // Asks which modules hold their own copy of a parse this tree shares. A planted register shape
+    // holds neither a directory recursion nor a ledger row regex, so it owes this register nothing
+    // — an arriving module pays the census, the blind spot, the negative probe and the drive, and
+    // pays nothing here. In the population because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/prose-numbers.ts",
     // Demands a classification of any module whose header states a numeric claim. A planted module
     // carries no such claim in any of the five shapes, so it owes this register nothing — and the

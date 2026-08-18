@@ -90,6 +90,7 @@ import { DEFERRAL_BOUND } from "./deferrals";
 import { QUARTER_MUTANT_BOUND } from "./quarter-mutants";
 import { DOSSIER_BOUND, dossierDiffFor } from "./dossier-derived";
 import { NAMED_CONDITIONS, UNREAD_BOUND } from "./unread-bounds";
+import { PRIVATE_COPY_BOUND, SHARED_PARSES } from "./private-copies";
 import { REMEDY_BOUND } from "./self-defeating";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
@@ -438,6 +439,34 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       },
     },
     numbers: [],
+  },
+  {
+    module: "src/quality/private-copies.ts",
+    name: "PRIVATE_COPY_BOUND",
+    unit: "W341",
+    text: PRIVATE_COPY_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a unit reads a third shared parse",
+      reads: "the register itself, for how many parses it publishes",
+      // TWO CLAUSES, ONE LIFTABLE. That a text scan cannot see a walk spelled with `glob` is the
+      // W267 class and has no remedy short of parsing TypeScript, which is why the sentence
+      // inherits `register-census.ts`'s bound rather than restating it. What CAN move is the
+      // number of parses read: `preparationCopies` already reads two more, and the day a unit
+      // brings a third in here the sentence stops describing this register.
+      stillOpen: () => SHARED_PARSES.length < 3,
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads the length of this module's own declared table. How many parses a register watches is a decision somebody writes down rather than anything a walk over a tree finds, so no root can be handed to it — and the event that lifts it is an edit to `SHARED_PARSES`, not a change to any repository.",
+      },
+    },
+    numbers: [
+      {
+        word: "two",
+        kind: "fixed_by_a_gate",
+        why: "How many shared parses this register reads: the tree recursion and the ledger row parse, which are the two rows W341's gate put in `SHARED_PARSES`. It counts the register's own table rather than anything a walk finds — a third arrives only with a later unit, whose gate would rewrite this sentence, and the bound's own predicate goes false on the same edit.",
+      },
+    ],
   },
   {
     module: "src/quality/dossier-derived.ts",

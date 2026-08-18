@@ -144,7 +144,14 @@ describe("W295 a stated bound is planted, and the register stays silent", () => 
     // `NOT_CALLABLE` while their module exported a detector taking a root; each is now demonstrated
     // by a plant, and leaving the ceiling at 38 would have left room for them to drift back without
     // anybody writing a reason.
-    expect(ofKind("undemonstrated").length).toBeLessThanOrEqual(35);
+    //
+    // W341 RAISED IT TO 36, and the reason is the kind a ceiling exists to make somebody write:
+    // `private-copies.test.ts` is a PROVING file — it plants trees in front of the shared
+    // recursion and exports nothing — so it joins `page-suite.test.ts` and `register-census.test.ts`
+    // behind `NOT_CALLABLE` for the reason that sentence states rather than for a bound nobody
+    // tried to demonstrate. The register it proves is demonstrated in the same commit, so the
+    // count moved by one and the demonstrated count moved by one with it.
+    expect(ofKind("undemonstrated").length).toBeLessThanOrEqual(36);
     expect(falseBounds(Object.fromEntries(ofKind("undemonstrated")))).toEqual([]);
   });
 });

@@ -52,8 +52,19 @@ export const EXCLUDED_DIRECTORIES: ReadonlySet<string> = new Set([
 
 const SKIP_DIRS = EXCLUDED_DIRECTORIES;
 
-/** Every file under `dir`, recursively, skipping the directories no walk here wants. */
-function filesUnder(dir: string): string[] {
+/**
+ * Every file under `dir`, recursively, skipping the directories no walk here wants.
+ *
+ * EXPORTED BY W341, AND THAT IS THE UNIT'S POINT. W282 moved seven walks here so each could be
+ * given a root, and W327 exported the skip list so there would be one answer to what the tree is —
+ * but both shared the ANSWERS and left the recursion private, so a module with a question these
+ * seven do not answer still had to write `readdirSync` again. `self-reference.ts` is the proof: it
+ * needed the walk WITHOUT an extension filter (its whole mechanism is a fixture extension no walk
+ * matches), imported the shared skip list, and then had to copy the recursion around it. Its copy
+ * had since grown a guard this one did not have — see below — which is a fix landing in the copy
+ * and never reaching the original, the exact direction of travel a private copy causes.
+ */
+export function filesUnder(dir: string): string[] {
   let entries: string[];
   try {
     entries = readdirSync(dir).sort();
@@ -63,7 +74,14 @@ function filesUnder(dir: string): string[] {
   return entries.flatMap((entry) => {
     if (SKIP_DIRS.has(entry)) return [];
     const full = path.join(dir, entry);
-    return statSync(full).isDirectory() ? filesUnder(full) : [full];
+    try {
+      return statSync(full).isDirectory() ? filesUnder(full) : [full];
+    } catch {
+      // W341, from `self-reference.ts`: a path `readdirSync` listed and `statSync` cannot resolve
+      // is a broken symlink. Skipping it is the only honest answer — it is not a file this tree
+      // holds — and throwing here would take every register built on this walk down with it.
+      return [];
+    }
   });
 }
 

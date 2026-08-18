@@ -185,6 +185,7 @@ export const REVIEWED_AT_W345: readonly Review[] = [
   { id: "blind-spots::src/quality/latent-y5.ts", verdict: { kind: "still_correct" } },
   { id: "blind-spots::src/quality/negative-probes.test.ts", verdict: { kind: "still_correct" } },
   { id: "blind-spots::src/quality/page-suite.test.ts", verdict: { kind: "still_correct" } },
+  { id: "blind-spots::src/quality/private-copies.test.ts", verdict: { kind: "still_correct" } },
   { id: "blind-spots::src/quality/register-census.test.ts", verdict: { kind: "still_correct" } },
   { id: "blind-spots::src/quality/scan-text.ts", verdict: { kind: "still_correct" } },
   { id: "blind-spots::src/quality/self-defeating.ts", verdict: { kind: "still_correct" } },

@@ -322,6 +322,22 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/private-copies.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/private-copies.test.ts :: refuses a module that only NAMES both parses, in prose",
+      plants: "src/planted/w341-prose.ts",
+    },
+  },
+  {
+    register: "src/quality/private-copies.test.ts",
+    negative: {
+      kind: "no_detector_of_its_own",
+      why: "It is `private-copies.ts`'s proving file — it points the shared recursion at trees holding a fixture-extension file and a skipped directory, which are that walk's two extremes. The discriminating pair for the register itself is declared above.",
+    },
+  },
+  {
     register: "src/quality/quarter-mutants.ts",
     negative: {
       kind: "already_driven",

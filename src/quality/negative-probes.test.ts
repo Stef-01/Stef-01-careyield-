@@ -365,6 +365,7 @@ describe("W292 every proved walk has a negative, and the register says which kin
     expect(exempt.map((p) => p.register).sort()).toEqual([
       "src/quality/negative-probes.test.ts",
       "src/quality/page-suite.test.ts",
+      "src/quality/private-copies.test.ts",
       "src/quality/register-census.test.ts",
     ]);
     for (const probe of exempt) {

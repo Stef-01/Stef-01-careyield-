@@ -168,6 +168,23 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/private-copies.ts::PRIVATE_COPY_BOUND",
+    condition: "A copy of either parse written in `scripts/`, in `e2e/`, or in a `.mts` file is invisible to it",
+    reading: {
+      kind: "not_observable",
+      why: "The W267 class, inherited rather than restated: this register reads TEXT, and a walk assembled from a library call it does not name is invisible to a text scan by construction. Reading it would take a TypeScript parse of the whole tree resolving what each import can do, which this tree has considered three times and refused three times — the cost is a second implementation of the compiler, and the failure mode of the cheap version is a scan that reports confidently about spellings it half-understands. The honest position is the sentence, which is why it is here rather than in a register nobody could write.",
+    },
+  },
+  {
+    bound: "src/quality/private-copies.ts::PRIVATE_COPY_BOUND",
+    condition: "a private copy of `prepareForScan`, `fixtureText` or `withTree` is a defect nothing here reports",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/bounds.ts::staleBounds",
+      how: "The clause is a LIVE PREDICATE rather than a sentence: `stillOpen` asks whether `SHARED_PARSES` still holds fewer than three rows, so the day a unit brings a third parse in here the bound goes stale and the register that watches bounds says so. What that reads is the REGISTER — how many parses it watches — and not the tree, so a copy of `withTree` sitting in a module today is still unreported. `preparationCopies` in `scan-text.ts` covers two of the shared preparations, which is the reason those two are named in the sentence and excluded from the gap.",
+    },
+  },
+  {
     bound: "src/quality/close-gate.ts::CLOSE_GATE_BOUND",
     condition: "A check welded inside a `.test.ts` exports nothing, so no register here can run it against a planted ledger",
     reading: {

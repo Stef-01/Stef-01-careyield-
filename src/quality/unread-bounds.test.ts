@@ -23,6 +23,7 @@ import { STATED_BOUNDS, type StatedBound } from "./bounds";
 import { artefactsPresent } from "./repository-clean";
 import { planterDiff } from "./planting";
 import { copyTree } from "./planting";
+import { allLedgerRows } from "./blocked-surface";
 
 const ROOT = process.cwd();
 
@@ -160,13 +161,15 @@ describe("W339 the register says what it is", () => {
     }
     // W329'S STANDING CHECK, BORROWED. A promise aimed at a unit that has landed is the defect W318
     // removed from deferrals, and a bound does not get to keep it.
-    const ledger = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
+    // W341: the SHARED ledger parse. This read the row shape itself, which is the copy W310's fix
+    // could not reach and W335 paid for twice.
+    const rows = allLedgerRows(ROOT);
     for (const row of NAMED_CONDITIONS) {
       const reading = row.reading;
       if (reading.kind !== "owed") continue;
-      const line = ledger.split("\n").find((l) => l.startsWith(`| ${reading.by} | `));
-      expect(line, `${reading.by} is owed a reading and is not a row`).toBeDefined();
-      expect(line, `${reading.by} has landed and the condition is still owed`).not.toMatch(/^\| \w+ \| done \|/);
+      const unit = rows.find((r) => r.id === reading.by);
+      expect(unit, `${reading.by} is owed a reading and is not a row`).toBeDefined();
+      expect(unit?.status, `${reading.by} has landed and the condition is still owed`).not.toBe("done");
     }
   });
 

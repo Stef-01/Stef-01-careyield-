@@ -85,3 +85,39 @@ export const ALL = PARTS.map((p) => p.join(""));
 // W305: a planted module that walks the tree.
 import { readdirSync } from "node:fs";
 export const walk = () => readdirSync("src");
+
+=== tree-recursion-markers ===
+readdirSync(
+isDirectory
+
+=== ledger-row-markers ===
+BUILD-STATE.md
+/^\|
+
+=== private-tree-recursion ===
+// W341: a planted module holding its own copy of the tree recursion.
+import { readdirSync, statSync } from "node:fs";
+export function everyFile(dir: string): string[] {
+  return readdirSync(dir).flatMap((entry) => {
+    const full = `${dir}/${entry}`;
+    return statSync(full).isDirectory() ? everyFile(full) : [full];
+  });
+}
+
+=== private-ledger-parse ===
+// W341: a planted module holding its own copy of the ledger row parse.
+import { readFileSync } from "node:fs";
+export function doneUnits(root: string): string[] {
+  return readFileSync(`${root}/BUILD-STATE.md`, "utf8")
+    .split("\n")
+    .flatMap((line) => {
+      const m = /^\| (W\d+) \| done \|/.exec(line);
+      return m ? [m[1]!] : [];
+    });
+}
+
+=== a-parse-named-in-prose ===
+// W341: a module that NAMES both parses and holds neither.
+// It talks about readdirSync( and isDirectory, and about BUILD-STATE.md rows
+// matched with /^\| (W\d+) \|, in prose, which is not a copy of anything.
+export const nothing = 0;

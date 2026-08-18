@@ -235,6 +235,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
     why: "It COPIES `BUILD-STATE.md` into a constructed tree — `COPIED_FILES` names it because four registers read the ledger — and copying a file is not reading a row. Without this the planted trees below would have no ledger at all.",
   },
   {
+    module: "src/quality/private-copies.ts",
+    why: "It NAMES the ledger's parse entry points and reads none of them. `parseLedgerRows` and `allLedgerRows` appear in a citation saying where the shared parse lives, which is the string this census matches on; W341 reads the text of modules, never a row. A close cannot break a register that has never opened the ledger.",
+  },
+  {
     module: "src/quality/assertion-drives.ts",
     why: "W289's drive harness. It plants a ledger to make a register speak, so its ledger is a fixture rather than this tree's, and a close changes nothing it reads.",
   },

@@ -29,9 +29,9 @@
 // reverse and requires the same answer, because "both orders, same answer" is the whole property
 // and a more elaborate harness would be a thing to maintain rather than a thing to use.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync } from "node:fs";
 import { prepareForScan } from "./scan-text";
+import { sourceModules } from "./tree-walks";
 
 /**
  * Assert a fold gives the same answer whichever way round its input arrives.
@@ -335,32 +335,27 @@ const FOLD_RE = new RegExp(
 export function discoverFoldSites(root: string): Array<{ module: string; folds: number }> {
   const found: Array<{ module: string; folds: number }> = [];
 
-  const walk = (dir: string) => {
-    for (const entry of readdirSync(dir).sort()) {
-      const full = join(dir, entry);
-      if (statSync(full).isDirectory()) {
-        walk(full);
-        continue;
-      }
-      // Tests are excluded: a fold in a test is the test's own arithmetic, not a product answer.
-      if (!entry.endsWith(".ts") || entry.includes(".test.")) continue;
-      // W168: comments are stripped first. A fold NAMED IN PROSE is not a fold, and this
-      // module's own header naming the patterns was enough to make it match itself. Counting
-      // comment mentions also inflates a declared count, which then has to be "corrected" by
-      // somebody who has not read the code — the failure mode a register exists to prevent.
-      // W295: STRING LITERALS BLANKED TOO. Comments were already subtracted (W168) because a fold
-      // NAMED IN PROSE is not a fold; the same is true of a fold quoted inside a fixture, and this
-      // register reported W295's own module because its bound sentence names `.reduce(` and
-      // `.at(-1)` as the patterns it looks for. Same defect one layer over, same remedy.
-      const source = prepareForScan(readFileSync(full, "utf8"));
-      const count = (source.match(FOLD_RE) ?? []).length;
-      // Repo-relative with posix separators on every platform: the register is written
-      // with "/" and Windows walks produce "\", which read as 20 phantom drifts.
-      if (count > 0) found.push({ module: full.slice(root.length + 1).replaceAll("\\", "/"), folds: count });
-    }
-  };
-
-  walk(join(root, "src"));
+  // W341: the shared walk. Tests are excluded by `sourceModules` already; the second filter stays
+  // because this register's rule is `.test.` ANYWHERE in the name — a fold in a test is the test's
+  // own arithmetic — and narrowing that to the shared walk's suffix rule would be a behaviour
+  // change smuggled in under a de-duplication.
+  for (const full of sourceModules(root)) {
+    const entry = full.slice(full.lastIndexOf("/") + 1);
+    if (entry.includes(".test.")) continue;
+    // W168: comments are stripped first. A fold NAMED IN PROSE is not a fold, and this
+    // module's own header naming the patterns was enough to make it match itself. Counting
+    // comment mentions also inflates a declared count, which then has to be "corrected" by
+    // somebody who has not read the code — the failure mode a register exists to prevent.
+    // W295: STRING LITERALS BLANKED TOO. Comments were already subtracted (W168) because a fold
+    // NAMED IN PROSE is not a fold; the same is true of a fold quoted inside a fixture, and this
+    // register reported W295's own module because its bound sentence names `.reduce(` and
+    // `.at(-1)` as the patterns it looks for. Same defect one layer over, same remedy.
+    const source = prepareForScan(readFileSync(full, "utf8"));
+    const count = (source.match(FOLD_RE) ?? []).length;
+    // Repo-relative with posix separators on every platform: the register is written
+    // with "/" and Windows walks produce "\", which read as 20 phantom drifts.
+    if (count > 0) found.push({ module: full.slice(root.length + 1).replaceAll("\\", "/"), folds: count });
+  }
   return found.sort((a, b) => a.module.localeCompare(b.module));
 }
 

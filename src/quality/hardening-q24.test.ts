@@ -27,6 +27,7 @@ import { allLedgerRows } from "./blocked-surface";
 import { builtSurface, outstandingRulings } from "@/founder/outstanding";
 import { reachableFromApp } from "@/security/reachability";
 import { withTree } from "./planting";
+import { fixtureFiles } from "./self-reference";
 
 const ROOT = process.cwd();
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
@@ -139,14 +140,26 @@ describe("W311 the findings left open are still open, so the deferral is not a f
     // its own comment that a fix must move the disposition to `fixed`. W327 scoped the walk, this
     // failed on the same commit, and it is rewritten here as the re-derivation of the fix rather
     // than of the defect — which is the shape W258 asks for in both directions.
-    const source = read("src/quality/self-reference.ts");
-    expect(source).toContain("allFilesUnder");
-    expect(source, "the walk stopped excluding anything").toMatch(
-      /allFilesUnder[\s\S]{0,600}EXCLUDED_DIRECTORIES/,
+    // W341 MOVED THE WALK AND THIS RE-DERIVATION MOVED WITH IT — from the text of one module to
+    // the behaviour of the tree. `self-reference.ts` had copied the recursion to get the shared
+    // skip list around it; the recursion is exported now, so asserting the two names sit within
+    // six hundred characters of each other in one file stopped meaning anything. Driving it is
+    // better than the assertion it replaces: a dependency shipping a fixture-extension file is the
+    // event the finding is ABOUT, and this plants one.
+    const leaked = withTree(
+      {
+        "node_modules/some-package/parked.fixtures": "text\n",
+        "src/quality/kept.fixtures": "text\n",
+      },
+      (root) => fixtureFiles(root),
     );
+    expect(leaked, "the walk stopped excluding anything").not.toContain(
+      "node_modules/some-package/parked.fixtures",
+    );
+    expect(leaked, "the walk stopped seeing this tree").toContain("src/quality/kept.fixtures");
     // The other consequence: `statSync` inside a `try`, so a broken symlink is skipped rather than
     // thrown through `SELF_REFERENCE_BOUND.stillOpen`. Driven for real in `instant.test.ts`.
-    expect(source).toMatch(/try \{\s*return statSync/);
+    expect(read("src/quality/tree-walks.ts")).toMatch(/try \{\s*return statSync/);
     expect(finding("Q24-CR-7").disposition.kind).toBe("fixed");
   });
 

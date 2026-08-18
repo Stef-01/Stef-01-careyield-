@@ -277,6 +277,12 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // branches it closed, and the modules the unit suite cannot reach. History: the register below
   // re-derives all three on every run, so the sentences are the argument and the derivations are
   // the check, which is the division `at_the_unit` exists to record.
+  // W341: three sentences about what W282 moved and what this unit converted. History in the same
+  // sense as the rows below — `privateCopies` re-derives the population on every run, so the
+  // sentence is the argument and the register is the check.
+  { module: "src/quality/latent-findings.ts", text: "seven walks", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/private-copies.ts", text: "seven private walks", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/refusal-branches.ts", text: "two entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "sixteen modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "two branches", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "two modules", resolution: { kind: "at_the_unit" } },

@@ -880,6 +880,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W339's register of the conditions this tree's own bounds name and nothing reads. Nobody but a developer reads it. Its longest strings are `UNREAD_RULE`, the argument for each condition and `UNREAD_BOUND`; its inputs are the tree's stated bounds and its own source files, and no patient, condition or appointment reason appears in any of it — the word `condition` here means a state of the repository, not anything clinical.",
   },
   {
+    module: "src/quality/private-copies.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W341's register of the modules holding their own copy of a parse this tree shares. Nobody but a developer reads it. Its longest strings are the cost of each shared parse, the standing argued for each site and `PRIVATE_COPY_BOUND`; its inputs are the text of this repository's own modules and short planted snippets of TypeScript, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/dossier-derived.ts",
     operatorCopy: [],
     notCopy:

@@ -30,9 +30,10 @@
 // FOUNDER GATE (plan §4): fabricated registry inputs and temporary directories. No store, no
 // patient, no page.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { coverageDiff } from "./route-coverage";
+import { sourceModules } from "./tree-walks";
 import { withTree as withRoot } from "./planting";
 
 /** A violation-reporting function found in the tree: the file it lives in and its name. */
@@ -57,37 +58,29 @@ export interface ReporterSite {
  */
 export function violationReporters(root: string): ReporterSite[] {
   const out: ReporterSite[] = [];
-  const walk = (dir: string) => {
-    for (const entry of readdirSync(dir)) {
-      if (entry === "node_modules" || entry === ".next") continue;
-      const full = path.join(dir, entry);
-      if (statSync(full).isDirectory()) {
-        walk(full);
-        continue;
-      }
-      if (!entry.endsWith(".ts") || entry.endsWith(".test.ts")) continue;
-      // W295: literals blanked, because a reporter written inside a FIXTURE STRING is not a
-      // reporter — W295's own module quotes `export function plantedDiff(...)` as a planted probe
-      // and this walk declared it a violation reporter the tree must have branches for.
-      // RAW TEXT, DELIBERATELY. W295 tried narrowing this scan the way W288 narrowed the tautology
-      // sweep — comments stripped, string literals blanked — because W295's fixtures quote
-      // `export function planted...` as planted probes. Both narrowings HID REAL REPORTERS: the
-      // literal scanner reads a `/` in prose as opening a regex and runs on to the next one,
-      // swallowing the `export function` line after it, and which reporters vanished changed with
-      // the order the two transforms ran in. A narrowing that silently drops registers is worse
-      // than the collision it fixes, so this stays raw and W295's fixtures split the token
-      // instead — the idiom `register-census.test.ts` already uses for its own planted walkers.
-      const text = readFileSync(full, "utf8");
-      // The signature may wrap, so the return type is read from the next 300 characters rather
-      // than from the same line — three of the six in this tree wrap their parameters.
-      for (const match of text.matchAll(/export function ([A-Za-z0-9_]*(?:Violations|Diff))\(/g)) {
-        const returns = /\)\s*:\s*([A-Za-z0-9_[\]<>]+)/.exec(text.slice(match.index, match.index + 300))?.[1];
-        if (!returns || returns === "string") continue;
-        out.push({ module: path.relative(root, full).split(path.sep).join("/"), fn: match[1]! });
-      }
+  // W341: the shared walk, which asks this module's exact question — non-test `.ts` under `src` —
+  // and carries the tree's own skip list rather than the two entries this copy happened to name.
+  for (const full of sourceModules(root)) {
+    // W295: literals blanked, because a reporter written inside a FIXTURE STRING is not a
+    // reporter — W295's own module quotes `export function plantedDiff(...)` as a planted probe
+    // and this walk declared it a violation reporter the tree must have branches for.
+    // RAW TEXT, DELIBERATELY. W295 tried narrowing this scan the way W288 narrowed the tautology
+    // sweep — comments stripped, string literals blanked — because W295's fixtures quote
+    // `export function planted...` as planted probes. Both narrowings HID REAL REPORTERS: the
+    // literal scanner reads a `/` in prose as opening a regex and runs on to the next one,
+    // swallowing the `export function` line after it, and which reporters vanished changed with
+    // the order the two transforms ran in. A narrowing that silently drops registers is worse
+    // than the collision it fixes, so this stays raw and W295's fixtures split the token
+    // instead — the idiom `register-census.test.ts` already uses for its own planted walkers.
+    const text = readFileSync(full, "utf8");
+    // The signature may wrap, so the return type is read from the next 300 characters rather
+    // than from the same line — three of the six in this tree wrap their parameters.
+    for (const match of text.matchAll(/export function ([A-Za-z0-9_]*(?:Violations|Diff))\(/g)) {
+      const returns = /\)\s*:\s*([A-Za-z0-9_[\]<>]+)/.exec(text.slice(match.index, match.index + 300))?.[1];
+      if (!returns || returns === "string") continue;
+      out.push({ module: path.relative(root, full).split(path.sep).join("/"), fn: match[1]! });
     }
-  };
-  walk(path.join(root, "src"));
+  }
   return out.sort((a, b) => `${a.module}${a.fn}`.localeCompare(`${b.module}${b.fn}`));
 }
 

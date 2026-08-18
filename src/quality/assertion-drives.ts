@@ -61,6 +61,7 @@ import { endingDiff } from "./self-ending";
 import { unreachedByUnitSuite } from "./unrun";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
+import { SHARED_PARSES, copyDefects } from "./private-copies";
 import { instantDiff } from "./instant";
 import { SURVIVORS_AT_W332 } from "./quarter-mutants";
 
@@ -235,6 +236,13 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
         },
       ]).length > 0
     );
+  },
+
+  "src/quality/private-copies.ts": (root) => {
+    // W341's comparison with the declaration table emptied, which is the state where every private
+    // copy in the tree is undeclared. The arm that must fire is the one saying a module holds a
+    // copy of a shared parse and says nothing about why.
+    return copyDefects(root, SHARED_PARSES, []).some((d) => d.kind === "undeclared");
   },
 
   "src/quality/close-gate.ts": (root) => {
@@ -440,12 +448,17 @@ export function resolveBranch(
 /**
  * Census entries allowed to assert nothing of their own, and why each is one.
  *
- * The escape hatch, closed by enumeration. Two are provers — they plant files in front of other
+ * The escape hatch, closed by enumeration. Three are provers — they plant files in front of other
  * registers' walks — and one is the shared walking itself, which holds no declared list to compare
- * anything against. A fourth entry here is a decision somebody writes down.
+ * anything against. A fifth entry here is a decision somebody writes down.
+ *
+ * W341 ADDED THE THIRD PROVER, and it is the one that proves the shared walking: `filesUnder` was
+ * private until W341 exported it, and the file that points it at a fixture-extension file and at a
+ * skipped directory asserts nothing else.
  */
 export const ASSERTS_NOTHING: readonly string[] = [
   "src/quality/page-suite.test.ts",
+  "src/quality/private-copies.test.ts",
   "src/quality/register-census.test.ts",
   "src/quality/tree-walks.ts",
 ];

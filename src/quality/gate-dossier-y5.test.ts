@@ -116,7 +116,11 @@ describe("W257 the ledger is the source, and it has something to say", () => {
     // So the direction is inverted and it is now the bound's own non-vacuity guard: while the
     // ledger ended at W260 the filter could not be shown to exclude anything, and every figure in
     // this file would have been just as green with no bound at all. It excludes thirteen rows now.
-    const all = [...LEDGER.matchAll(/^\| (W\d+) \|/gm)].map((m) => Number(m[1]!.slice(1)));
+    // W341: the shared parse. W335 moved this file onto `allLedgerRows` and this line stayed
+    // behind — one private copy of the row shape left in the file whose whole finding was a
+    // private copy of the row shape.
+    const all = allLedgerRows(ROOT)
+      .flatMap((r) => (/^W\d+$/.test(r.id) ? [Number(r.id.slice(1))] : []));
     expect(Math.max(...all), "the ledger has not grown, so the bound excludes nothing").toBeGreaterThan(
       Y5_LAST_UNIT,
     );

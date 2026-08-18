@@ -1339,6 +1339,27 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/private-copies.test.ts",
+    census: {
+      derives:
+        "The shared recursion itself, pointed at constructed trees — a fixture-extension file no shared ANSWER returns, and a dependency directory the tree's one skip list names.",
+      checkedAgainst:
+        "Nothing of its own. It is a member because W282's widened detector counts deriving through `tree-walks`, and the file proving the walk cannot exempt itself from the census that asks whether walks are proved.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "it IS the proof: `filesUnder` must return a planted `.fixtures` file and must not return a planted file under a skipped directory",
+      },
+      assertion: {
+        kind: "carries_no_assertion",
+        claim: "None of its own. What it asserts belongs to `private-copies.ts`, which carries its own entry.",
+        why:
+          "Same shape as `page-suite.test.ts` and `register-census.test.ts`: a prover rather than a register.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/pins.ts",
     census: {
       derives: "Every pin-named exported constant under `src/`, tests included — `*_AT_W<n>`, `*_LAST_UNIT`, `*_FIRST_UNIT`, `*_SURFACE_FLOOR`.",
@@ -2184,6 +2205,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
   {
     module: "src/quality/unread-bounds.ts",
     census: null,
+    branches: [],
+  },
+  {
+    module: "src/quality/private-copies.ts",
+    census: {
+      derives:
+        "Every TypeScript file under `src/` whose text carries all the markers of a parse this tree shares once — the recursion in `tree-walks.ts` and the ledger row parse in `blocked-surface.ts`.",
+      checkedAgainst:
+        "`DECLARED_COPIES`, in both directions: a copy the tree holds and nobody declared fails, and a declaration for a file that no longer holds one fails too.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module holding a private recursion and a module holding a private row parse are planted in constructed trees and each must be reported, beside a module that only NAMES both parses in prose, which must not be",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No module in `src/` keeps its own copy of a parse this tree shares without saying whether it is asking a different question or leaving the copy in place, with the cost.",
+        mutation:
+          "`copyDefects` is given an empty declaration table and must report every one of the copies the tree holds.",
+      },
+    },
     branches: [],
   },
   {

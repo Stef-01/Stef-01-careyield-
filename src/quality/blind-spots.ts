@@ -67,6 +67,7 @@ import {
 import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
 import { proseClaims } from "./prose-numbers";
+import { PRIVATE_COPY_BOUND, privateCopies } from "./private-copies";
 
 /** How a register's stated bound has been shown to be true. */
 export type Blindness =
@@ -236,6 +237,27 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
             // callable module, or the silence proves only that the walk found nothing.
             witnessSeen: source.includes("src/planted/welded.test.ts"),
             controlSeen: source.includes("src/planted/callable.ts"),
+          };
+        },
+      ),
+  },
+
+  "src/quality/private-copies.ts": {
+    kind: "demonstrated",
+    bound: PRIVATE_COPY_BOUND,
+    witness: "the same private recursion, written in `scripts/` instead of `src/`",
+    control: "the private recursion in `src/`, which the register must report or the silence proves nothing",
+    probe: () =>
+      withRoot(
+        {
+          "scripts/w341-outside.ts": fixtureText("private-tree-recursion"),
+          "src/planted/w341-inside.ts": fixtureText("private-tree-recursion"),
+        },
+        (root) => {
+          const seen = privateCopies(root).map((c) => c.file);
+          return {
+            witnessSeen: seen.includes("scripts/w341-outside.ts"),
+            controlSeen: seen.includes("src/planted/w341-inside.ts"),
           };
         },
       ),
@@ -846,6 +868,13 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
     kind: "undemonstrated",
     bound:
       "It plants files in front of other registers' walks and asserts nothing of its own, so its blind spot is that a walk it does not plant against is unproved and looks exactly like one that is.",
+    whyNotPlantable: NOT_CALLABLE,
+  },
+
+  "src/quality/private-copies.test.ts": {
+    kind: "undemonstrated",
+    bound:
+      "Same shape as the other proving files: it points `filesUnder` at constructed trees and asserts nothing of its own, so a walk defect that survives both roots — a file kind neither planting names — is invisible to it.",
     whyNotPlantable: NOT_CALLABLE,
   },
 
