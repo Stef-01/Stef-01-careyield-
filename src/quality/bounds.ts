@@ -71,6 +71,7 @@ import { CLEAN_BOUND } from "./repository-clean";
 import { SETUP_GAP_BOUND } from "@/console/setup-gaps";
 import { Q25_HARDENING_BOUND } from "./hardening-q25";
 import { ENDING_BOUND } from "./self-ending";
+import { CONTROL_BOUND } from "./controls";
 import { UNRUN_BOUND } from "./unrun";
 import { DEMO_PATH, PATH_BOUND, gateStops } from "@/demo/path";
 import { HEADER_CITATION_BOUND } from "./unit-headers";
@@ -221,6 +222,17 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         why: "Q24's finding count, quoted from that quarter's own pass to make the point that a total is not a comparison. History about a closed register, which is exactly why quoting it is safe and re-deriving it would be pointless.",
       },
     ],
+  },
+  {
+    module: "src/quality/controls.ts",
+    name: "CONTROL_BOUND",
+    unit: "W337",
+    text: CONTROL_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "The event a tied control is handed here is a fabrication, and it has to be: making the REAL event arrive means closing a row, finishing a run, or landing a unit, and a gate that did those to check them would be doing the thing rather than watching for it. Whether a control is wired to its real moment is a fact about the harness around it — a vitest hook, a close sequence — and is checked where that wiring lives. The declared-instant arm is thinner by construction: it can ask whether a declaration exists and never whether the sentence about what a moment cannot see is true, because that is a judgement. And a control the horizon does not name is invisible rather than ungoverned, which follows from the gate being a reading of a planning document; widening it to every control in the tree would be W327's register, which already exists and answers a different question.",
+    },
+    numbers: [],
   },
   {
     module: "src/quality/unrun.ts",

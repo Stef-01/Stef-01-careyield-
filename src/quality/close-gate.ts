@@ -59,6 +59,7 @@ import { PLACEHOLDER_SHA, closeRow, unitsInFlight } from "./closing-state";
 import { blockedSurfaceViolations } from "./blocked-surface";
 import { staleBounds } from "./bounds";
 import { classDefects } from "./claim-classes";
+import { controlDefects } from "./controls";
 import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
 import { endedDeclarations } from "./self-ending";
 import { CLAIMS, claimDefects } from "./prose-numbers";
@@ -118,6 +119,11 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
     id: "src/quality/claim-classes.ts::classDefects",
     why: "W324'S GATE, AND THE REASON THIS UNIT EXISTS. Its `pending` arm reads the ledger for the unit it waits on and fails the moment that row says `done`. It did, at the Q25 close, one commit after a green gate.",
     run: (root) => classDefects(root).map((d) => `${d.unit} ${d.what}`),
+  },
+  {
+    id: "src/quality/controls.ts::controlDefects",
+    why: "W337's gate, which inherits W324's `pending` arm and so reads the ledger for the unit each in-flight answer waits on. A close is exactly the event that arm watches: it fired once already in this unit's own first drive, when a sibling session closed W332 while the gate was being written.",
+    run: (root) => controlDefects(root).map((d) => `${d.unit} ${d.what}`),
   },
   {
     id: "src/quality/hardening-q25.ts::FINDINGS",

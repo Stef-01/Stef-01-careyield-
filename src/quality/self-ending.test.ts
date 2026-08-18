@@ -50,11 +50,14 @@ describe("W330 nothing waits on something that has already happened", () => {
 
   it("collects waits from every register that holds one, not just the deferrals", () => {
     const kinds = new Set(allEndings(ROOT).map((e) => e.ending.kind));
-    // W336: `unit_lands` LEFT THE LIVE SET when the tree's last two deferrals were answered, which
-    // is the register reporting an outcome rather than going quiet. The kind is still built and
-    // still driven — the tests below hand it fabricated waits — so what this line pins is the set
-    // the TREE holds, and it will grow again the day somebody defers something.
-    expect([...kinds].sort()).toEqual(["gate_ruled", "remedy_built", "unobservable"]);
+    // W337: NOT PINNED, because the live set MOVES and moving is the register working. W336 saw
+    // `unit_lands` leave when the tree's last deferrals were answered; W337 put it back the same
+    // day, by waiting on a unit a sibling session had not landed yet. A pinned set would have to
+    // be edited on both of those, which is W304's class. The property is that every kind the
+    // register can report is one the tree could hold, and that it is reporting something.
+    const all = ["gate_ruled", "remedy_built", "unit_lands", "unobservable"];
+    expect(kinds.size, "the register holds no waits at all, so nothing below is being read").toBeGreaterThan(1);
+    expect([...kinds].filter((k) => !all.includes(k)), "a kind nothing declares").toEqual([]);
     expect(allEndings(ROOT).length).toBeGreaterThan(0);
     expect(new Set(allEndings(ROOT).map((e) => e.id)).size, "two waits share an id").toBe(
       allEndings(ROOT).length,

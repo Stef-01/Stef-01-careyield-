@@ -30,6 +30,7 @@ import { parseGates } from "@/founder/outstanding";
 import { blockedRows, blockersIn, parseLedgerRows } from "./blocked-surface";
 import { STATED_BOUNDS } from "./bounds";
 import { CLASS_ANSWERS } from "./claim-classes";
+import { CONTROL_ANSWERS } from "./controls";
 import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
 import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
 import { FINDINGS as Q22_FINDINGS, type HardeningFinding, type UnitId } from "./hardening-q22";
@@ -143,6 +144,28 @@ export const ENDING_REGISTERS: readonly EndingRegister[] = [
       kind: "ended_there_too",
       check: "overdueDispositions",
       why: "The review pass W318 retyped. Its deferral is the one that had gone thirty-one units past a range nothing evaluated, which is why it is in this register rather than trusted to its own.",
+    },
+  },
+  {
+    unit: "W337",
+    module: "src/quality/controls.ts",
+    register: "CONTROL_ANSWERS",
+    entries: () =>
+      CONTROL_ANSWERS.flatMap((a) =>
+        a.answer.kind === "pending"
+          ? [
+              {
+                id: `W337::${a.unit}`,
+                what: `${a.unit}'s control is answered by a unit that has not landed: ${a.answer.why}`,
+                ending: { kind: "unit_lands" as const, unit: a.answer.by },
+              },
+            ]
+          : [],
+      ),
+    rechecked: {
+      kind: "ended_there_too",
+      check: "controlDefects",
+      why: "Q26's gate, and the arm W324 wrote is inherited whole. It is empty, and twice over: W332 was answered `pending` and a sibling session closed the row before this gate's first full run, and the second pending answer was then removed rather than kept — a gate that expires on another session's close reports somebody else's event as its own. The entry stays because the arm is still there to be used.",
     },
   },
   {
