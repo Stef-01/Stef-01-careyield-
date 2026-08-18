@@ -247,7 +247,7 @@ describe("W82 PROPERTY: enthusiasm never outranks the floor", () => {
     const ranked = rankByCapability(all, floor, TODAY);
 
     expect(ranked).toHaveLength(all.length);
-    expect(eligibleForRouting(ranked)).toHaveLength(0);
+    expect(eligibleForRouting(ranked)).toEqual([]);
     for (const c of ranked) expect(c.failures.length).toBeGreaterThan(0);
   });
 });

@@ -85,7 +85,7 @@ describe("W331 each finding is re-derived, so a fix that came undone fails here"
       'it("a", () => { expect(rows.length).toBe(xs.length); });',
       'it("b", () => { const rows = xs.map(f); });',
     ].join("\n");
-    expect(tautologiesIn("p.test.ts", beforeDeclaration)).toHaveLength(0);
+    expect(tautologiesIn("p.test.ts", beforeDeclaration)).toEqual([]);
     expect(finding("Q25-CR-1").disposition.kind).toBe("fixed");
   });
 
@@ -132,9 +132,15 @@ describe("W331 each finding is re-derived, so a fix that came undone fails here"
     expect(finding("Q25-CR-4").disposition.kind).toBe("fixed");
   });
 
-  it("CR-5: the prose scan still falls back to the whole file when a module has no import", () => {
-    expect(read("src/quality/prose-numbers.ts")).toContain("const header = cut > 0 ? source.slice(0, cut) : source;");
-    expect(finding("Q25-CR-5").disposition.kind).toBe("deferred");
+  it("CR-5: the prose scan reads comments and no code", () => {
+    const source = read("src/quality/prose-numbers.ts");
+    expect(source, "the whole-file fallback is back").not.toContain(
+      "const header = cut > 0 ? source.slice(0, cut) : source;",
+    );
+    expect(source).toContain("leadingComment(source)");
+    // The widening half, which is what made the narrowing safe rather than a loss of coverage.
+    expect(source).toContain('line.trimStart().startsWith("//")');
+    expect(finding("Q25-CR-5").disposition.kind).toBe("fixed");
   });
 
   it("CR-6: the derivations wired to no claim are gone", () => {

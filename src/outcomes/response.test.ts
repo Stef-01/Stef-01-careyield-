@@ -242,7 +242,7 @@ describe("W211 the fold is order-independent", () => {
     // `not_recorded` has nothing to cite, which is why it is the only one with a settle list.
     const silent = responseState(INVITE, []);
     const answered = responseState(INVITE, [event()]);
-    expect(silent.responses).toHaveLength(0);
+    expect(silent.responses).toEqual([]);
     expect(silent.wouldSettleIt.length).toBeGreaterThan(0);
     expect(answered.responses.length).toBeGreaterThan(0);
     expect(answered.wouldSettleIt).toEqual([]);

@@ -114,8 +114,8 @@ describe("W264 nothing in the product was signed", () => {
     // W127's registry seeds from the shipped registers and is what the sign-off dashboard shows,
     // so a rehearsal that seeded it would put a signed-looking pathway on a real surface.
     const rehearsal = rehearseSignOff();
-    expect(getPathwayEvents()).toHaveLength(0);
-    expect(getPathwayAttestations()).toHaveLength(0);
+    expect(getPathwayEvents()).toEqual([]);
+    expect(getPathwayAttestations()).toEqual([]);
     const stage = rehearsal.stages.find((s) => s.stage === "registry_untouched")!;
     expect(stage.observed).toContain("events 0 to 0");
     expect(stage.observed).toContain("attestations 0 to 0");

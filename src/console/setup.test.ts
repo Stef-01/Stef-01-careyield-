@@ -69,7 +69,7 @@ describe("W41 clinician roster", () => {
     expect(saveClinicians(PRACTICE_ID, [{ displayName: "Dr Solo", participating: false }], NOW, OWNER)).toHaveProperty(
       "clinicians",
     );
-    expect(record().clinicians).toHaveLength(0);
+    expect(record().clinicians).toEqual([]);
   });
 
   it("rejects an empty roster, short names and duplicates", () => {
@@ -85,7 +85,7 @@ describe("W41 clinician roster", () => {
 
   it("refuses a caller without the grant", () => {
     expect(saveClinicians(PRACTICE_ID, ROSTER, NOW, OUTSIDER)).toHaveProperty("form");
-    expect(record().clinicians).toHaveLength(0);
+    expect(record().clinicians).toEqual([]);
   });
 
   it("drops allowlisted clinicians that no longer exist", () => {

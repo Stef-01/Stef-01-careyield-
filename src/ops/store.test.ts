@@ -22,7 +22,7 @@ describe("ops store", () => {
   it("starts all-clear with no audit", () => {
     const state = getOps();
     expect(state.switches).toEqual({ killSwitch: false, pausedPracticeIds: [] });
-    expect(state.auditEvents).toHaveLength(0);
+    expect(state.auditEvents).toEqual([]);
   });
 
   it("engaging the kill switch records an audit event once", () => {

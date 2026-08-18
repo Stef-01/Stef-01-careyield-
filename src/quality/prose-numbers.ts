@@ -92,16 +92,48 @@ const numberOf = (word: string): number => WORDS[word.toLowerCase()] ?? Number(w
  * states the finding and a doc comment restates it beside the code — and two rows for one sentence
  * would be a register that grows when somebody moves a paragraph.
  */
+/**
+ * The comment block a module opens with, for a module that imports nothing.
+ *
+ * Every module in this tree opens `// W<n>: ...` and the header runs to the first line that is not
+ * a `//` comment or blank. Taking the whole file instead — which is what the missing-import case
+ * used to do — reads code as prose, and reading code as prose is the one thing this register's own
+ * negative probe says it must not do.
+ */
+function leadingComment(source: string): string {
+  const lines: string[] = [];
+  for (const line of source.split("\n")) {
+    if (line.trim() === "" || line.trimStart().startsWith("//")) {
+      lines.push(line);
+      continue;
+    }
+    break;
+  }
+  return lines.join("\n");
+}
+
 export function proseClaims(root: string): ProseClaim[] {
   const found = new Map<string, ProseClaim>();
   for (const file of sourceModules(root)) {
     const module = path.relative(root, file).split(path.sep).join("/");
     const source = readFileSync(file, "utf8");
+    // W336, answering Q25-CR-5: the header is the LEADING COMMENT BLOCK, not everything before the
+    // first import. The fallback used to be the whole file, so the 49 modules with no import line
+    // had their entire body read as header prose — a number in a string literal or an identifier
+    // counted as a claim this tree's prose makes about itself. The declared negative probe *does
+    // not read a claim out of code* passed only because its fixture happened to contain an import.
     const cut = source.indexOf("\nimport ");
-    const header = cut > 0 ? source.slice(0, cut) : source;
-    const docs = [...source.slice(cut > 0 ? cut : 0).matchAll(/\/\*\*[\s\S]*?\*\//g)]
-      .map((m) => m[0])
-      .join("\n");
+    const header = cut > 0 ? source.slice(0, cut) : leadingComment(source);
+    const body = source.slice(cut > 0 ? cut : header.length);
+    // Block comments AND standalone line comments, which together are the module's prose and
+    // nothing else. The first narrowing of this — header to the leading block — dropped four
+    // declared claims, all of them `//` notes further down an import-less module: real prose the
+    // whole-file fallback had been catching by accident. A surface that is exactly the comments
+    // keeps them and still reads no code, which is what the negative probe requires.
+    const docs = [
+      ...[...body.matchAll(/\/\*\*[\s\S]*?\*\//g)].map((m) => m[0]),
+      ...body.split("\n").filter((line) => line.trimStart().startsWith("//")),
+    ].join("\n");
     for (const [where, body] of [["header", header], ["doc", docs]] as const) {
       for (const match of body.matchAll(CLAIM_RE)) {
         const text = match[0].replace(/\s+/g, " ");
@@ -241,6 +273,40 @@ const q24Findings = (): number => HARDENING_Q24_FINDINGS.length;
  * already wrong when it read them.
  */
 export const CLAIMS: readonly DeclaredClaim[] = [
+  // W336: TWENTY CLAIMS THAT ARRIVED WHEN THE PROSE SURFACE BECAME THE COMMENTS. Answering
+  // Q25-CR-5 narrowed the header away from "the whole file" — which had been reading string
+  // literals as prose — and in the same move widened the surface to every `//` note, wherever it
+  // sits. These had never been read, and every one is the same kind: what a unit FOUND when it was
+  // written, in a sentence explaining why it did what it did. History, and the tree moving past
+  // any of them falsifies nothing, which is what `at_the_unit` is for. Q25-CR-5 was deferred
+  // rather than fixed precisely because this list would arrive all at once and each row needed
+  // somebody who could argue it; they are argued together because they share one argument.
+  { module: "src/privacy/record-classes.ts", text: "Six modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/assertion-vocabulary.ts", text: "664 sites", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/blocked-surface.ts", text: "sixteen rows", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/blocked-surface.ts", text: "Two rows", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/latent-y5.ts", text: "eleven modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/manifest.ts", text: "three derived registers", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/manifest.ts", text: "three hardening registers", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/manifest.ts", text: "two known files", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/page-suite.ts", text: "four specs", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/prose-numbers.ts", text: "49 modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/prose-numbers.ts", text: "eight specs", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/register-census.ts", text: "one held three entries", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/register-census.ts", text: "Seven walks", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/self-reference.ts", text: "eighteen modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/self-reference.ts", text: "eighteen ordinary modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/unit-headers.ts", text: "two modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/registers/membership.ts", text: "two open rows", resolution: { kind: "at_the_unit" } },
+  { module: "src/registers/sim-registers.ts", text: "two registers", resolution: { kind: "at_the_unit" } },
+  { module: "src/verticals/binding.ts", text: "two acceptances", resolution: { kind: "at_the_unit" } },
+  { module: "src/verticals/dermatology.ts", text: "two vertical files", resolution: { kind: "at_the_unit" } },
+  // W336: two claims that arrived when the prose surface stopped being "everything before the
+  // first import" and became the comments. `cdss-boundary.ts` HAS imports, so its line comments
+  // below them had never been read at all — the narrowing that answered Q25-CR-5 widened the
+  // surface in the same move, because a comment is prose wherever it sits.
+  { module: "src/compliance/cdss-boundary.ts", text: "four modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/compliance/cdss-boundary.ts", text: "four pre-floor surfaces", resolution: { kind: "at_the_unit" } },
   // W334: written in DIGITS, and the reason is a scan finding rather than a style choice. Spelled
   // out, this count reads as two claims — `CLAIM_RE` matched `eight specs` inside `thirty-eight
   // specs` and reported one number nobody classified beside one the tree no longer said. A
@@ -313,12 +379,9 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/privacy/adm-y5.ts", text: "thirty-seven new modules", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/adm-y5.ts", text: "two original scans", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/adm-y5.ts", text: "two privacy registers", resolution: { kind: "at_the_unit" } },
-  { module: "src/privacy/automated-decisions.ts", text: "four files", resolution: { kind: "at_the_unit" } },
-  { module: "src/privacy/automated-decisions.ts", text: "four fixtures", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/automated-decisions.ts", text: "four registers", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/automated-decisions.ts", text: "three scans", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/automated-decisions.ts", text: "two original scans", resolution: { kind: "at_the_unit" } },
-  { module: "src/privacy/automated-decisions.ts", text: "two registers", resolution: { kind: "at_the_unit" } },
   { module: "src/privacy/erasure-y5.ts", text: "thirty-seven modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "five registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "Five registers", resolution: { kind: "at_the_unit" } },
@@ -428,6 +491,5 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/tenancy/rollout.ts", text: "twelve sites", resolution: { kind: "at_the_unit" } },
   { module: "src/tenancy/store-reads.ts", text: "five findings", resolution: { kind: "at_the_unit" } },
   { module: "src/tenancy/store-reads.ts", text: "Five findings", resolution: { kind: "at_the_unit" } },
-  { module: "src/tenancy/store-reads.ts", text: "two console surfaces", resolution: { kind: "at_the_unit" } },
   { module: "src/verticals/assembly.ts", text: "two files", resolution: { kind: "at_the_unit" } },
 ];

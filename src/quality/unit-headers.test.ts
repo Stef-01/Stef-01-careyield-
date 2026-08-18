@@ -68,7 +68,7 @@ describe("W281 the door, against this tree", () => {
     const census = headerCensus(ROOT, LEDGER);
     expect(census.missing.length + census.misplaced.length + census.unknownUnit.length).toBe(0);
     expect(knownUnits(LEDGER).size).toBeGreaterThan(280);
-    expect(modulesWithNoUnitHeader().length).toBe(0);
+    expect(modulesWithNoUnitHeader()).toEqual([]);
   });
 
   it("states the rule rather than only enforcing it", () => {

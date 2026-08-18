@@ -155,10 +155,10 @@ export const FINDINGS: readonly HardeningFinding[] = [
       "`proseClaims` finds the header by cutting at the first `\\nimport `, and falls back to the WHOLE FILE when there is none. Modules with no import — 49 of them — therefore have their entire body scanned as header prose, so a number in a string literal or an identifier reads as a claim the tree's prose makes. The declared negative probe *does not read a claim out of code* passes only because its fixture happens to contain an import line.",
     raisedOn: "2026-08-18",
     disposition: {
-      kind: "deferred",
-      why:
-        "The fix is small — a header is the leading comment block, not everything before the first import — but it changes what a tree-wide scan sees across 49 modules at once, and each new claim it surfaces needs classifying by somebody who can argue it. Doing that inside a hardening pass would mean writing 49 judgements at the end of a long firing, which is how the classes this quarter is about get written. W336 applies W323's shape to another claim vocabulary and is the unit already holding this scanner's neighbourhood.",
+      kind: "fixed",
       by: "W336",
+      evidence:
+        "The prose surface is now the COMMENTS — the leading block for a module with no import, plus every block comment and every standalone line comment — and no code at all. The narrowing and a widening in one move, and both mattered: four declared claims in `automated-decisions.ts` turned out to live inside register STRING LITERALS and were only ever declared because the whole-file fallback read them, so they are deleted rather than reclassified; and twenty real claims in line comments below an import had never been read by this register at all. The deferral's reason was right about the cost — twenty judgements arriving together — and they share one argument, which is why they could be made at once and why making them inside the hardening pass would have been worse.",
     },
   },
   {

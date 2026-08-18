@@ -16,8 +16,8 @@ import {
   emptinessSpellings,
   formsIn,
   nonEmptyClaims,
-  vocabularyDefects,
-} from "./assertion-vocabulary";
+  vocabularyDefects, CANONICAL_EMPTY, EMPTY_FORMS, NOT_A_COLLECTION, NOT_EMPTINESS, emptinessDefects, emptyFormsIn } from "./assertion-vocabulary";
+import { evidenceReport } from "./empty-list-sweep";
 import { withRoot } from "./refusal-branches";
 
 const ROOT = process.cwd();
@@ -110,12 +110,88 @@ describe("W323 one way to say a list is non-empty", () => {
     expect(only("expect(xs).toEqual([]);")).toEqual(["equal []"]);
     // And the negations are the claim this unit normalised, not this one.
     expect(only("expect(xs).not.toHaveLength(0);")).toEqual([]);
-    // The tree still holds more than one, which is what keeps the bound open.
-    expect(emptinessSpellings(ROOT).length).toBeGreaterThan(1);
+    // AND THE TREE NOW HOLDS ONE, which is what W336 did and what closed this predicate. The
+    // spelling-by-spelling drives above are what keep the derivation honest afterwards: a scan
+    // that had stopped reading two of the three forms would report the same single answer.
+    expect(emptinessSpellings(ROOT)).toEqual(["equal []"]);
   });
 
-  it("states what it does not cover", () => {
-    expect(VOCABULARY_BOUND).toContain("ONE claim");
+  it("states what it does not cover, and moved when its remedy was built", () => {
+    expect(VOCABULARY_BOUND).toContain("TWO claims");
+    expect(VOCABULARY_BOUND, "the frontier is not named, so the sentence has no live predicate").toContain(
+      "The nearest is throwing",
+    );
     expect(VOCABULARY_BOUND.length).toBeGreaterThan(600);
+  });
+});
+
+describe("W336 one way to say a thing is absent", () => {
+  const only = (body: string) =>
+    withRoot({ "src/planted/e.test.ts": `it("t", () => { ${body} });\n` }, (root) => emptinessDefects(root));
+
+  it("says it one way, over the whole suite", () => {
+    expect(emptinessDefects(ROOT)).toEqual([]);
+  });
+
+  it("reports a planted variant, one spelling at a time", () => {
+    // W292's discrimination: each non-canonical form planted alone, so a scan that had collapsed
+    // two of them would still report something and look alive while measuring one thing.
+    expect(only("expect(xs).toHaveLength(0);").map((d) => d.what)).toEqual([
+      "says a collection is empty as `toHaveLength(0)`, and this tree says it as `equal []`",
+    ]);
+    expect(only("expect(xs.length).toBe(0);").map((d) => d.what)).toEqual([
+      "says a collection is empty as `count is 0`, and this tree says it as `equal []`",
+    ]);
+    expect(only("expect(xs).toEqual([]);"), "the canonical form is reported as a variant").toEqual([]);
+  });
+
+  it("refuses the shapes that are not this claim, each planted", () => {
+    for (const near of NOT_EMPTINESS) {
+      expect(only(near.planted), `${near.planted} was counted as this claim`).toEqual([]);
+      expect(near.why.length, `${near.planted} is refused without an argument`).toBeGreaterThan(120);
+    }
+  });
+
+  it("recognises every declared form, so a register nobody uses is still driven", () => {
+    for (const form of EMPTY_FORMS) {
+      expect(emptyFormsIn(form.planted), `${form.id} is declared and unrecognised`).toEqual([form.id]);
+      expect(form.why.length, `${form.id} is declared without an argument`).toBeGreaterThan(80);
+    }
+    expect(EMPTY_FORMS[0]!.id, "the canonical form is not the one listed first").toBe(CANONICAL_EMPTY);
+  });
+
+  it("excuses a `.length` that is not a collection's, and only where it is argued", () => {
+    // A FUNCTION HAS A `.length` TOO. `scopes.test.ts` asserts the arity of `grantedScopes`, and
+    // the first run of this conversion rewrote it into a comparison between a function and an
+    // empty array — a passing test broken to satisfy a vocabulary. Nothing in the source tells
+    // the two apart, so the exceptions are named and both directions are checked.
+    for (const [site, why] of Object.entries(NOT_A_COLLECTION)) {
+      expect(why.length, `${site} is excused without an argument`).toBeGreaterThan(120);
+    }
+    // Both directions: with the exception dropped, the site is reported again.
+    expect(emptinessDefects(ROOT, CANONICAL_EMPTY, {}).map((d) => d.site)).toEqual(
+      Object.keys(NOT_A_COLLECTION),
+    );
+  });
+
+  it("shares one definition of the claim with the bound's predicate", () => {
+    // The two derivations disagreed before this unit: the older `emptinessSpellings` counted the
+    // arity site the newer reading excludes, so the bound's predicate would have stayed open
+    // while the register said the tree was clean.
+    expect(emptinessSpellings(ROOT)).toEqual([CANONICAL_EMPTY]);
+    expect(emptinessSpellings(ROOT, {}), "the exception list is not read by both").toContain("count is 0");
+  });
+
+  it("hands the emptiness register the spelling it could not see", () => {
+    // W293'S GAP, WHICH IS WHY THIS UNIT IS WORTH MORE THAN A CONVERSION. `isEmptyList` knew
+    // `toEqual([])` and `toHaveLength(0)` and not the count form, so assertions spelled that way
+    // had never been asked for evidence at all.
+    const seen = withRoot(
+      { "src/planted/e.test.ts": 'it("t", () => { expect(rows.length).toBe(0); });\n' },
+      (root) => evidenceReport(root).hits.map((h) => h.file),
+    );
+    expect(seen, "the count spelling is invisible to the emptiness register again").toContain(
+      "src/planted/e.test.ts",
+    );
   });
 });

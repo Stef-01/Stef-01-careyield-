@@ -239,10 +239,21 @@ function requiresSomething(matcher: string, expected: string, negated: boolean, 
   return false;
 }
 
-function isEmptyList(matcher: string, expected: string, negated: boolean): boolean {
+function isEmptyList(matcher: string, expected: string, negated: boolean, subject = ""): boolean {
   if (negated) return false;
   if (["toEqual", "toStrictEqual"].includes(matcher)) return expected === "[]";
-  return matcher === "toHaveLength" && expected === "0";
+  if (matcher === "toHaveLength" && expected === "0") return true;
+  // W336: THE SPELLING THIS REGISTER COULD NOT SEE. `expect(rows.length).toBe(0)` is the same
+  // claim with the count moved into the subject, and five assertions in this suite had therefore
+  // never been asked for evidence — the register's whole subject is an empty list nobody proved
+  // could be non-empty, and it was reading two of the three ways this tree spells one. W336
+  // converted the live ones to the canonical form; this is here so the next arrival cannot hide.
+  // A sum (`a.length + b.length`) is excluded: two collections at once is a different claim.
+  const bare = blankLiterals(subject).trim();
+  if (["toBe", "toEqual", "toStrictEqual"].includes(matcher) && expected === "0") {
+    return /\.length\s*$/.test(bare) && !bare.includes("+");
+  }
+  return false;
 }
 
 export interface FileSweep {
@@ -289,7 +300,7 @@ export function sweepText(file: string, source: string): FileSweep {
     if (requiresSomething(a.matcher, a.expected, a.negated, a.subject)) {
       for (const s of sources) evidenced.add(s);
     }
-    if (isEmptyList(a.matcher, a.expected, a.negated)) {
+    if (isEmptyList(a.matcher, a.expected, a.negated, a.subject)) {
       empty.push({
         file,
         line: code.slice(0, a.index).split("\n").length,
@@ -413,6 +424,13 @@ export function classify(root: string): ClassifiedEmpty[] {
  * trusting it, and each one discharged rows in bulk.
  */
 export const UNEVIDENCED_AT_W293: readonly string[] = [
+  // W336: newly VISIBLE rather than newly written. `isEmptyList` did not know the count spelling,
+  // so this assertion had never been read by this register at all; W336 converted it to the
+  // canonical form and taught the register the spelling, and it arrived here on the same day. It
+  // is pinned rather than evidenced because the witness would have to hand the walk a constructed
+  // root, and the binding that takes one lives in `tree-walks.ts` — importing it into a test file
+  // makes that file a tree walker in W267's census, which is a declaration about the wrong thing.
+  "src/quality/unit-headers.test.ts :: is a door over something, not an empty list :: modulesWithNoUnitHeader",
   "src/audit/store.test.ts :: refuses a write against another practice's visit :: getAudit.outcomes",
   "src/audit/store.test.ts :: seeds three pending visits and no outcomes :: getAudit.outcomes",
   "src/capability/routing-sim.test.ts :: generates a comparison report from the run :: checkInvariants",

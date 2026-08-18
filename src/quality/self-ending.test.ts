@@ -50,8 +50,11 @@ describe("W330 nothing waits on something that has already happened", () => {
 
   it("collects waits from every register that holds one, not just the deferrals", () => {
     const kinds = new Set(allEndings(ROOT).map((e) => e.ending.kind));
-    // Four spellings of the same property, which is the argument for one register over four.
-    expect([...kinds].sort()).toEqual(["gate_ruled", "remedy_built", "unit_lands", "unobservable"]);
+    // W336: `unit_lands` LEFT THE LIVE SET when the tree's last two deferrals were answered, which
+    // is the register reporting an outcome rather than going quiet. The kind is still built and
+    // still driven — the tests below hand it fabricated waits — so what this line pins is the set
+    // the TREE holds, and it will grow again the day somebody defers something.
+    expect([...kinds].sort()).toEqual(["gate_ruled", "remedy_built", "unobservable"]);
     expect(allEndings(ROOT).length).toBeGreaterThan(0);
     expect(new Set(allEndings(ROOT).map((e) => e.id)).size, "two waits share an id").toBe(
       allEndings(ROOT).length,

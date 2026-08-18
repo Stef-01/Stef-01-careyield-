@@ -19,7 +19,7 @@ beforeEach(() => {
 describe("audit store", () => {
   it("seeds three pending visits and no outcomes", () => {
     expect(pendingVisitsFor(A)).toHaveLength(3);
-    expect(getAudit().outcomes).toHaveLength(0);
+    expect(getAudit().outcomes).toEqual([]);
   });
 
   it("records a valid outcome and removes the visit from pending", () => {
@@ -60,7 +60,7 @@ describe("audit store", () => {
         A,
       ),
     ).toEqual({ ok: false, error: "unnecessary_conflict" });
-    expect(outcomesFor(A)).toHaveLength(0);
+    expect(outcomesFor(A)).toEqual([]);
   });
 });
 

@@ -146,6 +146,6 @@ describe("W263 the loop may answer none of them", () => {
 
   it("records how many of the outstanding decisions the loop may take, which is zero", () => {
     expect(RELEASE_PATHS.length, "no blocker is described, so this counts nothing").toBeGreaterThan(5);
-    expect(answerableByTheLoop().length).toBe(0);
+    expect(answerableByTheLoop()).toEqual([]);
   });
 });

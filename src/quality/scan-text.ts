@@ -138,7 +138,17 @@ export const SCAN_ORDER_RULE =
  * purpose, and pretending otherwise would be the more comfortable lie.
  */
 export const SCAN_BOUND =
-  "One scan is deliberately outside this. `violationReporters` in W291's register reads RAW source, because both narrowings were tried at W295 and both hid real registers — comments-then-literals lost four, literals-then-comments lost a different three. The cause is understood and the fix is not: the reporter walk matches an `export function` signature, and any transform that can consume a signature can consume that one. So it stays raw, and W307 took its fixtures OUT of the surface it reads rather than narrowing it — which is the rule `register-census.test.ts` follows now too. What this buys is that the choice is made once and recorded, not that every scan in the tree now shares an implementation. A scan added tomorrow that reads raw text without saying why is invisible here, and the register below only knows about modules that ask for the preparation.";
+  "One scan is deliberately outside this. `violationReporters` in W291's register reads RAW source, because both narrowings were tried at W295 and both hid real registers — comments-then-literals lost four, literals-then-comments lost a different three. The cause is understood and the fix is not: the reporter walk matches an `export function` signature, and any transform that can consume a signature can consume that one. So it stays raw, and W307 took its fixtures OUT of the surface it reads rather than narrowing it — which is the rule `register-census.test.ts` follows now too. What this buys is that the choice is made once and recorded, not that every scan in the tree now shares an implementation. A scan added tomorrow that reads raw text without saying why is invisible here, and the register below only knows about modules that ask for the preparation. " +
+  "AND THE COMMENT STRIPPER IS NOT LITERAL-AWARE, which W336 found by writing a string that " +
+  "contained a line-comment marker: `stripComments` removed the rest of that line, leaving an " +
+  "unbalanced quote, and `blankLiterals` then swallowed everything after it — so a `reviewBy` on " +
+  "a later line vanished and W294's acceptance register reported a module that plainly holds one " +
+  "as holding none. The failure is SILENT and it is not rare: 52 modules under `src/` have a line " +
+  "the stripper leaves with an odd number of quotes, and every scanner built on this preparation " +
+  "is blind from that point in those files to the end. The order rule is not the cause and " +
+  "reversing it would not help; the fix is a single pass that tracks whether it is inside a " +
+  "literal, which is a unit rather than a patch, and until somebody writes it a scan reporting " +
+  "nothing about the back half of a module may be reporting nothing at all.";
 
 /** A module that prepares text for scanning, and what it asks for. */
 export interface ScanSite {

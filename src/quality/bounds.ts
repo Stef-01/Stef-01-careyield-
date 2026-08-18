@@ -86,7 +86,7 @@ import { DEFERRAL_BOUND } from "./deferrals";
 import { REMEDY_BOUND } from "./self-defeating";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
-  emptinessSpellings,
+  throwSpellings,
 } from "./assertion-vocabulary";
 
 /**
@@ -271,18 +271,19 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "Choosing one spelling per claim is a unit each",
-      reads: "the tree, for the OPPOSITE claim — a list is empty — still spelled more than one way",
-      // The bound's first clause is W267's `readdirSync` class and would have been the easy answer:
-      // a spelling nobody has thought of cannot be predicated over. The clause with teeth is the
-      // second — that this tree writes several claims several ways and W323 normalised ONE — and
-      // emptiness is the nearest unnormalised one, held three ways as this was written. When a
-      // later unit gives it a single spelling, this sentence is describing a tree that has moved.
-      stillOpen: (root) => emptinessSpellings(root).length > 1,
+      reads: "the tree, for the nearest unnormalised claim — a call throws — still spelled more than one way",
+      // W336 LIFTED THE PREVIOUS PREDICATE AND THIS IS ITS SUCCESSOR. The old one read emptiness,
+      // which was the nearest unnormalised claim when W323 wrote the sentence and was held three
+      // ways; W336 gave it one spelling, W306's driver reported the bound stale on the spot, and
+      // the sentence moved rather than the predicate being quietly widened. The frontier is now
+      // throwing: `toThrow()` and `toThrow(message)` are both live and are NOT equivalent, so the
+      // next unit here has a judgement to make rather than a conversion to run.
+      stillOpen: (root) => throwSpellings(root).length > 1,
       lifted: {
         kind: "constructed_tree",
         files: {
-          "src/planted/one-spelling.test.ts":
-            'it("t", () => {\n  expect(rows.length).toBe(0);\n  expect(cols.length).toBe(0);\n});\n',
+          "src/planted/one-throw.test.ts":
+            'it("t", () => {\n  expect(() => f()).toThrow("a message");\n  expect(() => g()).toThrow("another");\n});\n',
         },
       },
     },
@@ -290,7 +291,12 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       {
         word: "one",
         kind: "rate",
-        why: "'This covers ONE claim' and 'this unit normalised one' — the unit of the sentence, not a count of anything in the tree. It stays one however many spellings the register grows, which is the distinction W297's own entry draws for 'One assertion per register, driven once'.",
+        why: "'One spelling per claim is a unit each' — the unit of the sentence, not a count of anything in the tree. It stays one however many spellings either register grows, which is the distinction W297's own entry draws for 'One assertion per register, driven once'.",
+      },
+      {
+        word: "two",
+        kind: "fixed_by_a_gate",
+        why: "How many claims these registers normalise: non-emptiness by W323's gate and emptiness by W336's. It counts the REGISTERS this module declares — `NON_EMPTY_FORMS` and `EMPTY_FORMS` — which two units' verify gates put there, rather than anything a walk over the tree finds. A third arrives only with a third unit, whose gate would rewrite this sentence anyway.",
       },
     ],
   },

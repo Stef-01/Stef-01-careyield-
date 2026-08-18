@@ -222,18 +222,199 @@ export function vocabularyDefects(
  * bound to carry a predicate that can be seen saying false. This is that predicate's derivation:
  * when a later unit gives emptiness one spelling too, the sentence stops being true and says so.
  */
-export function emptinessSpellings(root: string): string[] {
+export function emptinessSpellings(
+  root: string,
+  exceptions: Readonly<Record<string, string>> = NOT_A_COLLECTION,
+): string[] {
+  // W336: ONE DEFINITION OF THE CLAIM, shared with `emptinessDefects`. This used to carry its own,
+  // cruder version — and the two then disagreed: `scopes.test.ts` asserts `grantedScopes.length`
+  // is zero about a FUNCTION, so its arity, and the newer reading excludes it while this one
+  // counted it. The bound's predicate reads this function, so the disagreement would have left the
+  // sentence describing a tree that had moved while the register said it had not.
+  const found = new Set<string>();
+  for (const file of testModules(root)) {
+    const rel = path.relative(root, file).split(path.sep).join("/");
+    const code = stripComments(readFileSync(file, "utf8"));
+    for (const a of assertionsIn(code)) {
+      const form = emptyFormOf(a);
+      if (form === null) continue;
+      if (`${rel} :: ${enclosingTest(code, a.index)}` in exceptions) continue;
+      found.add(form);
+    }
+  }
+  return [...found].sort();
+}
+
+// ---------------------------------------------------------------------------------------------
+// W336: the same shape for the OPPOSITE claim — this collection is empty.
+// ---------------------------------------------------------------------------------------------
+
+/** How this suite says a collection holds nothing. */
+export interface EmptyForm {
+  id: string;
+  planted: string;
+  why: string;
+}
+
+/**
+ * The canonical spelling of *this collection is empty*, and it is not the one W323 chose.
+ *
+ * W323 PUT THE COUNT IN THE SUBJECT and had a strong reason: every sweep in this tree keys on a
+ * subject ending in `.length`, so a spelling that hides the count in the matcher is invisible to
+ * all of them at once. The same argument points the OTHER WAY here, and the difference is worth
+ * stating because it looks like an inconsistency and is not.
+ *
+ * `expect(xs).toEqual([])` says the value IS an empty array — its type and its contents. The
+ * count forms say only that something has length zero, which an empty string, an empty Map read
+ * through `.size`, and a sum of two lengths all satisfy. For NON-emptiness the weaker form loses
+ * nothing, because a count above zero is the whole claim. For emptiness it loses the half that
+ * matters, and converting to it would WEAKEN 647 assertions to strengthen a scanner.
+ *
+ * So the canonical form is the strongest one, which is also the one 647 of the 664 sites already
+ * use. What that costs is that the count-keyed sweeps cannot see it — and the answer is not to
+ * change the assertions but to teach the one register that cares: W293's `isEmptyList` did not
+ * know the count spelling at all, so five assertions in this suite had never been asked for
+ * evidence. That is the finding this unit exists for, and it was invisible from either side until
+ * both vocabularies were written down beside each other.
+ */
+export const CANONICAL_EMPTY = "equal []";
+
+/** Every spelling of emptiness, canonical first. Planted, so a form nobody uses is still refused. */
+export const EMPTY_FORMS: readonly EmptyForm[] = [
+  {
+    id: CANONICAL_EMPTY,
+    planted: "expect(rows).toEqual([]);",
+    why: "THE CANONICAL FORM. It asserts the value is an empty array rather than that something about it is zero, which is the strongest of the three and the one the suite already overwhelmingly uses.",
+  },
+  {
+    id: "toHaveLength(0)",
+    planted: "expect(rows).toHaveLength(0);",
+    why: "Weaker: it passes for a string, and it says nothing about the value being a list. Converted where the subject is a list — which was all twelve.",
+  },
+  {
+    id: "count is 0",
+    planted: "expect(rows.length).toBe(0);",
+    why: "Weakest, and the one W293's emptiness register could not see. The subject is a NUMBER, so the assertion is about arithmetic and the list has already been left behind.",
+  },
+];
+
+/**
+ * Emptiness claims that are NOT this claim, each planted and required to be refused.
+ *
+ * W292's discriminating pairs, and these are not hypothetical — they are what the tree actually
+ * holds, and each would have been rewritten into a sentence it does not say.
+ */
+export const NOT_EMPTINESS: readonly NearMiss[] = [
+  {
+    planted: "expect(state.patients.size).toBe(0);",
+    why: "A MAP, whose emptiness `toEqual([])` cannot express — `[]` is not a Map and the assertion would fail against an empty one. The tree holds this in `pms/ingest.test.ts`. A conversion rule that read `.size` as a list's count would have broken a passing test to satisfy a vocabulary.",
+  },
+  {
+    planted: "expect(a.length + b.length).toBe(0);",
+    why: "A SUM of counts, which is a claim about two collections at once and has no list to be equal to. `unit-headers.test.ts` says exactly this about three census arms. Rewriting it as three assertions would be a different test with different failure output, which is a judgement rather than a conversion.",
+  },
+  {
+    planted: "expect(rows).not.toEqual([]);",
+    why: "The NEGATION, which is W323's claim wearing this one's matcher. It belongs to `NON_EMPTY_FORMS` and is converted by that register; counting it here would have both registers rewriting the same site in opposite directions.",
+  },
+];
+
+/**
+ * Sites whose `.length` is not a collection's, argued one at a time.
+ *
+ * A FUNCTION HAS A `.length` TOO, and it is its ARITY. `scopes.test.ts` asserts
+ * `expect(grantedScopes.length).toBe(0)` about a FUNCTION, to say it takes no argument — and the
+ * first run of this conversion rewrote it to `expect(grantedScopes).toEqual([])`, which compares a
+ * function to an empty array and fails. Nothing in the source distinguishes `fn.length` from
+ * `rows.length`; deciding needs types, and a scan that guessed would keep finding new ways to be
+ * wrong. So the exceptions are named, with the reason, and both directions are checked: an entry
+ * for a site that no longer says it fails, so this list can only shrink by somebody rewriting one.
+ */
+export const NOT_A_COLLECTION: Readonly<Record<string, string>> = {
+  "src/api/scopes.test.ts :: grants a console session every scope, in one place and with the reason":
+    "`grantedScopes` is a FUNCTION and `.length` is its arity — the assertion says it takes no argument, which W254 needs because a scope granter that read a request could grant different scopes to different callers. Converting it compares a function with an empty array.",
+};
+
+/** Every emptiness claim in the suite, with the spelling it uses. */
+export interface EmptyClaim {
+  file: string;
+  test: string;
+  form: string;
+}
+
+/** The form an assertion spells emptiness in, or null when it is not this claim. */
+export function emptyFormOf(a: Assertion): string | null {
+  if (a.negated) return null;
+  if (["toEqual", "toStrictEqual"].includes(a.matcher) && /^\[\s*\]$/.test(a.expected)) return CANONICAL_EMPTY;
+  if (a.matcher === "toHaveLength" && a.expected === "0") return "toHaveLength(0)";
+  // `.size` is a Map or a Set and a sum is two collections: neither has a list to equal, so they
+  // are near misses rather than sites, and `NOT_EMPTINESS` argues each.
+  if (a.expected === "0" && ["toBe", "toEqual", "toStrictEqual"].includes(a.matcher)) {
+    const subject = a.subject.trim();
+    if (/^[A-Za-z_$][\w$.()\[\]"' ]*\.length$/.test(subject) && !subject.includes("+")) return "count is 0";
+  }
+  return null;
+}
+
+/** Every emptiness spelling in a snippet — the plantable half, needing no tree. */
+export function emptyFormsIn(code: string): string[] {
+  return assertionsIn(code)
+    .map(emptyFormOf)
+    .filter((f): f is string => f !== null);
+}
+
+export interface EmptinessDefect {
+  site: string;
+  what: string;
+}
+
+/**
+ * Every emptiness claim not spelled the canonical way.
+ *
+ * ONE DIRECTION, for W323's reason: two of the three forms have no live occurrence once this unit
+ * lands, and a register of spellings exists to recognise what the tree does not use yet. The
+ * both-directions job is done by `EMPTY_FORMS` being PLANTED — a form nobody can demonstrate fails
+ * in the suite beside this.
+ */
+export function emptinessDefects(
+  root: string,
+  canonical: string = CANONICAL_EMPTY,
+  exceptions: Readonly<Record<string, string>> = NOT_A_COLLECTION,
+): EmptinessDefect[] {
+  const out: EmptinessDefect[] = [];
+  for (const file of testModules(root)) {
+    const rel = path.relative(root, file).split(path.sep).join("/");
+    const code = stripComments(readFileSync(file, "utf8"));
+    for (const a of assertionsIn(code)) {
+      const form = emptyFormOf(a);
+      if (form === null || form === canonical) continue;
+      const site = `${rel} :: ${enclosingTest(code, a.index)}`;
+      if (site in exceptions) continue;
+      out.push({
+        site,
+        what: `says a collection is empty as \`${form}\`, and this tree says it as \`${canonical}\``,
+      });
+    }
+  }
+  return out.sort((a, b) => `${a.site}${a.what}`.localeCompare(`${b.site}${b.what}`));
+}
+
+/**
+ * How this suite says a call throws — the next unnormalised claim, and the bound's new frontier.
+ *
+ * W336 LIFTED THE PREDICATE THAT READ EMPTINESS, so the sentence needed a live one or it would
+ * have been a bound whose remedy had been built and whose predicate could no longer say so. Two
+ * spellings today: `toThrow()` asserts only that something was thrown, and `toThrow(message)`
+ * asserts which. They are not equivalent — the bare form passes on the wrong error, including a
+ * `TypeError` from the test's own setup — so normalising them is a judgement about 54 assertions
+ * and a unit of its own, which is exactly what the bound says.
+ */
+export function throwSpellings(root: string): string[] {
   const found = new Set<string>();
   for (const file of testModules(root)) {
     for (const a of assertionsIn(stripComments(readFileSync(file, "utf8")))) {
-      if (a.negated) continue;
-      if (COUNT.test(a.subject) && ZERO_EQUALITY.includes(a.matcher) && a.expected === "0") {
-        found.add("count is 0");
-      } else if (a.matcher === "toHaveLength" && a.expected === "0") {
-        found.add("toHaveLength(0)");
-      } else if (["toEqual", "toStrictEqual"].includes(a.matcher) && /^\[\s*\]$/.test(a.expected)) {
-        found.add("equal []");
-      }
+      if (a.negated || !["toThrow", "toThrowError"].includes(a.matcher)) continue;
+      found.add(a.expected.trim() === "" ? "throws at all" : "throws with a message");
     }
   }
   return [...found].sort();
@@ -241,13 +422,21 @@ export function emptinessSpellings(root: string): string[] {
 
 /** What a green sweep does not prove. */
 export const VOCABULARY_BOUND =
-  "This covers ONE claim — a collection has at least one element — in the spellings " +
-  "`NON_EMPTY_FORMS` declares. A spelling nobody has thought of yet is invisible, which is the " +
-  "class of bound W267 states about `readdirSync` and has the same remedy: the register grows and " +
-  "says so. THE HARDER LIMIT IS THAT THE TREE HAS MANY SUCH CLAIMS AND THIS UNIT NORMALISED ONE. " +
-  "A list is empty, a value is present, a function throws, a string contains a marker — each is " +
-  "written several ways in this suite and none of them is checked here. Choosing one spelling per " +
-  "claim is a unit each, and nothing in this module makes the next one cheaper except the shape. " +
+  "This covers TWO claims — a collection has at least one element, and a collection is empty — in " +
+  "the spellings `NON_EMPTY_FORMS` and `EMPTY_FORMS` declare. A spelling nobody has thought of " +
+  "yet is invisible, which is the class of bound W267 states about `readdirSync` and has the same " +
+  "remedy: the register grows and says so. THE HARDER LIMIT IS THAT THE TREE HAS MANY SUCH CLAIMS " +
+  "AND TWO OF THEM ARE NORMALISED. A value is present, a function throws, a string contains a " +
+  "marker — each is written several ways in this suite and none of them is checked here. The " +
+  "nearest is throwing: `toThrow()` and `toThrow(message)` both live in this suite and are NOT " +
+  "equivalent, since the bare form passes on the wrong error including a `TypeError` from the " +
+  "test's own setup, so choosing between them is a judgement about every site rather than a " +
+  "conversion. Choosing one spelling per claim is a unit each, and nothing in this module makes " +
+  "the next one cheaper except the shape. AND THE TWO CANONICAL FORMS POINT OPPOSITE WAYS ON " +
+  "PURPOSE: non-emptiness puts the count in the SUBJECT so the count-keyed sweeps can read it, " +
+  "and emptiness keeps the LIST, because `toEqual([])` says the value is an empty array and the " +
+  "count forms say only that something is zero. Reading that as an inconsistency is the mistake " +
+  "this sentence exists to stop. " +
   "AND THE CANONICAL FORM WAS CHOSEN FOR THE SCANNERS, NOT FOR THE READER: its failure output is " +
   "`expected +0 to be greater than +0`, which names neither the list nor what was wanted, so the " +
   "assertion is only as legible as the message beside it — and nothing here requires a message. " +

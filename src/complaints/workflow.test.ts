@@ -210,6 +210,6 @@ describe("W206 a complaint belongs to one practice", () => {
     submitComplaint({ channel: "phone", summary: "Please stop", patientId: "pat-9", wantsOptOut: true }, AT, A);
     expect(complaintsForPatient("pat-9")).toHaveLength(1);
     expect(scrubPatientFromComplaints("pat-9", AT)).toBe(1);
-    expect(complaintsForPatient("pat-9")).toHaveLength(0);
+    expect(complaintsForPatient("pat-9")).toEqual([]);
   });
 });

@@ -80,7 +80,7 @@ describe("offerableSlots", () => {
 
   it("protects at least one slot for any non-zero fraction", () => {
     expect(offerableSlots(slots, config({ protectedCapacityFraction: 0.1 }))).toHaveLength(3);
-    expect(offerableSlots([slot("a", 9)], config({ protectedCapacityFraction: 0.1 }))).toHaveLength(0);
+    expect(offerableSlots([slot("a", 9)], config({ protectedCapacityFraction: 0.1 }))).toEqual([]);
   });
 
   it("combines window + type + protection", () => {
