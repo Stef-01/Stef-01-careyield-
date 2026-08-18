@@ -19,8 +19,11 @@ import {
   endingDiff,
   hasEnded,
   unreadableEndings,
+  proseWaitDefects,
+  proseWaits,
   waitingModules,
 } from "./self-ending";
+import { withTree } from "./planting";
 
 const ROOT = process.cwd();
 
@@ -174,5 +177,82 @@ describe("W330 nothing waits on something that has already happened", () => {
   it("says what it cannot find", () => {
     expect(ENDING_BOUND).toContain("A wait written as prose is");
     expect(ENDING_BOUND).toContain("W299+");
+  });
+});
+
+describe("W350 a wait written as prose, read against the ledger", () => {
+  // W349'S MUTATION RUN FOUND THIS SUITE MISSING. `proseWaits` shipped with W350 and nothing drove
+  // it: both of its decisions — is this line a COMMENT, and has the unit it names LANDED — survived
+  // being flipped. The register was doing the right thing and could have stopped at any time.
+  const ledger =
+    "| W900 | done | builder-B | 2026-01-01T00:00Z | abc1234 | a unit that landed |\n" +
+    "| W901 | in-progress | builder-B | 2026-01-01T00:00Z | — | a unit still open |\n";
+
+  it("reports a wait on a unit that has not landed", () => {
+    const found = withTree(
+      {
+        "BUILD-STATE.md": ledger,
+        "src/planted/waiting.ts": "// this holds until W901 supplies the value.\nexport const a = 1;\n",
+      },
+      (root) => proseWaits(root),
+    );
+    expect(found.map((w) => `${w.module}::${w.unit}`)).toEqual(["src/planted/waiting.ts::W901"]);
+  });
+
+  it("says nothing about a wait whose unit has landed, which is history rather than a promise", () => {
+    const found = withTree(
+      {
+        "BUILD-STATE.md": ledger,
+        "src/planted/history.ts": "// this was true until W900 retired it.\nexport const a = 1;\n",
+      },
+      (root) => proseWaits(root),
+    );
+    expect(found).toEqual([]);
+  });
+
+  it("reads COMMENTS and not code, so a fixture quoting the sentence is not a wait", () => {
+    const found = withTree(
+      {
+        "BUILD-STATE.md": ledger,
+        "src/planted/quoted.ts": 'export const FIXTURE = "// this holds until W901 lands";\n',
+      },
+      (root) => proseWaits(root),
+    );
+    expect(found).toEqual([]);
+  });
+
+  it("reports a live wait nobody declared, and stays quiet once somebody does", () => {
+    const tree = {
+      "BUILD-STATE.md": ledger,
+      "src/planted/waiting.ts": "// this holds until W901 supplies the value.\nexport const a = 1;\n",
+    };
+    expect(withTree(tree, (root) => proseWaitDefects(root, {}))).toEqual([
+      {
+        wait: "src/planted/waiting.ts::W901",
+        what: "waits on a unit that has not landed, in prose nobody declared",
+      },
+    ]);
+    expect(
+      withTree(tree, (root) => proseWaitDefects(root, { "src/planted/waiting.ts::W901": "x".repeat(100) })),
+    ).toEqual([]);
+  });
+
+  it("reports a declaration for a wait the tree no longer writes", () => {
+    const found = withTree({ "BUILD-STATE.md": ledger }, (root) =>
+      proseWaitDefects(root, { "src/planted/gone.ts::W901": "x".repeat(100) }),
+    );
+    expect(found).toEqual([
+      {
+        wait: "src/planted/gone.ts::W901",
+        what: "is declared and the tree no longer says it, or the unit has landed",
+      },
+    ]);
+  });
+
+  it("still reads this tree's one live wait, and it is declared", () => {
+    expect(proseWaitDefects(ROOT)).toEqual([]);
+    expect(proseWaits(ROOT).map((w) => `${w.module}::${w.unit}`)).toContain(
+      "src/registers/store.test.ts::W56",
+    );
   });
 });

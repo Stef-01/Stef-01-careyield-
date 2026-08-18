@@ -98,6 +98,7 @@ import { PLANTED_NAMES, TYPED_NAME_BOUND } from "./typed-names";
 import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SELF } from "./hardening-q26";
 import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
 import { HORIZON_CLAIM_BOUND, Q27_CLAIMS } from "./horizon-claims";
+import { ARGUED_DIRECTIONS, DIRECTION_BOUND } from "./failure-direction";
 import { REMEDY_BOUND } from "./self-defeating";
 import type { UnitId } from "./typed-names";
 import {
@@ -554,6 +555,34 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'W342 read one, W350 read another' — one condition each, the unit of the sentence rather than a count of anything the tree holds. It stays one however many conditions a later unit reads.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/failure-direction.ts",
+    name: "DIRECTION_BOUND",
+    unit: "W352",
+    text: DIRECTION_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "THE ARGUED ROWS ARE CHECKED FOR BEING WRITTEN AND NOT FOR BEING RIGHT",
+      reads: "the register itself, for a row the census cannot settle",
+      // THE LIVE CLAUSE IS THE ARGUED SET. That `loud` means one planted instance, and that a
+      // register can be loud and wrong at once, are properties of what a proof IS — no derivation
+      // reaches them. What moves is how many rows rest on somebody's reading: the day every census
+      // member has both halves proved, the census settles all of them and this sentence stops
+      // describing the register.
+      stillOpen: () => ARGUED_DIRECTIONS.length > 0,
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads this module's own argued table, an imported constant: how many census members the census leaves open is a fact about the census's proofs rather than about any repository, so no root can be handed to it. What lifts it is the last mixed entry gaining its missing half, which is an edit to the census rather than a change to any tree.",
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one planted instance', 'one constructed input' — the unit of what a proof covers rather than a count of anything the tree holds. It stays one however many registers the census gains, and the sentence deliberately states no total: the ratio it claims is asserted by this unit's suite rather than frozen in the prose, which is W304's rule.",
       },
     ],
   },
