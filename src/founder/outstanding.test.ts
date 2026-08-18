@@ -279,7 +279,9 @@ describe("W310 the copy makes no clinical claim", () => {
 
   it("is non-vacuous: the linter it passes does reject advice", () => {
     // Silence proves the copy only if the linter was running. W295's shape, on a copy check.
-    expect(lintEducationCopy("You should book an urgent review of this overdue patient.")).not.toEqual([]);
+    expect(
+      lintEducationCopy("You should book an urgent review of this overdue patient.").length,
+    ).toBeGreaterThan(0);
   });
 
   it("says it is about build status and mentions no patient or practice", () => {

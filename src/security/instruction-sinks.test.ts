@@ -49,6 +49,8 @@ describe("W153 there is no instruction sink", () => {
     // asserted by pointing the scanner at a directory whose test files it did read.
     const hits = findInstructionSinks(ROOT, ["src/security"]);
     expect(hits).toEqual([]);
-    expect(namesInstructionSink(`describe("x", () => fetch("${INSTRUCTION_SINK_MARKERS[1]}"))`)).not.toEqual([]);
+    expect(
+      namesInstructionSink(`describe("x", () => fetch("${INSTRUCTION_SINK_MARKERS[1]}"))`).length,
+    ).toBeGreaterThan(0);
   });
 });

@@ -186,7 +186,10 @@ describe("W265 the scrub is run, and the whole store surface is swept", () => {
     const { live } = captureStores();
     expect(Object.keys(live).length, "no store could be read, so the sweep is empty").toBeGreaterThan(8);
     seed();
-    expect(residualHits(PATIENT, live), "the seed did not reach the captured stores").not.toEqual([]);
+    expect(
+      residualHits(PATIENT, live).length,
+      "the seed did not reach the captured stores",
+    ).toBeGreaterThan(0);
 
     deletePatientEverywhere(PATIENT, NOW);
 

@@ -2015,6 +2015,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     ],
   },
   {
+    module: "src/quality/assertion-vocabulary.ts",
+    census: {
+      derives:
+        "Every assertion in every `*.test.ts` under `src/` that claims a collection has at least one element, in the six spellings `NON_EMPTY_FORMS` declares.",
+      checkedAgainst:
+        "`CANONICAL`, the one spelling this tree keeps — every claim found in any other form is reported.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "each declared spelling is planted as source and must be returned, and each of `NOT_THIS_CLAIM` is planted beside it and must not be — a floor, a ceiling, an `every` over elements, and the two un-negated emptiness claims",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No test in this tree says a collection is non-empty except as `expect(xs.length).toBeGreaterThan(0)`, which is the only spelling the tree's other sweeps can see is about a count.",
+        mutation:
+          "`vocabularyDefects` is given a different canonical form and must report every site in the tree.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/closing-state.ts",
     census: null,
     branches: [],

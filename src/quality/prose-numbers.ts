@@ -46,7 +46,7 @@ const WORDS: Readonly<Record<string, number>> = {
   eighteen: 18, nineteen: 19, twenty: 20, "twenty-one": 21, "twenty-two": 22, "twenty-five": 25,
   "twenty-six": 26, thirty: 30, "thirty-three": 33, "thirty-four": 34, "thirty-six": 36,
   "thirty-seven": 37,
-  forty: 40, fifty: 50, "fifty-four": 54,
+  forty: 40, fifty: 50, "fifty-two": 52, "fifty-four": 54,
 };
 
 /**
@@ -299,6 +299,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/acceptances.ts", text: "five registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "Five registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "nine registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
+  { module: "src/quality/assertion-vocabulary.ts", text: "fifty-two sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "seven re-derive their findings", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/blocked-surface.ts", text: "Eighteen rows", resolution: { kind: "derived", derive: blockedRows } },
   // W315 REMOVED THE SENTENCE THIS CLASSIFIED. Its own new bound moved the total from 22 to 23 on

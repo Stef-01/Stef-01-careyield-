@@ -820,6 +820,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W317's rule and sweep for a fix that carries the defect it fixes, with the two Q24 instances that produced it. Nobody but a developer reads it. Its longest strings are `REMEDY_RULE`, the arguments for each kept equality and `REMEDY_BOUND`; its inputs are the text of this tree's own test files, and no patient, condition or appointment reason appears in any of it.",
   },
   {
+    module: "src/quality/assertion-vocabulary.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W323's assertion vocabulary: the spellings this suite uses to say a collection has at least one element, and the one spelling it keeps. Nobody but a developer reads it. Its longest strings are the argument for each form, the argument for each near miss and `VOCABULARY_BOUND`; its inputs are the text of this tree's own test files and short planted snippets of TypeScript, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/closing-state.ts",
     operatorCopy: [],
     notCopy:

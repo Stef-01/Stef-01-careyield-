@@ -46,6 +46,10 @@ import { PLANTING_BOUND, planterDiff } from "./planting";
 import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
 import { MANIFEST_BOUND, manifestDiff } from "./manifest";
 import { REMEDY_BOUND, frozenEqualities } from "./self-defeating";
+import {
+  VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
+  vocabularyDefects,
+} from "./assertion-vocabulary";
 import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
 import { proseClaims } from "./prose-numbers";
@@ -79,6 +83,28 @@ const LEDGER_ROW = "| W1 | done | builder-A | 2026-08-14T00:00Z | abc1234 | a ro
 
 export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
   // ── Demonstrated: the detector takes a root, so a witness can be put in front of it ─────────
+  "src/quality/assertion-vocabulary.ts": {
+    kind: "demonstrated",
+    bound: ASSERTION_VOCABULARY_BOUND,
+    witness: "a list said to be non-empty in a SEVENTH spelling the form register does not hold",
+    control: "the same claim in a declared non-canonical spelling, which the register must report",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/unknown-spelling.test.ts":
+            'it("t", () => { expect(rows.length === 0).toBe(false); });\n',
+          "src/planted/known-spelling.test.ts": 'it("t", () => { expect(rows).not.toHaveLength(0); });\n',
+        },
+        (root) => {
+          const seen = vocabularyDefects(root).map((d) => d.site);
+          return {
+            witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
+            controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
   "src/quality/self-defeating.ts": {
     kind: "undemonstrated",
     bound: REMEDY_BOUND,

@@ -46,7 +46,7 @@ describe("W2 schema consistency", () => {
     // the predicate, so an unscoped policy on practice data fails here.
     for (const table of PRACTICE_SCOPED_TABLES) {
       const policies = policiesFor(table);
-      expect(policies, `missing policy for ${table}`).not.toHaveLength(0);
+      expect(policies.length, `missing policy for ${table}`).toBeGreaterThan(0);
 
       for (const policy of policies) {
         const scoped = table === "memberships"
@@ -63,7 +63,7 @@ describe("W55 register schema", () => {
   it("reference tables are readable by staff and writable by nobody", () => {
     for (const table of REFERENCE_TABLES) {
       const policies = policiesFor(table);
-      expect(policies, `missing policy for ${table}`).not.toHaveLength(0);
+      expect(policies.length, `missing policy for ${table}`).toBeGreaterThan(0);
 
       for (const policy of policies) {
         // `for all` would grant writes; reference rows change by migration only.

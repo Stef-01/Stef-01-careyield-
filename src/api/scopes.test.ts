@@ -204,8 +204,9 @@ describe("W254 no production credential enters the tree", () => {
     const fakeName = ["api", "Key"].join("");
     const fakeSecret = ["sk", "live", "0123456789abcdefghijklmn"].join("-");
     expect(
-      credentialShapedLiterals("fixture.ts", `const ${fakeName} = ${JSON.stringify(fakeSecret)};`),
-    ).not.toEqual([]);
+      credentialShapedLiterals("fixture.ts", `const ${fakeName} = ${JSON.stringify(fakeSecret)};`)
+        .length,
+    ).toBeGreaterThan(0);
   });
 
   it("cannot be switched on by a deployment setting", () => {

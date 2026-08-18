@@ -221,9 +221,9 @@ describe("W259 property five: W200's detector followed the product without being
     // the vacuity failure this tree keeps finding in its own controls.
     expect(lintEducationCopy("Your practice recorded six sessions last month.")).toEqual([]);
     expect(
-      lintEducationCopy("You should book a review appointment if this continues."),
+      lintEducationCopy("You should book a review appointment if this continues.").length,
       "the advice linter has stopped catching advice",
-    ).not.toEqual([]);
+    ).toBeGreaterThan(0);
   });
 });
 

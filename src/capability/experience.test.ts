@@ -286,7 +286,7 @@ describe("W80 no self-reported data is promoted to experience", () => {
       }),
     );
 
-    expect(cells).not.toHaveLength(0);
+    expect(cells.length).toBeGreaterThan(0);
     for (const cell of cells) {
       expect(cell.experience.source).toBe("derived_case_mix");
     }

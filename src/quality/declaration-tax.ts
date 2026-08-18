@@ -214,6 +214,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/assertion-vocabulary.ts",
+    // Asks how a test spells *this list is non-empty*. A planted MODULE is not a test file and
+    // makes no assertion, so it owes this register nothing — an arriving module pays the census,
+    // the blind spot, the negative probe and the drive, and pays nothing here. In the population
+    // because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/prose-numbers.ts",
     // Demands a classification of any module whose header states a numeric claim. A planted module
     // carries no such claim in any of the five shapes, so it owes this register nothing — and the

@@ -76,6 +76,10 @@ import { FOUNDER_BOUND } from "@/founder/outstanding";
 import { HARDENING_BOUND as HARDENING_Q24_BOUND } from "./hardening-q24";
 import { CLOSING_BOUND } from "./closing-state";
 import { REMEDY_BOUND } from "./self-defeating";
+import {
+  VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
+  emptinessSpellings,
+} from "./assertion-vocabulary";
 
 /**
  * W306: how a remedy's predicate could be shown answering the other way.
@@ -173,6 +177,37 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       why: "Two limits, neither liftable by a change to this tree. The first is that the RULE is a sentence and no sweep can apply it: whether a mechanism carries the defect's defining property is a judgement over arbitrary code, which is why the rule is written for a reader. The second is that the sweep can only see what `assertionsIn` returns, and a parser being exhaustive is not a state of the tree — it is a property of a parser nobody has proved, and W317 has a demonstration that it is not: an assertion it could read by eye and the parse did not return. Widening that parser is a unit, not a lifting of this sentence, and the sentence would still be true afterwards for whatever the wider parser misses.",
     },
     numbers: [],
+  },
+  {
+    module: "src/quality/assertion-vocabulary.ts",
+    name: "VOCABULARY_BOUND",
+    unit: "W323",
+    text: ASSERTION_VOCABULARY_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "Choosing one spelling per claim is a unit each",
+      reads: "the tree, for the OPPOSITE claim — a list is empty — still spelled more than one way",
+      // The bound's first clause is W267's `readdirSync` class and would have been the easy answer:
+      // a spelling nobody has thought of cannot be predicated over. The clause with teeth is the
+      // second — that this tree writes several claims several ways and W323 normalised ONE — and
+      // emptiness is the nearest unnormalised one, held three ways as this was written. When a
+      // later unit gives it a single spelling, this sentence is describing a tree that has moved.
+      stillOpen: (root) => emptinessSpellings(root).length > 1,
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/planted/one-spelling.test.ts":
+            'it("t", () => {\n  expect(rows.length).toBe(0);\n  expect(cols.length).toBe(0);\n});\n',
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'This covers ONE claim' and 'this unit normalised one' — the unit of the sentence, not a count of anything in the tree. It stays one however many spellings the register grows, which is the distinction W297's own entry draws for 'One assertion per register, driven once'.",
+      },
+    ],
   },
   {
     module: "src/quality/closing-state.ts",

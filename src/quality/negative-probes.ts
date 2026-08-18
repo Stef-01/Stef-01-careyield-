@@ -304,6 +304,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/assertion-vocabulary.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/assertion-vocabulary.test.ts :: refuses every near miss, which is what makes the recognition mean something",
+      plants: "expect(xs.length).toBeLessThan(3);",
+    },
+  },
+  {
     register: "src/quality/acceptances.ts",
     negative: {
       kind: "already_driven",

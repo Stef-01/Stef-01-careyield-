@@ -56,6 +56,7 @@ import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptan
 import { unacceptedTautologies } from "./tautology-sweep";
 import { fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
+import { vocabularyDefects } from "./assertion-vocabulary";
 
 /**
  * A comparison handed an input it must reject, keyed by the register the census names.
@@ -193,6 +194,13 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       numberDefects([probe]).length > 0 &&
       unresolvedBounds(root, ledger, [probe]).length > 0
     );
+  },
+
+  "src/quality/assertion-vocabulary.ts": (root) => {
+    // W323's comparison, handed a canonical form the tree does not use. Every non-emptiness claim
+    // in the tree is then in the wrong spelling, so the arm that must fire is the only arm there
+    // is — and the point is that the choice is an argument rather than a constant welded in.
+    return vocabularyDefects(root, "not equal []").length > 100;
   },
 
   "src/quality/prose-numbers.ts": (root) => {
