@@ -51,13 +51,14 @@ import { LATENT_FINDINGS, fired } from "./latent-findings";
 import { pinDiff } from "./pins";
 import { demandingRegisters, namingSites } from "./declaration-tax";
 import { numberDefects, staleBounds, unresolvedBounds } from "./bounds";
-import { BLIND_SPOTS, boundDiff, falseBounds } from "./blind-spots";
+import { BLIND_SPOTS, NOT_CALLABLE, boundDiff, falseBounds } from "./blind-spots";
 import { unaskedDefects, unaskedFacts } from "./unasked-facts";
 import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptances";
 import { unacceptedTautologies } from "./tautology-sweep";
 import { fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
 import { type Figure, figureDefects } from "./flattering-numbers";
+import { type Excuse, excuseDefects, excuses } from "./shared-excuses";
 import { type Selector, type Widening, supersetDefects } from "./superset";
 import { endingDiff } from "./self-ending";
 import { PREMISES_AT_W358, premiseDefects, stagedSpecs } from "./spec-premises";
@@ -411,6 +412,37 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       "src/planted/w289-fig.ts::fine",
     ]);
     return wrongWay.length === 1 && unmoved.length === 1 && clean.length === 0;
+  },
+
+  "src/quality/shared-excuses.ts": (root) => {
+    // W356's comparison, handed a row whose sentence the tree does not share, one that nothing can
+    // contradict and says nothing about what would settle it, and one the tree contradicts today.
+    // The rows are constructed rather than planted on disk: an excuse row holds a FUNCTION, so what
+    // this comparison has to reject is a table rather than a file. Each variant goes in BESIDE the
+    // real rows, because the register's first arm reports every shared sentence the table handed to
+    // it does not read — pass the planted row alone and all of them come back, which is a different
+    // defect answering for the one being driven.
+    const beside = (over: Partial<Excuse>): readonly Excuse[] => [
+      ...excuses().filter((excuse) => excuse.text !== NOT_CALLABLE),
+      {
+        name: "w289-planted",
+        text: NOT_CALLABLE,
+        claim: "a planted claim",
+        falsifier: () => [],
+        why: "a planted row",
+        ...over,
+      },
+    ];
+    const clean = excuseDefects(root, beside({}));
+    const unshared = excuseDefects(root, beside({ text: "a planted sentence nothing in this tree gives" }));
+    const contradicted = excuseDefects(root, beside({ falsifier: () => ["src/planted/w289.ts"] }));
+    const unsettled = excuseDefects(root, beside({ falsifier: null }));
+    return (
+      clean.length === 0 &&
+      unshared.length === 2 &&
+      contradicted.length === 1 &&
+      unsettled.length === 1
+    );
   },
 
   "src/quality/superset.ts": (root) => {

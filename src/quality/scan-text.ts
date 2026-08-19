@@ -181,6 +181,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "It scans for a function SIGNATURE — `export function x(...): number` — so both subtractions are load-bearing and for the same reason: this register's own note quotes the shape it looks for, and its suite plants the shape inside a string, so a scan that read either would be counting itself. W307's rule, arriving at a signature instead of a phrase.",
   },
   {
+    module: "src/quality/shared-excuses.ts",
+    prep: { comments: "subtracted", literals: "kept" },
+    why: "Its subject IS the literal — the sentence a register gives as its reason — so blanking would empty the population entirely. Comments are subtracted for the reason this unit is about: this tree's notes quote each other's excuses at length, and a sentence QUOTED in a note is somebody discussing an excuse rather than a second entry giving one, which would have read as sharing where there is none.",
+  },
+  {
     module: "src/quality/self-ending.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "The marker IS a literal — `kind: \"deferred\"` is how this tree spells a wait — so blanking literals would erase every declaration and leave the derivation reporting nothing at all, which is the silent-register failure the register itself is about. Comments are subtracted because this module's own notes quote the discriminants they look for, at length.",

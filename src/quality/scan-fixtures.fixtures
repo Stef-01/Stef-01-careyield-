@@ -150,3 +150,15 @@ export function echoDefects(root: string, declared: number[] = ECHOES): number[]
 it("t", () => {
   echoDefects(ROOT, ECHOES);
 });
+
+=== excuse-under-an-aside ===
+export const ASIDE = [
+  { note: "a sentence planted twice so W295 can watch this scan miss it" },
+  { note: "a sentence planted twice so W295 can watch this scan miss it" },
+];
+
+=== excuse-under-a-reason ===
+export const GIVEN = [
+  { reason: "a sentence planted twice so W295 can watch this scan find it" },
+  { reason: "a sentence planted twice so W295 can watch this scan find it" },
+];

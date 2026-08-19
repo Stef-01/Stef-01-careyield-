@@ -72,6 +72,7 @@ import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
 import { proseClaims } from "./prose-numbers";
 import { FIGURE_BOUND, countingFigures } from "./flattering-numbers";
+import { EXCUSE_BOUND, sharedExcuses } from "./shared-excuses";
 import { SUPERSET_BOUND, type Selector, supersetDefects } from "./superset";
 import { PRIVATE_COPY_BOUND, privateCopies } from "./private-copies";
 import { TYPED_NAME_BOUND, nameDefects } from "./typed-names";
@@ -445,6 +446,30 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
       ),
   },
 
+  "src/quality/shared-excuses.ts": {
+    kind: "demonstrated",
+    bound: EXCUSE_BOUND,
+    witness:
+      "one sentence given twice under a field name this register does not call a reason — the escape the bound's third clause names",
+    control: "the same shape given twice under `reason`, which the scan must find",
+    // W307: both planted modules live in `scan-fixtures.fixtures`. They are reason-position field
+    // declarations, so keeping them here would put two shared sentences into the very population
+    // this register derives — which is exactly what happened on the first attempt.
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/w295-aside.ts": fixtureText("excuse-under-an-aside"),
+          "src/planted/w295-reason.ts": fixtureText("excuse-under-a-reason"),
+        },
+        (root) => {
+          const seen = sharedExcuses(root).map((shared) => shared.text);
+          return {
+            witnessSeen: seen.some((text) => text.endsWith("miss it")),
+            controlSeen: seen.some((text) => text.endsWith("find it")),
+          };
+        },
+      ),
+  },
   "src/quality/superset.ts": {
     kind: "demonstrated",
     bound: SUPERSET_BOUND,

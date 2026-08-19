@@ -465,6 +465,39 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/shared-excuses.ts::EXCUSE_BOUND",
+    condition: "A SENTENCE GIVEN ONCE IS INVISIBLE HERE",
+    reading: {
+      kind: "not_observable",
+      why: "Not because the reasons given once cannot be listed — they can, and there are hundreds — but because the list would BE the tree's prose. Every reason field is a sentence nothing can contradict until somebody writes a falsifier for it, so a report at threshold one restates the register's own definition as a defect list and settles nothing. What is not observable is which single-given reason is load-bearing enough to matter, and that is a reader deciding, which is what the threshold stands in for.",
+    },
+  },
+  {
+    bound: "src/quality/shared-excuses.ts::EXCUSE_BOUND",
+    condition: "A FALSIFIER SETTLES ONE CLAUSE, NOT A SENTENCE",
+    reading: {
+      kind: "not_observable",
+      why: "A check that could tell whether a falsifier covers all of a sentence would have to enumerate the clauses of an English sentence and decide which are claims about the tree. `NOT_A_SILENCE` is the instance: one clause is a fact about a type declaration and the other is a reading of a bound's polarity, and no scan separates them. The register does the observable half instead — each row states the clause its falsifier reads, and the suite checks that the clause is not the sentence.",
+    },
+  },
+  {
+    bound: "src/quality/shared-excuses.ts::EXCUSE_BOUND",
+    condition: "THE SCAN READS A FIELD NAME",
+    reading: {
+      kind: "not_observable",
+      why: "Same shape as the first clause and worth stating separately, because the escape is different: a reason spelled under `what`, `how` or `note` is out of the population, and a report of every long prose string in a field this register does not call a reason would return most of the object literals in the tree. Telling a reason from a description is a reading of what the author meant the field to do, and no scan makes it.",
+    },
+  },
+  {
+    bound: "src/quality/shared-excuses.ts::EXCUSE_BOUND",
+    condition: "TWO SPELLINGS OF ONE SENTENCE ARE TWO EXCUSES",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/shared-excuses.ts::variantsOfDeclaredSentences",
+      how: "Reports every sentence given once that opens the same way as a sentence the register declares shared. It finds the tree's one instance — a W314 row explaining the word `one`, typed a third time with two words changed — so the clause is a live report rather than a warning. It reads the narrow half deliberately: the general normalisation the bound names as the remedy would also merge sentences an author meant to differ.",
+    },
+  },
+  {
     bound: "src/quality/superset.ts::SUPERSET_BOUND",
     condition: "A selector nobody declared can widen unwatched",
     reading: {

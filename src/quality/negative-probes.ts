@@ -466,6 +466,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/shared-excuses.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/shared-excuses.test.ts :: `Synthetic reset` dies on a caller the app can reach, and not on one it cannot",
+      plants: 'expect(liveCallersOfSyntheticResets(ROOT, row.text)).toEqual([])',
+    },
+  },
+  {
     register: "src/quality/superset.ts",
     negative: {
       kind: "already_driven",

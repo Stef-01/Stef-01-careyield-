@@ -2385,6 +2385,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/shared-excuses.ts",
+    census: {
+      derives:
+        "Every reason-string more than one register entry gives, in both spellings — a constant named once and referenced, and a sentence typed out twice — with reference sites resolved to the sentence they name so the two land in one currency.",
+      checkedAgainst:
+        "`EXCUSES`, where each row says whether anything in this tree can contradict its sentence. A row with a falsifier RUNS it, so a sentence the tree has outgrown fails the day it stops being true; a row without one has to say what would settle it.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a sentence given by two entries is planted in a copied tree and must be reported as read by no row; and each falsifier is driven against a copy carrying the change that ends its sentence — an export appearing where one says there is none, a third arm on `Blindness`, a practice parameter on a catalogue writer",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "every sentence more than one entry stands behind has been read, and every one that can be contradicted is checked against the tree on each run.",
+        mutation:
+          "a planted row whose sentence the tree no longer gives is reported, beside one with no falsifier and nothing said about what would settle it",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/superset.ts",
     census: {
       derives:

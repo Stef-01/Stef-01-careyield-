@@ -334,6 +334,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/shared-excuses.ts",
+    // Asks which sentences MORE THAN ONE entry already gives. A planted module has no entries and
+    // shares no sentence with anything, so it owes this register nothing on arrival — and a module
+    // that did borrow one would be reported as a sentence no row reads rather than demanded of.
+    // In the population because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/superset.ts",
     // Asks what each DECLARED selector does when handed an input it cannot understand. A planted
     // module adds no row to that table, so it owes this register nothing on arrival — an arriving

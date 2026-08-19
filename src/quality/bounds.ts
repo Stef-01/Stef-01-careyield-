@@ -106,6 +106,7 @@ import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
 import { HORIZON_CLAIM_BOUND, Q27_CLAIMS } from "./horizon-claims";
 import { ARGUED_DIRECTIONS, DIRECTION_BOUND } from "./failure-direction";
 import { FIGURE_BOUND, countingFigures } from "./flattering-numbers";
+import { EXCUSE_BOUND } from "./shared-excuses";
 import { SUPERSET_BOUND, undeclaredPopulations } from "./superset";
 import { REMEDY_BOUND } from "./self-defeating";
 import type { UnitId } from "./typed-names";
@@ -821,6 +822,48 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "two",
         kind: "rate",
         why: "'the two' — the honest reading and the blinded one, which is the shape of a measurement rather than a figure about this repository. Two is what a comparison takes.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/shared-excuses.ts",
+    name: "EXCUSE_BOUND",
+    unit: "W356",
+    text: EXCUSE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the scan grows a normalisation",
+      reads: "this register's own module, for the export a normalisation would arrive as",
+      // THE FOURTH CLAUSE IS THE LIVE ONE, and it is the only one that is somebody's to fix. That a
+      // sentence given once is invisible is the population's definition; that a falsifier settles a
+      // clause is what a falsifier IS; that the scan reads a field name is how any scan works. What
+      // MOVES is whether two spellings of one sentence stay two excuses — `one_quarter_one_reader`
+      // is the tree's own instance, two words apart from a third site — and the day this module
+      // exports a normalisation, the sentence stops describing it.
+      stillOpen: (root) => {
+        const module = path.join(root, "src/quality/shared-excuses.ts");
+        return !existsSync(module) || !readFileSync(module, "utf8").includes("export function normalisedSentence");
+      },
+      lifted: {
+        kind: "constructed_tree",
+        // The remedy state, spelled as the export it would arrive as: a tree where this register
+        // resolves two spellings to one sentence is a tree where the last clause is answered.
+        files: {
+          "src/quality/shared-excuses.ts":
+            "export function normalisedSentence(text: string): string {\n  return text;\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'A falsifier settles ONE clause, not a sentence' — the unit of the sentence rather than a count of anything the tree holds. It stays one however many clauses a sentence turns out to have, and it is the same one in 'two spellings of one sentence'.",
+      },
+      {
+        word: "two",
+        kind: "fixed_by_a_gate",
+        why: "The threshold this register's population is defined by: a reason-string is in it when more than one entry gives it. It is fixed by the rule rather than measured from the tree, and moving it is the change the first clause of the bound describes.",
       },
     ],
   },
