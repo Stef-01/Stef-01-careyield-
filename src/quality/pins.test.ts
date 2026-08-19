@@ -23,6 +23,7 @@ import {
 import { REVIEWED_AT_W345 } from "./escape-hatches";
 import { UNASKED_AT_W340 } from "./unasked-facts";
 import { EXCLUDED_AT_W349, SURVIVORS_AT_W349 } from "./quarter-mutants-q26";
+import { REMEDIES_AT_W357 } from "./unapplied-remedies";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { withPlantedIn } from "./planting";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
@@ -91,6 +92,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
     expect(live.map((p) => p.name).sort()).toEqual([
       "BLOCKED_AT_W263",
       "EXCLUDED_AT_W349",
+      "REMEDIES_AT_W357",
       "REVIEWED_AT_W345",
       "SURVIVORS_AT_W296",
       "SURVIVORS_AT_W332",
@@ -125,6 +127,9 @@ describe("W290 the live pins, and why live is not the defect", () => {
     // a module the sweep cannot reach, and a mutant its suite did not catch.
     expect(EXCLUDED_AT_W349.every((e) => e.module.endsWith(".ts"))).toBe(true);
     expect(SURVIVORS_AT_W349.every((s) => s.id.includes(" :: "))).toBe(true);
+    // W357's is the same class again and the strictest of the three: every row names a mutant and
+    // the suite drives each one, so `applied` cannot be true by assertion.
+    expect(REMEDIES_AT_W357.every((r) => r.id.includes(" :: "))).toBe(true);
   });
 
   it("makes each argue for interrupting somebody, not merely declare itself live", () => {

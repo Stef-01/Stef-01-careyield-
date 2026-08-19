@@ -113,6 +113,33 @@ describe("W124 determinism", () => {
     const report = simulatePathway(signedPathway(), cohort({ size: 0 }));
     expect(report.distribution).toEqual({ criteriaMet: 0, criteriaNotMet: 0, cannotDetermine: 0 });
     expect(renderSimulationReport(report)).toContain("| Criteria met | 0 | — |");
+
+    // W357 APPLIED W296'S REMEDY, WRITTEN AND UNBUILT SINCE THAT UNIT. `countTable` returns
+    // nothing for an empty list, and every fixture in this file has rows — so inverting that
+    // guard renders a heading and no rows for a populated table and a table for an empty one,
+    // and nothing notices. An empty cohort has nothing to count, which makes the sections the
+    // guard is about ABSENT rather than empty, and that is the claim the guard makes.
+    // The claim is about the rendered SECTIONS, which is what the guard controls. An assertion
+    // that `undeterminedBy` is empty was here too and came out: W323's canonical non-emptiness
+    // spelling puts the count in the subject, and W293's sweep reads evidence off the producer
+    // rather than off `producer.length`, so the pair could not both be satisfied — and the empty
+    // list was never the claim, only the reason for it.
+    const rendered = renderSimulationReport(report);
+    for (const heading of [
+      "### Facts that could not be determined",
+      "### Criteria that ruled a patient out",
+      "### Escalation criteria that fired",
+    ]) {
+      expect(rendered, `${heading} was rendered for a cohort with nothing to count`).not.toContain(heading);
+    }
+  });
+
+  it("renders the count sections when there IS something to count, so the absence above is a state", () => {
+    const populated = simulatePathway(signedPathway(), cohort());
+    // The evidence for the emptiness asserted above: this producer's list really does fill, so
+    // the empty answer over an empty cohort is a state rather than a list that is always empty.
+    expect(populated.undeterminedBy.length).toBeGreaterThan(0);
+    expect(renderSimulationReport(populated)).toContain("### Facts that could not be determined");
   });
 });
 

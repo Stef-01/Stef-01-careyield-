@@ -455,6 +455,15 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/unapplied-remedies.ts",
+    // Reads the three survivor registers and, for a row whose standing must be driven, rebuilds
+    // the mutation its id names by looking it up in `allMutants`. It walks nothing of its own —
+    // `mutation-sampling.ts`'s row carries that derivation — so W267's census does not hold it and
+    // a row there would be a declaration nothing re-derives. It is here because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/quarter-mutants-q26.ts",
     // Derives its population from a walk it does not perform: `quarterModules` walks and
     // `siblingSuite` resolves, and this module reads the answers. W267's census holds the file that

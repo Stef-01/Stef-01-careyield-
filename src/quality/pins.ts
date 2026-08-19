@@ -218,6 +218,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/unapplied-remedies.ts",
+    name: "REMEDIES_AT_W357",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a survivor recorded `uncaught` with a remedy nobody has built, or one of these being un-applied",
+      whyStopping:
+        "A NAMED ROW PER REMEDY, each proved by re-applying its mutant and requiring the suite to go red — so neither direction can be satisfied by retyping a digit, and the `applied` half cannot be satisfied by writing the word either, which is W304's line taken one step further. A remedy arriving is a hole somebody described and did not close, and W349 is the receipt for what that costs: W332 recorded one, left it for W331, and W337 copied the pattern into a second module with the gap attached. A remedy leaving means somebody unbuilt it. Both are worth stopping a build for.",
+    },
+  },
+  {
     module: "src/quality/quarter-mutants-q26.ts",
     name: "QUARTER_AT_W349",
     classification: {

@@ -57,6 +57,7 @@ import { UNASKED_BOUND } from "./unasked-facts";
 import { PAGE_FACT_BOUND } from "./founder-page-facts";
 import { WAITING_BOUND } from "@/console/waiting";
 import { Q26_MUTANT_BOUND } from "./quarter-mutants-q26";
+import { UNAPPLIED_BOUND } from "./unapplied-remedies";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -450,6 +451,42 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "What W296's standing sampler drew from this population when W349 measured it — the figure the bound's last clause is about. `sampledShare` re-derives it in the suite, which is what keeps the comparison honest rather than the sentence.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/unapplied-remedies.ts",
+    name: "UNAPPLIED_BOUND",
+    unit: "W357",
+    text: UNAPPLIED_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a sentence saying what would make a bound plantable is not a field, and this register would have to read English to find it",
+      reads: "`blind-spots.ts`, for a `whyNotPlantable` that has become a field this register could read",
+      // The one clause that names something buildable. A blind spot's remedy is prose today, so
+      // nothing resolves it; the day it is a field beside the sentence, this register's population
+      // grows and the bound is describing a tree that has moved. The predicate reads for that
+      // field rather than for a unit, because what lifts the sentence is the shape changing.
+      stillOpen: (root) =>
+        !/whenPlantable:/.test(readFileSync(path.join(root, "src/quality/blind-spots.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/blind-spots.ts":
+            '// W295: what a green suite does not prove.\nexport const BLIND_SPOTS = { "src/x.ts": { whenPlantable: "W900" } };\n',
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'only the last is uncovered', 'ONE MUTANT DIES', 'a register that never worked' — the unit of the sentence rather than a count of anything the tree holds. It stays one however many rows the register grows to.",
+      },
+      {
+        word: "four",
+        kind: "unit_id",
+        why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
       },
     ],
   },

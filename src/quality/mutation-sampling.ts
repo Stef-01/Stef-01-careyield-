@@ -251,30 +251,6 @@ export interface Survivor {
  */
 export const SURVIVORS_AT_W296: readonly Survivor[] = [
   {
-    id: "src/capability/experience.ts :: lte-to-lt :: return date >= window.fromIso && date <= window.toIso;",
-    reason: {
-      kind: "uncaught",
-      remedy:
-        "Narrowing `<=` to `<` drops every appointment falling ON the window's last day, and one file imports this module — its own — so nothing anywhere notices. The fixtures put appointments inside the window rather than on its edges. REMEDY: a case-mix window whose `toIso` is exactly one fixture appointment's date, asserted to include it; the same for `fromIso` on the other side.",
-    },
-  },
-  {
-    id: "src/pathways/simulation.ts :: eq-to-neq :: if (rows.length === 0) return [];",
-    reason: {
-      kind: "uncaught",
-      remedy:
-        "Inverting the empty guard makes `countTable` render a heading and no rows for a populated table, and emit a table for an empty one. Nothing catches it, because every simulation fixture has rows and no test renders a report with an empty count table. REMEDY: render a simulation whose count table is empty and assert the section is absent, which is the claim the guard makes.",
-    },
-  },
-  {
-    id: "src/synthetic/generate.ts :: neq-to-eq :: futureBookingRate: rate((p) => p.futureBookingAt !== null),",
-    reason: {
-      kind: "uncaught",
-      remedy:
-        "The reported rate becomes its own complement, and TEN files import this generator without one of them checking it. Synthetic-cohort statistics are the input to every sim in the tree, so a rate reported inside-out is a fixture that silently stops matching the scenario it names. REMEDY: generate a cohort and assert `futureBookingRate` equals the share of patients whose `futureBookingAt` is set, computed from the returned patients rather than from the same expression.",
-    },
-  },
-  {
     id: "src/console/store.ts :: eq-to-neq :: if (inputs.length === 0) errors.clinicians = \"Add at least one clinician.\";",
     reason: {
       kind: "caught_elsewhere",

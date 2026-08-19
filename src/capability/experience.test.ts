@@ -120,6 +120,29 @@ describe("W80 derived case mix", () => {
     expect(cells).toEqual([]);
   });
 
+  it("counts a visit ON either edge of the window, which is what the comparison claims", () => {
+    // W357 APPLIED W296'S REMEDY, WRITTEN AND UNBUILT SINCE THAT UNIT. The window test is
+    // `date >= fromIso && date <= toIso`, and every fixture above puts appointments comfortably
+    // INSIDE it — so narrowing either `<=` or `>=` by one day drops the edge and nothing anywhere
+    // notices, because the only file importing this module is its own suite. A boundary a
+    // comparison names and no fixture stands on is a comparison nobody is checking.
+    const onLastDay = deriveCaseMix(
+      input({
+        appointments: [appt({ id: "a1", patientId: "p1", startsAt: `${WINDOW.toIso}T09:00:00Z` })],
+        memberships: [member("p1", DIABETES)],
+      }),
+    );
+    expect(onLastDay, "an appointment on the window's last day was dropped").toHaveLength(1);
+
+    const onFirstDay = deriveCaseMix(
+      input({
+        appointments: [appt({ id: "a2", patientId: "p1", startsAt: `${WINDOW.fromIso}T09:00:00Z` })],
+        memberships: [member("p1", DIABETES)],
+      }),
+    );
+    expect(onFirstDay, "an appointment on the window's first day was dropped").toHaveLength(1);
+  });
+
   it("ignores another practice's appointments and memberships", () => {
     const cells = deriveCaseMix(
       input({

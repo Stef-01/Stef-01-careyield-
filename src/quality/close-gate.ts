@@ -276,8 +276,8 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
     why: "The same, for Q24's register. Named separately rather than folded into the line above, because two registers excused by one sentence is the shape where the second stops being read — and Q24's is the register the Q25 close actually fired against.",
   },
   {
-    module: "src/quality/quarter-mutants.ts",
-    why: "W332's survivor register. It names `parseLedgerRows` inside a survivor's ID — the line of source a mutant changed, quoted so a reader can see which change went unnoticed. A citation of code, not a call: this module runs mutants against suites and never opens the ledger. Same class as `blind-spots.ts` below, and the same reason the scan keeps literals: the ledger's own path only ever appears AS one.",
+    module: "src/quality/unapplied-remedies.ts",
+    why: "W357's remedy register. It names `parseLedgerRows` inside a survivor's ID — the line of source a mutant changed, quoted so a reader can see which change went unnoticed. A citation of code, not a call: this module reads the survivor registers and the modules they name, and never opens the ledger. THIS ROW REPLACED `quarter-mutants.ts`'s, which went stale in the same commit: W357 applied the remedy W332 had recorded, the survivor left that register, and the quoted line went with it. A citation moving between registers is exactly what an excusal register has to notice, and this one did.",
   },
   {
     module: "src/quality/blind-spots.ts",

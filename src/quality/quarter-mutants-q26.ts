@@ -161,6 +161,22 @@ export const SURVIVORS_AT_W349: readonly Survivor[] = [
     },
   },
   {
+    id: 'src/quality/self-ending.ts :: eq-to-neq :: if (comment === undefined) continue;',
+    reason: {
+      kind: "uncaught",
+      remedy:
+        "ARRIVED AFTER THIS REGISTER WAS WRITTEN, which is the register working. W350 added `proseWaits` — a scan whose subject IS the prose, so it keeps comment lines and drops code — and this guard is the inversion of every other scan in the file. Flipped to `!==` the loop reads CODE lines and never a comment, so `proseWaits` returns nothing; nothing asserts it returns anything, so the suite is silent. REMEDY: drive `proseWaits` over a constructed tree holding one comment that says `until W900` and one line of code that says the same thing inside a string, and require the first and only the first. That is the discriminant the guard exists for, and no fixture stands on it.",
+    },
+  },
+  {
+    id: 'src/quality/self-ending.ts :: eq-to-neq :: if (status.get(unit) === "done") continue;',
+    reason: {
+      kind: "uncaught",
+      remedy:
+        "The same arrival and the same silence. The guard drops a prose wait whose unit has LANDED, which is the whole point of reading the ledger — flipped to `!==` it reports the landed ones and hides the open ones, exactly inverting the register. Every fixture names an open unit, so both sides look alike. REMEDY: drive it with a comment naming a unit the ledger holds as `done` and require silence, alongside the existing open-unit case. Two cases separate a correct lookup from its inverse; one cannot, which is the shape W332 recorded, W349 found recurring and W357 applied in two other modules.",
+    },
+  },
+  {
     id: 'src/quality/dossier-derived.ts :: eq-to-neq :: } else if (started && line.trim() === "") break;',
     reason: {
       kind: "equivalent",

@@ -10,6 +10,9 @@
 // quoting a sentence the horizon does not hold.
 
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { parseLedgerRows } from "./blocked-surface";
 import {
   CLAIM_CLASS_BOUND,
   CLASS_ANSWERS,
@@ -88,6 +91,24 @@ describe("W324 Q25's gate: every claim class the horizon names is answered", () 
     expect(classDefects(ROOT, stale, [{ unit: "W316", what: "x" }])).toEqual([
       { unit: "W316", what: "waits on W1, which has landed" },
     ]);
+
+    // W357 APPLIED THE REMEDY W332 WROTE AND NOBODY BUILT, and W349 is why it could not wait
+    // again. One case cannot tell a correct lookup from any lookup that lands on a done row: flip
+    // `===` to `!==` in `find((r) => r.id === answer.by)` and the search returns the first row with
+    // a DIFFERENT id, which in this ledger is also done, so the arm reports the same sentence and
+    // the suite sees nothing. W332 recorded that survivor, wrote this remedy into the register and
+    // left it for W331 — which did not apply it. W337 then wrote `controls.ts` on the same pattern
+    // and the hole arrived with it, which W349 found and fixed there. This is the original.
+    const open = parseLedgerRows(readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8")).find(
+      (r) => r.status !== "done",
+    )!;
+    const waiting: ClassAnswer[] = [
+      { unit: "W316", answer: { kind: "pending", by: open.id as `W${number}`, why: "x".repeat(80) } },
+    ];
+    expect(
+      classDefects(ROOT, waiting, [{ unit: "W316", what: "x" }]),
+      "a class waiting on a row that has NOT landed was reported as expired",
+    ).toEqual([]);
   });
 
   it("reports an argument quoting a sentence the horizon does not hold", () => {

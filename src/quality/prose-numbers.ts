@@ -337,6 +337,13 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // the part of it the harness can reach. History: `populationDefects` re-derives both on every
   // run and the difference between them is asserted against `EXCLUDED_AT_W349`, so the sentences
   // are the finding and the derivations are the check.
+  // W357: what the remedy re-reading found on the day it ran — how many registers can record a
+  // remedy and how many rows the register opened with. History: `namedRemedies` re-derives the
+  // population from the registers on every run and `remedyDefects` checks the rows against it in
+  // both directions, so the sentences are the finding and the derivations are the check.
+  { module: "src/quality/manifest.ts", text: "three survivor registers", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/unapplied-remedies.ts", text: "THREE REGISTERS", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/unapplied-remedies.ts", text: "FOUR ROWS", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/quarter-mutants-q26.ts", text: "eleven modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/quarter-mutants-q26.ts", text: "ten modules", resolution: { kind: "at_the_unit" } },
   { module: "src/console/waiting.ts", text: "two routes", resolution: { kind: "at_the_unit" } },

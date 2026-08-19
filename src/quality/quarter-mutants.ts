@@ -187,14 +187,6 @@ export const SURVIVORS_AT_W332: readonly Survivor[] = [
       why: "The guard's FALSE branch cannot be taken while `CLOSING_CHECKS` holds an entry with id `sha-shape`, and it does — so `check` is never undefined and no test can reach the line the mutant changes. Flipped to `||` the expression would throw rather than return false, which is a real difference over a state the tree does not have. The `check` is computed inside `reports` from an imported constant, so it cannot be injected either: reaching it means deleting `sha-shape` from W315's register, at which point W324's own `names an export the module does not have` arm fires first. Left as a guard rather than removed, because the alternative is code that assumes a register's contents.",
     },
   },
-  {
-    id: "src/quality/claim-classes.ts :: eq-to-neq :: const row = parseLedgerRows(ledger).find((r) => r.id === answer.by);",
-    reason: {
-      kind: "uncaught",
-      remedy:
-        "The `pending` arm looks up the row it waits on, and `===` flipped to `!==` returns the FIRST row with a different id — which for this ledger is a row that is also `done`, so the arm reports the same thing and the suite sees nothing. W324's test drives the arm with a `by` naming a unit the ledger has closed, and that single case cannot tell a correct lookup from any lookup that lands on a done row. REMEDY: drive the arm a second time with a `by` naming a row that is NOT done and assert silence — under the mutant that lookup finds some other row that IS done and reports, so the pair separates them. Left for W331, whose hardening pass over W313–W325 is in flight in a sibling session and owns this module's quarter.",
-    },
-  },
 ];
 
 /** What a green full run does not prove. */

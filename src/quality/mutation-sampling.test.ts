@@ -18,6 +18,7 @@ import {
   OPERATORS,
   SAMPLE_RATE,
   SURVIVORS_AT_W296,
+  type Survivor,
   UNTESTED_AT_W296,
   allMutants,
   applyMutant,
@@ -209,13 +210,22 @@ describe("W296 every survivor is read, not merely listed", () => {
     // the setup wizard is tested, not in the store's own file. Publishing those five as holes
     // would have been false in the most damaging direction: a register that claims five defects
     // that are not defects teaches its readers to discount the three that are.
-    const uncaught = SURVIVORS_AT_W296.filter((s) => s.reason.kind === "uncaught");
-    const elsewhere = SURVIVORS_AT_W296.filter((s) => s.reason.kind === "caught_elsewhere");
-    expect(uncaught.map((s) => s.id.split(" :: ")[0]).sort()).toEqual([
-      "src/capability/experience.ts",
-      "src/pathways/simulation.ts",
-      "src/synthetic/generate.ts",
-    ]);
+    const byKind = (rows: readonly Survivor[], kind: string) => rows.filter((s) => s.reason.kind === kind);
+    // W357 EMPTIED THE `uncaught` HALF by building the three remedies this register had recorded
+    // and nobody had applied, so the list this test used to pin is now empty — and an empty list
+    // proves nothing about a filter. The separation is what the test is for, so it is driven on a
+    // constructed pair instead, and the live claim is the one that survives the fix: every
+    // remaining survivor is `caught_elsewhere` with a suite that exists.
+    const constructed: Survivor[] = [
+      { id: "src/a.ts :: eq-to-neq :: x", reason: { kind: "uncaught", remedy: "y".repeat(60) } },
+      { id: "src/b.ts :: eq-to-neq :: x", reason: { kind: "caught_elsewhere", caughtBy: "src/c.test.ts", why: "z".repeat(60) } },
+    ];
+    expect(byKind(constructed, "uncaught").map((s) => s.id)).toEqual(["src/a.ts :: eq-to-neq :: x"]);
+    expect(byKind(constructed, "caught_elsewhere").map((s) => s.id)).toEqual(["src/b.ts :: eq-to-neq :: x"]);
+
+    const uncaught = byKind(SURVIVORS_AT_W296, "uncaught");
+    const elsewhere = byKind(SURVIVORS_AT_W296, "caught_elsewhere");
+    expect(uncaught, "a hole came back into this register and W357 tracks no remedy for it").toEqual([]);
     expect(elsewhere.length).toBeGreaterThan(4);
     for (const survivor of elsewhere) {
       const reason = survivor.reason as { caughtBy: string };

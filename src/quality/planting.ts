@@ -219,6 +219,8 @@ export const WRITES_WITHOUT_A_PLANTER: Readonly<Record<string, string>> = {
     "Substitutes a mutated module for a real one and writes the original back, rather than adding a file and removing it. `withPlantedIn` deletes what it wrote, which for an existing file would delete the file — so this one restores instead, in its own `finally`, per module rather than per mutant.",
   "src/quality/quarter-mutants.ts":
     "The same substitution, in a module rather than a test. W332's runner takes its reader and its writer as a parameter so the loop can be driven off a map — `FILE_IO` is the real pair, and it is the only write here. The restore is in a `finally` per module, and the whole thing runs inside a copied tree. It is a non-test module because W289's remedy asked for one: welded inside a test file, the loop cannot be shown reporting a survivor without spawning a hundred seconds of subprocess.",
+  "src/quality/unapplied-remedies.test.ts":
+    "The same substitution as `mutation-sampling.test.ts` above and for its reason: it writes a mutated module over a real one inside a copied tree and writes the original back in a `finally`, because `withPlantedIn` deletes what it wrote and the file it writes already exists. W357 drives four mutants this way to prove the remedies recorded against them are built rather than written down.",
   "src/quality/blocked-surface.test.ts":
     "Writes a fabricated `BUILD-STATE.md` into a temporary root it makes itself, and rewrites it between assertions to grow and shrink the blocked surface. Nothing is planted into a copied tree; the root exists only for the ledger text.",
   "src/pilot/casestudy.test.ts":

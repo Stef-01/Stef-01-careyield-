@@ -32,6 +32,29 @@ describe("W3 synthetic practice engine", () => {
     expect(stats.openSlotRate).toBeLessThan(0.1);
   });
 
+  it("reports every rate as the share it names, computed from the patients rather than the same expression", () => {
+    // W357 APPLIED W296'S REMEDY, WRITTEN AND UNBUILT SINCE THAT UNIT. `futureBookingRate` is
+    // `rate((p) => p.futureBookingAt !== null)`, and inverting that predicate makes the reported
+    // rate its own complement — TEN files import this generator and not one of them checked it.
+    // Synthetic-cohort statistics are the input to every simulation in this tree, so a rate
+    // reported inside-out is a fixture that quietly stops matching the scenario it names, and the
+    // calibration bands above pass either way whenever a rate and its complement both fall in one.
+    //
+    // Re-derived from the returned patients rather than re-stated: a check that recomputed the
+    // same expression would agree with any predicate the module chose.
+    const share = (k: (p: (typeof data.patients)[number]) => boolean) =>
+      data.patients.filter(k).length / data.patients.length;
+    expect(stats.futureBookingRate).toBe(share((p) => p.futureBookingAt !== null));
+    expect(stats.chronicCareRate).toBe(share((p) => p.chronicCare));
+    expect(stats.activeRecallRate).toBe(share((p) => p.activeRecall));
+    expect(stats.usualClinicianRate).toBe(share((p) => p.usualClinicianId !== null));
+    expect(stats.optOutRate).toBe(share((p) => p.optedOut));
+    expect(stats.smsConsentRate).toBe(share((p) => p.smsConsent));
+    // Non-vacuity: a rate and its complement are different numbers here, so the equalities above
+    // are separating the predicate from its inverse rather than passing on a coincidence.
+    expect(stats.futureBookingRate).not.toBe(share((p) => p.futureBookingAt === null));
+  });
+
   it("produces meaningful unfilled capacity (the wedge exists)", () => {
     // Reference practice: ~8% of ~1,200 weekly slots open ≈ 96/week — well above the
     // 25/week modelling floor in the venture brief.
