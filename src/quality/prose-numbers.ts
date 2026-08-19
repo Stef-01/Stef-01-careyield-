@@ -352,6 +352,15 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // of demo specs the register's rows are about. History: `residueDefects` re-derives the gaps from
   // each spec's routes and resets on every run and checks the rows against them three ways, so the
   // sentence is the finding and the derivation is the check.
+  // W360: what Q27's hardening pass found on the day it read the quarter — how many registers stood
+  // on an unrun derivation, how many call sites kept their own list, and how many tree copies the
+  // box was holding. History, and each is re-derived by the pass's own suite rather than by the
+  // sentence: the registers are resolved by reading them, the call sites by scanning the files, and
+  // the sweep by driving `reclaimableCopies` on both a live and a dead maker.
+  { module: "src/quality/hardening-q27.ts", text: "182 copies", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/hardening-q27.ts", text: "four call sites", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/hardening-q27.ts", text: "three registers", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/hardening-q27.ts", text: "Three registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/spec-stores.ts", text: "two specs", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/spec-premises.ts", text: "nine copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/spec-premises.ts", text: "NINE ROWS", resolution: { kind: "at_the_unit" } },

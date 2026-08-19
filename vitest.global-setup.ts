@@ -10,7 +10,7 @@
 import { existsSync, readdirSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { ownedCopies, uncleanMessage } from "./src/quality/repository-clean";
+import { reclaimableCopies, uncleanMessage } from "./src/quality/repository-clean";
 
 /**
  * Temporary tree copies this run left behind, removed.
@@ -35,11 +35,26 @@ import { ownedCopies, uncleanMessage } from "./src/quality/repository-clean";
  * maker's pid into the name and this removes only its own; the window stays as a second condition,
  * because a pid is reused eventually and a directory older than this run is not this run's.
  */
+function isAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    // EPERM means the process exists and belongs to somebody else. ESRCH means it is gone.
+    return (error as NodeJS.ErrnoException).code === "EPERM";
+  }
+}
+
 function sweepTreeCopies(since: number): void {
-  for (const entry of ownedCopies(readdirSync(tmpdir()), process.pid)) {
+  for (const entry of reclaimableCopies(readdirSync(tmpdir()), process.pid, isAlive)) {
     const full = path.join(tmpdir(), entry);
+    const mine = entry.startsWith(`tree-${process.pid}-`);
     try {
-      if (statSync(full).mtimeMs >= since) rmSync(full, { recursive: true, force: true });
+      // W360: THE WINDOW APPLIES TO THIS RUN'S OWN COPIES ONLY. It was there so a directory older
+      // than the run would not be taken as this run's, which is a question about OUR pid being
+      // reused. A dead maker's copy has no such doubt and is older than this run by construction —
+      // applying the window to it is what made the sweep unable to reclaim anything at all.
+      if (!mine || statSync(full).mtimeMs >= since) rmSync(full, { recursive: true, force: true });
     } catch {
       // Gone already, or not ours to read. Either way there is nothing to sweep.
     }

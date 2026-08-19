@@ -34,8 +34,7 @@
 // FOUNDER GATE (plan §4): nothing crossed. It reads this repository's own commit log and ledger.
 
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import path from "node:path";
+import { allLedgerRows } from "./blocked-surface";
 import type { UnitId } from "./typed-names";
 
 /** One commit, as the record holds it. */
@@ -122,15 +121,19 @@ export function workWindow(root: string, log: readonly Commit[], unit: UnitId): 
   return { unit, from: opened.at, to: landing.at };
 }
 
-/** The SHA column of a unit's ledger row, or null when the row does not carry one. */
+/**
+ * The SHA column of a unit's ledger row, or null when the row does not carry one.
+ *
+ * W360: THE SHARED PARSE, not a hand `split("|")`. This was the eighth private copy of the ledger
+ * row parse and W341's register — built in the same quarter, for exactly this — did not report it,
+ * because its marker for the parse is the regex SPELLING `/^\|` and this one matched with
+ * `startsWith`. A detector keyed to how a thing is written misses the copy written differently,
+ * which is the only kind that gets written.
+ */
 export function ledgerSha(root: string, unit: UnitId): string | null {
-  const line = readFileSync(path.join(root, "BUILD-STATE.md"), "utf8")
-    .split("\n")
-    .find((l) => l.startsWith(`| ${unit} | `));
-  if (line === undefined) return null;
-  const cells = line.split("|").map((c) => c.trim());
-  const sha = cells[5] ?? "";
-  return /^[0-9a-f]{7,40}$/.test(sha) ? sha : null;
+  const row = allLedgerRows(root).find((r) => r.id === unit);
+  if (row === undefined) return null;
+  return /^[0-9a-f]{7,40}$/.test(row.sha) ? row.sha : null;
 }
 
 /** Where a state stood relative to a window, as the record has it. */

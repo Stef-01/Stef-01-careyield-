@@ -464,6 +464,15 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/hardening-q27.ts",
+    // A pass's record: findings, dispositions and the units read. It walks nothing — the ledger
+    // question goes through the shared `unaccountedFor`, which is handed the text — so W267's
+    // census does not hold it and a row there would be a declaration nothing re-derives. It is
+    // here because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/spec-stores.ts",
     census: {
       derives:

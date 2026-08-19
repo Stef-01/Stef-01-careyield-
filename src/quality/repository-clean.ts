@@ -59,16 +59,39 @@ export const ARTEFACTS: readonly Artefact[] = [
  */
 export const treeCopyPrefix = (pid: number): string => `tree-${pid}-`;
 
+
+/** The pid a tree copy's name carries, or null when the entry is not one of ours. */
+export function copyMaker(entry: string): number | null {
+  const match = /^tree-(\d+)-/.exec(entry);
+  return match ? Number(match[1]) : null;
+}
+
 /**
- * The temp-directory entries a process may remove: the ones it made.
+ * The copies no live process could still be using: ours, and any dead maker's.
  *
- * TAKES THE ENTRIES RATHER THAN READING THEM, which is W289's remedy and W328's constraint at the
- * same time: a `readdirSync` in this module would make W267's census classify it as a tree walker,
- * which it is not — it would be reading the system temp directory. Handed a list, the rule is a
- * comparison somebody can drive, and the harness keeps the reading and the mtime window.
+ * W360: W343 MADE OWNERSHIP THE PID AND THE SWEEP STOPPED RECLAIMING ANYTHING. The teardown it
+ * fixed exists for ONE case — residue from a run that was interrupted, because a run that finishes
+ * removes its own copies at process exit. An interrupted run has a DIFFERENT pid, so a sweep
+ * matching only this process's name can never touch the case it was built for. W331 found 426
+ * copies and 3.6 GB of `/tmp`; this box was holding 182 and 2.0 GB when the pass looked, and every
+ * register that could have said so watches the repository rather than the temp directory.
+ *
+ * `alive` is the parameter because liveness is the one thing a pure function cannot ask. Signal 0
+ * is the ordinary probe — it checks permission to signal and delivers nothing — and a pid that has
+ * been reused belongs to a process that is running, so the answer errs toward keeping a directory.
  */
-export function ownedCopies(entries: readonly string[], pid: number): string[] {
-  return entries.filter((entry) => entry.startsWith(treeCopyPrefix(pid))).sort();
+export function reclaimableCopies(
+  entries: readonly string[],
+  pid: number,
+  alive: (maker: number) => boolean,
+): string[] {
+  return entries
+    .filter((entry) => {
+      const maker = copyMaker(entry);
+      if (maker === null) return false;
+      return maker === pid || !alive(maker);
+    })
+    .sort();
 }
 
 /** Which artefacts the repository holds RIGHT NOW. The instant is the parameter, not the answer. */

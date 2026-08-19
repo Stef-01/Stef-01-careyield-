@@ -33,7 +33,7 @@
 // spec.
 
 import { parseLedgerRows } from "./blocked-surface";
-import type { HardeningFinding } from "./hardening-q22";
+import { type HardeningFinding, unaccountedFor } from "./hardening-q22";
 
 /**
  * The quarter, and the EXACT range of diff that was read.
@@ -158,15 +158,9 @@ export function undisposed(findings: readonly HardeningFinding[] = FINDINGS): st
  * empty list the range's ends are reportable, and the boundary is checked by a case that sits on it.
  */
 export function unaccountedUnitsFor(ledger: string, named: readonly string[]): string[] {
-  const known = new Set(named);
-  return parseLedgerRows(ledger)
-    .map((r) => r.id)
-    .filter((id) => {
-      const n = Number(id.replace(/^W/, ""));
-      return Number.isFinite(n) && n >= QUARTER.first && n <= QUARTER.last;
-    })
-    .filter((id) => !known.has(id))
-    .sort();
+  // W360: the shared derivation. This was its only copy until Q27's pass needed the same question
+  // about a different range, which is the moment a private one becomes two.
+  return unaccountedFor(ledger, QUARTER, named);
 }
 
 /** The same question about this pass's own coverage. */

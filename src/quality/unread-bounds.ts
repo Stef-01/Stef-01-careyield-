@@ -117,6 +117,14 @@ export interface NamedCondition {
  */
 export const NAMED_CONDITIONS: readonly NamedCondition[] = [
   {
+    bound: "src/quality/hardening-q27.ts::Q27_HARDENING_BOUND",
+    condition: "the kind a reader does not notice missing",
+    reading: {
+      kind: "not_observable",
+      why: "The condition is that a pass's own completeness cannot be checked — it reports what one reader saw in one range of diff, and Q27's theme is an answer the tree holds that nothing reads. Nothing could report THAT about a review: knowing the pass missed a finding means having the finding, and a check that had it would be the pass. A second reader is a different pass rather than an observation of this one's gap, and the tree's own registers are exactly the instrument the defect hides from — every one of them found the quarter green. The nearest thing to a remedy is what W349 and W352 already are: a mutation sweep and a driving test finding what a reader did not, one quarter late.",
+    },
+  },
+  {
     bound: "src/quality/unasked-facts.ts::UNASKED_BOUND",
     condition: "asked for by somebody this register cannot see",
     reading: {

@@ -572,15 +572,22 @@ export function presenceDefects(
   excused: Readonly<Record<string, string>> = NOT_A_MEMBERSHIP,
 ): VocabularyDefect[] {
   // W301: the shared citation parser, not a fifth split of the separator.
-  const excusedFiles = new Set(
-    Object.keys(excused).flatMap((k) => {
-      const parsed = parseCitation(k);
-      return typeof parsed === "string" ? [] : [parsed.file];
-    }),
-  );
+  //
+  // W360: AND THE SITE HALF OF THE KEY IS READ. It was parsed and thrown away — only the file
+  // survived — so an excuse naming ONE Map exempted every non-canonical presence claim in that
+  // file, and a planted `has(...)` in `route-coverage.test.ts` was silent while the same one
+  // anywhere else was reported. The key's second half is the SUBJECT the claim is about, which is
+  // what the excuse's own sentence argues about, so it is matched against the assertion's text
+  // rather than against the enclosing test's name.
+  const excuses = Object.keys(excused).flatMap((k) => {
+    const parsed = parseCitation(k);
+    return typeof parsed === "string" ? [] : [parsed];
+  });
+  const isExcused = (c: PresentClaim): boolean =>
+    excuses.some((e) => e.file === c.file && c.text.includes(`${e.assertion}.`));
   return presentClaims(root)
     .filter((c) => c.form !== canonical)
-    .filter((c) => !excusedFiles.has(c.file))
+    .filter((c) => !isExcused(c))
     .map((c) => ({ site: `${c.file} :: ${c.test}`, what: `says presence as \`${c.form}\`` }))
     .sort((a, b) => a.site.localeCompare(b.site));
 }

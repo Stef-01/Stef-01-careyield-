@@ -59,7 +59,7 @@ import { WAITING_BOUND } from "@/console/waiting";
 import { Q26_MUTANT_BOUND } from "./quarter-mutants-q26";
 import { UNAPPLIED_BOUND } from "./unapplied-remedies";
 import { PREMISE_BOUND, stagedSpecs } from "./spec-premises";
-import { RESIDUE_BOUND, specGaps } from "./spec-stores";
+import { RESIDUE_BOUND } from "./spec-stores";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -99,6 +99,7 @@ import { NAMED_CONDITIONS, UNREAD_BOUND } from "./unread-bounds";
 import { PRIVATE_COPY_BOUND, SHARED_PARSES } from "./private-copies";
 import { PLANTED_NAMES, TYPED_NAME_BOUND } from "./typed-names";
 import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SELF } from "./hardening-q26";
+import { Q27_HARDENING_BOUND } from "./hardening-q27";
 import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
 import { HORIZON_CLAIM_BOUND, Q27_CLAIMS } from "./horizon-claims";
 import { ARGUED_DIRECTIONS, DIRECTION_BOUND } from "./failure-direction";
@@ -811,6 +812,53 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "three",
         kind: "unit_id",
         why: "How many order claims are declared here, which is `TIMELINE_CLAIMS.length` and the register's own table. The bound's predicate reads the same length, so the sentence and the check move together and the suite reads the table rather than this word.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/hardening-q27.ts",
+    name: "Q27_HARDENING_BOUND",
+    unit: "W360",
+    text: Q27_HARDENING_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Independence is a property of WHO reads, and the loop has the builders it has — a second session reading Q27 would be a different pass rather than a lifting of this sentence, and the distance clause is worse here than in any pass before it precisely because the reader wrote four of these units the same day. The uneven lenses follow from the quarter's content: a quarter whose product surface is one waiting notice and one founder page gives a security lens the harness and little else. And the completeness clause is the one nothing can lift — a pass reports what a reader saw in a range of diff, and the defect this quarter is named for is by construction the kind a reader does not notice missing.",
+    },
+    numbers: [
+      {
+        word: "One",
+        kind: "rate",
+        why: "'One quarter read by one reader' — the unit of the sentence rather than a count of anything the tree holds. It stays one however many findings the pass records.",
+      },
+      {
+        word: "SIX",
+        kind: "unit_id",
+        why: "How many of Q27's thirteen units this reader wrote, which `SELF_REVIEWED` holds by name and this pass's suite checks against `REVIEWED_UNITS`. History: the authorship of W339–W351 cannot change, so the figure is fixed at the quarter rather than derived from a tree that moves.",
+      },
+      {
+        word: "four",
+        kind: "unit_id",
+        why: "How many of those six were written within the day, which is the distance clause's whole point. History about when the units landed, and the ledger's timestamps hold it — `SELF_REVIEWED` names the six and the dates are the rows'.",
+      },
+      {
+        word: "five",
+        kind: "unit_id",
+        why: "How many findings this pass recorded, a fact about the pass rather than about the tree — and the sentence's own point is that the number measures reading as much as building. `FINDINGS` holds them and the suite reads its length rather than this word.",
+      },
+      {
+        word: "thirteen",
+        kind: "fixed_by_a_gate",
+        why: "The size of Q27, which the horizon fixed before the quarter began. Not a measurement: a quarter is thirteen units because the plan laid thirteen rows, and `unaccountedUnits` resolves both ends against the ledger.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one console page', 'one notice component', 'one waiting notice', 'one range of diff', 'a lens with one object' — the unit of each phrase rather than a count anything maintains. Each stays one however many pages or registers the quarter had.",
+      },
+      {
+        word: "FOUR",
+        kind: "unit_id",
+        why: "How many of the five findings are about registers reading registers, which is the split the sentence is making — `FINDINGS` holds each with the module it is about, and the fifth is the temp directory. History about this pass's own record.",
       },
     ],
   },

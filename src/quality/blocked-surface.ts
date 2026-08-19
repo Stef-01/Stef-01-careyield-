@@ -54,6 +54,14 @@ export interface LedgerRow {
   note: string;
   /** The row's timestamp column, as written. Empty for rows that never carried one. */
   at: string;
+  /**
+   * The commit column, as written — `—` for a row that has not landed.
+   *
+   * W360: THE PARSE ALREADY CAPTURED IT AND NOTHING RETURNED IT, which is why W344 wrote the
+   * eighth private copy of this parse to read one column. A field the regex already has costs
+   * nothing to return and is the difference between one parse and two.
+   */
+  sha: string;
 }
 
 /** The same parse, over ledger TEXT — so a caller with the text in hand does not write a second regex. */
@@ -62,7 +70,7 @@ export function parseLedgerRows(ledger: string): LedgerRow[] {
     .split("\n")
     .flatMap((line) => {
       const m = LEDGER_ROW.exec(line);
-      return m ? [{ id: m[1]!, status: m[2]!, note: m[6]!, at: m[4]!.trim() }] : [];
+      return m ? [{ id: m[1]!, status: m[2]!, note: m[6]!, at: m[4]!.trim(), sha: m[5]!.trim() }] : [];
     });
 }
 

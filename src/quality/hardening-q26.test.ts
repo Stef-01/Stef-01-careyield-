@@ -25,7 +25,7 @@ import {
 import { QUARTER_AT_W332, quarterModules } from "./quarter-mutants";
 import { DECLARED_COPIES } from "./private-copies";
 import { copyTree } from "./planting";
-import { ownedCopies, treeCopyPrefix } from "./repository-clean";
+import { reclaimableCopies, treeCopyPrefix } from "./repository-clean";
 
 const ROOT = process.cwd();
 const read = (rel: string) => readFileSync(path.join(ROOT, rel), "utf8");
@@ -104,14 +104,29 @@ describe("W343 each finding is re-derived, so a fix that came undone fails here"
     const mine = copyTree(ROOT, { directories: ["src"] });
     try {
       const name = path.basename(mine);
-      const foreign = `tree-${process.pid + 1}-AbCdEf`;
+      const foreign = "tree-999001-AbCdEf"; // a LIVE sibling, by the predicate below
       const older = "tree-legacy-XyZ";
-      const sweepable = ownedCopies([name, foreign, older], process.pid);
+      // W360 CHANGED THE RULE THIS FINDING WAS FIXED BY, so the evidence is re-derived through the
+      // new one rather than left pointing at the old. `ownedCopies` said "mine"; `reclaimableCopies`
+      // says "mine, or a dead maker's" — because a sweep that could only take its own could never
+      // reclaim the case it exists for, an INTERRUPTED run, whose pid is by definition not this
+      // one. Q26's property is unchanged and is now stated more exactly: a sibling that is ALIVE is
+      // not swept, whatever its copies' timestamps say.
+      const live = (maker: number): boolean => maker === 999_001;
+      const sweepable = reclaimableCopies([name, foreign, older], process.pid, live);
       expect(sweepable, "this run cannot clean up after itself").toContain(name);
       expect(sweepable, "a sibling session's live copy is swept out from under it").not.toContain(foreign);
       expect(sweepable, "a copy from before the naming rule is not this process's to remove").not.toContain(
         older,
       );
+      // W360's addition, and the case W343's rule could not reach: a sibling that has DIED leaves
+      // copies nothing will ever remove, because a finished run cleans up at exit and an
+      // interrupted one does not. That residue is the only thing this sweep exists for.
+      const dead = `tree-${process.pid + 7}-QqRrSs`;
+      expect(
+        reclaimableCopies([dead], process.pid, live),
+        "an interrupted run's residue is left to accumulate, which is what the sweep is for",
+      ).toEqual([dead]);
     } finally {
       rmSync(mine, { recursive: true, force: true });
     }
@@ -121,7 +136,7 @@ describe("W343 each finding is re-derived, so a fix that came undone fails here"
   it("Q26-SEC-1: the harness sweeps through the rule rather than around it", () => {
     // The rule is only worth anything where the deletion happens. W258: the citation is resolved.
     const harness = read("vitest.global-setup.ts");
-    expect(harness).toContain("ownedCopies(readdirSync(tmpdir()), process.pid)");
+    expect(harness).toContain("reclaimableCopies(readdirSync(tmpdir()), process.pid, isAlive)");
     expect(harness, "the sweep grew a second, looser way of choosing what to delete").not.toMatch(
       /startsWith\("tree-"\)/,
     );

@@ -318,6 +318,23 @@ describe("W348 one way to say a thing is present", () => {
     );
   });
 
+  it("takes BOTH halves of the excuse's key, so an excuse cannot travel between files", () => {
+    // W360: the key is `<file> :: <subject>` and only the file used to be read, which exempted
+    // every non-canonical presence claim in a file that had one excuse. Both halves must hold
+    // together: an excuse naming the right SUBJECT in the wrong FILE excuses nothing, which is the
+    // case that separates the conjunction from a disjunction — and the disjunction is what a
+    // mutation of this line produces.
+    const wrongFile = { "src/quality/route-coverage.test.ts :: measured": "an excuse in the wrong file" };
+    const sites = presenceDefects(ROOT, CANONICAL_PRESENT, wrongFile).map((d) => d.site);
+    expect(sites.some((s) => s.startsWith("src/compliance/public-surfaces.test.ts"))).toBe(true);
+    expect(sites.some((s) => s.startsWith("src/quality/route-coverage.test.ts"))).toBe(true);
+    // And with the key's own file, that one site — and only it — goes quiet.
+    const rightFile = { "src/quality/route-coverage.test.ts :: specs": "the real excuse" };
+    const narrowed = presenceDefects(ROOT, CANONICAL_PRESENT, rightFile).map((d) => d.site);
+    expect(narrowed.some((s) => s.startsWith("src/quality/route-coverage.test.ts"))).toBe(false);
+    expect(narrowed.some((s) => s.startsWith("src/compliance/public-surfaces.test.ts"))).toBe(true);
+  });
+
   it("keeps the three claims apart, which is the whole reason they are three registers", () => {
     // The same snippet must read as exactly one claim. A collection with an element in it is not a
     // collection with something in it, and neither is a collection that is empty.

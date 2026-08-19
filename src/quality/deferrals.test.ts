@@ -18,20 +18,14 @@ import {
   inheritedBy,
   registerDiff,
 } from "./deferrals";
-import { type HardeningFinding, allHardeningFindings, overdueDispositions } from "./hardening-q22";
-import { FINDINGS as Q22_FINDINGS } from "./hardening-q22";
-import { FINDINGS as Q23_FINDINGS } from "./hardening-q23";
-import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
-import { FINDINGS as W279_FINDINGS } from "./review-w279";
-import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
-import { FINDINGS as Q26_FINDINGS } from "./hardening-q26";
+import { ALL_HARDENING_FINDINGS, type HardeningFinding, overdueDispositions } from "./hardening-q22";
 import { parseLedgerRows } from "./blocked-surface";
 import { COLLECTED_HARDENING_REGISTERS } from "./hardening-q22";
 import { withTree } from "./planting";
 
 const ROOT = process.cwd();
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
-const ALL = allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, Q25_FINDINGS, Q26_FINDINGS, W279_FINDINGS]);
+const ALL = ALL_HARDENING_FINDINGS;
 
 /** A finding with the disposition under test and nothing else that matters. */
 const deferredTo = (by: `W${number}`, id = "PLANTED-1"): HardeningFinding => ({

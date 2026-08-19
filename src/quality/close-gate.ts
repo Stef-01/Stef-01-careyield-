@@ -70,15 +70,10 @@ import { headerViolations } from "./unit-headers";
 import { fired } from "./latent-findings";
 import { deadAnchors } from "./latent-y5";
 import {
-  FINDINGS as Q22_FINDINGS,
-  allHardeningFindings,
+  ALL_HARDENING_FINDINGS,
   overdueDispositions,
   unaccountedUnits,
 } from "./hardening-q22";
-import { FINDINGS as Q23_FINDINGS } from "./hardening-q23";
-import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
-import { FINDINGS as W279_FINDINGS } from "./review-w279";
-import { FINDINGS as Q26_FINDINGS } from "./hardening-q26";
 
 /** The ledger's parse entry points. A module naming one of these reads the ledger. */
 export const LEDGER_PRIMITIVES = [
@@ -143,7 +138,7 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
     run: (root) =>
       overdueDispositions(
         ledgerOf(root),
-        allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, Q25_FINDINGS, Q26_FINDINGS, W279_FINDINGS]),
+        ALL_HARDENING_FINDINGS,
         CLOSE_GATE_TODAY,
       ).map((d) => `${d.finding} ${d.what}`),
   },
@@ -153,7 +148,7 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
     run: (root) =>
       dispositionDefects(
         ledgerOf(root),
-        allHardeningFindings([Q22_FINDINGS, Q23_FINDINGS, Q24_FINDINGS, Q25_FINDINGS, Q26_FINDINGS, W279_FINDINGS]),
+        ALL_HARDENING_FINDINGS,
       ).map((d) => `${d.finding} ${d.what}`),
   },
   {
@@ -242,6 +237,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
   {
     module: "src/quality/superset.ts",
     why: "It reads the ledger for one row's honest input: `unitsInCell` is handed the ids the ledger holds, so that the selector's right answer is measured against the real population rather than a list written here. A close ADDS a row, and the cell it parses names two ids that are already there — the size the selector returns does not move when the ledger grows.",
+  },
+  {
+    module: "src/quality/hardening-q27.ts",
+    why: "The same standing as every hardening register before it, and by the same mechanism: `unaccountedUnits` hands the ledger's TEXT to the shared `unaccountedFor`, asking which units of a quarter that is over this pass never read. A row closing today cannot change which units W339–W351 held. It also reads the ledger through `allLedgerRows` in its suite, to resolve each `fixed` disposition to a row the ledger holds — and a close can only ADD an id there, never remove the one a disposition names.",
   },
   {
     module: "src/quality/hardening-q26.ts",

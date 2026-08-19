@@ -60,6 +60,14 @@
 // changed, and the one citation repointed is a test-coverage claim.
 
 import { parseLedgerRows } from "./blocked-surface";
+// W360: the quarters' own registers, imported so the collected list and the values it names are
+// one object. Each of these imports only the TYPE back from this module, so the cycle is erased.
+import { FINDINGS as Q23_FINDINGS } from "./hardening-q23";
+import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
+import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
+import { FINDINGS as Q26_FINDINGS } from "./hardening-q26";
+import { FINDINGS as Q27_FINDINGS } from "./hardening-q27";
+import { FINDINGS as W279_FINDINGS } from "./review-w279";
 import type { UnitId } from "./typed-names";
 
 /** The lens a finding came from. The gate names three; each one produced something. */
@@ -279,14 +287,63 @@ export function allHardeningFindings(
  * names live here, beside the collector, and `registerDiff` compares them with the hardening
  * registers the tree actually holds.
  */
-export const COLLECTED_HARDENING_REGISTERS: readonly string[] = [
-  "src/quality/hardening-q22.ts",
-  "src/quality/hardening-q23.ts",
-  "src/quality/hardening-q24.ts",
-  "src/quality/hardening-q25.ts",
-  "src/quality/hardening-q26.ts",
-  "src/quality/review-w279.ts",
-];
+/** A pass's unit range, as its own module states it. */
+export interface PassRange {
+  first: number;
+  last: number;
+}
+
+/**
+ * Units the ledger holds inside a pass's range that the pass names nowhere.
+ *
+ * W360: SHARED RATHER THAN COPIED, and this pass is the one unit that must not copy it. W343
+ * wrote the derivation into `hardening-q26.ts` welded to that module's own `QUARTER`, so the next
+ * pass could only have it by writing it again — the shape W342 fixed for `quarterModules` and the
+ * shape this quarter's own findings are about. The range is ONE argument with the shape the caller
+ * already holds, so the mistaken call does not typecheck.
+ */
+export function unaccountedFor(
+  ledger: string,
+  range: PassRange,
+  named: readonly string[],
+): string[] {
+  const known = new Set(named);
+  return parseLedgerRows(ledger)
+    .map((r) => r.id)
+    .filter((id) => {
+      const n = Number(id.replace(/^W/, ""));
+      return Number.isFinite(n) && n >= range.first && n <= range.last;
+    })
+    .filter((id) => !known.has(id))
+    .sort();
+}
+
+export const HARDENING_REGISTERS: Readonly<Record<string, readonly HardeningFinding[]>> = {
+  "src/quality/hardening-q22.ts": FINDINGS,
+  "src/quality/hardening-q23.ts": Q23_FINDINGS,
+  "src/quality/hardening-q24.ts": Q24_FINDINGS,
+  "src/quality/hardening-q25.ts": Q25_FINDINGS,
+  "src/quality/hardening-q26.ts": Q26_FINDINGS,
+  "src/quality/hardening-q27.ts": Q27_FINDINGS,
+  "src/quality/review-w279.ts": W279_FINDINGS,
+};
+
+export const COLLECTED_HARDENING_REGISTERS: readonly string[] = Object.keys(HARDENING_REGISTERS);
+
+/**
+ * Every finding every collected pass has recorded.
+ *
+ * W360: THE LIST WAS FIXED IN ONE PLACE AND THE CALLERS KEPT THEIR OWN. W343 found the argument
+ * list copied four times and wrong for two quarters, and wrote `COLLECTED_HARDENING_REGISTERS` —
+ * a list of module PATHS, checked against the tree by `registerDiff`. The four
+ * `allHardeningFindings([Q22, …, W279])` call sites were left exactly as they were, so the tree
+ * held the answer and nothing read it: dropping `Q26_FINDINGS` from the close gate's collection
+ * left sixty tests green and `registerDiff` clean. The names and the arrays are now the same
+ * object, so the check that reads the tree and the value the callers pass cannot disagree.
+ */
+export const ALL_HARDENING_FINDINGS: readonly HardeningFinding[] = allHardeningFindings(
+  Object.values(HARDENING_REGISTERS),
+);
 
 export interface OverdueDisposition {
   finding: string;
