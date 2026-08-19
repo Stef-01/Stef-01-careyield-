@@ -176,6 +176,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "A declaration IS a string literal — `\"src/quality/bounds.ts\"` in a register — so blanking literals would make every declaration site disappear and the quarter's baseline read as zero. Comments are subtracted because this tree's notes cite each other's paths constantly, and counting those would inflate the number Q24 is measured against.",
   },
   {
+    module: "src/quality/flattering-numbers.ts",
+    prep: { comments: "subtracted", literals: "blanked" },
+    why: "It scans for a function SIGNATURE — `export function x(...): number` — so both subtractions are load-bearing and for the same reason: this register's own note quotes the shape it looks for, and its suite plants the shape inside a string, so a scan that read either would be counting itself. W307's rule, arriving at a signature instead of a phrase.",
+  },
+  {
     module: "src/quality/self-ending.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "The marker IS a literal — `kind: \"deferred\"` is how this tree spells a wait — so blanking literals would erase every declaration and leave the derivation reporting nothing at all, which is the silent-register failure the register itself is about. Comments are subtracted because this module's own notes quote the discriminants they look for, at length.",

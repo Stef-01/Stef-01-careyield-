@@ -2341,6 +2341,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/flattering-numbers.ts",
+    census: {
+      derives:
+        "Every exported function under `src/` whose declared return type is a number, narrowed to the ones whose body counts a population — a figure, as opposed to arithmetic over numbers it was handed.",
+      checkedAgainst:
+        "`FIGURES`, where each row declares which way an error moves its subject. The declaration is resolved by CALLING the derivation twice, honestly and with one member out of its sight, so a row is a measurement rather than an opinion.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module exporting a counting function is planted in a copied tree and must be reported as a figure no row classifies, beside one that only does arithmetic and must not be",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "every figure this tree derives has a row saying which way it fails, and every row's direction is the one its derivation actually takes.",
+        mutation:
+          "a planted row declaring `high` over a derivation that measures `low` is reported, beside one claiming `loud` with no second reader named",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/superset.ts",
     census: {
       derives:

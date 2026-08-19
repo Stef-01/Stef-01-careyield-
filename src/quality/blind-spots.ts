@@ -70,6 +70,7 @@ import {
 import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
 import { proseClaims } from "./prose-numbers";
+import { FIGURE_BOUND, countingFigures } from "./flattering-numbers";
 import { SUPERSET_BOUND, type Selector, supersetDefects } from "./superset";
 import { PRIVATE_COPY_BOUND, privateCopies } from "./private-copies";
 import { TYPED_NAME_BOUND, nameDefects } from "./typed-names";
@@ -387,6 +388,29 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.includes("scripts/w341-outside.ts"),
             controlSeen: seen.includes("src/planted/w341-inside.ts"),
+          };
+        },
+      ),
+  },
+
+  "src/quality/flattering-numbers.ts": {
+    kind: "demonstrated",
+    bound: FIGURE_BOUND,
+    witness: "a figure spelled as the LENGTH of a list — the count W354 is named after, which the scan reads no return type for",
+    control: "the same count declared as a number-returning export, which the scan must find",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/w295-length.ts":
+            "export function w295Unasked(root: string): string[] {\n  return [root].filter((r) => r.length > 0);\n}\n",
+          "src/planted/w295-number.ts":
+            "export function w295Counted(root: string): number {\n  return [root].filter((r) => r.length > 0).length;\n}\n",
+        },
+        (root) => {
+          const seen = countingFigures(root);
+          return {
+            witnessSeen: seen.includes("src/planted/w295-length.ts::w295Unasked"),
+            controlSeen: seen.includes("src/planted/w295-number.ts::w295Counted"),
           };
         },
       ),

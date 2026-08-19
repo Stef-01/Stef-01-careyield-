@@ -441,6 +441,30 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/flattering-numbers.ts::FIGURE_BOUND",
+    condition: "A FIGURE SPELLED AS THE LENGTH OF A LIST IS INVISIBLE HERE",
+    reading: {
+      kind: "not_observable",
+      why: "The condition is a count taken by a CALLER rather than returned by a derivation — `unaskedFacts(root).length`, the very figure W354 is named after. Reporting it means deciding which of this tree's thousands of `.length` reads is a figure somebody quotes and which is a loop bound, and that is a judgement about what a number MEANS rather than a property of the source. The remedy is a wider scan, which closes the gap rather than reporting it, and the sentence would still be true of whatever the wider scan misses — W267's class, arriving at a return type.",
+    },
+  },
+  {
+    bound: "src/quality/flattering-numbers.ts::FIGURE_BOUND",
+    condition: "A BLINDING IS ONE MISTAKE, NOT ALL OF THEM",
+    reading: {
+      kind: "not_observable",
+      why: "The condition is a figure that behaves one way for the mistake a row wrote and another way for a mistake nobody thought of. A check that could enumerate the mistakes a derivation is vulnerable to would not have needed the row, and the register says so: what it measures is the direction of ONE blinding, chosen by a reader. Nothing can report the blinding nobody chose.",
+    },
+  },
+  {
+    bound: "src/quality/flattering-numbers.ts::FIGURE_BOUND",
+    condition: "IS ABOUT A CONTRADICTION AND NOT ABOUT A READER",
+    reading: {
+      kind: "not_observable",
+      why: "The condition is the distinction between a wrong number that CAN be caught and one somebody is actually catching. Whether a person reads a screen is not a fact about this repository, and the register deliberately measures the half that is: a second door that disagrees. No check can close the other half, and the row is here so nobody reads `loud` as `noticed`.",
+    },
+  },
+  {
     bound: "src/quality/superset.ts::SUPERSET_BOUND",
     condition: "A selector nobody declared can widen unwatched",
     reading: {

@@ -319,6 +319,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/flattering-numbers.ts",
+    // Asks which way an error moves each figure the tree DERIVES, measured by calling it. A planted
+    // module exports no counting function reachable from the app, so it owes this register nothing
+    // on arrival — and a module that did would be reported as a figure no row classifies rather
+    // than demanded of. In the population because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/superset.ts",
     // Asks what each DECLARED selector does when handed an input it cannot understand. A planted
     // module adds no row to that table, so it owes this register nothing on arrival — an arriving

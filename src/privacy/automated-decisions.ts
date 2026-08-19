@@ -368,6 +368,8 @@ export const NOT_A_DECISION: Readonly<Record<string, string>> = {
     "W233 asks whether opening extra slots helped, and its whole content is that this product cannot say. It decides nothing about anybody: no patient, condition or appointment reason reaches it, and the only thing it reads is a count of slots filled per session. It decides nothing about a PRACTICE either, because answering the question needs sessions allocated to two groups before anyone chose which to open, no such trial has been run, and `SHIPPED_SESSION_ARMS` is empty. The refusal union it exports is about whether a measurement may be reported, not about a person.",
   "src/compliance/rail-y5.ts":
     "W259's re-derivation of the five rail properties against Y5. It decides nothing about anybody and computes nothing — it is a register of arguments plus a classification of which fields on `Patient` the matcher may see, read by this tree's own tests. It is reached by this register because it names patient fields throughout, which is the detector working as intended: a file whose subject is what the matcher may know about a person should be visible to the register that enumerates what software decides about one. The answer is that every clinical field is WITHHELD, and the classification is checked against the type in both directions so a field added to `Patient` tomorrow fails the suite until somebody says which it is.",
+  "src/quality/flattering-numbers.ts":
+    "W354's register of which way an error moves each figure this tree derives. It is reached here because it CALLS the derivations it measures, and two of them take patient-shaped values: a batch of four synthetic patients built by W283's tied panel, and care gaps holding nothing but a patient id. It decides nothing about anybody. Each probe hands a derivation a population it constructed in this file, reads the SIZE of the answer twice, and returns `low`, `high` or `loud` about the FUNCTION — never a verdict about a person. The complaints and CPD probes write to a store and empty it again in the same call, under a probe practice and a probe clinician; the interest probes write a file inside a temporary directory that is removed with it. No name, no condition and no appointment reason appears anywhere in it. Engineering.",
   "src/quality/g1-rehearsal.ts":
     "W262's first-connection rehearsal. It decides nothing about anybody: it walks the path a real connection would take — credential slot, loader refusal, session, scope check, scoped read, stamped envelope — over the practice's own synthetic data, and records what each stage observed. It is reached by this register through its `RehearsalRefusal` union, and the answer is that the union is about a walk that could not continue (no session resolved to a practice, no such endpoint) rather than about a person. No patient identifier enters the walk: the endpoints it drives return practice-level aggregates or the practice's own projected record, and the trace holds diagnostic strings naming a practice and an endpoint.",
   "src/api/scopes.ts":
@@ -528,9 +530,20 @@ export const NOTICE_REVISION: NoticeRevision = {
   // for the sampler's reason — it names modules that do decide things about people — and the right
   // answer is to say why that is not a decision rather than to narrow the scan. The published text
   // stays at fifteen decisions, and the date does not move: same calendar day, a later unit.
-  reviewedAt: "W340",
+  //
+  // W354 MOVED IT AN EIGHTH TIME, and the module joining the ruled-out half is the FIGURE REGISTER
+  // — which way an error moves each count this tree derives. Re-read rather than bumped. This one
+  // reaches the register differently from the seven before it and the difference is worth the note:
+  // it does not merely NAME modules that decide things about people, it CALLS them, and two of the
+  // derivations it calls take patient-shaped values. So the question was asked properly rather than
+  // waved through, and the answer is that nothing published changed: the values are constructed in
+  // the file itself — four synthetic patients tied on every field, care gaps holding nothing but a
+  // patient id — the probes read the SIZE of each answer twice and return a direction about the
+  // FUNCTION, and the store-backed probes reset what they wrote in the same call. The published
+  // text stays at fifteen decisions, and the date does not move: same calendar day, a later unit.
+  reviewedAt: "W354",
   decisionsAtReview: 15,
-  modulesAtReview: 104,
+  modulesAtReview: 105,
 };
 
 /** The line the page renders. Composed, so the page cannot state a date the register disagrees with. */

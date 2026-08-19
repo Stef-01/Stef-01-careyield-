@@ -57,6 +57,7 @@ import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptan
 import { unacceptedTautologies } from "./tautology-sweep";
 import { fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
+import { type Figure, figureDefects } from "./flattering-numbers";
 import { type Selector, type Widening, supersetDefects } from "./superset";
 import { endingDiff } from "./self-ending";
 import { PREMISES_AT_W358, premiseDefects, stagedSpecs } from "./spec-premises";
@@ -387,6 +388,29 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   },
 
   "src/quality/pins.ts": (root) => pinDiff(root, []).undeclared.length > 0,
+
+  "src/quality/flattering-numbers.ts": (root) => {
+    // W354's comparison, handed a row whose declaration its derivation contradicts and one whose
+    // blinding moves nothing. The rows are constructed rather than planted on disk: what a figure
+    // row holds is a pair of FUNCTIONS, so the input this comparison must reject is a table.
+    const row = (name: string, honest: number, blinded: number, direction: Figure["direction"]): Figure => ({
+      name,
+      what: "a planted figure",
+      direction,
+      why: "a planted row",
+      probe: { honest: () => honest, blinded: () => blinded },
+    });
+    const wrongWay = figureDefects(root, [row("src/planted/w289-fig.ts::wrong", 9, 3, "high")], [
+      "src/planted/w289-fig.ts::wrong",
+    ]);
+    const unmoved = figureDefects(root, [row("src/planted/w289-fig.ts::still", 9, 9, "low")], [
+      "src/planted/w289-fig.ts::still",
+    ]);
+    const clean = figureDefects(root, [row("src/planted/w289-fig.ts::fine", 9, 3, "low")], [
+      "src/planted/w289-fig.ts::fine",
+    ]);
+    return wrongWay.length === 1 && unmoved.length === 1 && clean.length === 0;
+  },
 
   "src/quality/superset.ts": (root) => {
     // W353's comparison, handed a selector that widens and one that refuses where it should not.

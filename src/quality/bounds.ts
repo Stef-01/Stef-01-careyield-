@@ -104,6 +104,7 @@ import { Q27_HARDENING_BOUND } from "./hardening-q27";
 import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
 import { HORIZON_CLAIM_BOUND, Q27_CLAIMS } from "./horizon-claims";
 import { ARGUED_DIRECTIONS, DIRECTION_BOUND } from "./failure-direction";
+import { FIGURE_BOUND, countingFigures } from "./flattering-numbers";
 import { SUPERSET_BOUND, undeclaredPopulations } from "./superset";
 import { REMEDY_BOUND } from "./self-defeating";
 import type { UnitId } from "./typed-names";
@@ -746,6 +747,46 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'one planted instance', 'one constructed input' — the unit of what a proof covers rather than a count of anything the tree holds. It stays one however many registers the census gains, and the sentence deliberately states no total: the ratio it claims is asserted by this unit's suite rather than frozen in the prose, which is W304's rule.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/flattering-numbers.ts",
+    name: "FIGURE_BOUND",
+    unit: "W354",
+    text: FIGURE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the scan grows and says so",
+      reads: "the tree, for a figure this scan can see",
+      // THE FIRST CLAUSE IS THE LIVE ONE. That one blinding is one mistake, and that a
+      // contradiction proves a wrong number CAN be caught rather than that anybody looks, are
+      // properties of what this measurement IS. What moves is the POPULATION: the scan reads a
+      // declared return type, and a wider one — the day somebody teaches it that a length taken by
+      // a caller is a figure too — makes the sentence describe a register that no longer exists.
+      stillOpen: (root) => !countingFigures(root).includes("src/quality/unasked-facts.ts::unaskedFacts"),
+      lifted: {
+        kind: "constructed_tree",
+        // The remedy state, spelled as the one figure the sentence names: the count W340 takes,
+        // which the scan cannot see because what W340 returns is a list. A tree where that export
+        // declares a number is a tree where the wider scan exists, and the sentence stops
+        // describing this register.
+        files: {
+          "src/quality/unasked-facts.ts":
+            "export function unaskedFacts(root: string): number {\n  return [root].length;\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'A BLINDING IS ONE MISTAKE, NOT ALL OF THEM' — the unit of what a row covers rather than a count of anything the tree holds. It stays one however many figures the register gains, and the sentence deliberately states no total: W304's rule is that a bound may not pin a register's size.",
+      },
+      {
+        word: "two",
+        kind: "rate",
+        why: "'the two' — the honest reading and the blinded one, which is the shape of a measurement rather than a figure about this repository. Two is what a comparison takes.",
       },
     ],
   },

@@ -89,7 +89,7 @@ const rel = (root: string, file: string) => path.relative(root, file).split(path
  * recursion over it would be the private copy W341 is about, written by the register that would
  * have reported it.
  */
-function readerFiles(root: string, served: readonly string[]): string[] {
+export function readerFiles(root: string, served: readonly string[]): string[] {
   return [
     ...typescriptFiles(root).map((f) => rel(root, f)),
     ...pageSpecFiles(root),
@@ -139,9 +139,22 @@ export function servedFacts(root: string): Fact[] {
 
 const isTest = (file: string) => file.endsWith(".test.ts") || file.endsWith(".spec.ts");
 
-/** The readers that are not a suite — the ones that make a fact something the product asks for. */
+/**
+ * A quality register is not a surface either — W354's finding, on this register.
+ *
+ * W354 imports `scrubClinicianCpd`, `eraseInterestSignups`, `pruneInterestSignups`,
+ * `interestSignupsFor` and `gapShareOfBatch` in order to MEASURE which way each of them fails, and
+ * five rows here went stale the moment it landed: the product still shows none of those figures to
+ * anybody. A register reads a derivation to check it, which is the same reason a suite was excluded
+ * on the day this was written — the sentence above already said "nothing but a suite ever asks for
+ * it" and the code said something narrower. The error moved the count DOWN, in the register whose
+ * subject is counts that fail the flattering way.
+ */
+const isARegister = (file: string) => file.startsWith("src/quality/");
+
+/** The readers that are not a suite or a register — the ones that make a fact something asked for. */
 export function askingReaders(fact: Fact): string[] {
-  return fact.readers.filter((f) => !isTest(f));
+  return fact.readers.filter((f) => !isTest(f) && !isARegister(f));
 }
 
 /**
@@ -185,6 +198,12 @@ export interface UnaskedFact {
  */
 export const UNASKED_AT_W340: readonly UnaskedFact[] = [
   { id: "src/api/refusals.ts::patientMarkersIn", why: { kind: "no_surface_asks", where: "an API refusal body is built from it and no route renders the markers it found" } },
+  // W354 ADDED THESE THREE by narrowing the reader rule: each was read only by a quality register,
+  // and a register checking a fact is not a screen showing one. The correction moved the count UP,
+  // which is the direction nobody has to be persuaded to look at.
+  { id: "src/interop/credentials.ts::loadCredential", why: { kind: "no_surface_asks", where: "no console screen shows which interop credential a practice is exchanging under, so the one reader is the register that checks the scope" } },
+  { id: "src/pathways/versioning.ts::pathwayAt", why: { kind: "no_surface_asks", where: "no screen shows a pathway as it stood at a past date, which is what an audit of a past decision would need" } },
+  { id: "src/quality/blocked-surface.ts::blockedSurfaceViolations", why: { kind: "not_a_derived_fact", what: "a build check rather than a product fact: it compares the ledger's blocked rows against the plan's gates, and its reader is the close gate rather than any screen" } },
   { id: "src/api/scopes.ts::endpointsFor", why: { kind: "no_surface_asks", where: "the console's API screen lists scopes and never the endpoints a scope opens" } },
   { id: "src/capability/interest.ts::interestsFor", why: { kind: "no_surface_asks", where: "the capability screen shows what a clinician can do and not what they said they are interested in" } },
   { id: "src/capability/provenance.ts::flagStaleProfiles", why: { kind: "no_surface_asks", where: "no screen shows which capability profiles have gone stale or which competence is still usable" } },

@@ -282,6 +282,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // sentence is the argument and the register is the check.
   { module: "src/quality/latent-findings.ts", text: "seven walks", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/private-copies.ts", text: "seven private walks", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/unasked-facts.ts", text: "five rows", resolution: { kind: "at_the_unit" } },
   // W342: how many times the tree had written `UnitId` when this unit consolidated it. History,
   // and the consolidation is the check: a fourth copy would be a fourth definition somebody wrote.
   { module: "src/quality/typed-names.ts", text: "three registers", resolution: { kind: "at_the_unit" } },

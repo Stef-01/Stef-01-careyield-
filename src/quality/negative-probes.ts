@@ -449,6 +449,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/flattering-numbers.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/flattering-numbers.test.ts :: counts, rather than merely returning a number",
+      plants: 'expect(counting).not.toContain("src/mbs/items.ts::estimateRevenuePerVisit")',
+    },
+  },
+  {
     register: "src/quality/superset.ts",
     negative: {
       kind: "already_driven",
