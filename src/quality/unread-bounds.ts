@@ -130,8 +130,8 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     condition: "a page that renders a number some other way is outside the population entirely",
     reading: {
       kind: "owed",
-      by: "W363",
-      why: "The gap is real and the tree already holds one instance of it: `/console/referrals` renders its day-two emptiness as a LIST, so the page's most important zero is not in this population and is covered only because W346's register holds the route. What would read it is a derivation of what a COMPONENT renders rather than of what an expression is called — `ZERO_MEANING_BOUND` names it as the remedy and `bounds.ts` carries the predicate that goes false when somebody builds it. Owed to W363 because that unit re-reads this quarter's checks for the direction each fails in, and a population that silently omits the case its own bound names is the direction this one fails in.",
+      by: "W371",
+      why: "The gap is real and the tree already holds one instance of it: `/console/referrals` renders its day-two emptiness as a LIST, so the page's most important zero is not in this population and is covered only because W346's register holds the route. What would read it is a derivation of what a COMPONENT renders rather than of what an expression is called — `ZERO_MEANING_BOUND` names it as the remedy and `bounds.ts` carries the predicate that goes false when somebody builds it. W361 OWED THIS TO W363 AND W363 DID NOT ANSWER IT: that unit re-read which way each named check fails, which is a different question from what a check is over, and W339's clock fired the moment it landed. Re-pointed at W371, whose own gate is the link graph — the derivation this condition has been waiting for.",
     },
   },
   {

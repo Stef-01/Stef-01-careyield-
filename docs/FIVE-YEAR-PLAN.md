@@ -828,6 +828,48 @@ worked. **Q28 adds no blocked row.**
 - **W363** The failure directions re-read — this quarter's gate → verify: every check `docs/HORIZON-Q28.md` names either declares the direction it fails in or is shown failing loudly; a check named and neither declared nor shown fails.
 - **W364** **QUARTER CLOSE.** Q29 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
 
+## 5n. Year 7 — Q29 (W365–W377)
+
+Expanded by W364 on 2026-08-19 under the §6 horizon rule, from `docs/AUDIT-Y5.md` and
+`docs/GATE-DOSSIER-Y5.md` — and from the Q28 ledger rows and `src/quality/quarter-mutants-q27.ts`,
+which are newer than both and are where the theme comes from. **One quarter, not a year.** See
+`docs/HORIZON-Q29.md` for the rule's six preconditions evaluated one at a time, and for the gate
+position recorded at this expansion.
+
+**Q29 — what the check is over.** Q28 asked which way each check fails, and its units landed. What
+the quarter kept finding on the way is that **the comparison was right and the population was
+wrong** — nine times, by two builders. W353 named the widening case and it kept happening after it:
+W362's mutation run over Q27 found exactly one survivor in sixty-four, and it was that shape one
+layer in, an inverted filter giving a WIDER field set that shares `by`, `id` and `value` with the
+right one, so every assertion over it passed. Three units in a row built the wrong population first
+and were caught only by driving it — W359's store walk went THROUGH store modules and reported
+thirty gaps where eight were real, W361's zero census counted every interpolation and got
+fifty-nine sites where the console renders twenty-seven, W355's drive census counted a function's
+own declaration as a call to itself. The narrow direction is worse because it is silent: W360 found
+`private-copies.ts` missing the eighth copy of the ledger parse because its marker is a regex
+spelling and `timelines.ts` writes the same parse another way, and `assertion-vocabulary.ts`
+keeping only the file from an excuse key of `<file> :: <site>`, so one exemption silences a whole
+file. The tree has a census of registers, a register of failure directions, superset probes and a
+defaults register — and nothing that holds the POPULATION itself. A green run says the comparison
+agreed with the declaration; it says nothing about who was missing. Every Q29 unit establishes what
+one check is over: derived rather than listed, resolved against the tree, and shown both including
+a planted member and excluding a planted non-member. The gate is not a number, for the reason
+Q24's was wrong and its four replacements worked. **Q29 adds no blocked row.**
+
+- **W365** The population register: for every check in W267's census, what it is over and how that set is derived → verify: every census member carries a population with its derivation named and resolved; a member whose population nothing derives fails; a planted register with no population reported.
+- **W366** [P] A marker that is a spelling: a detector that misses what it is named for → verify: every register matching its subject by literal text enumerated with what a differently-spelled instance would look like; W360's `timelines.ts` ledger parse driven as the case; a marker no second spelling has been tried against is reported.
+- **W367** [P] The population that is narrower than its own claim → verify: every register whose bound states a wider subject than its derivation walks is reported; the gap named in the bound resolved against the walk; a claim and a walk that agree must be distinguishable from one that has never been compared.
+- **W368** [P] An exemption keyed one way and applied another → verify: every excuse register whose key is finer than its application enumerated; W360's `presenceDefects` file-wide exemption driven as the case; an exemption that silences more than it names fails.
+- **W369** [P] The empty population: a check whose subject the tree no longer has → verify: every derivation that can return an empty set classified as empty-by-design, empty-because-fixed or empty-because-broken, each resolved; an empty result nothing distinguishes from a dead walk is reported.
+- **W370** Q28's hardening pass → verify: `code-review`, `security-review` and `simplify` over W352–W364; every finding disposed with a clock per W318; the pass's own bound stated.
+- **W371** [P] The e2e suite's own population: which pages a walk never reaches → verify: every console route enumerated against the specs that visit it, resolved through the link graph rather than through route strings; a route no spec reaches is reported; W363's `HORIZON_DIRECTION_BOUND` remedy applied to the citation half.
+- **W372** [P] A register whose members are listed where they could be derived → verify: every hand-listed register enumerated with whether the tree can derive its membership; one that can be and is not is reported with the derivation; a list that genuinely cannot be derived says why.
+- **W373** [P] The product's populations: which patients a rule is over → verify: every product rule that selects patients enumerated with the population it selects from, resolved against the synthetic set; a rule whose population is wider than its copy claims is reported; no founder gate crossed and no real patient data.
+- **W374** The survivors register over Q28's modules → verify: W349's run over every module Q28 added, each survivor named with its kind and its argument, the modules the harness cannot reach declared and resolved, and the sampler's share of that population measured.
+- **W375** The /tmp residue nothing reads → verify: the run-level sweep shown reclaiming a copy an interrupted run left, or the gap declared with what would close it; W360's two gigabytes driven as the case; a repository-clean register that watches only the repository says so.
+- **W376** The populations re-read — this quarter's gate → verify: every population `docs/HORIZON-Q29.md` names is derived, and is shown both including a planted member and excluding a planted non-member; a population named and not shown both ways fails.
+- **W377** **QUARTER CLOSE.** Q30 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
 ## 6. Horizon rule (supersedes the five-year expansion rule, W260)
 
 **The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,
