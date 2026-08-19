@@ -2425,6 +2425,17 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/spelling-markers.ts",
+    // NOT A WALKER, and the distinction matters here more than usual. W267's census is the
+    // registers that DERIVE a population by walking the tree; this one takes its population from
+    // `SCAN_SITES` — the modules W302 already checks against the tree in both directions — and
+    // spends its own work planting into a copy rather than recursing. Declaring a census would
+    // have made it a walker `treeWalkingFiles` cannot see, which is a false claim in the register
+    // whose whole subject is detectors that miss what they are named for.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/shared-excuses.ts",
     census: {
       derives:

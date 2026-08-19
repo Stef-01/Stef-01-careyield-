@@ -299,6 +299,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
     why: "W347's classification of the outstanding position. It names `parseLedgerRows` and `allLedgerRows` inside the IDS of the facts it classifies — `src/quality/blocked-surface.ts::allLedgerRows` is a row key, not a call — and it opens no ledger: what it reads is the founder page's source and the three modules' exports. Same class as `quarter-mutants.ts` above, and the same reason the scan keeps literals.",
   },
   {
+    module: "src/quality/spelling-markers.ts",
+    why: "W366 names `BUILD-STATE.md` to hand `headerCensus` the ledger argument its signature requires, and nothing it measures comes out of the file: the probe asks whether a PLANTED module appears in that register's answer, and the answer would be the same over an empty ledger. A close changes rows; this register reads none of them. THE HONEST HALF OF THIS EXCUSE is that the marker it declares for `unit-headers.ts` is about export declarations rather than ledger rows, so a close that broke the ledger parse would leave this register saying exactly what it says now — which is the argument for excusing it, and would be the argument against if it ever asked the ledger a question.",
+  },
+  {
     module: "src/founder/second-reading.ts",
     why: "W322's diff of what changed since the founder last looked. Its answer is SUPPOSED to move when a row closes — that is the feature — so reporting the movement as breakage would make the check unusable at exactly the moment it is for.",
   },

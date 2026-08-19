@@ -53,6 +53,8 @@ import { headerUnit, knownUnits } from "./unit-headers";
 import { ACCEPTANCE_REGISTERS, ACCEPTANCE_BOUND } from "./acceptances";
 import { BLIND_SPOTS, BLIND_SPOT_BOUND } from "./blind-spots";
 import { HATCH_BOUND } from "./escape-hatches";
+import { SPELLING_BOUND } from "./spelling-markers";
+import { resolveName } from "./typed-names";
 import { UNASKED_BOUND } from "./unasked-facts";
 import { PAGE_FACT_BOUND } from "./founder-page-facts";
 import { WAITING_BOUND } from "@/console/waiting";
@@ -919,6 +921,41 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "two",
         kind: "rate",
         why: "'the two' — the honest reading and the blinded one, which is the shape of a measurement rather than a figure about this repository. Two is what a comparison takes.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/spelling-markers.ts",
+    name: "SPELLING_BOUND",
+    unit: "W366",
+    text: SPELLING_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a generator over spellings rather than a table of them",
+      reads: "this register, for a marker with more than one alternative tried against it",
+      // THE FIRST CLAUSE IS THE LIVE ONE, and it is the only one of the three that a unit could
+      // close. The second is a statement about what `plausibility` IS — a judgement read off the
+      // formatter's behaviour rather than its configuration — and the third describes the
+      // population this register chose. What moves is the table: one planted alternative per
+      // marker is what makes `caught` weak, and the day a row carries a generated set of them the
+      // sentence stops describing this register.
+      stillOpen: (root) => resolveName(root, "export", "src/quality/spelling-markers.ts::spellingVariants") !== true,
+      lifted: {
+        kind: "constructed_tree",
+        // The remedy state, spelled as the export the sentence's remedy would have to add: a
+        // generator that yields the spellings of a subject instead of a row naming one. A tree
+        // where that export exists is a tree where the first clause has been closed.
+        files: {
+          "src/quality/spelling-markers.ts":
+            "export function spellingVariants(subject: string): string[] {\n  return [subject];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'THE VARIANT IS ONE SPELLING, NOT EVERY SPELLING' and 'exactly one alternative' — the unit of what a row proves, not a count of anything this tree holds. It stays one however many markers the register gains, which is W304's rule.",
       },
     ],
   },
