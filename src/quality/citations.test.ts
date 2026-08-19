@@ -101,6 +101,7 @@ describe("W301 a fifth implementation cannot arrive quietly", () => {
 
   it("declares each file that splits an id rather than a citation, with the reason", () => {
     expect(Object.keys(SEPARATOR_NOT_A_CITATION).sort()).toEqual([
+      "src/quality/horizon-directions.ts",
       "src/quality/mutation-sampling.test.ts",
       "src/quality/order-regressions.test.ts",
       "src/quality/quarter-mutants-q26.test.ts",
@@ -119,6 +120,7 @@ describe("W301 a fifth implementation cannot arrive quietly", () => {
     // back undeclared — which is the arm firing on input a healthy tree cannot produce.
     const diff = separatorDiff(ROOT, {});
     expect(diff.undeclared).toEqual([
+      "src/quality/horizon-directions.ts",
       "src/quality/mutation-sampling.test.ts",
       "src/quality/order-regressions.test.ts",
       "src/quality/quarter-mutants-q26.test.ts",

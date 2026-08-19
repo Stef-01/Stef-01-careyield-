@@ -283,6 +283,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
     why: "W357's remedy register. It names `parseLedgerRows` inside a survivor's ID — the line of source a mutant changed, quoted so a reader can see which change went unnoticed. A citation of code, not a call: this module reads the survivor registers and the modules they name, and never opens the ledger. THIS ROW REPLACED `quarter-mutants.ts`'s, which went stale in the same commit: W357 applied the remedy W332 had recorded, the survivor left that register, and the quoted line went with it. A citation moving between registers is exactly what an excusal register has to notice, and this one did.",
   },
   {
+    module: "src/quality/horizon-directions.ts",
+    why: "W363's gate register. It names the ledger as a TOKEN QUOTED FROM A PLANNING DOCUMENT — `docs/HORIZON-Q28.md` writes the ledger's filename in backticks, and this register carries one row per backticked token with the argument for why that one is not a check. The mention is data copied out of a document, not a read: this module opens the horizon and the modules the horizon names, and never the ledger itself. Excused explicitly rather than by pattern, because a register that quietly skipped a module holding the ledger's name in a string is exactly the omission W326 exists to stop.",
+  },
+  {
     module: "src/quality/blind-spots.ts",
     why: "W295's witnesses. It names `parseLedgerRows` inside the PLANTED SOURCE of the probe that demonstrates this register's own bound — a string literal it writes into a constructed tree, not a call it makes. The derivation strips comments and not literals, which is deliberate: the ledger's own path only ever appears AS a literal, so blanking them would hide every real reader to hide this one.",
   },

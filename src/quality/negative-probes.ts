@@ -415,6 +415,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/horizon-directions.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/horizon-directions.test.ts :: does not resolve a name two modules export, because that is not a resolution",
+      plants: "src/b/thing.ts",
+    },
+  },
+  {
     register: "src/quality/defaulted-registers.ts",
     negative: {
       kind: "already_driven",

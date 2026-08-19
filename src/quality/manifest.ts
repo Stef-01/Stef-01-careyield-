@@ -473,6 +473,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/horizon-directions.ts",
+    census: {
+      derives:
+        "Every backticked token in `docs/HORIZON-Q28.md`, resolved against the tree: to a file when the token names one, to the single module exporting it when the token names an export, and to nothing when two modules export it or the token names a value. A call is resolved by the name in front of its bracket, because the document quotes call shapes where the shape is the finding.",
+      checkedAgainst:
+        "W363's `CHECKS_AT_W363`, in four directions: a name the horizon uses that nothing answers fails, an answer for a name it no longer uses fails, a `not_a_check` for a token that resolves to a module fails, and a `shown_loud` citation naming a test or a file the tree does not hold fails.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a constructed tree holding a horizon that names one token and two modules exporting it, where the token must resolve to nothing rather than to either",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every check this quarter's horizon points at either has its failure direction settled by W352's census or is cited to a test that drives it to report.",
+        mutation:
+          "A token is added to the derived population and must be reported unanswered; an answer is kept for a token the horizon does not hold and must be reported the other way.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/quarter-mutants-q27.ts",
     // Derives its population from a walk it does not perform: `quarterModules` walks and
     // `siblingSuite` resolves, and this module reads the answers. W267's census holds the file that

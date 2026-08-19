@@ -63,6 +63,7 @@ import { RESIDUE_BOUND } from "./spec-stores";
 import { ZERO_MEANING_BOUND } from "@/console/zero-meaning";
 import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
+import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -496,6 +497,40 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/horizon-directions.ts",
+    name: "HORIZON_DIRECTION_BOUND",
+    unit: "W363",
+    text: HORIZON_DIRECTION_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "resolving the citation to a branch and CALLING it",
+      reads: "`horizon-directions.ts`, for a citation resolved to something runnable rather than to a test title",
+      // The clause that names something buildable, and the tree already has the shape: W291's
+      // refusal branches are cited by id and W289's driver RESOLVES and CALLS them rather than
+      // recording them. A `shown_loud` row here resolves a title in a file and stops. The predicate
+      // reads for the derivation, because what lifts the sentence is this module growing a way to
+      // run what it cites.
+      stillOpen: (root) =>
+        !/export function drivesItsCheck/.test(
+          readFileSync(path.join(root, "src/quality/horizon-directions.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/horizon-directions.ts":
+            "// W363: the failure directions re-read.\nexport function drivesItsCheck(): boolean {\n  return false;\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'the only mechanical thing standing behind it' is one thing — the unit of the sentence rather than a count of anything the tree holds. It stays one however many tokens the horizon quotes.",
       },
     ],
   },

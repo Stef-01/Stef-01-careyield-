@@ -28,6 +28,7 @@ import { PREMISES_AT_W358 } from "./spec-premises";
 import { RESIDUE_AT_W359 } from "./spec-stores";
 import { DRIVEN_AT_W355 } from "./defaulted-registers";
 import { EXCLUDED_AT_W362, UNMUTATED_AT_W362 } from "./quarter-mutants-q27";
+import { CHECKS_AT_W363 } from "./horizon-directions";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { withPlantedIn } from "./planting";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
@@ -95,6 +96,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
     const live = PINS.filter((p) => p.classification.kind === "live_by_design");
     expect(live.map((p) => p.name).sort()).toEqual([
       "BLOCKED_AT_W263",
+      "CHECKS_AT_W363",
       "DRIVEN_AT_W355",
       "EXCLUDED_AT_W349",
       "EXCLUDED_AT_W362",
@@ -152,6 +154,8 @@ describe("W290 the live pins, and why live is not the defect", () => {
     // W362's three are the same class a quarter on, and the third is new: a module the operators
     // find nothing to change in, which a survivor count cannot tell from one that was cleared.
     expect(EXCLUDED_AT_W362.every((e) => e.module.endsWith(".ts"))).toBe(true);
+    // W363's is the same class over a planning document: one row per token the horizon quotes.
+    expect(CHECKS_AT_W363.every((c) => c.token.length > 0)).toBe(true);
     expect(UNMUTATED_AT_W362.every((u) => u.why.length > 120)).toBe(true);
   });
 

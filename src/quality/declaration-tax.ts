@@ -200,6 +200,12 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/horizon-directions.ts",
+    // It reads a planning document, so a module planted under `src/` is outside its population by
+    // construction — the token would have to be quoted in the horizon first, which a plant cannot do.
+    demands: () => false,
+  },
+  {
     file: "src/quality/defaulted-registers.ts",
     // A planted module with no defaulted parameter is outside its population by construction, and
     // one WITH a defaulted register would be reported — but the probe plants a plain module, so the

@@ -97,6 +97,8 @@ export const SEPARATOR_NOT_A_CITATION: Readonly<Record<string, string>> = {
     "Splits a mutant id — `module :: operator :: line-of-code` — to read the module and the operator back out for assertions about the survivor register. Three parts rather than two, and nothing is resolved against a file.",
   "src/quality/quarter-mutants.test.ts":
     "Splits a mutant id for the same reason and in the same shape as `mutation-sampling.test.ts` above — reading the module and the operator back out to assert that a named survivor points at a file that exists and an operator W296 has. Three parts, and the right-hand one is a line of code rather than a name to resolve.",
+  "src/quality/horizon-directions.ts":
+    "Splits a `shown_loud` citation — `file :: test title` — to resolve the file and look for the title in it. Two parts rather than three, and the right-hand side is a sentence rather than a name to resolve against an export, which is what keeps it out of W258's citation shape.",
   "src/quality/quarter-mutants-q27.test.ts":
     "Splits a mutant id for the same reason and in the same shape as `quarter-mutants-q26.test.ts` below — reading the module back out to assert that a named survivor points at one the population holds. Three parts, and the right-hand one is a line of code rather than a name to resolve. Q27's list is empty, so the split runs over nothing today and the row is here because the code that would do it is.",
   "src/quality/quarter-mutants-q26.test.ts":

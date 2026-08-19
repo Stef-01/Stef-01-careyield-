@@ -218,6 +218,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/horizon-directions.ts",
+    name: "CHECKS_AT_W363",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "the quarter's horizon naming a check it did not name before, or dropping one",
+      whyStopping:
+        "A NAMED ROW PER TOKEN the document quotes, each either citing W352's settled direction or a test that drives the check to report — and the citation is resolved on every run, so a row cannot rot into a sentence. A token arriving means somebody edited a horizon that is supposed to be frozen the moment its quarter began, which is worth stopping for on its own; a token leaving means the same edit in the other direction. Neither can be satisfied by retyping a digit: the population is derived from the document and compared against the rows both ways.",
+    },
+  },
+  {
     module: "src/quality/quarter-mutants-q27.ts",
     name: "QUARTER_AT_W362",
     classification: {

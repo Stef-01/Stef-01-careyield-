@@ -64,6 +64,7 @@ import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
 import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import { HORIZON_DIRECTION_BOUND, horizonDefects, horizonTokens } from "./horizon-directions";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
   vocabularyDefects,
@@ -144,6 +145,29 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/horizon-directions.ts": {
+    kind: "demonstrated",
+    bound: HORIZON_DIRECTION_BOUND,
+    witness: "a check the horizon discusses in PROSE without quoting it, which this register cannot see and must not report",
+    control: "the same check quoted in backticks, which it must",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/spoken.ts": "export const spokenCheck = 1;\n",
+          "src/planted/quoted.ts": "export const quotedCheck = 1;\n",
+          "docs/HORIZON-Q28.md":
+            "The quarter leaned on spokenCheck without quoting it, and on `quotedCheck` with backticks.\n",
+        },
+        (root) => {
+          const reported = horizonDefects(root, [], horizonTokens(root)).map((d) => d.token);
+          return {
+            witnessSeen: reported.includes("spokenCheck"),
+            controlSeen: reported.includes("quotedCheck"),
           };
         },
       ),

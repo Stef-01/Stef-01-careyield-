@@ -65,6 +65,7 @@ import { PREMISES_AT_W358, premiseDefects, stagedSpecs } from "./spec-premises";
 import { residueDefects } from "./spec-stores";
 import { ZERO_CLAIMS, zeroDefects } from "@/console/zero-meaning";
 import { DRIVEN_AT_W355, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import { horizonDefects, horizonTokens } from "./horizon-directions";
 import { unreachedByUnitSuite } from "./unrun";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
@@ -505,6 +506,20 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
         },
       ]).didNotFire.length > 0
     );
+  },
+
+  "src/quality/horizon-directions.ts": (root) => {
+    // Both stale directions off the real horizon: an answer kept for a token the document does not
+    // name, and a `not_a_check` for one that resolves to a module. The arriving direction is driven
+    // in the module's own suite against a token added to the derived population.
+    const tokens = horizonTokens(root);
+    const gone = horizonDefects(root, [{ token: "vanished", standing: { kind: "not_a_check", why: "x" } }], []);
+    const wrong = horizonDefects(
+      root,
+      [{ token: "page-reach.ts", standing: { kind: "not_a_check", why: "x" } }],
+      tokens.filter((t) => t.token === "page-reach.ts"),
+    );
+    return gone.length > 0 && wrong.length > 0;
   },
 
   "src/quality/defaulted-registers.ts": (root) => {
