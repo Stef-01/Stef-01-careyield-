@@ -558,6 +558,14 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/reached-pages.ts::REACHED_BOUND",
+    condition: "a route linked through an `href` built at runtime, through a router push, or through a redirect is invisible to it",
+    reading: {
+      kind: "not_observable",
+      why: "AN `href` BUILT AT RUNTIME IS A VALUE, and reading it means evaluating the component that builds it — which needs the props a page passes, which needs the page rendered, which is the browser this register exists to avoid needing. The redirect half is worse: a guard sends an unauthenticated visitor to sign-in from a branch in server code, and a static reader cannot tell a redirect a person meets from one nothing reaches. The suite that CAN see both is the e2e run, and what it sees is a route arrived at rather than a route linked — which is the axis this register was built to hold apart from the other.",
+    },
+  },
+  {
     bound: "src/quality/empty-populations.ts::EMPTY_BOUND",
     condition: "a register emptied at runtime, built by a function that happens to return nothing, or spelled across lines is invisible to it",
     reading: {

@@ -473,6 +473,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/reached-pages.ts",
+    census: {
+      derives:
+        "Every console route the router serves, from `discoverSurfaces` over `app/`; every console path this product renders an `href` to, in both the JSX-attribute and the register-field spelling, with the file that renders it; and every console path a spec NAVIGATES to, read from `goto` rather than from the spec's whole text.",
+      checkedAgainst:
+        "W371's `REACHED_AT_W371`, in five directions: a route with no row, a row for something that is not a route, a row saying linked where nothing links, a row pinned unlinked that has since been given a link, and a route no spec navigates to.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a console page linked from the console index and opened by a spec is planted beside one whose path appears only in a URL assertion, and only the second may be reported as unnavigated",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No console route is served without the register saying how a person arrives at it, and no route pinned as having no way in can be given one — or lose the one it has — without this failing.",
+        mutation:
+          "`reachedDefects` is given a declared list with a route's row removed, and must report that route as one nothing says anything about.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/empty-populations.ts",
     census: {
       derives:

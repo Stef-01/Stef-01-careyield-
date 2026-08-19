@@ -36,6 +36,7 @@ import { diffCensus, discoverSurfaces, parseCensus } from "@/compliance/surfaces
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
+import { REACHED_AT_W371, reachedDefects } from "./reached-pages";
 import { emptyPopulationDefects } from "./empty-populations";
 import { separatorDiff } from "./citations";
 import { planterDiff } from "./planting";
@@ -90,6 +91,11 @@ export type Drive = (root: string) => boolean;
 const BEYOND_EVERY_REVIEW = "2099-01-01";
 
 export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
+  "src/quality/reached-pages.ts": (root) =>
+    reachedDefects(root, REACHED_AT_W371.filter((r) => r.route !== "/console")).some(
+      (d) => d.route === "/console",
+    ),
+
   "src/quality/empty-populations.ts": (root) =>
     emptyPopulationDefects(root, [
       { module: "src/gone.ts", name: "GONE_REGISTER", emptiness: { kind: "by_design", quote: "a sentence no module makes" } },

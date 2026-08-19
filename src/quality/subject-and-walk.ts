@@ -107,6 +107,7 @@ export const COMPARED_AT_W367: readonly Compared[] = [
   { bound: "src/quality/private-copies.ts::PRIVATE_COPY_BOUND", walk: ["typescriptFiles"], edge: { kind: "named", quote: "A copy of either parse written in `scripts/`, in `e2e/`, or in a `.mts` file is invisible to it" } },
   { bound: "src/quality/prose-numbers.ts::PROSE_BOUND", walk: ["pageSpecFiles", "sourceModules"], edge: { kind: "named", quote: "A claim phrased any other way is invisible to it" } },
   { bound: "src/quality/quarter-mutants.ts::QUARTER_MUTANT_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "IT ALSO MEASURES ONLY THE MODULES A QUARTER ADDED" } },
+  { bound: "src/quality/reached-pages.ts::REACHED_BOUND", walk: ["filesUnder", "pageSpecFiles"], edge: { kind: "named", quote: "a route linked through an `href` built at runtime, through a router push, or through a redirect is invisible to it" } },
   { bound: "src/quality/register-counts.ts::COUNT_BOUND", walk: ["testModules"], edge: { kind: "named", quote: "A register size pinned to a constant, to an arithmetic expression or to another register's length is invisible to it" } },
   { bound: "src/quality/scan-text.ts::SCAN_BOUND", walk: ["sourceModules", "typescriptFiles"], edge: { kind: "named", quote: "One scan is deliberately outside this" } },
   { bound: "src/quality/self-defeating.ts::REMEDY_BOUND", walk: ["testModules"], edge: { kind: "named", quote: "AND THE SWEEP CANNOT SEE MORE THAN `assertionsIn` RETURNS" } },

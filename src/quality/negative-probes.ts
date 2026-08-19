@@ -415,6 +415,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/reached-pages.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/reached-pages.test.ts :: reads a navigation and not a mention, which is the whole difference from W284",
+      plants: "e2e/a.spec.ts",
+    },
+  },
+  {
     register: "src/quality/empty-populations.ts",
     negative: {
       kind: "already_driven",

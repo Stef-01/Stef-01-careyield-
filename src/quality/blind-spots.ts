@@ -64,6 +64,7 @@ import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
 import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import { REACHED_BOUND, reachedDefects } from "./reached-pages";
 import { EMPTY_BOUND, emptyPopulationDefects } from "./empty-populations";
 import { HORIZON_DIRECTION_BOUND, horizonDefects, horizonTokens } from "./horizon-directions";
 import {
@@ -148,6 +149,41 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
           };
+        },
+      ),
+  },
+
+  "src/quality/reached-pages.ts": {
+    kind: "demonstrated",
+    bound: REACHED_BOUND,
+    witness: "a page linked only from a page nobody can reach, which passes here as linked and must not be reported",
+    control: "the same page with its one link taken away, which must be",
+    probe: () =>
+      withRoot(
+        {
+          "app/console/page.tsx": "export default function P() {\n  return <p>index</p>;\n}\n",
+          "app/console/island/page.tsx": "export default function P() {\n  return <p>island</p>;\n}\n",
+          "app/console/orphan/page.tsx": "export default function P() {\n  return <a href=\"/console/island\">island</a>;\n}\n",
+        },
+        (root) => {
+          const rows = [
+            { route: "/console", wayIn: { kind: "walked" as const } },
+            { route: "/console/island", wayIn: { kind: "walked" as const } },
+            { route: "/console/orphan", wayIn: { kind: "walked" as const } },
+          ];
+          const unlinked = (out: { route: string; what: string }[], route: string) =>
+            out.some((d) => d.route === route && d.what.includes("nothing in this product links to it"));
+          // `/console/island` is linked only from `/console/orphan`, which nothing links to at all.
+          const witnessSeen = unlinked(reachedDefects(root, rows), "/console/island");
+          const controlSeen = withRoot(
+            {
+              "app/console/page.tsx": "export default function P() {\n  return <p>index</p>;\n}\n",
+              "app/console/island/page.tsx": "export default function P() {\n  return <p>island</p>;\n}\n",
+              "app/console/orphan/page.tsx": "export default function P() {\n  return <p>no link</p>;\n}\n",
+            },
+            (bare) => unlinked(reachedDefects(bare, rows), "/console/island"),
+          );
+          return { witnessSeen, controlSeen };
         },
       ),
   },

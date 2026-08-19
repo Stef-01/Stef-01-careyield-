@@ -68,6 +68,7 @@ import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
+import { REACHED_BOUND } from "./reached-pages";
 import { EMPTY_BOUND } from "./empty-populations";
 import { SUBJECT_BOUND } from "./subject-and-walk";
 import { DRIVE_BOUND } from "./assertion-drives";
@@ -503,6 +504,38 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/reached-pages.ts",
+    name: "REACHED_BOUND",
+    unit: "W371",
+    text: REACHED_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a reachability closure from the console's own index",
+      reads: "`reached-pages.ts`, for a route reached by following links from where a person starts rather than linked from anywhere at all",
+      // The clause that names something buildable. A row proves some file renders an `href`; what
+      // it cannot say is that a person starting at the console can follow links to it. The
+      // predicate reads for the derivation that would settle it, not for a unit id.
+      stillOpen: (root) =>
+        !/export function reachableFromIndex/.test(
+          readFileSync(path.join(root, "src/quality/reached-pages.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/reached-pages.ts":
+            "// W371: the e2e suite's own population.\nexport function reachableFromIndex(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'the same question one level in' and 'the rows argue it one at a time' — the unit of each phrase rather than a count anything maintains. `reachedDefects` re-derives every row against the tree on each run, so there is no total in this sentence to go stale.",
       },
     ],
   },

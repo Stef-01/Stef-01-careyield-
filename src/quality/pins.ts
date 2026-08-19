@@ -246,6 +246,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/reached-pages.ts",
+    name: "REACHED_AT_W371",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a console route arriving or going, a page gaining or losing a link to one, or a spec starting or stopping navigating to one",
+      whyStopping:
+        "A NAMED ROW PER CONSOLE ROUTE, each checked against a link that is really rendered and a spec that really navigates — both re-derived on every run, so neither half can rot into a claim. A row arriving means the product serves a page nobody has said how to reach; a row leaving means a route went. The direction that matters most is the quiet one: half these routes are pinned as having no way in, and giving one of them a link fails here until the pin moves, which is what stops a finding from being fixed invisibly and then forgotten.",
+    },
+  },
+  {
     module: "src/quality/empty-populations.ts",
     name: "EMPTY_AT_W369",
     classification: {

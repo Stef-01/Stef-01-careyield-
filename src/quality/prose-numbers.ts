@@ -29,6 +29,7 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. This reads the tree's own comments.
 
+import { consoleRoutes, linkTargets } from "./reached-pages";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { pageSpecFiles, sourceModules } from "./tree-walks";
@@ -409,6 +410,16 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // specs` and reported one number nobody classified beside one the tree no longer said. A
   // hyphenated compound is a vocabulary gap in the scanner, and until somebody closes it the
   // honest move is to write the number in a form the scanner reads as one thing.
+  // W371: the unlinked half, derived so the header cannot outlive it. A route given a link drops
+  // out of the count here and out of the register in the same run.
+  {
+    module: "src/quality/reached-pages.ts",
+    text: "Fourteen console routes",
+    resolution: {
+      kind: "derived",
+      derive: (root) => consoleRoutes(root).filter((r) => !linkTargets(root).has(r) && !r.includes("[")).length,
+    },
+  },
   { module: "src/quality/page-suite.ts", text: "39 specs", resolution: { kind: "derived", derive: pageSpecs } },
   { module: "src/quality/route-coverage.ts", text: "39 spec files", resolution: { kind: "derived", derive: pageSpecs } },
   {
