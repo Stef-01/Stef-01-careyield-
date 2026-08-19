@@ -304,6 +304,8 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // the guard re-derives the ratio on every run, so the sentence is the reason and the register is
   // the check.
   { module: "src/quality/bounds.ts", text: "two bounds", resolution: { kind: "at_the_unit" } },
+  // W367: what the import cycle blanked while the unit was being built, not a count of anything now.
+  { module: "src/quality/subject-and-walk.ts", text: "three bounds", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/refusal-branches.ts", text: "two entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "sixteen modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/unrun.ts", text: "two branches", resolution: { kind: "at_the_unit" } },

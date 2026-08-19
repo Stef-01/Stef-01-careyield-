@@ -67,6 +67,7 @@ import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
+import { SUBJECT_BOUND } from "./subject-and-walk";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -500,6 +501,39 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/subject-and-walk.ts",
+    name: "SUBJECT_BOUND",
+    unit: "W367",
+    text: SUBJECT_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "deriving what a walk misses from the walk itself",
+      reads: "`subject-and-walk.ts`, for a walk's exclusions derived rather than quoted out of a sentence somebody wrote",
+      // The clause that names something buildable. Today a row proves an author WROTE an edge
+      // sentence; what it cannot say is whether that sentence is the walk's real edge. A walk's
+      // exclusions are derivable — `sourceModules` is `src/` minus tests and the shared skip list
+      // says the rest — and the predicate reads for that derivation rather than for a unit.
+      stillOpen: (root) =>
+        !/export const WALK_SCOPE/.test(
+          readFileSync(path.join(root, "src/quality/subject-and-walk.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/subject-and-walk.ts":
+            "// W367: the population that is narrower than its own claim.\nexport const WALK_SCOPE = {};\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one level in', 'it holds one row' — the unit of each phrase rather than a count anything maintains. The second is history about the register as this unit shipped it, and `subjectDefects` re-derives the rows both ways on every run.",
       },
     ],
   },

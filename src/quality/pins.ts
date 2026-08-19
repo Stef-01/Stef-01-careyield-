@@ -236,6 +236,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/subject-and-walk.ts",
+    name: "COMPARED_AT_W367",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a register gaining or losing a bound, or a bound's module changing which walk it calls",
+      whyStopping:
+        "A NAMED ROW PER BOUND-OVER-A-WALK, each carrying the walk it was read against and the sentence in which the bound names what that walk leaves out — both re-derived on every run, so neither can rot into a claim. A row arriving means a bound has never been read against its own population, which is the state this unit exists to make visible; a row leaving means a register stopped stating a bound or stopped walking. The gate's own last clause is why the arrival side matters: a bound nobody has compared is silent in exactly the way one whose subject and walk agree is silent.",
+    },
+  },
+  {
     module: "src/quality/quarter-mutants-q27.ts",
     name: "QUARTER_AT_W362",
     classification: {

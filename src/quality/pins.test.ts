@@ -29,6 +29,7 @@ import { RESIDUE_AT_W359 } from "./spec-stores";
 import { DRIVEN_AT_W355 } from "./defaulted-registers";
 import { EXCLUDED_AT_W362, UNMUTATED_AT_W362 } from "./quarter-mutants-q27";
 import { CHECKS_AT_W363 } from "./horizon-directions";
+import { COMPARED_AT_W367 } from "./subject-and-walk";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { withPlantedIn } from "./planting";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
@@ -97,6 +98,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
     expect(live.map((p) => p.name).sort()).toEqual([
       "BLOCKED_AT_W263",
       "CHECKS_AT_W363",
+      "COMPARED_AT_W367",
       "DRIVEN_AT_W355",
       "EXCLUDED_AT_W349",
       "EXCLUDED_AT_W362",
@@ -156,6 +158,9 @@ describe("W290 the live pins, and why live is not the defect", () => {
     expect(EXCLUDED_AT_W362.every((e) => e.module.endsWith(".ts"))).toBe(true);
     // W363's is the same class over a planning document: one row per token the horizon quotes.
     expect(CHECKS_AT_W363.every((c) => c.token.length > 0)).toBe(true);
+    // W367's is the same class over pairs: one row per bound that sits above a walk, keyed by the
+    // bound and carrying the walk it was read against.
+    expect(COMPARED_AT_W367.every((c) => c.bound.includes("::") && c.walk.length > 0)).toBe(true);
     expect(UNMUTATED_AT_W362.every((u) => u.why.length > 120)).toBe(true);
   });
 

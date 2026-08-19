@@ -473,6 +473,15 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/subject-and-walk.ts",
+    // Reads a pair of registers — `STATED_BOUNDS` and W365's `POPULATIONS` — and compares them
+    // each other. It walks nothing: the bounds are a module constant and the populations are
+    // another, so the files it opens are none. W267's census does not hold it and a row there would
+    // be a declaration nothing re-derives. It is here because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/populations.ts",
     // Reads the census and, for each member it names, that module's own source — so its population
     // is `TREE_DERIVED_REGISTERS` rather than a walk of the tree, and W267's census holds the file
