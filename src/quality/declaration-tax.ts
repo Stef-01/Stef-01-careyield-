@@ -200,6 +200,13 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/defaulted-registers.ts",
+    // A planted module with no defaulted parameter is outside its population by construction, and
+    // one WITH a defaulted register would be reported — but the probe plants a plain module, so the
+    // honest cost of arriving is nothing.
+    demands: () => false,
+  },
+  {
     file: "src/console/zero-meaning.ts",
     // It watches `app/console/**/page.tsx`, so a module planted under `src/` is outside its
     // population by construction. Zero is the honest cost: a new register owes this one nothing.

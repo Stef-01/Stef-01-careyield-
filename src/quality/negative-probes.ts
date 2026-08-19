@@ -415,6 +415,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/defaulted-registers.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/defaulted-registers.test.ts :: is not satisfied by a call that hands the default back, which proves least of all",
+      plants: "src/planted/thing.test.ts",
+    },
+  },
+  {
     register: "src/console/zero-meaning.ts",
     negative: {
       kind: "already_driven",

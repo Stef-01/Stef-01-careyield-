@@ -121,3 +121,32 @@ export function doneUnits(root: string): string[] {
 // It talks about readdirSync( and isDirectory, and about BUILD-STATE.md rows
 // matched with /^\| (W\d+) \|, in prose, which is not a copy of anything.
 export const nothing = 0;
+
+=== a-default-nothing-drives ===
+// W355: a module whose exported comparison defaults a register nobody ever supplies.
+export const THINGS = [1];
+export function thingDefects(root: string, declared: number[] = THINGS): number[] {
+  void root;
+  return declared;
+}
+
+=== a-default-driven-by-another-name ===
+// W355: the same shape, with a call handing the default back under a different name.
+const SAME = THINGS;
+it("t", () => {
+  thingDefects(ROOT, SAME);
+});
+
+=== a-default-handed-straight-back ===
+// W355: a module whose only call supplies the argument as the default's own text.
+export const ECHOES = [1];
+export function echoDefects(root: string, declared: number[] = ECHOES): number[] {
+  void root;
+  return declared;
+}
+
+=== a-default-echoed-at-the-call ===
+// W355: the call that proves least — the default, written out.
+it("t", () => {
+  echoDefects(ROOT, ECHOES);
+});

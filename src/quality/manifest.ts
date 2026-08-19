@@ -473,6 +473,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/defaulted-registers.ts",
+    census: {
+      derives:
+        "Every exported function that takes a `root: string` and defaults a parameter to a register by name or to a derivation call, plus — for each — the files that supply that argument with something other than the default's own text. Signatures and call sites are brace-matched rather than pattern-matched, and the function's own declaration is not counted as a call to itself.",
+      checkedAgainst:
+        "W355's `DRIVEN_AT_W355`, in three directions: a defaulted register no call anywhere supplies fails outright, a parameter driven only from outside its own suite with nothing recording where fails, and a record whose files the tree no longer agrees with — or whose own suite has started driving it — fails the other way.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a constructed tree holding a module that defaults a register and nothing that calls it, which must be reported; the same tree with a call handing the default straight back, which must still be reported; and again with a call handing a different value, which must not",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every defaulted register on a function that reads this tree has been handed a different value by something, so the parameter is a question somebody can ask rather than a signature that reads as though they could.",
+        mutation:
+          "A record is given files the tree disagrees with and must be reported drifted; a record is given for a parameter the tree does not hold and must be reported the other way.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/console/zero-meaning.ts",
     census: {
       derives:

@@ -345,3 +345,24 @@ describe("W348 one way to say a thing is present", () => {
     expect(presentFormsIn("expect(rows).toEqual([]);")).toEqual([]);
   });
 });
+
+describe("W355 the defaulted register is handed a different value, at home", () => {
+  // A default promises the comparison can be asked another question, and a promise nobody collects
+  // is a signature that reads as drivable while the only value it ever had is the default. W355
+  // found twelve parameters in this tree whose parameter no call anywhere supplied; this is one of them.
+
+  it("takes an exceptions map it is given, not only its own", () => {
+    const withNone = emptinessDefects(ROOT, CANONICAL_EMPTY, {});
+    const withOwn = emptinessDefects(ROOT);
+    expect(withNone.length, "the exceptions map made no difference").toBeGreaterThan(withOwn.length);
+  });
+
+  it("takes the canonical spelling it is given, not only its own", () => {
+    // Naming a different form as canonical inverts the question: every site spelled the tree's way
+    // becomes a defect. A parameter that changed nothing would answer the same either way.
+    const inverted = emptinessDefects(ROOT, "length is 0");
+    expect(inverted.length, "the canonical spelling made no difference").toBeGreaterThan(
+      emptinessDefects(ROOT).length,
+    );
+  });
+});

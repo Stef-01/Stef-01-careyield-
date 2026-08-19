@@ -20,7 +20,7 @@ import {
   populationDefects,
   q26Population,
 } from "./quarter-mutants-q26";
-import { FILE_IO, quarterModules, quarterMutants, runMutants, sampledShare } from "./quarter-mutants";
+import { FILE_IO, type UnitRange, quarterModules, quarterMutants, runMutants, sampledShare } from "./quarter-mutants";
 import { OPERATORS, samplingReport, siblingSuite } from "./mutation-sampling";
 import { copyTree, withTree } from "./planting";
 import { parseLedgerRows } from "./blocked-surface";
@@ -208,4 +208,25 @@ describe("W349 the full run over the quarter's reachable modules", () => {
     },
     2_400_000,
   );
+});
+
+describe("W355 the defaulted register is handed a different value, at home", () => {
+  // W355 found twelve defaulted parameters in this tree whose value no call anywhere supplied.
+  // Two are here: both `populationDefects` and `q26Population` take the quarter's RANGE and neither
+  // had ever been given one — the shape W343 recorded when `quarterModules` took a loose pair and
+  // a wrong call returned the whole tree instead of six modules.
+
+  it("takes the unit range it is given, not only Q26's", () => {
+    const oneUnit: UnitRange = { first: QUARTER_AT_W349.first, last: QUARTER_AT_W349.first };
+    expect(q26Population(ROOT, EXCLUDED_AT_W349, oneUnit).length, "a one-unit range read the whole quarter")
+      .toBeLessThan(q26Population(ROOT).length);
+  });
+
+  it("reports against the range it is given, so a narrowed quarter is a different question", () => {
+    const oneUnit: UnitRange = { first: QUARTER_AT_W349.first, last: QUARTER_AT_W349.first };
+    const narrowed = populationDefects(ROOT, EXCLUDED_AT_W349, oneUnit);
+    expect(narrowed, "a range that excludes every excused module reported nothing").not.toEqual(
+      populationDefects(ROOT),
+    );
+  });
 });

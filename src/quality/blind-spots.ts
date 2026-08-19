@@ -63,6 +63,7 @@ import { UNASKED_BOUND, unaskedFacts } from "./unasked-facts";
 import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
+import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
   vocabularyDefects,
@@ -142,6 +143,34 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/defaulted-registers.ts": {
+    kind: "demonstrated",
+    bound: DEFAULT_BOUND,
+    witness: "a call handing the parameter a DIFFERENT NAME for the same value, which drives nothing and must not be reported",
+    control: "the same module with the default handed straight back, which must be",
+    // THE PLANTED SOURCE LIVES IN THE FIXTURES FILE, and W355 found out why the hard way: written
+    // as string literals here, `defaultedParameters` read them out of THIS module and reported two
+    // defaulted registers that exist only inside a probe. W341's fixture file is where a planted
+    // module that looks like real source belongs, and `scan-text.ts` records that it keeps
+    // literals for exactly this reason.
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/thing.ts": fixtureText("a-default-nothing-drives"),
+          "src/planted/thing.test.ts": fixtureText("a-default-driven-by-another-name"),
+          "src/planted/echo.ts": fixtureText("a-default-handed-straight-back"),
+          "src/planted/echo.test.ts": fixtureText("a-default-echoed-at-the-call"),
+        },
+        (root) => {
+          const reported = defaultDefects(root, [], defaultedParameters(root)).map((d) => d.parameter);
+          return {
+            witnessSeen: reported.includes("src/planted/thing.ts::thingDefects::2"),
+            controlSeen: reported.includes("src/planted/echo.ts::echoDefects::2"),
           };
         },
       ),

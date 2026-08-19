@@ -179,3 +179,20 @@ describe("W347 the register is subject to its own rule", () => {
     expect(PAGE_FACT_BOUND).toContain("judgement");
   });
 });
+
+describe("W355 the defaulted register is handed a different value, at home", () => {
+  // A default promises the comparison can be asked another question, and a promise nobody collects
+  // is a signature that reads as drivable while the only value it ever had is the default. W355
+  // found twelve parameters in this tree whose parameter no call anywhere supplied; this is two of them.
+
+  it("reads the page it is given, not only the founder page", () => {
+    const other = pageNames(ROOT, "app/console/registers/page.tsx");
+    expect(other, "another page's names were not read").toContain("RegistersPage");
+    expect(other).not.toEqual(pageNames(ROOT));
+  });
+
+  it("derives from the module list it is given, not only its own", () => {
+    expect(positionDerivations(ROOT, []), "an empty module list still derived something").toEqual([]);
+    expect(positionDerivations(ROOT).length).toBeGreaterThan(0);
+  });
+});

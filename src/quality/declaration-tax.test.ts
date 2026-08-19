@@ -37,6 +37,7 @@ import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { withPlantedIn } from "./planting";
 import { withRoot } from "./refusal-branches";
 import { fixtureToken } from "./scan-text";
+import { DECLARATION_HOMES, homeDiff } from "./declaration-tax";
 
 const ROOT = process.cwd();
 const PLANTED = "src/planted/w300-probe.ts";
@@ -299,5 +300,21 @@ describe("W308 the same measurement, re-run at the end of the quarter it judges"
     for (const shape of Object.keys(TAX_AT_W308) as ModuleShape[]) {
       expect(horizon, `${shape} is not in the recorded table`).toContain(shape);
     }
+  });
+});
+
+describe("W355 the defaulted register is handed a different value, at home", () => {
+  // A default promises the comparison can be asked another question, and a promise nobody collects
+  // is a signature that reads as drivable while the only value it ever had is the default. W355
+  // found twelve parameters in this tree whose parameter no call anywhere supplied; this is one of them.
+
+  it("takes a probe list it is given, not only its own", () => {
+    // In the COPY, because `homeDiff` plants a probe module to ask what each register reports and
+    // `withPlantedIn` refuses the repository — which is W328's rule, and the reason this drive
+    // could not simply be written against `ROOT`.
+    const none = homeDiff(COPY, DECLARATION_HOMES, []);
+    expect(none.stale, "an empty probe population left every home accounted for").not.toEqual(
+      homeDiff(COPY).stale,
+    );
   });
 });

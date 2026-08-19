@@ -61,6 +61,7 @@ import { UNAPPLIED_BOUND } from "./unapplied-remedies";
 import { PREMISE_BOUND, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND } from "./spec-stores";
 import { ZERO_MEANING_BOUND } from "@/console/zero-meaning";
+import { DEFAULT_BOUND } from "./defaulted-registers";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -493,6 +494,39 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/defaulted-registers.ts",
+    name: "DEFAULT_BOUND",
+    unit: "W355",
+    text: DEFAULT_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "running the function both ways and requiring the results to differ",
+      reads: "`defaulted-registers.ts`, for a drive that calls each function twice rather than reading the text of its call sites",
+      // The clause that names something buildable. Today a parameter counts as driven when some
+      // call writes text that is not the default's text — which says an argument was supplied, not
+      // that the answer moved. The predicate reads for the derivation rather than for a unit,
+      // because what lifts the sentence is the module growing a way to CALL the functions it reads.
+      stillOpen: (root) =>
+        !/export function answersDiffer/.test(
+          readFileSync(path.join(root, "src/quality/defaulted-registers.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/defaulted-registers.ts":
+            "// W355: a default that turns a wrong call into a plausible answer.\nexport function answersDiffer(): boolean {\n  return false;\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'the one call shape that proves least' — the unit of the sentence rather than a count of anything the tree holds. It stays one however many parameters the population grows to.",
       },
     ],
   },

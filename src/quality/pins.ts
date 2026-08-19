@@ -218,6 +218,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/defaulted-registers.ts",
+    name: "DRIVEN_AT_W355",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a defaulted register starting or stopping being driven from its own module's suite",
+      whyStopping:
+        "A NAMED ROW PER PARAMETER, each carrying the files that drive it and each re-derived on every run — so neither direction can be satisfied by retyping a digit and a row cannot rot into a sentence. A parameter joining is one whose own suite stopped handing it a value, which is the state W296 found and W306's rule exists against; a parameter leaving means somebody wrote the drive at home, which is work worth noticing. The arm that reports a parameter driven NOWHERE is separate and takes no row at all: twelve of those existed when this unit ran and all twelve were closed, and a thirteenth is a signature promising something nobody has ever collected.",
+    },
+  },
+  {
     module: "src/quality/spec-stores.ts",
     name: "RESIDUE_AT_W359",
     classification: {

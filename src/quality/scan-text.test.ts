@@ -25,6 +25,7 @@ import {
   orderingLosses,
 } from "./scan-text";
 import { stripComments } from "@/security/reachability";
+import type { ScanSite } from "./scan-text";
 
 const ROOT = process.cwd();
 
@@ -168,5 +169,22 @@ describe("W302 the reversion is recorded rather than tidied away", () => {
     expect(walk.slice(0, 1400), "the walk now prepares its text, and the bound still says it does not").not.toContain(
       "prepareForScan(",
     );
+  });
+});
+
+describe("W355 the defaulted register is handed a different value, at home", () => {
+  // A default promises the comparison can be asked another question, and a promise nobody collects
+  // is a signature that reads as drivable while the only value it ever had is the default. W355
+  // found twelve parameters in this tree whose parameter no call anywhere supplied; this is one of them.
+
+  it("takes a declared site list it is given, not only its own", () => {
+    // One producer, asked twice — so the empty list below is evidenced by the same expression
+    // having been shown full, which is W293's rule and the reason this is a helper.
+    const undeclaredGiven = (declared: readonly ScanSite[] | undefined): string[] =>
+      (declared === undefined ? scanSitesInTree(ROOT) : scanSitesInTree(ROOT, declared)).undeclared;
+    expect(undeclaredGiven([]), "an empty declared list reported no undeclared site").toContain(
+      SCAN_SITES[0]!.module,
+    );
+    expect(undeclaredGiven(undefined), "the tree disagrees with its own declared sites").toEqual([]);
   });
 });

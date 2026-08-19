@@ -149,3 +149,15 @@ describe("W263 the loop may answer none of them", () => {
     expect(answerableByTheLoop()).toEqual([]);
   });
 });
+
+describe("W355 the defaulted register is handed a different value, at home", () => {
+  // A default promises the comparison can be asked another question, and a promise nobody collects
+  // is a signature that reads as drivable while the only value it ever had is the default. W355
+  // found twelve parameters in this tree whose parameter no call anywhere supplied; this is one of them.
+
+  it("takes a release-path list it is given, not only its own", () => {
+    const none = blockedSurfaceViolations(ROOT, BLOCKED_AT_W263, []);
+    const own = blockedSurfaceViolations(ROOT, BLOCKED_AT_W263);
+    expect(none, "an empty path list changed nothing").not.toEqual(own);
+  });
+});

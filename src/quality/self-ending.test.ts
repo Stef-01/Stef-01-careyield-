@@ -256,3 +256,22 @@ describe("W350 a wait written as prose, read against the ledger", () => {
     );
   });
 });
+
+describe("W355 the defaulted register is handed a different value, at home", () => {
+  // A default promises the comparison can be asked another question, and a promise nobody collects
+  // is a signature that reads as drivable while the only value it ever had is the default. W355
+  // found twelve parameters in this tree whose parameter no call anywhere supplied; this is two of them.
+
+  it("reads the ledger text it is given, not only the tree's", () => {
+    const ledger = "| W900 | done | builder-B | 2026-01-01T00:00Z | abc1234 | a unit that landed |\n";
+    const given = proseWaits(ROOT, ledger);
+    const own = proseWaits(ROOT);
+    expect(given, "the ledger argument made no difference").not.toEqual(own);
+  });
+
+  it("reads the waits it is given, not only the ones it derives", () => {
+    const planted = [{ module: "src/planted/x.ts", unit: "W901", line: "// until W901" }];
+    const found = proseWaitDefects(ROOT, {}, planted as never);
+    expect(found.map((d) => d.wait), "a wait handed in was not read").toContain("src/planted/x.ts::W901");
+  });
+});

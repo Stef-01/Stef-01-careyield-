@@ -26,6 +26,7 @@ import { EXCLUDED_AT_W349, SURVIVORS_AT_W349 } from "./quarter-mutants-q26";
 import { REMEDIES_AT_W357 } from "./unapplied-remedies";
 import { PREMISES_AT_W358 } from "./spec-premises";
 import { RESIDUE_AT_W359 } from "./spec-stores";
+import { DRIVEN_AT_W355 } from "./defaulted-registers";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { withPlantedIn } from "./planting";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
@@ -93,6 +94,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
     const live = PINS.filter((p) => p.classification.kind === "live_by_design");
     expect(live.map((p) => p.name).sort()).toEqual([
       "BLOCKED_AT_W263",
+      "DRIVEN_AT_W355",
       "EXCLUDED_AT_W349",
       "PREMISES_AT_W358",
       "REMEDIES_AT_W357",
@@ -140,6 +142,9 @@ describe("W290 the live pins, and why live is not the defect", () => {
     // W359's is the same class again, keyed by a PAIR — the spec and the store it reads — because
     // one spec can owe an argument for more than one store and a spec-level row would hide that.
     expect(RESIDUE_AT_W359.every((r) => r.store.endsWith("/store.ts"))).toBe(true);
+    // W355's is the same class over signatures rather than files: one row per defaulted parameter
+    // driven from outside its own suite, keyed by `module::fn::position` and carrying the files.
+    expect(DRIVEN_AT_W355.every((r) => r.parameter.split("::").length === 3)).toBe(true);
   });
 
   it("makes each argue for interrupting somebody, not merely declare itself live", () => {

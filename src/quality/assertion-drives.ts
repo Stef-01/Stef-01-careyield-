@@ -63,6 +63,7 @@ import { endingDiff } from "./self-ending";
 import { PREMISES_AT_W358, premiseDefects, stagedSpecs } from "./spec-premises";
 import { residueDefects } from "./spec-stores";
 import { ZERO_CLAIMS, zeroDefects } from "@/console/zero-meaning";
+import { DRIVEN_AT_W355, defaultDefects, defaultedParameters } from "./defaulted-registers";
 import { unreachedByUnitSuite } from "./unrun";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
@@ -472,6 +473,18 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
         },
       ]).didNotFire.length > 0
     );
+  },
+
+  "src/quality/defaulted-registers.ts": (root) => {
+    // Both stale directions off one record: files the tree disagrees with, and a record for a
+    // parameter the tree does not hold. The arriving direction — a defaulted register nothing
+    // supplies — is driven on a planted tree in the module's own suite, where such a module can
+    // be made to exist.
+    const params = defaultedParameters(root);
+    const first = DRIVEN_AT_W355[0]!;
+    const drifted = defaultDefects(root, [{ parameter: first.parameter, drivenBy: ["src/nowhere.ts"] }], params);
+    const gone = defaultDefects(root, [{ parameter: "src/gone.ts::gone::2", drivenBy: ["src/x.ts"] }], []);
+    return drifted.length > 0 && gone.length > 0;
   },
 
   "src/console/zero-meaning.ts": (root) => {
