@@ -44,9 +44,8 @@
 // FOUNDER GATE (plan §4): nothing crossed. This reads the tree's own exported sentences, and the
 // trees it plants are throwaway directories holding only the files a predicate reads.
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { existsSync } from "node:fs";
 import { type Plantable, withTree } from "./planting";
 import { sourceModules, pageSpecFiles } from "./tree-walks";
 import { headerUnit, knownUnits } from "./unit-headers";
@@ -650,22 +649,21 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: HORIZON_DIRECTION_BOUND,
     lifting: {
       kind: "remedy",
-      remedy: "resolving the citation to a branch and CALLING it",
-      reads: "`horizon-directions.ts`, for a citation resolved to something runnable rather than to a test title",
-      // The clause that names something buildable, and the tree already has the shape: W291's
-      // refusal branches are cited by id and W289's driver RESOLVES and CALLS them rather than
-      // recording them. A `shown_loud` row here resolves a title in a file and stops. The predicate
-      // reads for the derivation, because what lifts the sentence is this module growing a way to
-      // run what it cites.
+      remedy: "moving a welded comparison out of its `.test.ts`",
+      reads: "`plan-ledger.ts`, for a ledger comparison that exists as a module at all rather than only inside its own test",
+      // W371 BUILT THE PREVIOUS REMEDY AND THIS IS WHAT IS LEFT. `drivesItsCheck` now resolves each
+      // citation to a drive and calls it, so the sentence no longer says nothing runs them. Two
+      // rows still cannot be run, and for one reason: their comparison is written inline in a
+      // `.test.ts`, which exports nothing. `plan-ledger` is the sharper of the two — there is no
+      // module at all — so the predicate reads for one existing, because that is the change that
+      // would close the residue rather than a unit somebody promises.
       stillOpen: (root) =>
-        !/export function drivesItsCheck/.test(
-          readFileSync(path.join(root, "src/quality/horizon-directions.ts"), "utf8"),
-        ),
+        !existsSync(path.join(root, "src/quality/plan-ledger.ts")),
       lifted: {
         kind: "constructed_tree",
         files: {
-          "src/quality/horizon-directions.ts":
-            "// W363: the failure directions re-read.\nexport function drivesItsCheck(): boolean {\n  return false;\n}\n",
+          "src/quality/plan-ledger.ts":
+            "// W371: the ledger comparison, callable.\nexport function ledgerDefects(): string[] {\n  return [];\n}\n",
         },
       },
     },

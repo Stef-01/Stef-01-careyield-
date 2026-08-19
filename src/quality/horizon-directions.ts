@@ -211,7 +211,7 @@ export const CHECKS_AT_W363: readonly NamedCheck[] = [
     token: "readEvidence",
     standing: {
       kind: "shown_loud",
-      citation: "src/credentials/vault.test.ts :: refuses a non-member and a member of another practice alike",
+      citation: "src/credentials/vault.test.ts :: a grant cannot read another practice's document, and is not told it exists",
       how: "The horizon names it as the second export W340's count credited with a reader that was a probe string. The vault is a product read behind a grant rather than a register, so W352 says nothing about it; what makes a failure loud is that the refusal is the assertion — a read that should be refused and is not fails this test rather than returning something a caller might not look at.",
     },
   },
@@ -297,16 +297,108 @@ export function horizonDefects(
 }
 
 /** What this register does not prove. */
+/**
+ * How a `shown_loud` citation is RUN.
+ *
+ * W363 shipped these rows resolving a title in a file and stopping, and said so in its own bound:
+ * a citation nobody runs is worth what W258 says it is worth. W371 closes that. The drive is HANDED
+ * IN rather than imported, for W367's reason — `bounds.ts` imports this module's bound, so importing
+ * a check back would complete a cycle whose symptom is `undefined` at module-eval — and because a
+ * register that imported every check it cites would be a second copy of the census.
+ */
+export interface CitationDrive {
+  /** The `shown_loud` token this drives. */
+  token: string;
+  /** Resolved and CALLED. True when the named check REPORTED on an input it must reject. */
+  drive: () => boolean;
+}
+
+/**
+ * A citation nothing can run, because the check it names has no callable form.
+ *
+ * EVERY ROW HERE IS W289'S CLASS RATHER THAN A NEW ONE: its whole comparison lives inside a
+ * `.test.ts`, which exports nothing, so the citation cannot be resolved to anything a register may
+ * call. `remedy` is required — a residue with no named change is how a short exception list becomes
+ * a bin.
+ */
+export interface UnrunnableCitation {
+  token: string;
+  remedy: string;
+}
+
+export const UNRUNNABLE_CITATIONS: readonly UnrunnableCitation[] = [
+  {
+    token: "plan-ledger",
+    remedy:
+      "There is no `plan-ledger.ts` at all — the ledger comparison is written inline in `plan-ledger.test.ts`, which reads the plan and the ledger and asserts about them in the same breath. Moving the comparison into a module that takes the ledger's rows as an argument would make it callable, and would also make it drivable by W289, which cannot reach it either.",
+  },
+  {
+    token: "src/quality/horizon-q28.test.ts",
+    remedy:
+      "The cited behaviour is a REFUSAL TO WRITE A NUMBER — the quarter gate declining to set a numeric threshold and saying why — and it is asserted about the document rather than computed from it. Exporting the reading as a function over the document's text would make it callable; until then the citation names a decision rather than a derivation.",
+  },
+];
+
+export interface CitationDefect {
+  token: string;
+  what: string;
+}
+
+/**
+ * Every `shown_loud` citation resolved to something runnable and CALLED.
+ *
+ * THIS IS THE HALF W363'S BOUND SAID WAS MISSING, and building it found the thing that kind of gap
+ * hides: the `readEvidence` row cited a test that drives `openVault`. Both live in `vault.test.ts`
+ * and the title resolved, so every check this tree had was satisfied by a row that pointed at the
+ * wrong assertion. The citation now names the test that calls `readEvidence`.
+ */
+export function drivesItsCheck(
+  checks: readonly NamedCheck[],
+  drives: readonly CitationDrive[],
+  unrunnable: readonly UnrunnableCitation[] = UNRUNNABLE_CITATIONS,
+): CitationDefect[] {
+  const cited = checks.filter((c) => c.standing.kind === "shown_loud").map((c) => c.token);
+  const byToken = new Map(drives.map((d) => [d.token, d]));
+  const excused = new Set(unrunnable.map((u) => u.token));
+  const out: CitationDefect[] = [];
+
+  for (const token of cited) {
+    const drive = byToken.get(token);
+    if (drive && excused.has(token)) {
+      out.push({ token, what: "is both driven here and declared unrunnable, which cannot both be true" });
+      continue;
+    }
+    if (!drive) {
+      if (!excused.has(token)) out.push({ token, what: "cites a test and nothing here runs the check it names" });
+      continue;
+    }
+    if (!drive.drive()) {
+      out.push({ token, what: "has a drive that did not report, so the citation stands on nothing" });
+    }
+  }
+  for (const { token } of drives) {
+    if (!cited.includes(token)) out.push({ token, what: "is driven here and is not a shown_loud citation" });
+  }
+  for (const { token } of unrunnable) {
+    if (!cited.includes(token)) out.push({ token, what: "is excused here and is not a shown_loud citation" });
+  }
+  return out.sort((a, b) => `${a.token}${a.what}`.localeCompare(`${b.token}${b.what}`));
+}
+
 export const HORIZON_DIRECTION_BOUND =
   "IT READS THE BACKTICKS, which is how this document happens to mark a name and not a rule about " +
   "prose. A check the horizon discusses in words without quoting it is outside the population " +
   "entirely, and the quarter's argument is mostly words — so a clean run here means every check " +
   "the document POINTED AT is answered, not every check it leaned on. The remedy is a reading of " +
   "the prose rather than of its punctuation, which is a judgement rather than a resolution. " +
-  "A `shown_loud` ROW RESOLVES A TITLE, NOT A BEHAVIOUR: the cited test must exist in the cited " +
-  "file, and nothing here runs it or checks that it drives the named check rather than something " +
-  "else in the same module. That is the same gap W292's citations carry and it is closed the same " +
-  "way when it is closed — by resolving the citation to a branch and CALLING it. AND `not_a_check` " +
+  "A `shown_loud` ROW IS RUN AND NOT ONLY RESOLVED, since W371: `drivesItsCheck` takes a drive per " +
+  "citation, CALLS it, and fails when the named check does not report on an input it must reject. " +
+  "What that still does not prove is that the drive and the cited test are the SAME assertion — " +
+  "they exercise the same export, and a test asserting something else about it would satisfy both. " +
+  "AND SOME ROWS CANNOT BE RUN AT ALL: `plan-ledger` and `horizon-q28.test.ts` keep their whole " +
+  "comparison inside a `.test.ts`, which exports nothing, so `UNRUNNABLE_CITATIONS` names them with " +
+  "the change that would make them callable — moving a welded comparison out of its `.test.ts`. " +
+  "AND `not_a_check` " +
   "IS THE CLASS TO WATCH: it holds most of the rows, every one of them a judgement that a token " +
   "names data rather than a derivation, and the only mechanical thing standing behind it is that " +
   "the token resolves to no module in this tree.";

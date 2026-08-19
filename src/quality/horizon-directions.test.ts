@@ -14,6 +14,9 @@ import {
   CHECKS_AT_W363,
   HORIZON,
   HORIZON_DIRECTION_BOUND,
+  UNRUNNABLE_CITATIONS,
+  type CitationDrive,
+  drivesItsCheck,
   type NamedCheck,
   type NamedToken,
   horizonDefects,
@@ -22,6 +25,19 @@ import {
 import { directions } from "./failure-direction";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { withTree } from "./planting";
+import { existsSync } from "node:fs";
+import { classDefects } from "./claim-classes";
+import { controlDefects } from "./controls";
+import { loadIntervals } from "@/registers/intervals";
+import { openVault, readEvidence, resetVault, storeEvidence } from "@/credentials/vault";
+import type { Membership } from "@/tenancy/tenancy";
+
+/** The membership set W121's own suite uses, restated here because it is local to that file. */
+const VAULT_MEMBERS: readonly Membership[] = [
+  { practiceId: "prac-a", email: "owner@a.example", role: "owner" },
+  { practiceId: "prac-b", email: "owner@b.example", role: "owner" },
+];
+import { populationDefects as q26PopulationDefects } from "./quarter-mutants-q26";
 
 const ROOT = process.cwd();
 const TOKENS = horizonTokens(ROOT);
@@ -179,6 +195,109 @@ describe("W363 the answers, read against what stands behind them", () => {
   it("states what a green gate does not cover", () => {
     expect(HORIZON_DIRECTION_BOUND.length).toBeGreaterThan(600);
     expect(HORIZON_DIRECTION_BOUND).toContain("IT READS THE BACKTICKS");
-    expect(HORIZON_DIRECTION_BOUND).toContain("RESOLVES A TITLE, NOT A BEHAVIOUR");
+    expect(HORIZON_DIRECTION_BOUND).toContain("IS RUN AND NOT ONLY RESOLVED");
+    expect(HORIZON_DIRECTION_BOUND).toContain("SOME ROWS CANNOT BE RUN AT ALL");
+  });
+});
+
+describe("W371 every shown_loud citation is resolved to something runnable and CALLED", () => {
+  // W363'S OWN BOUND NAMED THIS AS ITS GAP: a row resolved a test title and stopped. Each drive
+  // below reaches the export the token names and hands it an input it must reject, and the drive is
+  // CALLED here rather than recorded — which is the difference the bound was written about.
+  //
+  // The drives live in the test rather than in the register on purpose. `bounds.ts` imports that
+  // module's bound, so a register importing every check it cites would complete a cycle of exactly
+  // the shape W367 spent a unit digging out.
+  const DRIVES: readonly CitationDrive[] = [
+    {
+      // Nothing declared: every class the horizon names must come back unanswered.
+      token: "claim-classes.ts",
+      drive: () => classDefects(ROOT, []).length > 0,
+    },
+    {
+      token: "controls.ts",
+      drive: () => controlDefects(ROOT, []).length > 0,
+    },
+    {
+      // A row missing its cadence is refused at load rather than dropped, and says which row.
+      token: "guidelineIntervals",
+      drive: () => loadIntervals([{ id: "planted", condition: "x" }]).rejected.length > 0,
+    },
+    {
+      // W18'S BOUNDARY, driven on the export the token names — not on `openVault`, which is what
+      // the citation used to point at.
+      token: "readEvidence",
+      drive: () => {
+        resetVault();
+        const a = openVault(VAULT_MEMBERS, "owner@a.example", "prac-a");
+        const b = openVault(VAULT_MEMBERS, "owner@b.example", "prac-b");
+        if (!a.ok || !b.ok) return false;
+        const stored = storeEvidence(b.grant, {
+          credentialId: "cred-1",
+          subjectClinicianId: "clin-1",
+          filename: "b.pdf",
+          contentType: "application/pdf",
+          content: "JVBERi0=",
+          uploadedOn: "2026-01-01",
+        });
+        if (!stored.ok) return false;
+        // The refusal, and its control: B's own grant finds exactly what A's cannot.
+        return (
+          readEvidence(a.grant, stored.summary.ref).found === false &&
+          readEvidence(b.grant, stored.summary.ref).found === true
+        );
+      },
+    },
+    {
+      token: "src/quality/quarter-mutants-q26.ts",
+      drive: () => q26PopulationDefects(ROOT, []).length > 0,
+    },
+  ];
+
+  it("runs every citation that has a runnable form, and every one of them reports", () => {
+    expect(drivesItsCheck(CHECKS_AT_W363, DRIVES)).toEqual([]);
+    expect(DRIVES.length, "no citation is driven, so this checks nothing").toBeGreaterThan(4);
+  });
+
+  it("reports a citation nothing runs, which is the state W363 shipped in", () => {
+    // NOT COMPARED AGAINST A MAP OF THE SAME REGISTER, which would be W317's shape: empty the
+    // register and both sides go empty together. A floor, the one `what`, and two tokens by name.
+    const undriven = drivesItsCheck(CHECKS_AT_W363, [], []);
+    expect(undriven.length, "no citation is left undriven, so this checks nothing").toBeGreaterThan(4);
+    expect(new Set(undriven.map((d) => d.what))).toEqual(
+      new Set(["cites a test and nothing here runs the check it names"]),
+    );
+    expect(undriven.map((d) => d.token)).toContain("plan-ledger");
+    expect(undriven.map((d) => d.token)).toContain("readEvidence");
+  });
+
+  it("reports a drive that did not report, so a citation cannot stand on a quiet check", () => {
+    const silent: CitationDrive[] = [{ token: "controls.ts", drive: () => false }];
+    expect(drivesItsCheck(CHECKS_AT_W363, silent).filter((d) => d.token === "controls.ts")).toEqual([
+      { token: "controls.ts", what: "has a drive that did not report, so the citation stands on nothing" },
+    ]);
+  });
+
+  it("refuses a token that is both driven and excused, because only one of them can be true", () => {
+    const both = drivesItsCheck(CHECKS_AT_W363, [{ token: "plan-ledger", drive: () => true }]);
+    expect(both.filter((d) => d.token === "plan-ledger")).toEqual([
+      { token: "plan-ledger", what: "is both driven here and declared unrunnable, which cannot both be true" },
+    ]);
+  });
+
+  it("reports a drive and an excusal for something that is not a shown_loud citation", () => {
+    expect(drivesItsCheck([], [{ token: "gone", drive: () => true }], [{ token: "also-gone", remedy: "x" }])).toEqual([
+      { token: "also-gone", what: "is excused here and is not a shown_loud citation" },
+      { token: "gone", what: "is driven here and is not a shown_loud citation" },
+    ]);
+  });
+
+  it("names the change that would make each unrunnable citation callable", () => {
+    expect(UNRUNNABLE_CITATIONS.length, "nothing is excused, so the residue checks nothing").toBeGreaterThan(1);
+    for (const { token, remedy } of UNRUNNABLE_CITATIONS) {
+      expect(remedy.length, `${token} is excused without a remedy`).toBeGreaterThan(120);
+      // The excuse is a fact about the tree: the check really has no module to call.
+      expect(existsSync(path.join(ROOT, `src/quality/${token}.ts`)), `${token} has a module after all`).toBe(false);
+    }
   });
 });
