@@ -31,6 +31,7 @@ import { type Plantable, withTree } from "./planting";
 import { privateCopies } from "./private-copies";
 import { filesUnder, sourceModules, typescriptFiles } from "./tree-walks";
 import { appliedExemptions } from "./exemption-reach";
+import { emptyRegisters } from "./empty-populations";
 import { violationReporters } from "./refusal-branches";
 import { namingSites } from "./declaration-tax";
 import { treeWalkingFiles } from "./register-census";
@@ -82,6 +83,16 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/blind-spots.ts", "src/quality/spelling-markers.ts"],
     why:
       "W368's scan walks the tree for a detector's defaulted exemption parameter, and both holders plant one — `blind-spots.ts` as the positive control for that register's own blind spot, `spelling-markers.ts` as the pair a second spelling of the parameter is measured against. Written inline, each holder became an exemption the register reported as applied and unmeasured, which W355 caught first: its defaulted-register scan read the same literals as real parameters nobody drives.",
+  },
+  {
+    detector: "src/quality/empty-populations.ts::emptyRegisters",
+    sees: (root) => emptyRegisters(root).map((r) => `${r.module}::${r.name}`),
+    plant: { "src/planted/empty-register.ts": fixtureText("empty-register-module") },
+    marker: "planted/empty-register",
+    holdersAppear: "never",
+    holders: ["src/quality/empty-populations.test.ts"],
+    why:
+      "W369's walk looks for `export const NAME … = []` across the tree, and its suite has to plant one to prove the walk rather than the reader. Written inline, the example would BE an empty register in this tree — undeclared, and reported by the very check it was written to drive.",
   },
   {
     detector: "src/quality/refusal-branches.ts::violationReporters",

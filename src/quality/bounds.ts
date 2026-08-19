@@ -68,6 +68,7 @@ import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
+import { EMPTY_BOUND } from "./empty-populations";
 import { SUBJECT_BOUND } from "./subject-and-walk";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
@@ -502,6 +503,38 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/empty-populations.ts",
+    name: "EMPTY_BOUND",
+    unit: "W369",
+    text: EMPTY_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "asking who reads an empty register and driving them on a member",
+      reads: "`empty-populations.ts`, for an empty register whose consumers are shown to work rather than only whose sentence is shown to exist",
+      // The clause that names something buildable. A row proves the module still argues its
+      // emptiness; what it cannot say is whether anything still READS the list. The predicate
+      // reads for the register that would hold those consumers, not for a unit id.
+      stillOpen: (root) =>
+        !/export const EMPTY_CONSUMERS/.test(
+          readFileSync(path.join(root, "src/quality/empty-populations.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/empty-populations.ts":
+            "// W369: the empty population.\nexport const EMPTY_CONSUMERS = {};\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'the question one level in' — the unit of a phrase about depth rather than a count anything maintains. `emptyPopulationDefects` re-derives the population and the rows both ways on every run, so there is no total here to go stale.",
       },
     ],
   },

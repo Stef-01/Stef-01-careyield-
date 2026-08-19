@@ -246,6 +246,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/empty-populations.ts",
+    name: "EMPTY_AT_W369",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a register shipping empty, an empty one gaining its first member, or a module rewording the sentence that argues its emptiness",
+      whyStopping:
+        "A NAMED ROW PER EMPTY REGISTER, each carrying words that must still be in the module it names — re-derived on every run in both directions, so neither side can rot into a label. A row arriving means something now ships empty and nobody has said whether that is a claim or a leftover, which is the exact state this unit exists to make visible; a row leaving means an empty register filled, and a register crossing from empty to non-empty is often a founder gate being crossed, which is the loudest thing this tree can stop for. It cannot be satisfied by retyping a digit: the population is a walk over the tree's declarations and every quote is resolved against its module's own text.",
+    },
+  },
+  {
     module: "src/quality/quarter-mutants-q27.ts",
     name: "QUARTER_AT_W362",
     classification: {

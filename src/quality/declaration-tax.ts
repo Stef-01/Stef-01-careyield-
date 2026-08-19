@@ -200,6 +200,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/empty-populations.ts",
+    // Its population is registers that ship EMPTY, and the probe plants a plain module with no
+    // register at all — outside by construction. A module arriving with an empty register does owe
+    // a row, which is the register's whole point, but that is a cost of the register rather than a
+    // cost of arriving.
+    demands: () => false,
+  },
+  {
     file: "src/quality/horizon-directions.ts",
     // It reads a planning document, so a module planted under `src/` is outside its population by
     // construction — the token would have to be quoted in the horizon first, which a plant cannot do.
@@ -655,7 +663,15 @@ export const AUTHOR_TAX_AT_W313: Readonly<Record<ModuleShape, number>> = {
   a_full_register: 6,
 };
 
-/** Shapes whose author-cost has moved since W313's record. */
+/**
+ * Shapes whose author-cost has moved since W313's record.
+ *
+ * EMPTY, AND EMPTY THE WAY `MOVED_SINCE_W308` IS: the mechanism exists ahead of the movement it
+ * records, because a record with no way to account for a later movement gets edited instead of
+ * extended. W369 found this one saying nothing about its own emptiness while its sibling above
+ * argued the case properly — which is exactly how an empty register stops being distinguishable
+ * from a dead one.
+ */
 export const MOVED_SINCE_W313: readonly Movement[] = [];
 
 /**

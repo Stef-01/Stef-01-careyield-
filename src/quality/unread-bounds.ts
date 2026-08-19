@@ -558,6 +558,14 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/empty-populations.ts::EMPTY_BOUND",
+    condition: "a register emptied at runtime, built by a function that happens to return nothing, or spelled across lines is invisible to it",
+    reading: {
+      kind: "not_observable",
+      why: "THREE GAPS IN ONE CLAUSE AND ALL THREE STOP AT THE SAME PLACE. Seeing a register that is empty at RUNTIME means evaluating the module, and W367 proved in this exact neighbourhood that a module's exported values depend on which file entered the graph first — so a register reading values would report a different population per importer, which is worse than reporting none. Seeing that a FUNCTION returns nothing means claiming it returns nothing on every run, which is not a walk. And the line-anchored read is the price of the distinction the register is built on: a multi-line match finds declarations quoted inside comments and strings, so widening it trades a gap this bound names for a class of false reports it would not.",
+    },
+  },
+  {
     bound: "src/quality/unread-bounds.ts::UNREAD_BOUND",
     condition: "a bound naming a gap in words this vocabulary does not hold is outside this register",
     reading: {

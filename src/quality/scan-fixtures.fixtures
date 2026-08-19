@@ -226,3 +226,24 @@ export const E: Readonly<Record<string, string>> = {};
 export function check(excused: Readonly<Record<string, string>> = E): string[] {
   return Object.keys(excused);
 }
+=== empty-register-module ===
+export const PLANTED_EMPTY: readonly string[] = [];
+export const PLANTED_WIDE: ReadonlyArray<{ file: string }> = [];
+export const PLANTED_FULL: readonly string[] = ["a member"];
+const PLANTED_PRIVATE: readonly string[] = [];
+
+=== empty-register-mention ===
+// export const MENTIONED_EMPTY: readonly string[] = [];
+const note = "export const QUOTED_EMPTY: readonly string[] = [];";
+  export const INDENTED_EMPTY: readonly string[] = [];
+
+=== empty-register-argued ===
+/**
+ * The shipped set: none.
+ *
+ * Empty because a ruling has not landed, and a test pins it so content cannot arrive sideways.
+ */
+export const PLANTED_ARGUED: readonly string[] = [];
+
+=== empty-register-unargued ===
+export const PLANTED_ARGUED: readonly string[] = [];

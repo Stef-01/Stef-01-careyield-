@@ -100,6 +100,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
       "CHECKS_AT_W363",
       "COMPARED_AT_W367",
       "DRIVEN_AT_W355",
+      "EMPTY_AT_W369",
       "EXCLUDED_AT_W349",
       "EXCLUDED_AT_W362",
       "PREMISES_AT_W358",

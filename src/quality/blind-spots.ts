@@ -64,6 +64,7 @@ import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
 import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import { EMPTY_BOUND, emptyPopulationDefects } from "./empty-populations";
 import { HORIZON_DIRECTION_BOUND, horizonDefects, horizonTokens } from "./horizon-directions";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
@@ -147,6 +148,32 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
           };
+        },
+      ),
+  },
+
+  "src/quality/empty-populations.ts": {
+    kind: "demonstrated",
+    bound: EMPTY_BOUND,
+    witness: "a register whose sentence is intact and which nothing anywhere reads, which this cannot tell from a live one and must not report",
+    control: "the same register with the sentence taken away, which it must report",
+    probe: () =>
+      withRoot(
+        { "src/planted/argued.ts": fixtureText("empty-register-argued") },
+        (root) => {
+          const declared = [
+            {
+              module: "src/planted/argued.ts",
+              name: "PLANTED_ARGUED",
+              emptiness: { kind: "by_design" as const, quote: "Empty because a ruling has not landed" },
+            },
+          ];
+          const witnessSeen = emptyPopulationDefects(root, declared).length > 0;
+          const controlSeen = withRoot(
+            { "src/planted/argued.ts": fixtureText("empty-register-unargued") },
+            (bare) => emptyPopulationDefects(bare, declared).length > 0,
+          );
+          return { witnessSeen, controlSeen };
         },
       ),
   },

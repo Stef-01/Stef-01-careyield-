@@ -36,6 +36,7 @@ import { diffCensus, discoverSurfaces, parseCensus } from "@/compliance/surfaces
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
+import { emptyPopulationDefects } from "./empty-populations";
 import { separatorDiff } from "./citations";
 import { planterDiff } from "./planting";
 import { countDiff } from "./register-counts";
@@ -89,6 +90,11 @@ export type Drive = (root: string) => boolean;
 const BEYOND_EVERY_REVIEW = "2099-01-01";
 
 export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
+  "src/quality/empty-populations.ts": (root) =>
+    emptyPopulationDefects(root, [
+      { module: "src/gone.ts", name: "GONE_REGISTER", emptiness: { kind: "by_design", quote: "a sentence no module makes" } },
+    ]).length > 0,
+
   "src/quality/citations.ts": (root) => separatorDiff(root, {}).undeclared.length > 0,
 
   "src/quality/planting.ts": (root) => planterDiff(root, {}).undeclared.length > 0,

@@ -415,6 +415,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/empty-populations.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/empty-populations.test.ts :: finds a register in a file that was not there before, which is the walk and not the scan",
+      plants: "src/planted/mention.ts",
+    },
+  },
+  {
     register: "src/quality/horizon-directions.ts",
     negative: {
       kind: "already_driven",

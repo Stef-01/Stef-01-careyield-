@@ -153,6 +153,11 @@ export function populationDefects(
  *
  * W296'S TYPE AND W296'S FOUR KINDS, unchanged for the third quarter: a survivor is a question
  * rather than a verdict, and which of the four it is can only be settled by reading.
+ *
+ * EMPTY BECAUSE THE RUN FOUND NOTHING LEFT, not because nobody ran it. The survivor W362 did find
+ * was fixed in `typed-names.test.ts` rather than recorded here, per W357. An empty survivors
+ * register and a harness nobody ever started look identical from outside, so this sentence is the
+ * only thing that separates them — W369.
  */
 export const SURVIVORS_AT_W362: readonly Survivor[] = [];
 

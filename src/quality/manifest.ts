@@ -473,6 +473,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/empty-populations.ts",
+    census: {
+      derives:
+        "Every register this tree exports with no members — `export const NAME … = []` across `typescriptFiles`, read line-anchored so a mention of a declaration inside a comment or a string is not one. Both spellings of the type count: `readonly T[]` and `ReadonlyArray<T>`, which is the difference between the walk and the hand search this unit began with.",
+      checkedAgainst:
+        "W369's `EMPTY_AT_W369`, in three directions: an empty register with no row fails, a row for a register the tree no longer holds empty fails, and a row whose quote is not in the module it names fails — the quote resolved against the module's own prose with the doc comment's continuation markers taken off.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module declaring an empty register in each of the two spellings is planted into an otherwise bare tree, and both must be reported while a register with a member and one nobody exports are not",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No register in this tree ships empty without its own module saying, in words still there to be read, whether the emptiness is a claim or a leftover.",
+        mutation:
+          "`emptyPopulationDefects` is given a declared list naming a register the tree does not hold, and must report both that row and every empty register the list leaves out.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/subject-and-walk.ts",
     // Reads a pair of registers — `STATED_BOUNDS` and W365's `POPULATIONS` — and compares them
     // each other. It walks nothing: the bounds are a module constant and the populations are
