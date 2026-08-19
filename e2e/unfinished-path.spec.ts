@@ -26,6 +26,10 @@ async function startButDoNotFinish(page: import("@playwright/test").Page) {
 }
 
 test.beforeEach(async ({ request }) => {
+  // W359: this walk is about what an operator has NOT finished, and the ops pages it reads render
+  // the sending switches and the booking rail. A pause another spec left engaged is an unfinished
+  // step this file did not create, which is the one thing it must not be reading.
+  await request.post("/api/mock/ops");
   await request.post("/api/mock/console");
 });
 

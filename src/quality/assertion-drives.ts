@@ -60,6 +60,7 @@ import { claimDefects } from "./prose-numbers";
 import { type Selector, type Widening, supersetDefects } from "./superset";
 import { endingDiff } from "./self-ending";
 import { PREMISES_AT_W358, premiseDefects, stagedSpecs } from "./spec-premises";
+import { residueDefects } from "./spec-stores";
 import { unreachedByUnitSuite } from "./unrun";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
@@ -446,6 +447,17 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
         },
       ]).didNotFire.length > 0
     );
+  },
+
+  "src/quality/spec-stores.ts": (root) => {
+    // Both stale directions off one register: an argument for a spec that already resets the store,
+    // and an argument for a spec the suite does not hold. The arriving direction is driven on a
+    // planted tree in the module's own suite, where a store can be made to exist.
+    const closed = residueDefects(root, [{ spec: "e2e/ops.spec.ts", store: "src/ops/store.ts", why: "x" }], [
+      "e2e/ops.spec.ts",
+    ]);
+    const gone = residueDefects(root, [{ spec: "e2e/gone.spec.ts", store: "src/ops/store.ts", why: "x" }], []);
+    return closed.length > 0 && gone.length > 0;
   },
 
   "src/quality/spec-premises.ts": (root) => {

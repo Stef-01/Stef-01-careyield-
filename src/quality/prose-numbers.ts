@@ -348,6 +348,11 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // tree. History either way: `stagedSpecs` re-derives the population from the specs on every run
   // and `premiseDefects` checks the rows against it in three directions, so the sentences are the
   // finding and the derivations are the check.
+  // W359: the shape the unit's title names — a pair of specs standing on one store — and the pair
+  // of demo specs the register's rows are about. History: `residueDefects` re-derives the gaps from
+  // each spec's routes and resets on every run and checks the rows against them three ways, so the
+  // sentence is the finding and the derivation is the check.
+  { module: "src/quality/spec-stores.ts", text: "two specs", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/spec-premises.ts", text: "nine copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/spec-premises.ts", text: "NINE ROWS", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/manifest.ts", text: "three survivor registers", resolution: { kind: "at_the_unit" } },

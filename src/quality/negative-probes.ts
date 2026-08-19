@@ -415,6 +415,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/spec-stores.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/spec-stores.test.ts :: stays quiet once the same spec resets it, which is what makes the report mean anything",
+      plants: "app/api/mock/thing/route.ts",
+    },
+  },
+  {
     register: "src/quality/spec-premises.ts",
     negative: {
       kind: "already_driven",

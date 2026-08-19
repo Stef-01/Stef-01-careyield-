@@ -218,6 +218,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/spec-stores.ts",
+    name: "RESIDUE_AT_W359",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a spec beginning to read a store it does not reset, or one of these gaps being closed",
+      whyStopping:
+        "A NAMED ROW PER SPEC AND STORE, each arguing what makes that spec's answer independent of what ran before it — a launcher that clears every store itself, or an assertion about a refusal no contents could change. A gap arriving is a spec whose result depends on file order, which is the defect W346 shipped and this unit exists to stop; a gap closing means the argument is now an excuse for work that was done, and it survives every green run unless something says so. Neither direction can be satisfied by retyping a digit: the population is derived from each spec's routes and resets on every run and the rows are compared against it three ways.",
+    },
+  },
+  {
     module: "src/quality/spec-premises.ts",
     name: "PREMISES_AT_W358",
     classification: {

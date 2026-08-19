@@ -12,6 +12,10 @@ interface MockState {
 test.beforeEach(async ({ page, request }) => {
   await request.post("/api/mock/state");
   await request.post("/api/mock/console");
+  // W359: and the referral rail, which the pages this file walks render. With the console just
+  // reset there is no practice to seed against, so this leaves the rail EMPTY — which is what an
+  // erasure walk needs to be standing on: a record it finds afterwards must be one this spec made.
+  await request.post("/api/mock/referrals");
   await page.goto("/console");
   await page.getByLabel("Work email").fill("manager@demo.practice.example");
   await page.getByRole("button", { name: "Sign in" }).click();

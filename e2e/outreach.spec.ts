@@ -31,6 +31,11 @@ async function gotoOutreach(page: Page) {
 }
 
 test.beforeEach(async ({ request }) => {
+  // W359: the ops rail first, then the console — `ops.spec.ts`'s order, and it matters because the
+  // ops reset seeds against whatever practice the console holds. Both are reset here rather than
+  // only the console: the outreach pages this file walks render the sending switches and the
+  // booking rail, so without it this spec answers about whichever spec last engaged a kill switch.
+  await request.post("/api/mock/ops");
   await request.post("/api/mock/console");
 });
 

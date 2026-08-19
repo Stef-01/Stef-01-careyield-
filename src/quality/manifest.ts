@@ -464,6 +464,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/spec-stores.ts",
+    census: {
+      derives:
+        "For every `*.spec.ts` under `e2e/`, the stores its premise reads and the stores it puts back — the first by walking from each route it visits and STOPPING at the first store module, the second by reading which `reset*` functions each mock route it POSTs imports. The routes come from its `goto` literals and from the `route:` fields of the path registers it iterates, scoped to the constant it names.",
+      checkedAgainst:
+        "W359's `RESIDUE_AT_W359`, in three directions: a store a spec reads and does not reset with nothing arguing for it fails, an argument for a gap the spec has since closed fails, and an argument for a spec the suite no longer holds fails.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a constructed tree holding a page that reads a planted store and a spec that visits it, which must be reported; the same tree with a mock route resetting that store and the spec posting to it, which must not",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every e2e spec resets the stores its premise depends on, so what it asserts is about the state it established rather than about whichever spec ran before it.",
+        mutation:
+          "An argument is supplied for a spec that already resets the store, and must be reported stale; an argument is supplied for a spec the suite does not hold, and must be reported the other way.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/spec-premises.ts",
     census: {
       derives:

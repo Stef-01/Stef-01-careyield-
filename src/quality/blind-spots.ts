@@ -61,6 +61,7 @@ import { CONTROLS, INSTANT_BOUND, instantDiff } from "./instant";
 import { QUARTER_MUTANT_BOUND, quarterModules } from "./quarter-mutants";
 import { UNASKED_BOUND, unaskedFacts } from "./unasked-facts";
 import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
+import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
   vocabularyDefects,
@@ -139,6 +140,36 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/spec-stores.ts": {
+    kind: "demonstrated",
+    bound: RESIDUE_BOUND,
+    witness: "a page a spec reaches by CLICKING A LINK, whose store this register cannot see and must not report",
+    control: "the same page reached by `goto`, whose store it must",
+    probe: () =>
+      withRoot(
+        {
+          "app/console/hub/page.tsx": 'export default function P() { return null; }\n',
+          "app/console/linked/page.tsx":
+            'import { readLinked } from "@/linked/store";\nexport default function P() { return readLinked(); }\n',
+          "app/console/direct/page.tsx":
+            'import { readDirect } from "@/direct/store";\nexport default function P() { return readDirect(); }\n',
+          "src/linked/store.ts": "export function readLinked(): number {\n  return 1;\n}\n",
+          "src/direct/store.ts": "export function readDirect(): number {\n  return 1;\n}\n",
+          "e2e/clicks.spec.ts":
+            'test("walks", async ({ page }) => {\n  await page.goto("/console/hub");\n' +
+            '  await page.getByRole("link", { name: "Linked" }).click();\n' +
+            '  await page.goto("/console/direct");\n});\n',
+        },
+        (root) => {
+          const reported = residueDefects(root, [], ["e2e/clicks.spec.ts"]).map((d) => d.store);
+          return {
+            witnessSeen: reported.includes("src/linked/store.ts"),
+            controlSeen: reported.includes("src/direct/store.ts"),
           };
         },
       ),

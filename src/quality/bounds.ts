@@ -59,6 +59,7 @@ import { WAITING_BOUND } from "@/console/waiting";
 import { Q26_MUTANT_BOUND } from "./quarter-mutants-q26";
 import { UNAPPLIED_BOUND } from "./unapplied-remedies";
 import { PREMISE_BOUND, stagedSpecs } from "./spec-premises";
+import { RESIDUE_BOUND, specGaps } from "./spec-stores";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -489,6 +490,38 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/spec-stores.ts",
+    name: "RESIDUE_BOUND",
+    unit: "W359",
+    lifting: {
+      kind: "remedy",
+      remedy: "a derivation of the link graph",
+      reads: "`spec-stores.ts`, for a route set derived from what a page's links point at rather than from route strings",
+      // The one clause naming something buildable. Today `specRoutes` resolves two spellings of a
+      // route STRING — a `goto` literal and a path register's `route:` field — and a page a spec
+      // reaches by clicking a nav link is in neither. The predicate reads for the derivation rather
+      // than for a unit, because what lifts the sentence is the module growing a way to answer
+      // "where does this link go", and that is a named export or it does not exist.
+      stillOpen: (root) =>
+        !/export function linkRoutes/.test(readFileSync(path.join(root, "src/quality/spec-stores.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/spec-stores.ts":
+            "// W359: two specs sharing a store.\nexport function linkRoutes(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    text: RESIDUE_BOUND,
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'the one thing the suite would most like' — the unit of the sentence rather than a count of anything the tree holds. It stays one however many specs or stores the register grows to.",
       },
     ],
   },
