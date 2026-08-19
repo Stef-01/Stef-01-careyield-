@@ -30,6 +30,7 @@ import { FIXTURES_FILE, fixtureText, fixtureToken, prepareForScan } from "./scan
 import { type Plantable, withTree } from "./planting";
 import { privateCopies } from "./private-copies";
 import { filesUnder, sourceModules, typescriptFiles } from "./tree-walks";
+import { appliedExemptions } from "./exemption-reach";
 import { violationReporters } from "./refusal-branches";
 import { namingSites } from "./declaration-tax";
 import { treeWalkingFiles } from "./register-census";
@@ -71,6 +72,16 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/blind-spots.ts", "src/quality/assertion-drives.ts"],
     why:
       "W153's scanner walks `src/` for model endpoints and both holders plant one as a witness. Written inline, each holder became an undeclared instruction sink — the collision W237 recorded and W289 hit again one unit later.",
+  },
+  {
+    detector: "src/quality/exemption-reach.ts::appliedExemptions",
+    sees: (root) => appliedExemptions(root).map((e) => e.split("::")[0]!),
+    plant: { "src/planted/w307-exemption.ts": fixtureText("w295-map-exemption") },
+    marker: "planted/w307-exemption",
+    holdersAppear: "never",
+    holders: ["src/quality/blind-spots.ts", "src/quality/spelling-markers.ts"],
+    why:
+      "W368's scan walks the tree for a detector's defaulted exemption parameter, and both holders plant one — `blind-spots.ts` as the positive control for that register's own blind spot, `spelling-markers.ts` as the pair a second spelling of the parameter is measured against. Written inline, each holder became an exemption the register reported as applied and unmeasured, which W355 caught first: its defaulted-register scan read the same literals as real parameters nobody drives.",
   },
   {
     detector: "src/quality/refusal-branches.ts::violationReporters",

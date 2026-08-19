@@ -450,6 +450,31 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/exemption-reach.ts::REACH_BOUND",
+    condition: "An exemption welded inside a function",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/exemption-reach.ts::appliedExemptions",
+      how: "THE GAP THE SENTENCE NAMES IS THE ONE THING HERE THAT IS READ. `appliedExemptions` walks the tree and reports the maps a detector takes as a defaulted parameter, and the census arm fails in both directions — a module that starts applying one joins the population without a hand edit, and a row naming a map no detector takes is reported. What the scan cannot reach is an exemption with no parameter at all, and that is exactly why the bound's predicate reads this function rather than the table: the day the scan grows past the idiom, the sentence stops describing this register.",
+    },
+  },
+  {
+    bound: "src/quality/exemption-reach.ts::REACH_BOUND",
+    condition: "might reach the whole directory and this register would report it identically",
+    reading: {
+      kind: "not_observable",
+      why: "A pair says the reach exceeds the key by at least one step. Measuring the DISTANCE means planting instances at every grain between the key and the tree — a sibling in the same test, the same file, the same directory, the same quarter — and asking which of them the exemption still covers, which is a different register rather than another arm of this one. What this one can say honestly is bounded by what one pair can show, and the sentence says so instead of implying more.",
+    },
+  },
+  {
+    bound: "src/quality/exemption-reach.ts::REACH_BOUND",
+    condition: "`wider` IS NOT `WRONG`",
+    reading: {
+      kind: "not_observable",
+      why: "Whether a wide reach is acceptable is a judgement about the check it silences — a file-grained key is the honest grain when the check itself is file-grained — and no derivation settles it. The register deliberately reports `wider` as a standing rather than a defect, and this row exists so that the choice is on the record instead of looking like an omission: nothing here will ever fail because an exemption reaches past its key, only because the reach is undeclared or has changed.",
+    },
+  },
+  {
     bound: "src/quality/flattering-numbers.ts::FIGURE_BOUND",
     condition: "A FIGURE SPELLED AS THE LENGTH OF A LIST IS INVISIBLE HERE",
     reading: {

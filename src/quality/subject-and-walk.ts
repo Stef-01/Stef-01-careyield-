@@ -97,6 +97,7 @@ export const COMPARED_AT_W367: readonly Compared[] = [
   { bound: "src/quality/declaration-tax.ts::TAX_BOUND", walk: ["sourceModules", "testModules"], edge: { kind: "named", quote: "Nor does it reach the sites whose comparison lives inside a `.test.ts`" } },
   { bound: "src/quality/defaulted-registers.ts::DEFAULT_BOUND", walk: ["sourceModules", "typescriptFiles"], edge: { kind: "named", quote: "A function that reads the tree through something other than a `root` parameter is outside the population entirely" } },
   { bound: "src/quality/deferrals.ts::DEFERRAL_BOUND", walk: ["typescriptFiles"], edge: { kind: "named", quote: "A hardening pass whose findings never reach `allHardeningFindings` was invisible here" } },
+  { bound: "src/quality/exemption-reach.ts::REACH_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "An exemption welded inside a function, one keyed by a typed record rather than a string map, or one spelled as a skip list in an array is outside the scan entirely" } },
   { bound: "src/quality/flattering-numbers.ts::FIGURE_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "A FIGURE SPELLED AS THE LENGTH OF A LIST IS INVISIBLE HERE" } },
   { bound: "src/quality/horizon-directions.ts::HORIZON_DIRECTION_BOUND", walk: ["typescriptFiles"], edge: { kind: "named", quote: "A check the horizon discusses in words without quoting it is outside the population entirely" } },
   { bound: "src/quality/manifest.ts::MANIFEST_BOUND", walk: ["own_recursion"], edge: { kind: "named", quote: "It does not reach TEST FILES" } },

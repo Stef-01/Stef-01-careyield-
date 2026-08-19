@@ -2434,6 +2434,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/exemption-reach.ts",
+    census: {
+      derives:
+        "Every map a detector takes as a defaulted `Readonly<Record<string, string>>` parameter — this tree's idiom for an exemption a test can substitute — scanned out of the source rather than listed.",
+      checkedAgainst:
+        "`EXEMPTIONS`, where each row says what one key NAMES and what the check is ABOUT. The declaration is resolved by planting a PAIR into a copied tree and calling the detector with a crafted exemption: the named instance must go quiet, and whether a second instance under the same key goes quiet with it is the answer.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module declaring a register and taking it as a defaulted exemption parameter is planted in a copied tree and must join the derived population; and each driven row plants two instances under one key, one of them named by a crafted excuse",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "every exemption this tree applies has been measured against a sibling instance under its own key, or is named as one that has not.",
+        mutation:
+          "a planted row declaring `exact` over an exemption that silences the sibling too is reported, beside one declaring `wider` over an exemption that has since been narrowed",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/spelling-markers.ts",
     // NOT A WALKER, and the distinction matters here more than usual. W267's census is the
     // registers that DERIVE a population by walking the tree; this one takes its population from

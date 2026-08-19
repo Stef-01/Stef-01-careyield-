@@ -55,6 +55,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
     expect(blindMarkers()).toEqual([
       "src/quality/acceptances.ts",
       "src/quality/declaration-tax.ts",
+      "src/quality/exemption-reach.ts",
       "src/quality/order-independence.ts",
       "src/quality/private-copies.ts",
       "src/quality/typed-names.ts",
@@ -63,6 +64,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
     // before they could reach a commit, and three are ordinary code.
     expect(reachableBlindness()).toEqual([
       "src/quality/declaration-tax.ts",
+      "src/quality/exemption-reach.ts",
       "src/quality/order-independence.ts",
       "src/quality/private-copies.ts",
     ]);

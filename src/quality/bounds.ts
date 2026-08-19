@@ -54,6 +54,7 @@ import { ACCEPTANCE_REGISTERS, ACCEPTANCE_BOUND } from "./acceptances";
 import { BLIND_SPOTS, BLIND_SPOT_BOUND } from "./blind-spots";
 import { HATCH_BOUND } from "./escape-hatches";
 import { SPELLING_BOUND } from "./spelling-markers";
+import { REACH_BOUND, appliedExemptions } from "./exemption-reach";
 import { resolveName } from "./typed-names";
 import { UNASKED_BOUND } from "./unasked-facts";
 import { PAGE_FACT_BOUND } from "./founder-page-facts";
@@ -955,6 +956,42 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "two",
         kind: "rate",
         why: "'the two' — the honest reading and the blinded one, which is the shape of a measurement rather than a figure about this repository. Two is what a comparison takes.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/exemption-reach.ts",
+    name: "REACH_BOUND",
+    unit: "W368",
+    text: REACH_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the register that finds them",
+      reads: "the tree, for an exemption this scan can see",
+      // THE FIRST CLAUSE IS THE LIVE ONE. That a pair measures one step and not the distance, and
+      // that `wider` is not `wrong`, are properties of what this measurement IS. What moves is the
+      // POPULATION: the scan reads one spelling of an exemption, and a wider one — the day
+      // somebody teaches it a skip list in an array — makes the sentence describe a register that
+      // no longer exists.
+      stillOpen: (root) => !appliedExemptions(root).some((e) => e.endsWith("::EXCLUDED_ROUTES")),
+      lifted: {
+        kind: "constructed_tree",
+        // The remedy state, spelled as an exemption in the shape the sentence says it cannot see
+        // being picked up anyway: a tree where the scan has grown past the defaulted-parameter
+        // idiom is a tree where this sentence stops describing this register.
+        files: {
+          // W307's rule, and W355 is what enforced it here: spelled inline, the planted module's
+          // source sat in THIS file as a literal, and the defaulted-register scan read it as a real
+          // parameter nobody drives. A fixture is not a module.
+          "src/quality/exemption-reach-probe.ts": fixtureText("exemption-reach-lifted"),
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'ONE IDIOM, NOT EVERY EXEMPTION' and 'MEASURED ON ONE PAIR' — the unit of what the scan reads and of what a probe proves, not a count of anything this tree holds. Both stay one however many exemptions the register gains, which is W304's rule.",
       },
     ],
   },

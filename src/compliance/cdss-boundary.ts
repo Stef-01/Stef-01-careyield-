@@ -970,6 +970,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W354's register of which way an error moves each figure this tree derives. Nobody but a developer reads it. Its longest strings are the argument for each figure and `FIGURE_BOUND`; the values it constructs are a handful of synthetic records built in the file itself — a probe practice, a probe clinician and an `@example.test` address — and no real patient, condition or appointment reason appears in any of it.",
   },
   {
+    module: "src/quality/exemption-reach.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W368's register of how far each exemption this tree applies reaches past the key it names. Nobody but a developer reads it. Its longest strings are the argument for each exemption and `REACH_BOUND`; the values it constructs are short TypeScript source fragments planted into a copied tree — a write call, a split, a pair of assertions — and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/spelling-markers.ts",
     operatorCopy: [],
     notCopy:

@@ -181,7 +181,7 @@ export interface DefaultDefect {
 export const DRIVEN_AT_W355: readonly DrivenElsewhere[] = [
   { parameter: "src/founder/outstanding.ts::gatesBlockingNothing::2", drivenBy: ["src/quality/founder-page-facts.test.ts"] },
   { parameter: "src/founder/outstanding.ts::outstandingRulings::2", drivenBy: ["src/founder/outstanding.ts"] },
-  { parameter: "src/quality/assertion-vocabulary.ts::presenceDefects::2", drivenBy: ["src/quality/hardening-q27.test.ts"] },
+  { parameter: "src/quality/assertion-vocabulary.ts::presenceDefects::2", drivenBy: ["src/quality/exemption-reach.test.ts", "src/quality/exemption-reach.ts", "src/quality/hardening-q27.test.ts"] },
   { parameter: "src/quality/blocked-surface.ts::blockedSurfaceViolations::2", drivenBy: ["src/quality/manifest.ts"] },
   { parameter: "src/quality/close-gate.ts::breaksOnClose::5", drivenBy: ["src/quality/close-gate.ts"] },
   { parameter: "src/quality/declaration-tax.ts::homeDiff::2", drivenBy: ["src/quality/author-tax.test.ts", "src/quality/latent-findings.ts", "src/quality/manifest.ts"] },

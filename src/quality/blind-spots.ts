@@ -73,6 +73,7 @@ import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
 import { proseClaims } from "./prose-numbers";
 import { FIGURE_BOUND, countingFigures } from "./flattering-numbers";
+import { REACH_BOUND, appliedExemptions } from "./exemption-reach";
 import { EXCUSE_BOUND, sharedExcuses } from "./shared-excuses";
 import { SUPERSET_BOUND, type Selector, supersetDefects } from "./superset";
 import { PRIVATE_COPY_BOUND, privateCopies } from "./private-copies";
@@ -447,6 +448,30 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
       ),
   },
 
+  "src/quality/exemption-reach.ts": {
+    kind: "demonstrated",
+    bound: REACH_BOUND,
+    witness:
+      "an exemption spelled as a SKIP LIST — an array of sites a detector filters against — which is the shape the bound says the scan cannot see",
+    control:
+      "the same exemption written as this tree's defaulted `Readonly<Record<string, string>>` parameter, which the scan must find",
+    probe: () =>
+      withRoot(
+        {
+          // W307's rule, and W355 enforced it: spelled inline, these probe bodies sat in THIS file
+          // as literals and the defaulted-register scan read both as real parameters nobody drives.
+          "src/planted/w295-skip-list.ts": fixtureText("w295-skip-list-exemption"),
+          "src/planted/w295-map.ts": fixtureText("w295-map-exemption"),
+        },
+        (root) => {
+          const seen = appliedExemptions(root);
+          return {
+            witnessSeen: seen.includes("src/planted/w295-skip-list.ts::W295_SKIPPED"),
+            controlSeen: seen.includes("src/planted/w295-map.ts::W295_EXCUSED"),
+          };
+        },
+      ),
+  },
   "src/quality/flattering-numbers.ts": {
     kind: "demonstrated",
     bound: FIGURE_BOUND,

@@ -226,6 +226,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "The subject is a ROW REGEX and a `readdirSync` call, both of which live inside literals — blanked, a private copy of the ledger parse is indistinguishable from a module that never touches the ledger, and this register would report a clean tree while every copy it exists to find sat in it. Comments are subtracted because a module explaining what a copy looks like is not one, and the two modules whose notes describe these parses at length are `tree-walks.ts` and this one.",
   },
   {
+    module: "src/quality/exemption-reach.ts",
+    prep: { comments: "subtracted", literals: "blanked" },
+    why: "It looks for a detector's PARAMETER — `Readonly<Record<string, string>> = SOME_REGISTER,` — so the subject is a type annotation rather than a value, and literals are blanked because this module's own probe bodies carry that exact declaration as planted TEXT: the first scan over a copied tree with the plant in it would have counted the string the probe writes as well as the module the probe wrote it into. Comments are subtracted for the ordinary reason and one more — this file's header quotes the idiom it looks for, at length.",
+  },
+  {
     module: "src/quality/acceptances.ts",
     prep: { comments: "subtracted", literals: "blanked" },
     why: "It looks for `reviewBy:` followed by a quote, which is why `blankLiterals` keeps the opening delimiter: blanking it away would blind the detector to every real acceptance register while blinding it to fixtures.",

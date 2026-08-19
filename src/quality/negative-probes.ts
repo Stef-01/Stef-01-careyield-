@@ -466,6 +466,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/exemption-reach.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/exemption-reach.test.ts :: derives the population from the tree rather than listing it",
+      plants: 'expect(grown).toContain("src/quality/reach-probe.ts::PLANTED_EXCUSE")',
+    },
+  },
+  {
     register: "src/quality/flattering-numbers.ts",
     negative: {
       kind: "already_driven",

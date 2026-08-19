@@ -184,3 +184,45 @@ export const WALKS = [sourceModules, textFiles];
 import { sourceModules, textFiles } from "@/quality/tree-walks";
 export const a = sourceModules(process.cwd());
 export const b = textFiles(process.cwd());
+
+=== exemption-reach-lifted ===
+export const EXCLUDED_ROUTES: Readonly<Record<string, string>> = {};
+export function check(
+  root: string,
+  excused: Readonly<Record<string, string>> = EXCLUDED_ROUTES,
+): string[] {
+  return [root, ...Object.keys(excused)];
+}
+
+=== w295-skip-list-exemption ===
+export const W295_SKIPPED: readonly string[] = ["a"];
+export function w295Check(
+  root: string,
+  skipped: readonly string[] = W295_SKIPPED,
+): string[] {
+  return [root].filter((r) => !skipped.includes(r));
+}
+
+=== w295-map-exemption ===
+export const W295_EXCUSED: Readonly<Record<string, string>> = {};
+export function w295Applied(
+  root: string,
+  excused: Readonly<Record<string, string>> = W295_EXCUSED,
+): string[] {
+  return [root, ...Object.keys(excused)];
+}
+
+=== w366-exemption-parameter-wrapped ===
+export const E: Readonly<Record<string, string>> = {};
+export function check(
+  root: string,
+  excused: Readonly<Record<string, string>> = E,
+): string[] {
+  return [root, ...Object.keys(excused)];
+}
+
+=== w366-exemption-parameter-inline ===
+export const E: Readonly<Record<string, string>> = {};
+export function check(excused: Readonly<Record<string, string>> = E): string[] {
+  return Object.keys(excused);
+}

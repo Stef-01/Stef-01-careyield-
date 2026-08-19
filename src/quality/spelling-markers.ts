@@ -30,12 +30,13 @@
 // FOUNDER GATE (plan §4): nothing crossed. It reads and plants this repository's own source text.
 
 import { acceptanceCarryingModules } from "./acceptances";
+import { appliedExemptions } from "./exemption-reach";
 import { namingSites } from "./declaration-tax";
 import { numberReturningExports } from "./flattering-numbers";
 import { discoverFoldSites } from "./order-independence";
 import { copyTree, planterDiff, withPlantedIn } from "./planting";
 import { privateCopies } from "./private-copies";
-import { SCAN_SITES } from "./scan-text";
+import { SCAN_SITES, fixtureText } from "./scan-text";
 import { nameSites } from "./typed-names";
 import { headerCensus } from "./unit-headers";
 
@@ -232,6 +233,28 @@ export const MARKERS: readonly Marker[] = [
           'export const PLANTED_BOUND = "x";\n',
           'export const\n  PLANTED_BOUND = "x";\n',
           (copy) => names(headerCensus(copy, "BUILD-STATE.md")),
+        ),
+    },
+  },
+  {
+    module: "src/quality/exemption-reach.ts",
+    matches:
+      "a detector's defaulted exemption parameter — `Readonly<Record<string, string>> = NAME,` — " +
+      "with the trailing comma the multi-line signature carries",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "the same parameter written LAST on a single-line signature, where there is no trailing " +
+        "comma for the scan to anchor on",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          // W307's rule: spelled inline, these two bodies sat in THIS file as literals and W355's
+          // defaulted-register scan read the wrapped one as a real parameter nobody drives.
+          fixtureText("w366-exemption-parameter-wrapped"),
+          fixtureText("w366-exemption-parameter-inline"),
+          (copy) => appliedExemptions(copy).some((e) => e.includes("spelling-probe")),
         ),
     },
   },

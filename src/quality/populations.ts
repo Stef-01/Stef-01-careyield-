@@ -136,6 +136,7 @@ export const POPULATIONS: readonly Population[] = [
   { file: "src/quality/deferrals.ts", source: { kind: "shared_walk", walks: ["typescriptFiles"] } },
   { file: "src/quality/dossier-q18.test.ts", source: { kind: "own_recursion" } },
   { file: "src/quality/empty-list-sweep.ts", source: { kind: "shared_walk", walks: ["testModules"] } },
+  { file: "src/quality/exemption-reach.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },
   { file: "src/quality/flattering-numbers.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },
   { file: "src/quality/g5-rehearsal.test.ts", source: { kind: "own_recursion" } },
   { file: "src/quality/hardening-q26.test.ts", source: { kind: "own_recursion" } },

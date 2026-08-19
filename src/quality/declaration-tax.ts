@@ -332,6 +332,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/exemption-reach.ts",
+    // Asks how far each exemption this tree APPLIES reaches past its own key. A planted module
+    // declares no detector taking a defaulted exemption parameter, so it owes this register
+    // nothing on arrival — and a module that did would be reported as an exemption no row measures
+    // rather than demanded of. In the population because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/flattering-numbers.ts",
     // Asks which way an error moves each figure the tree DERIVES, measured by calling it. A planted
     // module exports no counting function reachable from the app, so it owes this register nothing

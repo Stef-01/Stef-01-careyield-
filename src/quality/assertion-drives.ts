@@ -46,6 +46,7 @@ import { diffFoldRegister, discoverFoldSites } from "./order-independence";
 import { undeclaredInstructionSinks } from "@/security/instruction-sinks";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { REFUSAL_BRANCHES, type RefusalBranch, driveBranches, withRoot } from "./refusal-branches";
+import { type Exemption, reachDefects } from "./exemption-reach";
 import { anchorCoverage, deadAnchors } from "./latent-y5";
 import { LATENT_FINDINGS, fired } from "./latent-findings";
 import { pinDiff } from "./pins";
@@ -391,6 +392,31 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   },
 
   "src/quality/pins.ts": (root) => pinDiff(root, []).undeclared.length > 0,
+
+  "src/quality/exemption-reach.ts": (root) => {
+    // W368's comparison, handed a row whose probe never applied, one declaring `exact` over an
+    // exemption that silences the sibling too, and one whose reading matches. The rows are
+    // constructed rather than planted on disk: a reach row holds a FUNCTION, so what this
+    // comparison has to reject is a table rather than a file.
+    const row = (name: string, reach: Exemption["reach"]): Exemption => ({
+      module: `src/planted/w289-${name}.ts`,
+      map: "PLANTED",
+      detector: "src/planted/w289.ts::check",
+      key: "a planted key",
+      subject: "a planted subject",
+      reach,
+    });
+    const noControl = reachDefects(root, [
+      row("nocontrol", { kind: "exact", probe: () => ({ named: false, sibling: false }) }),
+    ]);
+    const tooWide = reachDefects(root, [
+      row("toowide", { kind: "exact", probe: () => ({ named: true, sibling: true }) }),
+    ]);
+    const clean = reachDefects(root, [
+      row("clean", { kind: "exact", probe: () => ({ named: true, sibling: false }) }),
+    ]);
+    return noControl.length === 1 && tooWide.length === 1 && clean.length === 0;
+  },
 
   "src/quality/flattering-numbers.ts": (root) => {
     // W354's comparison, handed a row whose declaration its derivation contradicts and one whose
