@@ -162,3 +162,25 @@ export const GIVEN = [
   { reason: "a sentence planted twice so W295 can watch this scan find it" },
   { reason: "a sentence planted twice so W295 can watch this scan find it" },
 ];
+
+=== a-module-calling-two-walks ===
+import { sourceModules, typescriptFiles } from "@/quality/tree-walks";
+export const a = sourceModules(process.cwd());
+export const b = typescriptFiles(process.cwd());
+
+=== a-module-calling-one-walk ===
+import { sourceModules } from "@/quality/tree-walks";
+export const a = sourceModules(process.cwd());
+
+=== a-module-calling-a-test-walk ===
+import { testModules } from "@/quality/tree-walks";
+export const a = testModules(process.cwd());
+
+=== a-module-listing-walks-without-calling-them ===
+import { sourceModules, textFiles } from "@/quality/tree-walks";
+export const WALKS = [sourceModules, textFiles];
+
+=== a-module-calling-two-walks-by-name ===
+import { sourceModules, textFiles } from "@/quality/tree-walks";
+export const a = sourceModules(process.cwd());
+export const b = textFiles(process.cwd());

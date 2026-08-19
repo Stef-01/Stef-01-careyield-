@@ -111,9 +111,9 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     },
     marker: "planted/walks",
     holdersAppear: "for_other_reasons",
-    holders: ["src/quality/register-census.test.ts"],
+    holders: ["src/quality/populations.test.ts", "src/quality/register-census.test.ts"],
     why:
-      "W267's census finds files that walk the tree by the call they make, and its own probes have to make that call in a string. Written inline, the test file counts as a walker.",
+      "W267's census finds files that walk the tree by the call they make, and its own probes have to make that call in a string. Written inline, the test file counts as a walker. W365 joined for the same reason from the other side: its probes plant modules that IMPORT the shared walks, and the census reads that import as walking too — so a register about populations would have had the widest population in the tree.",
   },
   {
     detector: "src/quality/unit-headers.ts::headerNamesUnknown",

@@ -64,6 +64,7 @@ import { ZERO_MEANING_BOUND } from "@/console/zero-meaning";
 import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
+import { POPULATION_BOUND } from "./populations";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -497,6 +498,44 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/populations.ts",
+    name: "POPULATION_BOUND",
+    unit: "W365",
+    text: POPULATION_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a reachability walk rather than a name scan",
+      reads: "`populations.ts`, for a population derived from what a module can REACH rather than from the names its text contains",
+      // The clause that names something buildable, and the tree already owns the mechanism:
+      // `reachableFrom` in `security/reachability.ts` follows imports through helpers. A name scan
+      // credits a module with a walk it never reaches and misses one it reaches through another
+      // module. The predicate reads for the derivation, because what lifts the sentence is this
+      // register calling the walk rather than matching its name.
+      // Read for an EXPORT, not for the helper's name: the bound's own text names `reachableFrom`
+      // as the remedy, so a predicate matching that name reports itself lifted the moment the
+      // sentence is written. W365 hit that on the first run — the bound describing its own remedy
+      // is the shape W306 built this arm to catch.
+      stillOpen: (root) =>
+        !/export function reachedWalks/.test(
+          readFileSync(path.join(root, "src/quality/populations.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/populations.ts":
+            "// W365: the population register.\nexport function reachedWalks(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one bucket for twenty-six members' — the unit of the sentence rather than a count of anything the tree maintains. It stays one however many members join that bucket.",
       },
     ],
   },

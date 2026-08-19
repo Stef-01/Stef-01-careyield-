@@ -473,6 +473,15 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/populations.ts",
+    // Reads the census and, for each member it names, that module's own source — so its population
+    // is `TREE_DERIVED_REGISTERS` rather than a walk of the tree, and W267's census holds the file
+    // that does the walking rather than every file that opens one. A row there would be a
+    // declaration nothing re-derives. It is in the manifest because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/horizon-directions.ts",
     census: {
       derives:

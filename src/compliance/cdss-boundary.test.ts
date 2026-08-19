@@ -168,6 +168,7 @@ const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/quality/defaulted-registers.ts": () => import("@/quality/defaulted-registers"),
   "src/quality/quarter-mutants-q27.ts": () => import("@/quality/quarter-mutants-q27"),
   "src/quality/horizon-directions.ts": () => import("@/quality/horizon-directions"),
+  "src/quality/populations.ts": () => import("@/quality/populations"),
   "src/quality/hardening-q27.ts": () => import("@/quality/hardening-q27"),
   "src/quality/hardening-q25.ts": () => import("@/quality/hardening-q25"),
   "src/console/setup-gaps.ts": () => import("@/console/setup-gaps"),

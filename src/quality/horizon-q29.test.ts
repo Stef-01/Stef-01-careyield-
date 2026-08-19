@@ -113,10 +113,15 @@ describe("W364 the document reads the ledger it claims to read", () => {
     const named = (extra: readonly string[]): string[] => [...IN_FLIGHT_AT_EXPANSION, ...extra];
     expect(named(["W999"]), "the in-flight list cannot hold a row at all").toEqual(["W999"]);
     expect(named([]), "the list was populated when this expansion ran").toEqual([]);
-    const claimed = asAtHorizon().filter((r) => r.status === "claimed").map((r) => r.id);
-    expect(claimed, "a row was in flight and the list does not name it").toEqual([
-      `W${Q29_HORIZON_LAST_UNIT}`,
-    ]);
+    // THE CLOSING ROW IS NOT A SIBLING'S, and this assertion is about rows OTHER than it — which
+    // W364 got wrong on its first run in exactly the way W351 recorded and warned about. The
+    // original required the claimed set to BE the closing row, so it held while this unit was in
+    // flight and failed the moment the row closed: a check reading a live status inside a document
+    // about a moment it does not run in. What is claimed is that nobody ELSE held a row.
+    const claimedByOthers = asAtHorizon()
+      .filter((r) => r.status === "claimed" && r.n !== Q29_HORIZON_LAST_UNIT)
+      .map((r) => r.id);
+    expect(claimedByOthers, "a row was in flight and the list does not name it").toEqual([]);
     // And the mechanism still works: naming a row removes it from the count.
     const without = asAtHorizon().filter(
       (r) => !["W363"].includes(r.id) && (r.status === "done" || r.n === Q29_HORIZON_LAST_UNIT),
@@ -291,9 +296,10 @@ describe("W364 the theme is derived from evidence that exists", () => {
     // the fact — a horizon claiming a quiet moment while a row is open is precisely a figure priced
     // against a position nobody held.
     expect(DOC).toContain("Q28's own gate landed before this expansion ran");
-    expect(asAtHorizon().filter((r) => r.status === "claimed").map((r) => r.id)).toEqual([
-      `W${Q29_HORIZON_LAST_UNIT}`,
-    ]);
+    expect(
+      asAtHorizon().filter((r) => r.status === "claimed" && r.n !== Q29_HORIZON_LAST_UNIT),
+      "a row inside the priced range was held by somebody else after all",
+    ).toEqual([]);
   });
 
   it("refuses to set a numeric gate, and says why", () => {
