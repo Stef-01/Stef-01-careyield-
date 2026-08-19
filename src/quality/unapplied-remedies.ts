@@ -26,6 +26,13 @@
 // from a register that never worked — `UNAPPLIED_BOUND` says so, and the driven arm over the four
 // historical rows is what keeps the file honest in the meantime.
 //
+// W358: AND THE FIRST ROWS THIS REGISTER GREW WERE BOTH WRONG. W357 shipped a pair of `open` rows
+// against `proseWaits`, owed to a future unit — from a sweep taken before W352 landed. W352 had
+// already applied exactly the remedy W349 named, and driving each mutant by hand confirmed it. The
+// register recorded work as outstanding that was done, which is this file's own subject read
+// backwards: a row saying `open` is as unchecked as a row saying `applied` was before this unit,
+// and only the `applied` half is driven. `UNAPPLIED_BOUND` says so; nothing yet closes it.
+//
 // FOUNDER GATE (plan §4): nothing crossed. Mutants are applied inside a copied tree.
 
 import { readFileSync } from "node:fs";
@@ -111,22 +118,6 @@ export const REMEDIES_AT_W357: readonly RemedyRow[] = [
       kind: "applied",
       by: "W357",
       how: "`generate.test.ts` re-derives every reported rate from the returned patients rather than from the same expression, and asserts that a rate and its complement are different numbers so the equalities separate the predicate from its inverse. Ten files import this generator and the calibration bands passed either way.",
-    },
-  },
-  {
-    id: 'src/quality/self-ending.ts :: eq-to-neq :: if (comment === undefined) continue;',
-    standing: {
-      kind: "open",
-      owed: "W358",
-      why: "ARRIVED WHILE THIS UNIT WAS BEING BUILT, which is the only reason the register ships with an open row at all — and a better one than the four historical ones, because it shows the bookkeeping catching something rather than recording something already known. W350 added `proseWaits` after W349's sweep ran; the next run found two mutants its suite does not notice. Owed to W358, whose subject is a walk asserting the state it claims: `proseWaits` has no fixture standing on the comment/code discriminant this guard is, which is that unit's shape exactly.",
-    },
-  },
-  {
-    id: 'src/quality/self-ending.ts :: eq-to-neq :: if (status.get(unit) === "done") continue;',
-    standing: {
-      kind: "open",
-      owed: "W358",
-      why: "The same arrival and the same owner. The guard drops a prose wait whose unit has landed and every fixture names an open one, so the correct lookup and its inverse look alike — the one-case shape W332 recorded in `claim-classes.ts`, W349 found recurring in `controls.ts`, and this unit applied in both. Recording it here rather than fixing it is a deliberate line: it is another builder's just-landed code and the pair that separates it belongs beside their register, not bolted on from outside.",
     },
   },
   {

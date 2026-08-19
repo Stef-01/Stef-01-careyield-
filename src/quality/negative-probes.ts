@@ -415,6 +415,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/spec-premises.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/spec-premises.test.ts :: walks a tree it was handed, and reports the staging spec in it and not the other",
+      plants: "e2e/navigates.spec.ts",
+    },
+  },
+  {
     register: "src/quality/self-ending.ts",
     negative: {
       kind: "already_driven",

@@ -60,6 +60,7 @@ import { CLOSE_GATE_BOUND, ledgerNamingModules } from "./close-gate";
 import { CONTROLS, INSTANT_BOUND, instantDiff } from "./instant";
 import { QUARTER_MUTANT_BOUND, quarterModules } from "./quarter-mutants";
 import { UNASKED_BOUND, unaskedFacts } from "./unasked-facts";
+import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
   vocabularyDefects,
@@ -138,6 +139,32 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/spec-premises.ts": {
+    kind: "demonstrated",
+    bound: PREMISE_BOUND,
+    witness: "a spec that seeds its state through `request.post` instead of the browser, which stages a premise this register cannot see and must not report",
+    control: "a spec whose helper fills the same fields and saves them through the UI, which it must",
+    probe: () =>
+      withRoot(
+        {
+          "e2e/seeded.spec.ts":
+            'test.beforeEach(async ({ request }) => {\n' +
+            '  await request.post("/api/mock/console", { data: { name: "X", holdout: 10 } });\n});\n',
+          "e2e/driven.spec.ts":
+            'async function onboard(page) {\n  await page.getByLabel("Practice name").fill("X");\n' +
+            '  await page.getByLabel("Holdout share (%)").fill("10");\n' +
+            '  await page.getByRole("button", { name: "Create practice" }).click();\n}\n',
+        },
+        (root) => {
+          const reported = premiseDefects(root, [], stagedSpecs(root)).map((d) => d.spec);
+          return {
+            witnessSeen: reported.includes("e2e/seeded.spec.ts"),
+            controlSeen: reported.includes("e2e/driven.spec.ts"),
           };
         },
       ),

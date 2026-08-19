@@ -59,6 +59,7 @@ import { fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
 import { type Selector, type Widening, supersetDefects } from "./superset";
 import { endingDiff } from "./self-ending";
+import { PREMISES_AT_W358, premiseDefects, stagedSpecs } from "./spec-premises";
 import { unreachedByUnitSuite } from "./unrun";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
@@ -445,6 +446,17 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
         },
       ]).didNotFire.length > 0
     );
+  },
+
+  "src/quality/spec-premises.ts": (root) => {
+    // Both directions off ONE input, because the register's two arms fail opposite ways: an
+    // arriving spec nothing tracks is a gap, and a tracked spec that has stopped staging is a row
+    // describing a file that moved. A drive exercising only the first would leave the arm that
+    // reads as coverage undriven.
+    const staged = stagedSpecs(root);
+    const arriving = premiseDefects(root, PREMISES_AT_W358, [...staged, "e2e/w289-probe.spec.ts"]);
+    const departed = premiseDefects(root, PREMISES_AT_W358, staged.slice(1));
+    return arriving.length > 0 && departed.length > 0;
   },
 
   "src/quality/tautology-sweep.ts": (root) => {

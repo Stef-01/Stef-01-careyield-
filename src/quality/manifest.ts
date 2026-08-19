@@ -464,6 +464,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/spec-premises.ts",
+    census: {
+      derives:
+        "Every `*.spec.ts` under `e2e/` whose setup stages a premise through the browser — `pageSpecFiles` for the population, and, for membership, a file-level async helper that fills two or more labelled fields and clicks a save-shaped button. Derived from the helper's shape rather than from a list, so a spec that starts staging one joins without anybody editing this file.",
+      checkedAgainst:
+        "W358's `PREMISES_AT_W358`, in three directions: a spec that stages a premise and nothing tracks fails, a tracked spec that no longer stages one fails, and a row declared `asserted` whose file reads nothing back through the store fails.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "`stagedSpecs` is pointed at a tree holding one spec whose helper fills and saves and one whose helper only navigates, and must report the first and not the second",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every e2e spec whose setup claims a state asserts that state through a different door than the one that wrote it, before any test walks on it.",
+        mutation:
+          "A spec is added to the derived population and must be reported untracked; a tracked spec is dropped from it and must be reported the other way.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/quarter-mutants-q26.ts",
     // Derives its population from a walk it does not perform: `quarterModules` walks and
     // `siblingSuite` resolves, and this module reads the answers. W267's census holds the file that

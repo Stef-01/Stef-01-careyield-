@@ -218,6 +218,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/spec-premises.ts",
+    name: "PREMISES_AT_W358",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a spec starting or stopping staging a premise through the browser",
+      whyStopping:
+        "A NAMED ROW PER SPEC, each saying how that file reads its premise back or why it does not, and each `asserted` row resolved against the file rather than believed. A spec arriving is a walk somebody wrote on a state nothing checked — the defect this unit exists for — and a spec leaving the population means its setup stopped staging, which changes what the row is about. Neither direction can be satisfied by retyping a digit, because there is no digit: the population is derived from each helper's shape on every run and the rows are compared against it both ways.",
+    },
+  },
+  {
     module: "src/quality/unapplied-remedies.ts",
     name: "REMEDIES_AT_W357",
     classification: {

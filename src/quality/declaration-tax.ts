@@ -200,6 +200,13 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/spec-premises.ts",
+    // It watches `e2e/`, so a module planted under `src/` is outside its population by
+    // construction rather than by an omission. Zero is the honest cost: a new register does not
+    // owe this one a row, and pretending otherwise would inflate the tax measurement.
+    demands: () => false,
+  },
+  {
     file: "src/quality/unit-headers.ts",
     demands: (root, planted) =>
       names(headerViolations(root, readFileSync(path.join(root, "BUILD-STATE.md"), "utf8")), planted),

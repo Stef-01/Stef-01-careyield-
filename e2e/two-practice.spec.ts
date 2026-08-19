@@ -13,6 +13,7 @@
 // they would test is unit-tested instead.
 
 import { expect, test } from "@playwright/test";
+import { expectPremise } from "./premise";
 
 const OWNER = "owner@demo.practice.example";
 const OUTSIDER = "stranger@elsewhere.example";
@@ -34,6 +35,17 @@ async function onboard(page: import("@playwright/test").Page, name: string, hold
 
 test.beforeEach(async ({ request }) => {
   await request.post("/api/mock/console");
+});
+
+// W358: THE PREMISE THIS FILE WALKS ON, ASSERTED THROUGH A DIFFERENT DOOR THAN THE ONE THAT WROTE
+// IT. Every test below drives the setup above and then reads a console it believes exists. A
+// wizard step that silently does not save leaves the whole file walking a practice that is not
+// there — and passing, because an empty console for a missing practice renders like an empty
+// console for a new one. `waitForURL` proves the browser arrived; this proves the data landed.
+test("the setup establishes the state this spec walks on", async ({ page, request }) => {
+  await signIn(page, OWNER);
+  await onboard(page, "Harbour Family Practice", "10");
+  await expectPremise(request, { named: "Harbour Family Practice", member: OWNER });
 });
 
 test("one owner, two practices: both are offered and the console says which it is on", async ({ page }) => {

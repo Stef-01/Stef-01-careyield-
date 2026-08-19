@@ -58,6 +58,7 @@ import { PAGE_FACT_BOUND } from "./founder-page-facts";
 import { WAITING_BOUND } from "@/console/waiting";
 import { Q26_MUTANT_BOUND } from "./quarter-mutants-q26";
 import { UNAPPLIED_BOUND } from "./unapplied-remedies";
+import { PREMISE_BOUND, stagedSpecs } from "./spec-premises";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -488,6 +489,58 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/spec-premises.ts",
+    name: "PREMISE_BOUND",
+    unit: "W358",
+    text: PREMISE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "threading the readback through every call site",
+      reads: "the staged specs, for a readback that runs before every walk rather than in one test of its own",
+      // The clause that names something buildable. The mechanical form of "every call site" is the
+      // hook every test already runs through: a `test.beforeEach` that calls `expectPremise` puts
+      // the assertion in front of each walk instead of beside them. So the predicate looks in the
+      // hook rather than in the file — a spec that merely MENTIONS the helper somewhere below is
+      // the state this bound describes, not the state that lifts it, and reading the whole file
+      // would report itself lifted on the tree this unit just built.
+      stillOpen: (root) =>
+        !stagedSpecs(root).some((spec) => {
+          const source = readFileSync(path.join(root, spec), "utf8");
+          const at = source.indexOf("test.beforeEach(");
+          if (at === -1) return false;
+          const end = source.indexOf("\n});", at);
+          return end !== -1 && source.slice(at, end).includes("expectPremise(");
+        }),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "e2e/lifted.spec.ts":
+            'async function setup(page) {\n  await page.getByLabel("A").fill("1");\n' +
+            '  await page.getByLabel("B").fill("2");\n' +
+            '  await page.getByRole("button", { name: "Save" }).click();\n}\n' +
+            "test.beforeEach(async ({ request }) => {\n  await expectPremise(request);\n});\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one dedicated test', 'either works for all of them or none' — the unit of the shape rather than a count of anything the tree holds. It stays one however many specs join the population.",
+      },
+      {
+        word: "nine",
+        kind: "unit_id",
+        why: "The specs this unit wired, fixed at the unit that wired them — history about a reading that happened, and `premiseDefects` re-derives the population on every run in three directions, so the register is what maintains the figure rather than the sentence. A tenth arrives with the spec that stages a premise.",
+      },
+      {
+        word: "two",
+        kind: "fixed_by_a_gate",
+        why: "'two fills and a save-shaped button' — the threshold `stagesAPremise` applies, fixed in the code the sentence is describing. Not a measurement: the derivation IS the number, and `spec-premises.test.ts` drives a helper that fills exactly that many without saving to prove both halves are load-bearing.",
       },
     ],
   },

@@ -151,6 +151,13 @@ export function q26Population(
  * which of the four it is can only be settled by reading. The run found three; the third is fixed
  * in `controls.test.ts` and is not here, because a register recording a hole somebody has just
  * closed is the stale direction W332's own report arm exists to catch.
+ *
+ * W358 REMOVED A PAIR OF ROWS FOR THE SAME REASON, and they should never have been added. W357 read a
+ * sweep of `self-ending.ts` taken before W352 landed and recorded both of `proseWaits`'s guards as
+ * uncaught — W352 had already driven them, with six tests against a planted ledger. Re-running the
+ * quarter is what reported it: the full run said two declared survivors are now caught, and
+ * flipping each guard by hand fired four and five tests respectively. A measurement is only about
+ * the tree it was taken on, and a survivor register is the one place that is easy to forget.
  */
 export const SURVIVORS_AT_W349: readonly Survivor[] = [
   {
@@ -158,22 +165,6 @@ export const SURVIVORS_AT_W349: readonly Survivor[] = [
     reason: {
       kind: "unreached",
       why: "THE SAME SHAPE Q25 PRODUCED IN `claim-classes.ts`, in the module W337 wrote from it. The guard's FALSE branch cannot be taken while `CLOSING_CHECKS` holds an entry with id `sha-shape`, and it does — so `check` is never undefined and no test reaches the line the mutant changes. Flipped to `||` the expression would throw rather than return false, which is a real difference over a state the tree does not have. The `check` is computed inside a `fires` closure from an imported constant, so it cannot be injected either: reaching it means deleting `sha-shape` from W315's register, at which point W337's own `names an export the module does not have` arm fires first. Left as a guard rather than removed, because the alternative is code that assumes a register's contents.",
-    },
-  },
-  {
-    id: 'src/quality/self-ending.ts :: eq-to-neq :: if (comment === undefined) continue;',
-    reason: {
-      kind: "uncaught",
-      remedy:
-        "ARRIVED AFTER THIS REGISTER WAS WRITTEN, which is the register working. W350 added `proseWaits` — a scan whose subject IS the prose, so it keeps comment lines and drops code — and this guard is the inversion of every other scan in the file. Flipped to `!==` the loop reads CODE lines and never a comment, so `proseWaits` returns nothing; nothing asserts it returns anything, so the suite is silent. REMEDY: drive `proseWaits` over a constructed tree holding one comment that says `until W900` and one line of code that says the same thing inside a string, and require the first and only the first. That is the discriminant the guard exists for, and no fixture stands on it.",
-    },
-  },
-  {
-    id: 'src/quality/self-ending.ts :: eq-to-neq :: if (status.get(unit) === "done") continue;',
-    reason: {
-      kind: "uncaught",
-      remedy:
-        "The same arrival and the same silence. The guard drops a prose wait whose unit has LANDED, which is the whole point of reading the ledger — flipped to `!==` it reports the landed ones and hides the open ones, exactly inverting the register. Every fixture names an open unit, so both sides look alike. REMEDY: drive it with a comment naming a unit the ledger holds as `done` and require silence, alongside the existing open-unit case. Two cases separate a correct lookup from its inverse; one cannot, which is the shape W332 recorded, W349 found recurring and W357 applied in two other modules.",
     },
   },
   {

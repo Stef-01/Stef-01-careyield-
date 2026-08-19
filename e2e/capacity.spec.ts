@@ -10,6 +10,7 @@
 // blank capacity page, who must not come away thinking the diary is full.
 
 import { expect, test, type Page } from "@playwright/test";
+import { expectPremise } from "./premise";
 
 async function signIn(page: Page, email = "manager@demo.practice.example") {
   await page.goto("/console/signin");
@@ -30,6 +31,17 @@ async function createPractice(page: Page, name: string) {
 
 test.beforeEach(async ({ request }) => {
   await request.post("/api/mock/console");
+});
+
+// W358: THE PREMISE THIS FILE WALKS ON, ASSERTED THROUGH A DIFFERENT DOOR THAN THE ONE THAT WROTE
+// IT. Every test below drives the setup above and then reads a console it believes exists. A
+// wizard step that silently does not save leaves the whole file walking a practice that is not
+// there — and passing, because an empty console for a missing practice renders like an empty
+// console for a new one. `waitForURL` proves the browser arrived; this proves the data landed.
+test("the setup establishes the state this spec walks on", async ({ page, request }) => {
+  await signIn(page);
+  await createPractice(page, "Demo Family Practice");
+  await expectPremise(request, { named: "Demo Family Practice", member: "manager@demo.practice.example" });
 });
 
 test("signed-out access redirects to sign-in", async ({ page }) => {
