@@ -132,3 +132,43 @@ test("the page makes no clinical claim about any patient", async ({ page, reques
     expect(body, `register console must not say "${banned}"`).not.toContain(banned);
   }
 });
+
+test("a register nobody has counted says so, rather than showing a zero", async ({ page, request }) => {
+  // W361: THE STAND-IN ZERO. `registersFor` returns a constant `NO_COUNTS` for a practice nothing
+  // has computed counts for, and `seedCounts` has exactly one caller in this tree — the mock route
+  // above. So every practice outside a test has always been shown `0` under "On this register",
+  // which reads as "we looked and nobody is on it" and means "nobody has looked". This walk is the
+  // only way to reach that state: seed the practice, then reset the register store WITHOUT counts.
+  await signInOnboardAndSeed(page, request);
+  await request.post("/api/mock/registers?uncounted=1");
+  await gotoRegisters(page);
+
+  const members = page.getByTestId("members-placeholder_register_a");
+  await expect(members, "an uncounted register still renders a number").not.toHaveText("0");
+  await expect(members).toHaveAttribute("data-counted", "no");
+  await expect(members).toHaveText(/not counted yet/i);
+  await expect(page.getByTestId("gaps-placeholder_register_a")).toHaveAttribute("data-counted", "no");
+
+  // And the other direction on the same screen, so the notice is a STATE rather than the only
+  // thing this page can say: seeded counts render as numerals again.
+  await request.post("/api/mock/registers");
+  await gotoRegisters(page);
+  await expect(page.getByTestId("members-placeholder_register_a")).toHaveText("42");
+  await expect(page.getByTestId("members-placeholder_register_a")).toHaveAttribute("data-counted", "yes");
+});
+
+test("the uncounted notice makes no claim about anybody's care", async ({ page, request }) => {
+  // FOUNDER GATE (plan §4). A page that has stopped saying "0 on this register" must not have
+  // started saying anything clinical in its place: it says what has NOT been done, never what
+  // anybody needs.
+  await signInOnboardAndSeed(page, request);
+  await request.post("/api/mock/registers?uncounted=1");
+  await gotoRegisters(page);
+  const body = (await page.textContent("body")) ?? "";
+  // The same list this file's own clinical-claim walk uses. `patient` is not on it and must not
+  // be: the page says how many people are on a register, which is the operator fact it exists for.
+  for (const banned of ["needs", "should be seen", "at risk", "overdue for care", "requires"]) {
+    expect(body, `the uncounted register console must not say "${banned}"`).not.toContain(banned);
+  }
+  expect(body, "the stand-in zero came back somewhere else on the page").toContain("Not counted yet");
+});

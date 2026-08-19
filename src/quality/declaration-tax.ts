@@ -200,6 +200,12 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/console/zero-meaning.ts",
+    // It watches `app/console/**/page.tsx`, so a module planted under `src/` is outside its
+    // population by construction. Zero is the honest cost: a new register owes this one nothing.
+    demands: () => false,
+  },
+  {
     file: "src/quality/spec-stores.ts",
     // It watches `e2e/` against `app/`, so a module planted under `src/` is outside its population
     // by construction. Zero is the honest cost: a new register owes this one nothing.

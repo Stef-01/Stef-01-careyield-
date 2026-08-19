@@ -61,6 +61,7 @@ import { type Selector, type Widening, supersetDefects } from "./superset";
 import { endingDiff } from "./self-ending";
 import { PREMISES_AT_W358, premiseDefects, stagedSpecs } from "./spec-premises";
 import { residueDefects } from "./spec-stores";
+import { ZERO_CLAIMS, zeroDefects } from "@/console/zero-meaning";
 import { unreachedByUnitSuite } from "./unrun";
 import { vocabularyDefects } from "./assertion-vocabulary";
 import { readerDiff } from "./close-gate";
@@ -447,6 +448,15 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
         },
       ]).didNotFire.length > 0
     );
+  },
+
+  "src/console/zero-meaning.ts": (root) => {
+    // Both stale directions off one register: a classification for a count nothing renders, and a
+    // count rendered with nothing classifying it. The arriving direction is driven on a planted
+    // page in the module's own suite, where a console page can be made to exist.
+    const orphan = zeroDefects(root, ZERO_CLAIMS, []);
+    const unclassified = zeroDefects(root, [], [{ route: "/console/w289", expression: "rows.length" }]);
+    return orphan.length > 0 && unclassified.length > 0;
   },
 
   "src/quality/spec-stores.ts": (root) => {

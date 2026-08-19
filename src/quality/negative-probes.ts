@@ -415,6 +415,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/console/zero-meaning.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/console/zero-meaning.test.ts :: tells a count on the screen from a count in a condition",
+      plants: "app/console/thing/page.tsx",
+    },
+  },
+  {
     register: "src/quality/spec-stores.ts",
     negative: {
       kind: "already_driven",

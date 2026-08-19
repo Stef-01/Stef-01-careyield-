@@ -62,6 +62,7 @@ import { QUARTER_MUTANT_BOUND, quarterModules } from "./quarter-mutants";
 import { UNASKED_BOUND, unaskedFacts } from "./unasked-facts";
 import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
+import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
 import {
   VOCABULARY_BOUND as ASSERTION_VOCABULARY_BOUND,
   vocabularyDefects,
@@ -140,6 +141,29 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/console/zero-meaning.ts": {
+    kind: "demonstrated",
+    bound: ZERO_MEANING_BOUND,
+    witness: "an empty LIST rendered as rows, whose zero this register cannot see and must not report",
+    control: "the same emptiness rendered as a count, which it must",
+    probe: () =>
+      withRoot(
+        {
+          "app/console/listed/page.tsx":
+            "export default function P() {\n  return (\n    <ul>{rows.map((r) => (<li key={r.id}>{r.name}</li>))}</ul>\n  );\n}\n",
+          "app/console/counted/page.tsx":
+            "export default function P() {\n  return (\n    <p>{rows.length} things</p>\n  );\n}\n",
+        },
+        (root) => {
+          const reported = zeroDefects(root, [], zeroSites(root)).map((d) => d.site);
+          return {
+            witnessSeen: reported.some((s) => s.startsWith("/console/listed")),
+            controlSeen: reported.some((s) => s.startsWith("/console/counted")),
           };
         },
       ),

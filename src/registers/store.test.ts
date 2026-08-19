@@ -74,6 +74,27 @@ describe("W60 register isolation", () => {
       gapCount: 0,
     });
   });
+
+  it("says whether the zero is a count or the absence of one, which is not the same fact", () => {
+    // W361: the default above is a CONSTANT, and the console rendered it as a bold numeral under
+    // "On this register" — a claim that the practice's list was read and nobody was on it, for a
+    // practice nothing has ever been run for. `seedCounts` has one caller in this tree and it is
+    // the e2e mock route, so that was every real practice. The store cannot say what the count
+    // would be; it can say whether anybody asked, and both directions are driven here.
+    seedCounts(PRACTICE_A, { [REGISTER_A]: { memberCount: 42, gapCount: 9 } });
+
+    const counted = registersFor(PRACTICE_A).find((r) => r.condition.code === REGISTER_A);
+    expect(counted?.counted, "a register that WAS counted reads as uncounted").toBe(true);
+
+    const uncounted = registersFor(PRACTICE_B).find((r) => r.condition.code === REGISTER_A);
+    expect(uncounted?.counted, "the stand-in zero reads as a measurement").toBe(false);
+    expect(uncounted?.counts, "the stand-in is no longer a zero").toEqual({ memberCount: 0, gapCount: 0 });
+
+    // And a register the seed did not name is uncounted even for a practice that HAS counts —
+    // the flag is per register, because a run can cover one and not another.
+    const other = registersFor(PRACTICE_A).find((r) => r.condition.code !== REGISTER_A);
+    if (other) expect(other.counted, "one seeded register made every register look counted").toBe(false);
+  });
 });
 
 describe("W60 G5 boundary", () => {

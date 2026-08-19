@@ -473,6 +473,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/console/zero-meaning.ts",
+    census: {
+      derives:
+        "Every count a console page RENDERS: the markup of each console page file from its first `return (`, brace-matched into interpolations, minus attribute positions, and within each interpolation the counting-named expressions that are not in a comparison. A count only compared against zero decides what is shown and shows no number; a count behind a ternary shows one.",
+      checkedAgainst:
+        "W361's `ZERO_CLAIMS`, in four directions: a rendered count nothing classifies fails, a classification for a count the page no longer renders fails, a zero called a WAIT on a page saying nothing about a cycle fails, and a zero called a MEASUREMENT on a route W346 says is waiting fails.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a constructed page rendering one count and branching on another, where only the rendered one may be reported; a second holding the same count in an attribute, where none may be",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every zero this console renders says which of three things it is — a measurement, a cycle that has not run, or a question nobody has been asked — rather than leaving a digit to argue.",
+        mutation:
+          "A count is added to the derived population and must be reported unclassified; a classification is kept for a count the population does not hold and must be reported the other way.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/spec-stores.ts",
     census: {
       derives:

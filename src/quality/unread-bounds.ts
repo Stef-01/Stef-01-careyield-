@@ -117,6 +117,15 @@ export interface NamedCondition {
  */
 export const NAMED_CONDITIONS: readonly NamedCondition[] = [
   {
+    bound: "src/console/zero-meaning.ts::ZERO_MEANING_BOUND",
+    condition: "a page that renders a number some other way is outside the population entirely",
+    reading: {
+      kind: "owed",
+      by: "W363",
+      why: "The gap is real and the tree already holds one instance of it: `/console/referrals` renders its day-two emptiness as a LIST, so the page's most important zero is not in this population and is covered only because W346's register holds the route. What would read it is a derivation of what a COMPONENT renders rather than of what an expression is called — `ZERO_MEANING_BOUND` names it as the remedy and `bounds.ts` carries the predicate that goes false when somebody builds it. Owed to W363 because that unit re-reads this quarter's checks for the direction each fails in, and a population that silently omits the case its own bound names is the direction this one fails in.",
+    },
+  },
+  {
     bound: "src/quality/hardening-q27.ts::Q27_HARDENING_BOUND",
     condition: "the kind a reader does not notice missing",
     reading: {

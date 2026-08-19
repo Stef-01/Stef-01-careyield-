@@ -116,6 +116,17 @@ export interface RegisterSummary {
   intervals: GuidelineInterval[];
   enabled: boolean;
   counts: RegisterCounts;
+  /**
+   * Whether the counts above were COMPUTED for this practice, or are the stand-in zero.
+   *
+   * W361: `NO_COUNTS` is a constant, and the page rendered it as a bold numeral under "On this
+   * register". `seedCounts` has exactly one caller in this tree and it is the e2e mock route, so
+   * every practice outside a test has always been shown a zero that is the absence of a run rather
+   * than the result of one — the exact zero W179 refused, in the shape of a measurement. The store
+   * cannot say what the count WOULD be; it can say whether anybody has ever asked, and that is the
+   * one thing the page needs to stop making a claim it has no basis for.
+   */
+  counted: boolean;
 }
 
 const NO_COUNTS: RegisterCounts = { memberCount: 0, gapCount: 0 };
@@ -136,6 +147,7 @@ export function registersFor(practiceId: PracticeId): RegisterSummary[] {
       intervals: state.intervals.filter((i) => i.conditionCode === condition.code),
       enabled: !disabled.includes(condition.code),
       counts: counts[condition.code] ?? NO_COUNTS,
+      counted: counts[condition.code] !== undefined,
     }));
 }
 

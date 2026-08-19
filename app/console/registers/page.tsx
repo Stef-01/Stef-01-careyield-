@@ -23,6 +23,16 @@ const ERROR_COPY: Record<string, string> = {
   unknown_register: "That register no longer exists. The list has been refreshed.",
 };
 
+/**
+ * W361: what this page says instead of a number nobody has worked out.
+ *
+ * A zero under "On this register" is a claim that the practice's list was read and nobody is on
+ * it. Until a run has happened there is no such reading, and the stand-in zero the store returns
+ * says the opposite of the truth to the one reader who would act on it. It says what has not
+ * happened rather than promising when it will — W346's posture, one page over.
+ */
+const NOT_RUN_COPY = "Not counted yet";
+
 export default async function RegistersPage({
   searchParams,
 }: {
@@ -63,7 +73,7 @@ export default async function RegistersPage({
           </p>
         ) : (
           <ul className="flex flex-col gap-4">
-            {registers.map(({ condition, intervals, enabled, counts }) => (
+            {registers.map(({ condition, intervals, enabled, counts, counted }) => (
               <li
                 key={condition.code}
                 data-testid={`register-${condition.code}`}
@@ -89,14 +99,30 @@ export default async function RegistersPage({
                 <dl className="mt-4 flex gap-8">
                   <div>
                     <dt className="text-xs uppercase tracking-wide text-stone-500">On this register</dt>
-                    <dd data-testid={`members-${condition.code}`} className="text-xl font-semibold text-stone-900">
-                      {counts.memberCount}
+                    <dd
+                      data-testid={`members-${condition.code}`}
+                      data-counted={counted ? "yes" : "no"}
+                      className={
+                        counted
+                          ? "text-xl font-semibold text-stone-900"
+                          : "text-sm font-medium text-stone-500"
+                      }
+                    >
+                      {counted ? counts.memberCount : NOT_RUN_COPY}
                     </dd>
                   </div>
                   <div>
                     <dt className="text-xs uppercase tracking-wide text-stone-500">Due by schedule</dt>
-                    <dd data-testid={`gaps-${condition.code}`} className="text-xl font-semibold text-stone-900">
-                      {counts.gapCount}
+                    <dd
+                      data-testid={`gaps-${condition.code}`}
+                      data-counted={counted ? "yes" : "no"}
+                      className={
+                        counted
+                          ? "text-xl font-semibold text-stone-900"
+                          : "text-sm font-medium text-stone-500"
+                      }
+                    >
+                      {counted ? counts.gapCount : NOT_RUN_COPY}
                     </dd>
                   </div>
                 </dl>

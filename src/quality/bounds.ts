@@ -60,6 +60,7 @@ import { Q26_MUTANT_BOUND } from "./quarter-mutants-q26";
 import { UNAPPLIED_BOUND } from "./unapplied-remedies";
 import { PREMISE_BOUND, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND } from "./spec-stores";
+import { ZERO_MEANING_BOUND } from "@/console/zero-meaning";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -491,6 +492,43 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/console/zero-meaning.ts",
+    name: "ZERO_MEANING_BOUND",
+    unit: "W361",
+    text: ZERO_MEANING_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a reading of what a component renders",
+      reads: "`zero-meaning.ts`, for a population derived from the components a page renders rather than from the names of the expressions it interpolates",
+      // The clause that names something buildable. Today a count is found by what the expression
+      // is CALLED — `.length`, `.size`, `.total`, a `count` suffix — so `/console/referrals`, whose
+      // day-two zero is an empty LIST, has its most important zero outside the population. The
+      // predicate reads for the derivation rather than for a unit, because what lifts the sentence
+      // is the module growing a way to ask what a component puts on the screen.
+      stillOpen: (root) =>
+        !/export function renderedBy/.test(readFileSync(path.join(root, "src/console/zero-meaning.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/console/zero-meaning.ts":
+            "// W361: the console says which of its zeroes is a measurement.\nexport function renderedBy(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'a count on a screen', 'the one reader', 'one caller' — the unit of each phrase rather than a count anything maintains. Each stays one however many pages or rows the register grows to.",
+      },
+      {
+        word: "two",
+        kind: "fixed_by_a_gate",
+        why: "'the two things a source can answer' — the arms of the resolution, fixed by the code the sentence describes rather than measured off the tree: `zeroDefects` resolves that the count is still rendered and that a page calling its zero a wait says so. A third would be a third arm, and the suite drives each of the ones there are.",
       },
     ],
   },

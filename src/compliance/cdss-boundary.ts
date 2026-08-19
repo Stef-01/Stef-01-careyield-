@@ -766,6 +766,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W360's pass is reviewer-facing: unit ids, module paths, what each finding is and what was done about it. The longest strings on it are arguments addressed to whoever reads the quarter next, and nothing here renders or reaches a practice.",
   },
   {
+    module: "src/console/zero-meaning.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W361's register is reviewer-facing: route paths, the expressions pages interpolate, and the argument for what a zero at each would mean. The operator copy it is ABOUT lives on the pages; nothing here renders and no practice sees it.",
+  },
+  {
     module: "src/quality/spec-stores.ts",
     operatorCopy: [],
     notCopy:
