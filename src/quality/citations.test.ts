@@ -104,6 +104,7 @@ describe("W301 a fifth implementation cannot arrive quietly", () => {
       "src/quality/mutation-sampling.test.ts",
       "src/quality/order-regressions.test.ts",
       "src/quality/quarter-mutants-q26.test.ts",
+      "src/quality/quarter-mutants-q27.test.ts",
       "src/quality/quarter-mutants.test.ts",
     ]);
     for (const [file, why] of Object.entries(SEPARATOR_NOT_A_CITATION)) {
@@ -121,6 +122,7 @@ describe("W301 a fifth implementation cannot arrive quietly", () => {
       "src/quality/mutation-sampling.test.ts",
       "src/quality/order-regressions.test.ts",
       "src/quality/quarter-mutants-q26.test.ts",
+      "src/quality/quarter-mutants-q27.test.ts",
       "src/quality/quarter-mutants.test.ts",
     ]);
   });

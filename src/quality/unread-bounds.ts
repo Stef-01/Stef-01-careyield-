@@ -117,6 +117,15 @@ export interface NamedCondition {
  */
 export const NAMED_CONDITIONS: readonly NamedCondition[] = [
   {
+    bound: "src/quality/quarter-mutants-q27.ts::Q27_MUTANT_BOUND",
+    condition: "a module they find NOTHING to change in gets no verdict at all",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/quarter-mutants-q27.ts::populationDefects",
+      how: "THE GAP THE SENTENCE NAMES IS THE ONE THING HERE THAT IS READ. `populationDefects` walks the population, builds each module's mutants, and reports any module yielding none that `UNMUTATED_AT_W362` does not record — both directions, so a module falling silent joins the register and a record for a module that has grown a branch fails. The clause exists because a survivor count cannot tell an unmutated module from a cleared one; what closes it is that the register cannot go quiet without the build stopping. The bound's OTHER clauses — five operators, the quarter-only population, a caught mutant not being a tested line — are inherent to the instrument and are argued as such in `escape-hatches.ts`.",
+    },
+  },
+  {
     bound: "src/console/zero-meaning.ts::ZERO_MEANING_BOUND",
     condition: "a page that renders a number some other way is outside the population entirely",
     reading: {

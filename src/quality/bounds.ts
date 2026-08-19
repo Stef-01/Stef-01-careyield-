@@ -62,6 +62,7 @@ import { PREMISE_BOUND, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND } from "./spec-stores";
 import { ZERO_MEANING_BOUND } from "@/console/zero-meaning";
 import { DEFAULT_BOUND } from "./defaulted-registers";
+import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
@@ -495,6 +496,28 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/quarter-mutants-q27.ts",
+    name: "Q27_MUTANT_BOUND",
+    unit: "W362",
+    text: Q27_MUTANT_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Every clause is about what a mutation run IS. Five operators are five operators: widening them is a different instrument rather than a fix, and a module they find nothing to change in gets no verdict from any number of them — `UNMUTATED_AT_W362` records the one this quarter has, which is the honest response rather than a lift. Measuring only what a quarter ADDED is the population the unit is defined over; a run over every module the quarter TOUCHED is the standing sampler's job and W296 does it. And the last clause is the deepest: a caught mutant says some assertion went red, not that the assertion was about the changed line, and nothing short of reading each pair settles that — which is a person's judgement over sixty pairs rather than a check.",
+    },
+    numbers: [
+      {
+        word: "five",
+        kind: "fixed_by_a_gate",
+        why: "W296's operator set, fixed in `OPERATORS` and asserted against it by that unit's own suite. Not a measurement of this quarter: the same five ran over Q25 and Q26, which is what makes the three runs comparable at all.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'the one this quarter has' — the unit of the sentence about `UNMUTATED_AT_W362`, and it stays one however many modules join that register, because the clause is about the KIND of thing rather than the count of them.",
       },
     ],
   },

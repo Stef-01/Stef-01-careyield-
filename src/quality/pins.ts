@@ -218,6 +218,45 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/quarter-mutants-q27.ts",
+    name: "QUARTER_AT_W362",
+    classification: {
+      kind: "range_bound",
+      why:
+        "Q27's first and last unit, fixed by the horizon that laid the quarter out and resolved against the ledger by this module's own suite. A quarter does not grow.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q27.ts",
+    name: "EXCLUDED_AT_W362",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a module the quarter added becoming reachable, or a new one arriving that the harness cannot run",
+      whyStopping:
+        "A NAMED ROW PER MODULE, each saying WHY the sweep cannot reach it and each resolved against the tree — a `runs_the_sweep` row must name the suite `siblingSuite` really finds, and a `no_sibling_suite` row fails the moment one appears. An exclusion arriving is a module nobody is measuring; an exclusion leaving is a module somebody made measurable. Both change what the survivor list below means, and a reader who cannot tell an empty list from an unrun one is the failure this quarter is named after.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q27.ts",
+    name: "UNMUTATED_AT_W362",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a module in the population growing a line one of W296's five operators matches",
+      whyStopping:
+        "A module the operators find NOTHING to change in gets no verdict, and in a survivor count it reads exactly like a module that was cleared. The row names it and argues what it holds instead — three early returns and two constants, none of them an equality, a boolean join, a comparison or an arithmetic operator. A module leaving this list has grown a branch the sweep can now measure, which is worth a build stopping for because it changes what the empty survivor list covers.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q27.ts",
+    name: "SURVIVORS_AT_W362",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a mutant surviving the quarter's suites, or a declared survivor being caught",
+      whyStopping:
+        "EMPTY, AND THE EMPTINESS IS THE CLAIM. Sixty-odd mutants ran and one survived; the remedy was applied in the same unit rather than recorded, because W357 showed what recorded remedies are worth — four written into survivor registers and never built, the oldest since W296. A survivor arriving is a hole somebody has to read; a declared one being caught means the register describes a suite that has moved. Neither can be satisfied by retyping a digit: the list is named rows and the run below re-derives it.",
+    },
+  },
+  {
     module: "src/quality/defaulted-registers.ts",
     name: "DRIVEN_AT_W355",
     classification: {

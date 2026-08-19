@@ -27,6 +27,7 @@ import { REMEDIES_AT_W357 } from "./unapplied-remedies";
 import { PREMISES_AT_W358 } from "./spec-premises";
 import { RESIDUE_AT_W359 } from "./spec-stores";
 import { DRIVEN_AT_W355 } from "./defaulted-registers";
+import { EXCLUDED_AT_W362, UNMUTATED_AT_W362 } from "./quarter-mutants-q27";
 import { BLOCKED_AT_W263, blockedRows } from "./blocked-surface";
 import { withPlantedIn } from "./planting";
 import { UNPROVEN_AT_W290, walkUnproven } from "./register-census";
@@ -96,6 +97,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
       "BLOCKED_AT_W263",
       "DRIVEN_AT_W355",
       "EXCLUDED_AT_W349",
+      "EXCLUDED_AT_W362",
       "PREMISES_AT_W358",
       "REMEDIES_AT_W357",
       "RESIDUE_AT_W359",
@@ -103,8 +105,10 @@ describe("W290 the live pins, and why live is not the defect", () => {
       "SURVIVORS_AT_W296",
       "SURVIVORS_AT_W332",
       "SURVIVORS_AT_W349",
+      "SURVIVORS_AT_W362",
       "UNASKED_AT_W340",
       "UNEVIDENCED_AT_W293",
+      "UNMUTATED_AT_W362",
       "UNPROVEN_AT_W290",
       "UNTESTED_AT_W296",
     ]);
@@ -145,6 +149,10 @@ describe("W290 the live pins, and why live is not the defect", () => {
     // W355's is the same class over signatures rather than files: one row per defaulted parameter
     // driven from outside its own suite, keyed by `module::fn::position` and carrying the files.
     expect(DRIVEN_AT_W355.every((r) => r.parameter.split("::").length === 3)).toBe(true);
+    // W362's three are the same class a quarter on, and the third is new: a module the operators
+    // find nothing to change in, which a survivor count cannot tell from one that was cleared.
+    expect(EXCLUDED_AT_W362.every((e) => e.module.endsWith(".ts"))).toBe(true);
+    expect(UNMUTATED_AT_W362.every((u) => u.why.length > 120)).toBe(true);
   });
 
   it("makes each argue for interrupting somebody, not merely declare itself live", () => {

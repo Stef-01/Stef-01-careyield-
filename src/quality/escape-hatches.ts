@@ -213,6 +213,7 @@ export const REVIEWED_AT_W345: readonly Review[] = [
   // been written to notice `proseWaits` by name and went false the moment it existed. What is left
   // is a wait with no unit id in it, which needs a reading of what an event is rather than a
   // resolution of a name: a judgement over arbitrary prose, not a check somebody could write.
+  { id: "bounds::src/quality/quarter-mutants-q27.ts::Q27_MUTANT_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/self-ending.ts::ENDING_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/founder-page-facts.ts::PAGE_FACT_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/hardening-q23.ts::HARDENING_BOUND", verdict: { kind: "still_correct" } },

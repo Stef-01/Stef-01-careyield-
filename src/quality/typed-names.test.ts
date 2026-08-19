@@ -204,6 +204,27 @@ describe("W342 a field typed loosely beside a twin typed strictly", () => {
     const strict = typings.filter((t) => t.type === "UnitId");
     expect(strict.length, "no unit field is typed strictly, so the comparison is over nothing").toBeGreaterThan(4);
   });
+
+  it("reads UNIT fields, and not every field a name site happens to carry", () => {
+    // W362'S SURVIVOR. `nameSites` classifies each site `unit`, `module` or `export`, and the
+    // filter that keeps the unit ones flipped to its inverse without a test noticing: the wider set
+    // is a SUPERSET — it shares `by`, `id` and `value` with the unit fields — so `looseTwins` still
+    // returned nothing and the strict count still cleared its floor. The wrong answer was bigger
+    // than the right one and every assertion over it passed, which is W353's shape exactly.
+    //
+    // What separates them is a field only the OTHER kinds carry. `module` is one: no register puts
+    // a `W`-number behind it, and the inverted filter reports its declarations by the hundred.
+    const sites = nameSites(ROOT);
+    const unitFields = new Set(sites.filter((s) => s.kind === "unit").map((s) => s.field));
+    expect(unitFields, "the tree stopped carrying unit ids in a field named `unit`").toContain("unit");
+    expect(unitFields, "`module` now carries unit ids, so this control is no longer a control").not.toContain(
+      "module",
+    );
+    expect(
+      unitFieldTypings(ROOT, sites).map((t) => t.field),
+      "a field the tree never shows carrying a unit id was typed as one",
+    ).not.toContain("module");
+  });
 });
 
 describe("W342 the bound", () => {
