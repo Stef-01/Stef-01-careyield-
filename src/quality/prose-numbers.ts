@@ -32,6 +32,7 @@
 import { consoleRoutes, linkTargets } from "./reached-pages";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { weldedLedgerTests } from "./close-gate";
 import { pageSpecFiles, sourceModules } from "./tree-walks";
 import { parseLedgerRows } from "./blocked-surface";
 import { ACCEPTANCE_REGISTERS } from "./acceptances";
@@ -263,6 +264,8 @@ const blockedRows = (root: string): number =>
 const acceptanceRegisters = (): number => ACCEPTANCE_REGISTERS.length;
 const acceptedTautologies = (): number => ACCEPTED_TAUTOLOGIES.length;
 const pageSpecs = (root: string): number => pageSpecFiles(root).length;
+// W370: the checks the close gate cannot call, re-derived rather than pinned in the pass's prose.
+const weldedTests = (root: string): number => weldedLedgerTests(root).length;
 const q24Findings = (): number => HARDENING_Q24_FINDINGS.length;
 
 /**
@@ -493,11 +496,12 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/privacy/erasure-y5.ts", text: "thirty-seven modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "five registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "Five registers", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/acceptances.ts", text: "eleven registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
+  { module: "src/quality/acceptances.ts", text: "twelve registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
   { module: "src/quality/assertion-vocabulary.ts", text: "fifty-two sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/close-gate.ts", text: "four modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "six entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "three walks", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/hardening-q28.ts", text: "50 files", resolution: { kind: "derived", derive: weldedTests } },
   { module: "src/quality/spelling-markers.ts", text: "two files", resolution: { kind: "not_a_tree_count" } },
   { module: "src/quality/deferrals.ts", text: "Two registers", resolution: { kind: "not_a_tree_count" } },
   { module: "src/quality/quarter-mutants.ts", text: "sixty-eight mutation sites", resolution: { kind: "at_the_unit" } },

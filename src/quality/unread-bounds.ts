@@ -42,6 +42,7 @@ import path from "node:path";
 // bound entries came out with `text: undefined` and the phrase scan crashed on the first row. The
 // bounds are a PARAMETER instead, which is W289's rule and removes the cycle rather than ordering
 // around it.
+import { parseLedgerRows } from "./blocked-surface";
 import type { StatedBound } from "./bounds";
 
 /**
@@ -130,8 +131,8 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     condition: "a page that renders a number some other way is outside the population entirely",
     reading: {
       kind: "owed",
-      by: "W371",
-      why: "The gap is real and the tree already holds one instance of it: `/console/referrals` renders its day-two emptiness as a LIST, so the page's most important zero is not in this population and is covered only because W346's register holds the route. What would read it is a derivation of what a COMPONENT renders rather than of what an expression is called — `ZERO_MEANING_BOUND` names it as the remedy and `bounds.ts` carries the predicate that goes false when somebody builds it. W361 OWED THIS TO W363 AND W363 DID NOT ANSWER IT: that unit re-read which way each named check fails, which is a different question from what a check is over, and W339's clock fired the moment it landed. Re-pointed at W371, whose own gate is the link graph — the derivation this condition has been waiting for.",
+      by: "W377",
+      why: "The gap is real and the tree already holds one instance of it: `/console/referrals` renders its day-two emptiness as a LIST, so the page's most important zero is not in this population and is covered only because W346's register holds the route. What would read it is a derivation of what a COMPONENT RENDERS rather than of what an expression is called. RE-AIMED TWICE NOW, AND THE SECOND TIME IS THE INTERESTING ONE. W361 owed it to W363, which re-read which way each named check fails — a different question — and W339's clock fired the moment that unit landed. W364 re-pointed it at W371 on the grounds that a link graph was the derivation this condition had been waiting for. It is not: W371 derives which routes are REACHABLE, from hrefs a rendered file carries, and reachability is not what a page renders its zero AS. Nothing in that register looks at a number. So the condition is re-aimed to W377, the quarter close, whose job is to say what the next quarter carries — and this time the reason it is being moved is written down rather than a second guess at which unit will happen to want it. W370 IS WHY THIS WAS CAUGHT BEFORE THE COMMIT INSTEAD OF AFTER: the clock is a close-gate reader now, and closing W371 with the promise still aimed at it fails `verify:close` rather than `main`."
     },
   },
   {
@@ -640,6 +641,37 @@ export function conditionDefects(
 }
 
 /** What a green register does not prove. */
+/**
+ * Every `owed` reading whose unit the ledger already holds as `done`, from ledger TEXT.
+ *
+ * W370: CALLABLE, BECAUSE THIS CHECK COULD ONLY EVER GO WRONG AT A CLOSE AND NOTHING RAN IT THERE.
+ * The comparison lived welded inside this module's suite, so W326's close gate — which simulates
+ * the row as it will be committed and runs the registers against it — had nothing to call. W363's
+ * close turned `main` red on exactly this line, and `weldedLedgerTests` had been naming this file
+ * as unreachable on every run since W315. Taking the ledger as TEXT rather than a root is what
+ * makes it answerable about a ledger that does not exist yet.
+ */
+export function staleOwedConditions(
+  ledger: string,
+  conditions: readonly NamedCondition[] = NAMED_CONDITIONS,
+): string[] {
+  const rows = parseLedgerRows(ledger);
+  const out: string[] = [];
+  for (const condition of conditions) {
+    const reading = condition.reading;
+    if (reading.kind !== "owed") continue;
+    const row = rows.find((r) => r.id === reading.by);
+    if (row === undefined) {
+      out.push(`${condition.bound} is owed a reading by ${reading.by}, which is not a row`);
+      continue;
+    }
+    if (row.status === "done") {
+      out.push(`${condition.bound} is owed a reading by ${reading.by}, which has landed`);
+    }
+  }
+  return out.sort();
+}
+
 export const UNREAD_BOUND =
   "The population is a phrase scan over a house style, so a bound naming a gap in words this " +
   "vocabulary does not hold is outside this register — the class W267 states about `readdirSync`, " +

@@ -56,8 +56,26 @@ export type Plantable = Readonly<Record<string, string>>;
 
 function write(root: string, files: Plantable): string[] {
   const written: string[] = [];
+  const base = path.resolve(root);
   for (const [rel, contents] of Object.entries(files)) {
-    const full = path.join(root, rel);
+    const full = path.resolve(base, rel);
+    // W370: THE GUARD CHECKED THE ROOT AND NOT THE KEYS. `refuseTheRepository` exists so a probe
+    // cannot be written into the tree other test workers are reading, and it inspects the root it
+    // is handed — while `path.join(root, rel)` with a `..` in the key walks straight back out of
+    // that root and past the check. Nothing in this tree passes such a key today; the point is that
+    // the one thing this harness refuses was one relative path away, and a guard that can be
+    // stepped around is the direction Q28 is about.
+    //
+    // `resolve` RATHER THAN `join`, AND THAT IS THE SECOND WAY OUT. `join` treats an ABSOLUTE key
+    // as a suffix — `path.join("/a/b", "/etc/x")` is `/a/b/etc/x` — so an absolute key would land
+    // inside the root and pass a check written for `..`. `resolve` discards the base for it, which
+    // is what puts it outside and gets it refused. Both are driven.
+    if (!full.startsWith(base + path.sep)) {
+      throw new Error(
+        `plant refuses the key ${rel}: it resolves outside the tree it is planted in ` +
+          `(${full}). A probe that escapes its root is written where nothing will remove it.`,
+      );
+    }
     mkdirSync(path.dirname(full), { recursive: true });
     writeFileSync(full, contents, "utf8");
     written.push(full);

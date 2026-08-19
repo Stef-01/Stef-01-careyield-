@@ -67,6 +67,7 @@ import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
 import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
 import { FINDINGS as Q26_FINDINGS } from "./hardening-q26";
 import { FINDINGS as Q27_FINDINGS } from "./hardening-q27";
+import { FINDINGS as Q28_FINDINGS } from "./hardening-q28";
 import { FINDINGS as W279_FINDINGS } from "./review-w279";
 import type { UnitId } from "./typed-names";
 
@@ -325,6 +326,7 @@ export const HARDENING_REGISTERS: Readonly<Record<string, readonly HardeningFind
   "src/quality/hardening-q25.ts": Q25_FINDINGS,
   "src/quality/hardening-q26.ts": Q26_FINDINGS,
   "src/quality/hardening-q27.ts": Q27_FINDINGS,
+  "src/quality/hardening-q28.ts": Q28_FINDINGS,
   "src/quality/review-w279.ts": W279_FINDINGS,
 };
 

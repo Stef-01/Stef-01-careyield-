@@ -61,6 +61,7 @@ import { staleBounds } from "./bounds";
 import { classDefects } from "./claim-classes";
 import { controlDefects } from "./controls";
 import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
+import { staleOwedConditions } from "./unread-bounds";
 import { endedDeclarations } from "./self-ending";
 import { CLAIMS, claimDefects } from "./prose-numbers";
 import { founderDiff } from "@/founder/outstanding";
@@ -126,6 +127,12 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
     why: "W331's pass, whose deferrals point at W334 and W336. It is here as its own reader rather than folded into the aggregate above BECAUSE folding it in would not have named the module: `readerDiff` keys on the module in a reader's id, so a register whose findings are checked through somebody else's reader reads as unwatched — which is how W326 reported this one the day it was written.",
     run: (root) =>
       overdueDispositions(ledgerOf(root), Q25_FINDINGS, CLOSE_GATE_TODAY).map((d) => `${d.finding} ${d.what}`),
+  },
+  {
+    id: "src/quality/unread-bounds.ts::staleOwedConditions",
+    why:
+      "W339's clock on a bound's `owed` reading, and W370 is why it is here. The arm refuses a promise aimed at a unit that has LANDED, so a close is the only event that can make it fire — and for a quarter it was welded inside `unread-bounds.test.ts`, where this gate had nothing to call. It fired at W363's close and turned `main` red, then W364's close did the same thing from the other side. `weldedLedgerTests` had been naming both files as unreachable on every run of that quarter.",
+    run: (root) => staleOwedConditions(ledgerOf(root)),
   },
   {
     id: "src/quality/self-ending.ts::endedDeclarations",

@@ -1,6 +1,6 @@
 // W294: the acceptance registers, re-derived — and the review date nobody was enforcing.
 //
-// AN ACCEPTANCE IS A RULE SWITCHED OFF FOR ONE STRING. This tree has eleven registers of them:
+// AN ACCEPTANCE IS A RULE SWITCHED OFF FOR ONE STRING. This tree has twelve registers of them:
 // advice-linter findings accepted on operator copy, on composed copy and on public pages, hardening
 // findings accepted after a review, tautologies accepted because the real assertion is a
 // `@ts-expect-error`, and dependency advisories accepted in the audit gate. Every one carries a
@@ -48,6 +48,7 @@ import { FINDINGS as Q23_FINDINGS } from "./hardening-q23";
 import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
 import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
 import { FINDINGS as Q26_FINDINGS } from "./hardening-q26";
+import { FINDINGS as Q28_FINDINGS } from "./hardening-q28";
 import { FINDINGS as W279_REVIEW_FINDINGS } from "./review-w279";
 import type { UnitId } from "./typed-names";
 
@@ -97,6 +98,17 @@ const hardeningAcceptances = (
     );
 
 export const ACCEPTANCE_REGISTERS: readonly AcceptanceRegister[] = [
+  {
+    module: "src/quality/hardening-q28.ts",
+    unit: "W370",
+    register: "FINDINGS",
+    entries: () => hardeningAcceptances("W370", Q28_FINDINGS),
+    rederivation: {
+      kind: "rederived_in_its_own_test",
+      citation:
+        "src/quality/hardening-q28.test.ts :: Q28-CR-4: the three exemptions still reach past their keys",
+    },
+  },
   {
     module: "src/quality/hardening-q26.ts",
     unit: "W343",

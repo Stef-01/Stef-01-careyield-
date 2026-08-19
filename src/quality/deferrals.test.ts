@@ -159,9 +159,14 @@ describe("W329 the unit reads what it inherits, before the close rather than aft
     const deferredIn = (findings: readonly HardeningFinding[]) =>
       findings.filter((f) => f.disposition.kind === "deferred").map((f) => f.id);
     expect(deferredIn([...ALL, deferredTo("W999", "PROBE")]), "the derivation finds nothing when handed one").toEqual([
+      "Q28-SIMP-1",
       "PROBE",
     ]);
-    expect(deferredIn(ALL)).toEqual([]);
+    // W370: NAMED, WHICH IS WHAT THE LINE ABOVE'S COMMENT SAYS THIS IS FOR. Q28's pass deferred one
+    // finding — the fourteen modules that read source text outside `SCAN_SITES` — to W372, whose
+    // row is that finding with the subject filled in. A deferral arriving is meant to fail this
+    // line and make somebody write down what it is; this is that writing down.
+    expect(deferredIn(ALL)).toEqual(["Q28-SIMP-1"]);
     // And the resolver still works, driven on a fabricated deferral rather than on a live one.
     expect(inheritedBy("W334", [...ALL, deferredTo("W334", "PROBE")])).toEqual(["PROBE"]);
     // `done` rather than `claimed`: the first draft pinned the row's IN-FLIGHT state and went red

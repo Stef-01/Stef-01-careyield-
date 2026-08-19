@@ -18,6 +18,7 @@ import {
   UNREAD_RULE,
   boundsNamingAGap,
   conditionDefects,
+  staleOwedConditions,
 } from "./unread-bounds";
 import { STATED_BOUNDS, type StatedBound } from "./bounds";
 import { artefactsPresent } from "./repository-clean";
@@ -194,5 +195,64 @@ describe("W339 the register says what it is", () => {
     expect(UNREAD_BOUND).toContain("not_observable");
     expect(UNREAD_BOUND).toContain("W339 found to be");
     expect(UNREAD_BOUND.length).toBeGreaterThan(600);
+  });
+});
+
+describe("W370 the owed clock, made callable so a close can run it", () => {
+  // W326's gate had nothing to call here: the comparison lived welded inside this suite, so a
+  // promise going stale could only be found AFTER the close. It was, twice in one day. These drive
+  // every branch of the lifted function against a ledger built for the purpose.
+  const LEDGER_TEXT = [
+    "| Unit | Status | Session | Claimed | SHA | What |",
+    "| --- | --- | --- | --- | --- | --- |",
+    "| W900 | done | builder-B | 2026-01-01T00:00Z | abc1234 | a landed row. |",
+    "| W901 | claimed | builder-B | 2026-01-01T00:00Z | — | a row still in flight. |",
+  ].join("\n");
+
+  const owed = (by: `W${number}`): NamedCondition => ({
+    bound: "src/planted/w370.ts::PLANTED_BOUND",
+    condition: "a planted condition",
+    reading: { kind: "owed", by, why: "a planted reason" },
+  });
+
+  it("reports a promise aimed at a unit that has landed", () => {
+    expect(staleOwedConditions(LEDGER_TEXT, [owed("W900")])).toEqual([
+      "src/planted/w370.ts::PLANTED_BOUND is owed a reading by W900, which has landed",
+    ]);
+  });
+
+  it("says nothing about a promise aimed at a unit still in flight", () => {
+    // The other direction, and the one that matters at a close: this is the state every live
+    // promise is in, so a check that reported here would fail on every commit.
+    expect(staleOwedConditions(LEDGER_TEXT, [owed("W901")])).toEqual([]);
+  });
+
+  it("reports a promise aimed at a unit the ledger does not hold at all", () => {
+    expect(staleOwedConditions(LEDGER_TEXT, [owed("W999")])[0]).toContain("which is not a row");
+  });
+
+  it("looks at `owed` readings and nothing else", () => {
+    const read: NamedCondition = {
+      bound: "src/planted/w370.ts::PLANTED_BOUND",
+      condition: "a planted condition",
+      reading: { kind: "read_by", check: "src/planted/w370.ts::check", how: "a planted how" },
+    };
+    const never: NamedCondition = {
+      bound: "src/planted/w370.ts::PLANTED_BOUND",
+      condition: "a planted condition",
+      reading: { kind: "not_observable", why: "a planted why" },
+    };
+    expect(staleOwedConditions(LEDGER_TEXT, [read, never])).toEqual([]);
+    // And the same table WITH an owed row still reports, so the skip above is a filter rather than
+    // a function that answers nothing.
+    expect(staleOwedConditions(LEDGER_TEXT, [read, never, owed("W900")])).toHaveLength(1);
+  });
+
+  it("matches a promise to its own row and not to a neighbour", () => {
+    // `r.id === reading.by`: with only W901 in flight, a promise aimed at W900 must still resolve
+    // to W900's landed row rather than to whichever row the scan reached first.
+    expect(staleOwedConditions(LEDGER_TEXT, [owed("W900"), owed("W901")])).toEqual([
+      "src/planted/w370.ts::PLANTED_BOUND is owed a reading by W900, which has landed",
+    ]);
   });
 });

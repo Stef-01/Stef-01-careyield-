@@ -33,6 +33,7 @@ import { CLASS_ANSWERS } from "./claim-classes";
 import { CONTROL_ANSWERS } from "./controls";
 import { FINDINGS as Q24_FINDINGS } from "./hardening-q24";
 import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
+import { FINDINGS as Q28_FINDINGS } from "./hardening-q28";
 import { FINDINGS as Q22_FINDINGS, type HardeningFinding, type UnitId } from "./hardening-q22";
 import { FINDINGS as W279_FINDINGS } from "./review-w279";
 import { prepareForScan } from "./scan-text";
@@ -102,6 +103,17 @@ const deferrals = (unit: string, findings: readonly HardeningFinding[]): SelfEnd
 
 /** Every register in this tree holding a declaration that waits for something. */
 export const ENDING_REGISTERS: readonly EndingRegister[] = [
+  {
+    unit: "W370",
+    module: "src/quality/hardening-q28.ts",
+    register: "FINDINGS",
+    entries: () => deferrals("W370", Q28_FINDINGS),
+    rechecked: {
+      kind: "ended_there_too",
+      check: "overdueDispositions",
+      why: "W318's shared check reads the same deferral against the same ledger, and should. What is added here is that Q28's one deferral — the fourteen modules reading source text outside `SCAN_SITES`, owed to W372 — is read BESIDE everything else this tree waits on, so a pass that quietly dropped its own clock would still be visible from outside it.",
+    },
+  },
   {
     unit: "W318",
     module: "src/quality/hardening-q22.ts",

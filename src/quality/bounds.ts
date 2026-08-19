@@ -110,6 +110,7 @@ import { NAMED_CONDITIONS, UNREAD_BOUND } from "./unread-bounds";
 import { PRIVATE_COPY_BOUND, SHARED_PARSES } from "./private-copies";
 import { PLANTED_NAMES, TYPED_NAME_BOUND } from "./typed-names";
 import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SELF } from "./hardening-q26";
+import { Q28_HARDENING_BOUND } from "./hardening-q28";
 import { Q27_HARDENING_BOUND } from "./hardening-q27";
 import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
 import { HORIZON_CLAIM_BOUND, Q27_CLAIMS } from "./horizon-claims";
@@ -1239,6 +1240,33 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "three",
         kind: "unit_id",
         why: "How many order claims are declared here, which is `TIMELINE_CLAIMS.length` and the register's own table. The bound's predicate reads the same length, so the sentence and the check move together and the suite reads the table rather than this word.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/hardening-q28.ts",
+    name: "Q28_HARDENING_BOUND",
+    unit: "W370",
+    text: Q28_HARDENING_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Independence is a property of WHO reads, and the loop has the builders it has — a second session reading Q28 would be a different pass rather than a lifting of this sentence. The clause about the sharpest instrument is the same kind of statement pointed inward: that two of these findings were MEASURED by later registers rather than seen by this reader is a fact about what a pass is, not a gap a pass can close by trying harder. The uneven lenses follow from the quarter's content — a quarter whose product surface is one console page gives a security lens the harness and little else. And the completeness clause is the one nothing can lift: a pass reports what a reader saw in a range of diff, and the defect this quarter is named for, a check that fails toward looking correct, is by construction the kind a reader does not notice missing.",
+    },
+    numbers: [
+      {
+        word: "One",
+        kind: "rate",
+        why: "'One quarter read by one reader' — the unit of the sentence rather than a count of anything the tree holds. It stays one however many findings the pass raises, which is W304's rule.",
+      },
+      {
+        word: "thirteen",
+        kind: "unit_id",
+        why: "The size of the quarter — W352 to W364 — which `QUARTER` holds as a range and this pass's suite checks `REVIEWED_UNITS` against. History: a quarter's extent is fixed the moment its close lands, so the number cannot go stale from a tree that moves.",
+      },
+      {
+        word: "THREE",
+        kind: "unit_id",
+        why: "How many of the quarter's units this reader wrote, which `SELF_REVIEWED` holds by name and this pass's suite checks against the ledger. History: the authorship of W352-W364 cannot change, so the number is fixed at the quarter rather than derived from a tree that moves.",
       },
     ],
   },

@@ -126,6 +126,7 @@ const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/quality/horizon-claims.ts": () => import("@/quality/horizon-claims"),
   "src/quality/failure-direction.ts": () => import("@/quality/failure-direction"),
   "src/quality/flattering-numbers.ts": () => import("@/quality/flattering-numbers"),
+  "src/quality/hardening-q28.ts": () => import("@/quality/hardening-q28"),
   "src/quality/exemption-reach.ts": () => import("@/quality/exemption-reach"),
   "src/quality/spelling-markers.ts": () => import("@/quality/spelling-markers"),
   "src/quality/shared-excuses.ts": () => import("@/quality/shared-excuses"),
