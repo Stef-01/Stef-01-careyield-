@@ -57,6 +57,7 @@ import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptan
 import { unacceptedTautologies } from "./tautology-sweep";
 import { fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
+import { type Selector, type Widening, supersetDefects } from "./superset";
 import { endingDiff } from "./self-ending";
 import { unreachedByUnitSuite } from "./unrun";
 import { vocabularyDefects } from "./assertion-vocabulary";
@@ -383,6 +384,24 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   },
 
   "src/quality/pins.ts": (root) => pinDiff(root, []).undeclared.length > 0,
+
+  "src/quality/superset.ts": (root) => {
+    // W353's comparison, handed a selector that widens and one that refuses where it should not.
+    // The rows are constructed rather than planted on disk: what a selector row holds is a pair of
+    // FUNCTIONS, so the input this comparison must reject is a table and not a file.
+    const row = (name: string, honest: number, degenerate: number, expected: Widening): Selector => ({
+      name,
+      what: "a planted population",
+      honest: () => honest,
+      degenerate: () => degenerate,
+      expected,
+      why: "a planted row",
+    });
+    const widens = supersetDefects(root, [row("src/planted/w289-wide.ts::wide", 3, 9, "narrows")]);
+    const quiet = supersetDefects(root, [row("src/planted/w289-quiet.ts::quiet", 3, 0, "refuses")]);
+    const clean = supersetDefects(root, [row("src/planted/w289-fine.ts::fine", 3, 1, "narrows")]);
+    return widens.length === 1 && quiet.length === 1 && clean.length === 0;
+  },
 
   "src/quality/latent-y5.ts": (root) => {
     void root;

@@ -100,6 +100,7 @@ import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SEL
 import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
 import { HORIZON_CLAIM_BOUND, Q27_CLAIMS } from "./horizon-claims";
 import { ARGUED_DIRECTIONS, DIRECTION_BOUND } from "./failure-direction";
+import { SUPERSET_BOUND, undeclaredPopulations } from "./superset";
 import { REMEDY_BOUND } from "./self-defeating";
 import type { UnitId } from "./typed-names";
 import {
@@ -620,6 +621,34 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'one planted instance', 'one constructed input' — the unit of what a proof covers rather than a count of anything the tree holds. It stays one however many registers the census gains, and the sentence deliberately states no total: the ratio it claims is asserted by this unit's suite rather than frozen in the prose, which is W304's rule.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/superset.ts",
+    name: "SUPERSET_BOUND",
+    unit: "W353",
+    text: SUPERSET_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the list grows and says so",
+      reads: "W267's census, for a walking register no selector declares",
+      // THE FIRST CLAUSE IS THE LIVE ONE. That one degenerate input is not all of them, and that a
+      // count cannot see a selector returning the same number of the wrong things, are properties
+      // of what this measurement IS — no list reaches them. What moves is the POPULATION: every
+      // census member takes something and narrows it, and the day each of them has a declared
+      // degenerate input the sentence stops describing this register.
+      stillOpen: () => undeclaredPopulations().length > 0,
+      lifted: {
+        kind: "derived_without_a_tree",
+        why: "It reads W267's census against this module's own table — how many walking registers have a declared degenerate input is a fact about two constants rather than about any repository, so no root can be handed to it. What lifts it is a row added here, not a change to any tree.",
+      },
+    },
+    numbers: [
+      {
+        word: "ONE",
+        kind: "rate",
+        why: "'ONE DEGENERATE INPUT IS NOT ALL OF THEM' — the unit of what a row covers rather than a count of anything the tree holds. It stays one however many selectors the register gains, and the sentence deliberately states no total: W304's rule is that a bound may not pin a register's size.",
       },
     ],
   },

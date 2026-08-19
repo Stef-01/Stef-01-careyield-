@@ -2266,6 +2266,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/superset.ts",
+    census: {
+      derives:
+        "What each of this tree's population-taking derivations returns when it is handed an input it cannot understand — the honest answer's size beside the degenerate one's, measured by calling both.",
+      checkedAgainst:
+        "`SELECTORS`, where each row declares whether its subject must narrow or must refuse. The comparison is a size rather than a set: a selector answering with the same NUMBER of the wrong things reads clean, which the bound says.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module whose header names a unit inside the quarter is planted in a copied tree, and the honest answer of the row that measures the quarter must grow by one",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "no selector this tree declares widens when handed an input it cannot understand, and none behaves differently from what its row says.",
+        mutation:
+          "a planted selector whose degenerate answer is bigger than its honest one is reported by name, beside one declared to refuse that merely narrows",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/hardening-q26.test.ts",
     census: {
       derives:

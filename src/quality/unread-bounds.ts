@@ -424,6 +424,32 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/superset.ts::SUPERSET_BOUND",
+    condition: "A selector nobody declared can widen unwatched",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/superset.ts::undeclaredPopulations",
+      how: "PARTLY, AND THE HALF IT READS IS THE HALF THAT ROTS. The condition is that the population of selectors is a list somebody wrote. `undeclaredPopulations` resolves that list against W267's census — every register the census holds takes something and narrows it, so a walking module with no row here is named rather than assumed absent. What stays unread is a derivation that narrows a population W267 never saw it walk, which is that register's own bound arriving one module over.",
+    },
+  },
+  {
+    bound: "src/quality/superset.ts::SUPERSET_BOUND",
+    condition:
+      "A selector that narrows on the declared input and widens on some other one reads clean here",
+    reading: {
+      kind: "not_observable",
+      why: "The condition is a selector with a SECOND degenerate input nobody thought of. Reporting it means knowing which inputs a function cannot understand, which is the question the row was written to answer — a check that could enumerate them would not have needed the row. The remedy is a wider row rather than a report, and the sentence stays true afterwards of whatever the wider row misses: W267's class, arriving in an argument list instead of a walk.",
+    },
+  },
+  {
+    bound: "src/quality/superset.ts::SUPERSET_BOUND",
+    condition: "A selector returning the same NUMBER of the wrong things is invisible to this",
+    reading: {
+      kind: "not_observable",
+      why: "The condition is a selector that narrows to the right SIZE and the wrong members. Reporting it means comparing SETS, and a register comparing sets holds the right answer — which is the thing the selector was asked for, so the register would be the selector. The measurement is a count because a count is what an outside observer can take, and the bound says so in the same sentence.",
+    },
+  },
+  {
     bound: "src/quality/unread-bounds.ts::UNREAD_BOUND",
     condition: "a bound naming a gap in words this vocabulary does not hold is outside this register",
     reading: {

@@ -240,6 +240,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
     why: "It reads the ledger for the SHA column of a row that has ALREADY closed — the commit a past unit landed at — so the close of a row today adds a window rather than moving one. A row whose SHA changed under a rebase comes back `unreadable` rather than wrong, which is the state this register was built to report honestly.",
   },
   {
+    module: "src/quality/superset.ts",
+    why: "It reads the ledger for one row's honest input: `unitsInCell` is handed the ids the ledger holds, so that the selector's right answer is measured against the real population rather than a list written here. A close ADDS a row, and the cell it parses names two ids that are already there — the size the selector returns does not move when the ledger grows.",
+  },
+  {
     module: "src/quality/hardening-q26.ts",
     why: "It parses a ledger it is HANDED — `unaccountedUnitsFor` takes the text — to ask which units in one past quarter this pass never read. A row closing today cannot change which units Q326–Q338 held, and the range is pinned to a quarter that is over. Same standing as the three hardening registers before it.",
   },

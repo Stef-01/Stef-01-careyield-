@@ -67,6 +67,7 @@ import {
 import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
 import { proseClaims } from "./prose-numbers";
+import { SUPERSET_BOUND, type Selector, supersetDefects } from "./superset";
 import { PRIVATE_COPY_BOUND, privateCopies } from "./private-copies";
 import { TYPED_NAME_BOUND, nameDefects } from "./typed-names";
 import { DEFERRAL_BOUND, hardeningRegisterModules } from "./deferrals";
@@ -307,6 +308,32 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           };
         },
       ),
+  },
+
+  "src/quality/superset.ts": {
+    kind: "demonstrated",
+    bound: SUPERSET_BOUND,
+    witness: "a walking register with no selector row — a population nobody wrote a degenerate input for",
+    control: "a selector row whose degenerate answer is bigger than its honest one, which must be reported",
+    probe: () => {
+      const row = (name: string, honest: number, degenerate: number): Selector => ({
+        name,
+        what: "a planted population",
+        honest: () => honest,
+        degenerate: () => degenerate,
+        expected: "narrows",
+        why: "a planted row",
+      });
+      const undeclared = "src/planted/w295-unwatched.ts";
+      const rows = [row("src/planted/w295-wide.ts::wide", 3, 9)];
+      const seen = supersetDefects(process.cwd(), rows).map((d) => d.selector);
+      return {
+        // The bound's own sentence: the register says nothing about the module it was never told
+        // to watch, and `undeclaredPopulations` is the reason that silence is at least named.
+        witnessSeen: seen.some((name) => name.startsWith(undeclared)),
+        controlSeen: seen.includes("src/planted/w295-wide.ts::wide"),
+      };
+    },
   },
 
   "src/quality/self-defeating.ts": {

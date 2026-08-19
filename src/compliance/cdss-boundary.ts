@@ -910,6 +910,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W352's register of which way each register in W267's census fails — loud, or toward looking correct. Nobody but a developer reads it. Its longest strings are the argument for each open row and `DIRECTION_BOUND`; its inputs are the census's own entries, and no patient, condition or appointment reason appears in any of it.",
   },
   {
+    module: "src/quality/superset.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W353's register of what each population-taking derivation returns when handed an input it cannot understand. Nobody but a developer reads it. Its longest strings are the argument for each selector and `SUPERSET_BOUND`; its inputs are this tree's own exported functions, called against this repository, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/horizon-claims.ts",
     operatorCopy: [],
     notCopy:

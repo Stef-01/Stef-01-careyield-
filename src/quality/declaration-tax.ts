@@ -300,6 +300,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/superset.ts",
+    // Asks what each DECLARED selector does when handed an input it cannot understand. A planted
+    // module adds no row to that table, so it owes this register nothing on arrival — an arriving
+    // module can move the SIZE a selector returns and cannot make one widen. In the population
+    // because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/self-reference.ts",
     // Asks about modules that assemble a literal from fragments, which a planted module does not do.
     // It demands nothing of an arriving module, and is in the population because the census holds it.

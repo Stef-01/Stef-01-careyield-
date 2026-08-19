@@ -68,9 +68,19 @@ export interface UnitRange {
  * while reporting a quarter. A population that fails OPEN is the worst way for a register to be
  * wrong, and the fix is the one W342 used at its own parse boundary: make the shape the caller
  * already has the shape the function takes.
+ *
+ * AND W353 FOUND THE HALF OF THAT FIX THAT WAS NOT ONE. A shape is not a behaviour: a range of
+ * `{ first: NaN, last: NaN }` typechecks perfectly, every comparison against it is false in both
+ * directions, and the filter kept the whole repository again. So the range is CHECKED rather than
+ * trusted, and it refuses rather than answering — a range whose ends are not numbers is a mistake
+ * at a boundary, not a state of the tree, which is the call `asUnitId` makes about a unit id read
+ * out of a document.
  */
 export function quarterModules(root: string, range: UnitRange = QUARTER_AT_W332): string[] {
   const { first, last } = range;
+  if (!Number.isFinite(first) || !Number.isFinite(last)) {
+    throw new Error(`${first}..${last}: not a range of units`);
+  }
   const out: string[] = [];
   for (const file of sourceModules(root)) {
     const unit = headerUnit(readFileSync(file, "utf8"));

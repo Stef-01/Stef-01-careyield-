@@ -423,6 +423,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/superset.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/superset.test.ts :: notices a module arriving in the population it measures",
+      plants: '"src/planted/w353-outside.ts": OUTSIDE',
+    },
+  },
+  {
     register: "src/quality/self-reference.ts",
     negative: {
       kind: "already_driven",
