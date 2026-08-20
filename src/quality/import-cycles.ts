@@ -207,6 +207,7 @@ export const CYCLES_AT_W381: readonly DeclaredCycle[] = [
       "src/quality/bounds.ts",
       "src/quality/claim-classes.ts",
       "src/quality/close-gate.ts",
+      "src/quality/close-sensitivity.ts",
       "src/quality/closing-state.ts",
       "src/quality/controls.ts",
       "src/quality/declaration-tax.ts",
