@@ -92,7 +92,7 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     plant: { "src/planted/sync.ts": fixtureText("removal-by-rmsync") },
     marker: "planted/sync",
     holdersAppear: "never",
-    holders: ["src/quality/blind-spots.ts", "src/quality/run-residue.test.ts"],
+    holders: ["src/quality/blind-spots.ts", "src/quality/horizon-q29-gate.ts", "src/quality/run-residue.test.ts"],
     why:
       "W375's walk looks for an `rmSync` call under `src/`, and both holders plant one — `blind-spots.ts` as the control for that register's own blind spot, the suite as the proof that the walk reaches a file nobody told it about. Written inline, each holder became a removal site the register reported against a function that removes nothing.",
   },

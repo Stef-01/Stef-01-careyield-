@@ -246,6 +246,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/horizon-q29-gate.ts",
+    name: "POPULATIONS_AT_W376",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "the quarter's horizon naming a unit it did not name before, or a unit landing whose module the gate was waiting for",
+      whyStopping:
+        "A NAMED ROW PER UNIT THE HORIZON LISTS, each either running that unit's own derivation both ways on a planted tree or arguing why it establishes no population — the population read out of the document and compared against the rows in both directions on every build. A row arriving means somebody edited a document that is frozen the moment its quarter begins, which is worth stopping for on its own; a row leaving means the same edit the other way. Nothing here can be satisfied by retyping a digit: every probe plants and runs.",
+    },
+  },
+  {
     module: "src/quality/run-residue.ts",
     name: "RECLAMATION_AT_W375",
     classification: {

@@ -482,6 +482,16 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/horizon-q29-gate.ts",
+    // Reads ONE DOCUMENT — `docs/HORIZON-Q29.md` — and then the modules its rows name, one file at
+    // a time. The probes each plant into a throwaway tree and run somebody else's walk over it, so
+    // the walking is the other register's; nothing here lists a directory of this repository.
+    // W267's census does not hold it and a row there would be a declaration nothing re-derives. It
+    // is in the manifest because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/run-residue.ts",
     census: {
       derives:

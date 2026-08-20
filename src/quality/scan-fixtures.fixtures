@@ -325,3 +325,32 @@ import { rm } from "node:fs/promises";
 export async function clears(dir: string): Promise<void> {
   await rm(dir, { recursive: true, force: true });
 }
+
+=== q29-member-walk ===
+import { sourceModules } from "@/quality/tree-walks";
+export function reads(root: string): string[] {
+  return sourceModules(root);
+}
+
+=== q29-nonmember-walk ===
+import type { Patient } from "@/domain/types";
+export const NOTHING: readonly Patient[] = [];
+
+=== q29-member-exemption ===
+export const PLANTED_EXCUSED: Readonly<Record<string, string>> = {};
+export function applies(
+  root: string,
+  excused: Readonly<Record<string, string>> = PLANTED_EXCUSED,
+): string[] {
+  return [root, ...Object.keys(excused)];
+}
+
+=== q29-member-hand-list ===
+export const PLANTED_MODULES: readonly { module: string; why: string }[] = [
+  { module: "src/quality/a.ts", why: "a planted row" },
+];
+
+=== q29-member-console-page ===
+export default function Page() {
+  return <p>planted</p>;
+}

@@ -68,6 +68,7 @@ import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
+import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
 import { TEMP_RESIDUE_BOUND } from "./run-residue";
 import { RULE_BOUND } from "./patient-populations";
 import { REACHED_BOUND } from "./reached-pages";
@@ -507,6 +508,43 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/horizon-q29-gate.ts",
+    name: "QUARTER_GATE_BOUND",
+    unit: "W376",
+    text: QUARTER_GATE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a unit that established two is re-read on one of them",
+      reads: "`horizon-q29-gate.ts`, for a row per POPULATION rather than a row per unit",
+      // The clause that names something buildable. The document's table lists units, and a unit
+      // that built more than one population is re-read on whichever its row names. The predicate
+      // reads for the register that would hold them all.
+      stillOpen: (root) =>
+        !/export const POPULATIONS_BY_SET/.test(
+          readFileSync(path.join(root, "src/quality/horizon-q29-gate.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/horizon-q29-gate.ts":
+            "// W376: the populations re-read.\nexport const POPULATIONS_BY_SET = [];\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one of them', 'one that belongs', 'one that does not' — the unit of each phrase rather than a count anything maintains. It stays one however many units the horizon lists.",
+      },
+      {
+        word: "two",
+        kind: "fixed_by_a_gate",
+        why: "The quarter's own gate sentence: a population is shown both INCLUDING a planted member and EXCLUDING a planted non-member, which is two plants per row and cannot be one without the gate becoming the free half. Fixed by `docs/HORIZON-Q29.md` rather than measured, and `quarterDefects` reads both halves of every reading on each build.",
       },
     ],
   },

@@ -179,6 +179,22 @@ export interface PlantedName {
  */
 export const PLANTED_NAMES: readonly PlantedName[] = [
   {
+    value: "src/planted/walker.ts",
+    why: "W376's gate hands W367's `boundedWalkers` a bound whose module calls a shared walk, so the member half of that quarter's reading can be shown. The pair is fabricated on purpose: a real module would make the reading a fact about this tree rather than a demonstration that the derivation can see one arrive.",
+  },
+  {
+    value: "src/planted/still.ts",
+    why: "The non-member beside it, and the one that matters — a module that walks nothing, handed to three of W376's probes as the thing each derivation must REFUSE. If this ever became a real file the refusals would stop meaning anything, which is why the register checks fabrications in both directions.",
+  },
+  {
+    value: "src/planted/scanner.ts",
+    why: "W376's reading of W366: a scan site with no marker declaring how it matches, handed to `censusDefects` so the missing-marker arm can be shown reporting and then shown silent once a marker names it.",
+  },
+  {
+    value: "src/quality/quarter-mutants-q28.ts",
+    why: "The module W374 will write. W376's gate records that unit as not landed and DERIVES that from the tree rather than from a ledger status that moves while the suite runs; the name is fabricated until the unit ships, at which point this register reports it and the gate must grow a probe.",
+  },
+  {
     value: "W9999",
     why: "W289's drive hands a register a unit id no ledger will ever hold, so the arm that reports an unresolvable unit can be shown firing. A four-digit unit is out of this plan's reach by construction.",
   },
