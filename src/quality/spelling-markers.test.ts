@@ -53,6 +53,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
 
   it("names the markers a second spelling gets past", () => {
     expect(blindMarkers()).toEqual([
+      "src/console/rendered-zeros.ts",
       "src/quality/acceptances.ts",
       "src/quality/declaration-tax.ts",
       "src/quality/derivable-lists.ts",
@@ -69,6 +70,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
     // they could reach a commit, and the rest are ordinary code. W375 added the plainest of the
     // second kind — `rm` from `fs/promises` is what the rest of Node has moved to.
     expect(reachableBlindness()).toEqual([
+      "src/console/rendered-zeros.ts",
       "src/quality/declaration-tax.ts",
       "src/quality/derivable-lists.ts",
       "src/quality/exemption-reach.ts",

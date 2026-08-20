@@ -200,6 +200,13 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/console/rendered-zeros.ts",
+    // Its population is what a CONSOLE PAGE renders, and a planted module under `src/` is not a
+    // page — outside by construction. A page that renders a list owes an empty state rather than a
+    // row here, which is the register's point: the declaration is the thing it wants fewer of.
+    demands: () => false,
+  },
+  {
     file: "src/quality/hook-reach.ts",
     // Its population is HOOKS, and a planted module with no `beforeAll`, `afterAll` or process
     // handler in it wires none — outside by construction. A module that adds a hook removing a

@@ -415,6 +415,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/console/rendered-zeros.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/console/rendered-zeros.test.ts :: does not report the same list once the page answers it, in either idiom this tree writes",
+      plants: "zero-probe-ternary",
+    },
+  },
+  {
     register: "src/quality/hook-reach.ts",
     negative: {
       kind: "already_driven",

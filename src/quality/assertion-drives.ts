@@ -36,6 +36,7 @@ import { diffCensus, discoverSurfaces, parseCensus } from "@/compliance/surfaces
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
+import { SILENT_AT_W384, silentDiff } from "@/console/rendered-zeros";
 import { hookSites, unreachedReclaimers } from "./hook-reach";
 import { cycleDefects, cyclicComponents } from "./import-cycles";
 import { momentDefects } from "./moments";
@@ -97,6 +98,14 @@ export type Drive = (root: string) => boolean;
 const BEYOND_EVERY_REVIEW = "2099-01-01";
 
 export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
+  "src/console/rendered-zeros.ts": (root) =>
+    // The claim is that every silent list on this console is one of the declared rows. Hand the
+    // register a declaration for a list the console does not render and it must report it stale.
+    silentDiff(root, [
+      ...SILENT_AT_W384,
+      { route: "/console/dashboard", subject: "nothing.rendersThis", what: "a row about a list that is not there" },
+    ]).stale.includes("/console/dashboard :: nothing.rendersThis"),
+
   "src/quality/hook-reach.ts": (root) => {
     // The tree as it stood before W375: the sweep wired into `teardown` and nowhere else. The
     // claim is that no hook removing a path sits at a moment an interrupted run skips with

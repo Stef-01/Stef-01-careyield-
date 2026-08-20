@@ -70,6 +70,7 @@ import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
+import { RENDERED_BOUND } from "@/console/rendered-zeros";
 import { HOOK_BOUND } from "./hook-reach";
 import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
@@ -514,6 +515,36 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/console/rendered-zeros.ts",
+    name: "RENDERED_BOUND",
+    unit: "W384",
+    text: RENDERED_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a reading of whether the words are ABOUT the subject",
+      reads: "`rendered-zeros.ts`, for an emptiness answered by a heading above the list rather than by the other arm of the conditional it sits in",
+      // The clause that names something buildable, and what several declared rows are waiting on.
+      // Widening to ancestors is not it — every page has an `<h1>` — so the predicate reads for a
+      // derivation that resolves the words against the subject rather than against the position.
+      stillOpen: (root) =>
+        !/export function wordsAbout/.test(readFileSync(path.join(root, "src/console/rendered-zeros.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/console/rendered-zeros.ts":
+            "// W384: what a page renders.\nexport function wordsAbout(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'ONE OF THEM IS A GUESS' — which of the three exclusions rests on a single call rather than on a derivation, so it counts the sentence's own admission rather than anything in the tree. It stays one however many list renders the console grows.",
       },
     ],
   },

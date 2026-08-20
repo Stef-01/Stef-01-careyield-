@@ -64,6 +64,7 @@ import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
 import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import { RENDERED_BOUND, silentZeros } from "@/console/rendered-zeros";
 import { HOOK_BOUND, unreachedReclaimers } from "./hook-reach";
 import { CYCLE_BOUND, cyclicComponents, moduleGraph, runtimeMembers } from "./import-cycles";
 import { MOMENT_BOUND, momentsOf } from "./moments";
@@ -154,6 +155,31 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/console/rendered-zeros.ts": {
+    kind: "demonstrated",
+    bound: RENDERED_BOUND,
+    witness:
+      "a page whose emptiness is answered by the HEADING above the list rather than by the other arm of a conditional — words a reader meets, which this register cannot tell from silence",
+    control:
+      "the same words moved into the empty arm of a conditional, which it does read as an answer",
+    probe: () =>
+      withRoot(
+        {
+          "app/console/heading-probe/page.tsx": fixtureText("zero-probe-heading"),
+          "app/console/arm-probe/page.tsx": fixtureText("zero-probe-ternary"),
+        },
+        (root) => {
+          const silent = silentZeros(root);
+          // `seen` here is the register RECOGNISING the answer, which is the sense `falseBounds`
+          // and `deadProbes` read: the witness stays unseen while the bound is true.
+          return {
+            witnessSeen: !silent.includes("/console/heading-probe :: rows"),
+            controlSeen: !silent.includes("/console/arm-probe :: rows"),
           };
         },
       ),

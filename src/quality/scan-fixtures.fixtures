@@ -563,3 +563,129 @@ function cleanUp(): void {
 afterAll(() => {
   cleanUp();
 });
+
+=== zero-probe-silent ===
+import { listRows } from "@/demo/probe";
+
+export default async function ProbePage() {
+  const rows = await listRows();
+  return (
+    <section>
+      <h2>Probe</h2>
+      <ul>
+        {rows.map((row) => (
+          <li key={row.id}>{row.id}</li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+=== zero-probe-ternary ===
+import { listRows } from "@/demo/probe";
+
+export default async function ProbePage() {
+  const rows = await listRows();
+  return (
+    <section>
+      <h2>Probe</h2>
+      {rows.length === 0 ? (
+        <p>Nothing has been recorded here yet.</p>
+      ) : (
+        <ul>
+          {rows.map((row) => (
+            <li key={row.id}>{row.id}</li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+=== zero-probe-and-blocks ===
+import { listRows } from "@/demo/probe";
+
+export default async function ProbePage() {
+  const rows = await listRows();
+  return (
+    <section>
+      <h2>Probe</h2>
+      {rows.length > 0 && (
+        <ul>
+          {rows.map((row) => (
+            <li key={row.id}>{row.id}</li>
+          ))}
+        </ul>
+      )}
+      {rows.length === 0 && <p>Nothing has been recorded here yet.</p>}
+    </section>
+  );
+}
+
+=== zero-probe-excluded ===
+import { listRows } from "@/demo/probe";
+
+const STEPS = ["one", "two"];
+
+export default async function ProbePage() {
+  const rows = await listRows();
+  return (
+    <section>
+      <h2>Probe</h2>
+      <p>{rows.map((row) => row.id).join(", ")}</p>
+      <ul>
+        {STEPS.map((step) => (
+          <li key={step}>{step}</li>
+        ))}
+      </ul>
+      <ol>
+        {rows.map((row) => (
+          <li key={row.id}>
+            {row.parts.map((part) => (
+              <span key={part}>{part}</span>
+            ))}
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+=== zero-probe-heading ===
+import { listRows } from "@/demo/probe";
+
+export default async function ProbePage() {
+  const rows = await listRows();
+  return (
+    <section>
+      <h2>Nothing has been recorded here yet</h2>
+      <ul>
+        {rows.map((row) => (
+          <li key={row.id}>{row.id}</li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+=== zero-probe-component-empty ===
+import { EmptyState } from "@/console/ui";
+import { listRows } from "@/demo/probe";
+
+export default async function ProbePage() {
+  const rows = await listRows();
+  return (
+    <section>
+      <h2>Probe</h2>
+      {rows.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <ul>
+          {rows.map((row) => (
+            <li key={row.id}>{row.id}</li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}

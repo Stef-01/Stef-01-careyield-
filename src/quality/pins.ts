@@ -254,6 +254,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/console/rendered-zeros.ts",
+    name: "SILENT_AT_W384",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a console page gaining or losing an empty state, or gaining or losing a list it renders rows from",
+      whyStopping:
+        "A NAMED ROW PER SILENT LIST, each saying what the reader gets instead, and the population is re-derived from the markup on every run. A row arriving means a page has grown a list that renders nothing and says nothing — the defect this unit exists to name — and a row leaving means somebody wrote the empty state, which is the outcome. It cannot be satisfied by retyping a digit: the register compares route-and-subject names against what the pages render, in both directions.",
+    },
+  },
+  {
     module: "src/quality/import-cycles.ts",
     name: "CYCLES_AT_W381",
     classification: {

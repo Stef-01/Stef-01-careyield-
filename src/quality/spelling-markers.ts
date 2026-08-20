@@ -37,6 +37,7 @@ import { numberReturningExports } from "./flattering-numbers";
 import { discoverFoldSites } from "./order-independence";
 import { copyTree, planterDiff, withPlantedIn, withTree as withRoot } from "./planting";
 import { hookSites } from "./hook-reach";
+import { silentZeros } from "@/console/rendered-zeros";
 import { moduleGraph } from "./import-cycles";
 import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
@@ -148,6 +149,34 @@ export const MARKERS: readonly Marker[] = [
           (copy) =>
             hookSites(copy).some((site) => site.module === PROBE_FILE && site.reclaims === "outside_the_process"),
         ),
+    },
+  },
+  {
+    module: "src/console/rendered-zeros.ts",
+    matches:
+      "words in the empty arm of a conditional: a run of letters between tags, or an interpolation " +
+      "of a SCREAMING_CASE copy constant",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "`{rows.length === 0 ? <EmptyState /> : <ul>…</ul>}` — the empty arm renders a COMPONENT, which puts words in front of the reader exactly as a paragraph does and which this scan reads as silence, because a component's own copy lives in another file.",
+      plausibility: "idiomatic",
+      probe: (root) => {
+        // Not `twoSpellings`: that plants into a module under `src/`, and this detector only reads
+        // `page.tsx` under `app/console/`. Same shape, planted where it can be seen.
+        const copy = copyTree(root);
+        const page = "app/console/spelling-probe/page.tsx";
+        // BOTH NAMES SPELLED OUT. `fixtureText(name)` behind a parameter is a call W307's citation
+        // check cannot resolve, and an uncited block is one nothing keeps in step with its loader.
+        const saw = (body: string) =>
+          withPlantedIn(copy, { [page]: body }, () =>
+            !silentZeros(copy).includes("/console/spelling-probe :: rows"),
+          );
+        return {
+          control: saw(fixtureText("zero-probe-ternary")),
+          variant: saw(fixtureText("zero-probe-component-empty")),
+        };
+      },
     },
   },
   {

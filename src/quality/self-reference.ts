@@ -31,6 +31,7 @@ import { type Plantable, withTree } from "./planting";
 import { privateCopies } from "./private-copies";
 import { filesUnder, sourceModules, typescriptFiles } from "./tree-walks";
 import { appliedExemptions } from "./exemption-reach";
+import { silentZeros } from "@/console/rendered-zeros";
 import { unreachedReclaimers } from "./hook-reach";
 import { cyclicComponents } from "./import-cycles";
 import { momentsOf } from "./moments";
@@ -88,6 +89,16 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/blind-spots.ts", "src/quality/spelling-markers.ts"],
     why:
       "W368's scan walks the tree for a detector's defaulted exemption parameter, and both holders plant one — `blind-spots.ts` as the positive control for that register's own blind spot, `spelling-markers.ts` as the pair a second spelling of the parameter is measured against. Written inline, each holder became an exemption the register reported as applied and unmeasured, which W355 caught first: its defaulted-register scan read the same literals as real parameters nobody drives.",
+  },
+  {
+    detector: "src/console/rendered-zeros.ts::silentZeros",
+    sees: (root) => silentZeros(root),
+    plant: { "app/console/zero-probe/page.tsx": fixtureText("zero-probe-silent") },
+    marker: "console/zero-probe",
+    holdersAppear: "never",
+    holders: ["src/quality/blind-spots.ts", "src/console/rendered-zeros.test.ts"],
+    why:
+      "W384's detector only reads `page.tsx` under `app/console/`, so a plant has to BE a page for it to be read at all — and both holders need the same page, one as the positive control beside its heading witness and one as the control the remedy is driven against. The fixture file is the only place they can share a body without either of them carrying JSX markup inside a module under `src/`, which is where the console registers do not look and the module registers do: W373 met exactly that when planted `Patient` strings written inline made W201's census classify a build register as patient-touching.",
   },
   {
     detector: "src/quality/hook-reach.ts::unreachedReclaimers",

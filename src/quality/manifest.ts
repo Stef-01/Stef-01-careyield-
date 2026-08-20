@@ -81,6 +81,7 @@ import { readerDiff } from "./close-gate";
 import { instantDiff } from "./instant";
 import { dispositionDefects, registerDiff } from "./deferrals";
 import { OUTSTANDING_HEADING, dossierDiff } from "./dossier-derived";
+import { SILENT_AT_W384, silentDiff } from "@/console/rendered-zeros";
 
 /**
  * Everything one module owes the registers that watch it.
@@ -502,6 +503,49 @@ export const MANIFEST: readonly ModuleEntry[] = [
       },
     },
     branches: [],
+  },
+  {
+    module: "src/console/rendered-zeros.ts",
+    census: {
+      derives:
+        "Every zero a reader can meet on this console: the counts W361's expression-name walk finds, folded in whole, plus every list a page renders rows from — with module constants, another `map`'s row parameter and a `map` that is `join`ed left out — each classified by whether the markup answers its emptiness in words. The answer is read from the arm of the conditional the reader gets when the list is empty, and from the `&&` block that tests the same subject, which are the two idioms this console is written in.",
+      checkedAgainst:
+        "W384's `SILENT_AT_W384`, in both directions: a list that renders nothing and says nothing with no row fails, and a row for a list that has started speaking or that the console no longer renders fails.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a console page is planted whose one list has no empty arm and must be reported, and the same page with the arm — written as a ternary and again as a pair of `&&` blocks — must not be",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every list this console renders either answers its own emptiness in words or is one of the eight that do not, each argued with what the reader gets instead.",
+        mutation:
+          "`silentDiff` is given a declaration for a list the console does not render, and must report it stale.",
+      },
+    },
+    branches: [
+      {
+        fn: "silentDiff",
+        branch: "undeclared",
+        reach: {
+          kind: "driven",
+          drive: () => silentDiff(process.cwd(), []).undeclared.length > 0,
+        },
+      },
+      {
+        fn: "silentDiff",
+        branch: "stale",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            silentDiff(process.cwd(), [
+              ...SILENT_AT_W384,
+              { route: "/console/dashboard", subject: "nothing.rendersThis", what: "a row about a list that is not there" },
+            ]).stale.length > 0,
+        },
+      },
+    ],
   },
   {
     module: "src/quality/hook-reach.ts",

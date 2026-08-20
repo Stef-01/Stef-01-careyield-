@@ -101,6 +101,7 @@ export const COMPARED_AT_W367: readonly Compared[] = [
   { bound: "src/quality/derivable-lists.ts::DERIVABLE_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "A hand-listed register keyed by something else — a route, a unit id, a store name, a record class — is outside the scan entirely" } },
   { bound: "src/quality/exemption-reach.ts::REACH_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "An exemption welded inside a function, one keyed by a typed record rather than a string map, or one spelled as a skip list in an array is outside the scan entirely" } },
   { bound: "src/quality/flattering-numbers.ts::FIGURE_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "A FIGURE SPELLED AS THE LENGTH OF A LIST IS INVISIBLE HERE" } },
+  { bound: "src/console/rendered-zeros.ts::RENDERED_BOUND", walk: ["filesUnder"], edge: { kind: "named", quote: "a zero rendered as a chart, a progress bar, a disabled control or an empty form is in neither register" } },
   { bound: "src/quality/hook-reach.ts::HOOK_BOUND", walk: ["filesUnder"], edge: { kind: "named", quote: "the same defect at a construct this population excludes by definition" } },
   { bound: "src/quality/horizon-directions.ts::HORIZON_DIRECTION_BOUND", walk: ["typescriptFiles"], edge: { kind: "named", quote: "A check the horizon discusses in words without quoting it is outside the population entirely" } },
   { bound: "src/quality/manifest.ts::MANIFEST_BOUND", walk: ["own_recursion"], edge: { kind: "named", quote: "It does not reach TEST FILES" } },
