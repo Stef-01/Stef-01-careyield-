@@ -1006,6 +1006,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W374's survivors register over Q28's modules: the population, the one module the harness cannot reach, and the four mutants this run closed. Nobody but a developer reads it. Its longest strings are the argument for each exclusion and `Q28_MUTANT_BOUND`; it constructs no record of any kind, and no patient, condition or appointment reason appears in any of it.",
   },
   {
+    module: "src/quality/welded-comparisons.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W379's register of which welded ledger comparisons could be lifted out of a test file. Nobody but a developer reads it. Its longest strings are the argument for each row and `WELDED_BOUND`; it constructs no record of any kind — every value it handles is a test-file path or a marker from this repository's own source — and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/derivable-lists.ts",
     operatorCopy: [],
     notCopy:

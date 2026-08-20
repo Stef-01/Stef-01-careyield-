@@ -55,6 +55,7 @@ import { HATCH_BOUND } from "./escape-hatches";
 import { SPELLING_BOUND } from "./spelling-markers";
 import { REACH_BOUND, appliedExemptions } from "./exemption-reach";
 import { DERIVABLE_BOUND } from "./derivable-lists";
+import { WELDED_BOUND } from "./welded-comparisons";
 import { resolveName } from "./typed-names";
 import { UNASKED_BOUND } from "./unasked-facts";
 import { PAGE_FACT_BOUND } from "./founder-page-facts";
@@ -1143,6 +1144,42 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "two",
         kind: "rate",
         why: "'the two' — the honest reading and the blinded one, which is the shape of a measurement rather than a figure about this repository. Two is what a comparison takes.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/welded-comparisons.ts",
+    name: "WELDED_BOUND",
+    unit: "W379",
+    text: WELDED_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "run that change on it",
+      reads: "this register, for a movable row somebody has moved",
+      // THE FIRST CLAUSE IS THE LIVE ONE. That the population is a name scan is a statement about
+      // what the derivation reads; that moving and registering are two facts is a statement about
+      // what those two words mean. What moves is the JUDGEMENT: every `movable` row says a change
+      // could be made and nobody has made it, and the day a second row becomes `moved` the
+      // sentence stops describing this register.
+      // READS THE TREE, not this module's own table: W306 plants the remedy into a constructed
+      // tree and requires the predicate to go false there, which a predicate closing over the live
+      // register can never do.
+      stillOpen: (root) =>
+        (readFileSync(path.join(root, "src/quality/welded-comparisons.ts"), "utf8").match(
+          /kind: "moved",/g,
+        ) ?? []).length < 3,
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/welded-comparisons.ts": fixtureText("welded-comparisons-lifted"),
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "two",
+        kind: "rate",
+        why: "'those are two separate facts' — the number of things being distinguished in one sentence, not a count of anything the tree holds. It stays two however many comparisons are lifted.",
       },
     ],
   },

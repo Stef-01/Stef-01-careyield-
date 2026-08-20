@@ -354,3 +354,10 @@ export const PLANTED_MODULES: readonly { module: string; why: string }[] = [
 export default function Page() {
   return <p>planted</p>;
 }
+
+=== welded-comparisons-lifted ===
+export const WELDED_CHECKS: readonly { file: string; standing: { kind: string; to: string } }[] = [
+  { file: "src/quality/horizon-q29.test.ts", standing: { kind: "moved", to: "a::b" } },
+  { file: "src/quality/horizon-q30.test.ts", standing: { kind: "moved", to: "a::b" } },
+  { file: "src/quality/pins.test.ts", standing: { kind: "moved", to: "a::b" } },
+];

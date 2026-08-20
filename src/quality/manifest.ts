@@ -2550,6 +2550,14 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/welded-comparisons.ts",
+    // Derives its population from a walk it does not perform: `weldedLedgerTests` walks the test
+    // modules and this register reads the answer, narrowing it with a per-file text read. W267's
+    // census holds the file that does the walking rather than every caller of it.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/derivable-lists.ts",
     census: {
       derives:

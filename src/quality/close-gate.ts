@@ -62,6 +62,7 @@ import { classDefects } from "./claim-classes";
 import { controlDefects } from "./controls";
 import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
 import { staleOwedConditions } from "./unread-bounds";
+import { heldByOthers, parseLedgerRows } from "./blocked-surface";
 import { endedDeclarations } from "./self-ending";
 import { CLAIMS, claimDefects } from "./prose-numbers";
 import { founderDiff } from "@/founder/outstanding";
@@ -127,6 +128,20 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
     why: "W331's pass, whose deferrals point at W334 and W336. It is here as its own reader rather than folded into the aggregate above BECAUSE folding it in would not have named the module: `readerDiff` keys on the module in a reader's id, so a register whose findings are checked through somebody else's reader reads as unwatched — which is how W326 reported this one the day it was written.",
     run: (root) =>
       overdueDispositions(ledgerOf(root), Q25_FINDINGS, CLOSE_GATE_TODAY).map((d) => `${d.finding} ${d.what}`),
+  },
+  {
+    id: "src/quality/blocked-surface.ts::heldByOthers",
+    why:
+      "W379's move, and the reason it was worth making. Every quarter close asserts that nobody ELSE held a row when the expansion priced the quarter, and every copy of that assertion lived inside the horizon suite that made it — where this gate had nothing to call. Two of those copies broke at a close and went red on `main`: W364 required the claimed set to BE its own row, W377 required a sibling's row to still be `claimed`. A close is precisely the event that changes what this answers, which is why it belongs here and not only in a suite that runs after the commit.",
+    run: (root) => {
+      const ledger = ledgerOf(root);
+      const closing = Math.max(
+        ...parseLedgerRows(ledger)
+          .filter((row) => /^W\d+$/.test(row.id))
+          .map((row) => Number(row.id.slice(1))),
+      );
+      return heldByOthers(ledger, closing);
+    },
   },
   {
     id: "src/quality/unread-bounds.ts::staleOwedConditions",
@@ -304,6 +319,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
   {
     module: "src/quality/founder-page-facts.ts",
     why: "W347's classification of the outstanding position. It names `parseLedgerRows` and `allLedgerRows` inside the IDS of the facts it classifies — `src/quality/blocked-surface.ts::allLedgerRows` is a row key, not a call — and it opens no ledger: what it reads is the founder page's source and the three modules' exports. Same class as `quarter-mutants.ts` above, and the same reason the scan keeps literals.",
+  },
+  {
+    module: "src/quality/welded-comparisons.ts",
+    why: "W379's register of which welded ledger comparisons could be lifted. It reads the ledger's PRIMITIVE NAMES out of test files rather than the ledger itself — `readsTheLiveLedger` looks for the markers a comparison is written with, and would answer the same over an empty `BUILD-STATE.md`. A close changes rows; this register reads none of them. THE HONEST HALF is that its subject is exactly the checks this gate cannot reach, so a close that broke one of them would leave this register saying what it says now — which is the argument for excusing it, and would be the argument against if it ever asked the ledger a question.",
   },
   {
     module: "src/quality/spelling-markers.ts",

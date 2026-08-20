@@ -19,7 +19,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { blockedRows } from "./blocked-surface";
+import { blockedRows, heldByOthers } from "./blocked-surface";
 import { outstandingRulings } from "@/founder/outstanding";
 
 const ROOT = process.cwd();
@@ -118,10 +118,17 @@ describe("W364 the document reads the ledger it claims to read", () => {
     // original required the claimed set to BE the closing row, so it held while this unit was in
     // flight and failed the moment the row closed: a check reading a live status inside a document
     // about a moment it does not run in. What is claimed is that nobody ELSE held a row.
-    const claimedByOthers = asAtHorizon()
-      .filter((r) => r.status === "claimed" && r.n !== Q29_HORIZON_LAST_UNIT)
-      .map((r) => r.id);
-    expect(claimedByOthers, "a row was in flight and the list does not name it").toEqual([]);
+    // W379: THE SHARED CALLABLE, not a third copy. `heldByOthers` takes the ledger as TEXT, so the
+    // close gate can ask it about the row as it will be committed — which is the one moment this
+    // comparison can go wrong and the one it was never run at.
+    expect(
+      heldByOthers(LEDGER, Q29_HORIZON_LAST_UNIT, IN_FLIGHT_AT_EXPANSION),
+      "a row was in flight and the list does not name it",
+    ).toEqual([]);
+    expect(
+      heldByOthers(`${LEDGER}| W1 | claimed | s | t | — | a planted row. |\n`, Q29_HORIZON_LAST_UNIT),
+      "the derivation finds nothing when handed one",
+    ).toEqual(["W1"]);
     // And the mechanism still works: naming a row removes it from the count.
     const without = asAtHorizon().filter(
       (r) => !["W363"].includes(r.id) && (r.status === "done" || r.n === Q29_HORIZON_LAST_UNIT),

@@ -203,6 +203,7 @@ export const UNASKED_AT_W340: readonly UnaskedFact[] = [
   // which is the direction nobody has to be persuaded to look at.
   { id: "src/interop/credentials.ts::loadCredential", why: { kind: "no_surface_asks", where: "no console screen shows which interop credential a practice is exchanging under, so the one reader is the register that checks the scope" } },
   { id: "src/pathways/versioning.ts::pathwayAt", why: { kind: "no_surface_asks", where: "no screen shows a pathway as it stood at a past date, which is what an audit of a past decision would need" } },
+  { id: "src/quality/blocked-surface.ts::heldByOthers", why: { kind: "not_a_derived_fact", what: "a build check rather than a product fact: it reads the ledger for rows a session other than the closing one holds, and its readers are W326's close gate and the two horizon suites W379 lifted it out of" } },
   { id: "src/quality/blocked-surface.ts::blockedSurfaceViolations", why: { kind: "not_a_derived_fact", what: "a build check rather than a product fact: it compares the ledger's blocked rows against the plan's gates, and its reader is the close gate rather than any screen" } },
   { id: "src/api/scopes.ts::endpointsFor", why: { kind: "no_surface_asks", where: "the console's API screen lists scopes and never the endpoints a scope opens" } },
   { id: "src/capability/interest.ts::interestsFor", why: { kind: "no_surface_asks", where: "the capability screen shows what a clinician can do and not what they said they are interested in" } },

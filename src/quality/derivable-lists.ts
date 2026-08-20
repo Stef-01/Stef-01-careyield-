@@ -183,6 +183,7 @@ export const LISTED_REGISTERS: readonly ListedRegister[] = [
   },
   { id: "src/quality/tautology-sweep.ts::ACCEPTED_TAUTOLOGIES", membership: welded("src/quality/tautology-sweep.test.ts") },
   { id: "src/quality/unit-headers.ts::ADOPTED_MODULES", membership: welded("src/quality/unit-headers.test.ts") },
+  { id: "src/quality/welded-comparisons.ts::WELDED_CHECKS", membership: callable("src/quality/welded-comparisons.ts::weldedCensusDefects") },
   { id: "src/quality/unrun.ts::UNRUN_MODULES", membership: callable("src/quality/unrun.ts::unrunDefects") },
   {
     id: "src/referrals/scoping.ts::REFERRAL_SCOPING",

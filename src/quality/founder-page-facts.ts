@@ -130,6 +130,13 @@ export const PAGE_FACTS: readonly PageFact[] = [
     shown: { kind: "rendered", section: "Does this page agree with the documents — added by W347" },
   },
   {
+    id: "src/quality/blocked-surface.ts::heldByOthers",
+    shown: {
+      kind: "declared",
+      why: "Not about the outstanding position at all: it reads the ledger for rows a session OTHER than the closing one holds, which is a fact about who is working right now rather than about what is waiting on a founder. W379 lifted it out of two horizon suites so W326's close gate could run it, and the gate is its reader. Showing it on the founder's page would put the loop's own scheduling in front of a person whose question is which rulings are outstanding.",
+    },
+  },
+  {
     id: "src/quality/blocked-surface.ts::answerableByTheLoop",
     shown: { kind: "rendered", section: "Who decides — the sentence under What is waiting, added by W347" },
   },

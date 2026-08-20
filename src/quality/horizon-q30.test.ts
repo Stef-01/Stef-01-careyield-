@@ -20,7 +20,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { blockedRows } from "./blocked-surface";
+import { blockedRows, heldByOthers } from "./blocked-surface";
 import { outstandingRulings } from "@/founder/outstanding";
 
 const ROOT = process.cwd();
@@ -133,15 +133,19 @@ describe("W377 the document reads the ledger it claims to read", () => {
     // rediscovered. Its first version required the claimed set to BE its own row, so it held while
     // the unit was in flight and failed the moment it closed. What is claimed is that nobody ELSE
     // held a row except the one the list names.
-    const others = (rows: readonly Row[]): string[] =>
-      rows
-        .filter((r) => r.n !== Q30_HORIZON_LAST_UNIT && !IN_FLIGHT_AT_EXPANSION.includes(r.id))
-        .map((r) => r.id);
-    // W293's rule, and W374 is why it is here: once the named row closed, `held` emptied and the
-    // assertion below became an empty list over a source that is empty by construction. Shown
-    // holding one first, on the same producer, so the emptiness is a reading.
-    expect(others([...held, { id: "W999", n: 999, status: "claimed" } as Row])).toEqual(["W999"]);
-    expect(others(held), "a row was in flight and the list does not name it").toEqual([]);
+    // W379: THE SHARED CALLABLE, not a second copy. This comparison existed twice — here and in
+    // Q29's suite — and both copies were welded inside a `.test.ts` where W326's close gate had
+    // nothing to call. `heldByOthers` takes the ledger as TEXT, so the gate can ask it about the
+    // row as it will be committed, which is the one moment it can go wrong.
+    expect(
+      heldByOthers(LEDGER, Q30_HORIZON_LAST_UNIT, IN_FLIGHT_AT_EXPANSION),
+      "a row was in flight and the list does not name it",
+    ).toEqual([]);
+    // W293's rule, on the same producer: shown holding one before it is asserted to hold none.
+    expect(
+      heldByOthers(`${LEDGER}| W1 | claimed | s | t | — | a planted row. |\n`, Q30_HORIZON_LAST_UNIT),
+      "the derivation finds nothing when handed one",
+    ).toEqual(["W1"]);
     // And the exemption is load-bearing: counting W374 as done moves the number the document states.
     const counted = asAtHorizon().filter(
       (r) => r.status === "done" || r.n === Q30_HORIZON_LAST_UNIT || IN_FLIGHT_AT_EXPANSION.includes(r.id),

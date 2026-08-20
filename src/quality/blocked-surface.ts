@@ -125,6 +125,39 @@ export interface ReleasePath {
  * causes it. A new blocked row fails here until somebody moves this number, and moving it means
  * having written its release path.
  */
+/**
+ * Rows a SESSION OTHER THAN the closing one held, at or below a horizon's last unit.
+ *
+ * W379 LIFTED THIS OUT OF TWO `.test.ts` FILES, and the reason is the whole of W370's Q28-CR-1.
+ * Every quarter close writes the same comparison — nobody else was holding a row when this
+ * expansion priced the quarter — and every copy of it has been welded inside the horizon suite that
+ * makes it, where W326's close gate has nothing to call. Two of those copies broke at a close: W364
+ * required the claimed set to BE its own row, and W377 required a sibling's row to still be
+ * `claimed`. Both were right about the fact and wrong about the reading, and both went red on
+ * `main` rather than at `verify:close`.
+ *
+ * TAKES THE LEDGER AS TEXT, which is what makes it answerable about a ledger that does not exist
+ * yet — the close gate hands it the row as it will be committed. `closing` is the expansion's own
+ * unit, subtracted because a unit holding its own row is not a sibling; `exempt` is what the
+ * document already names as in flight, and a row named there is priced rather than missed.
+ */
+export function heldByOthers(
+  ledger: string,
+  closing: number,
+  exempt: readonly string[] = [],
+): string[] {
+  // The unit NUMBER out of the row id: `LedgerRow` carries `id` rather than an ordinal, and the
+  // horizon suites that held the two copies of this both derived it the same way.
+  const unit = (id: string): number => Number(id.slice(1));
+  return parseLedgerRows(ledger)
+    .filter((row) => /^W\d+$/.test(row.id))
+    .filter((row) => unit(row.id) <= closing)
+    .filter((row) => row.status === "claimed")
+    .filter((row) => unit(row.id) !== closing && !exempt.includes(row.id))
+    .map((row) => row.id)
+    .sort();
+}
+
 export const BLOCKED_AT_W263 = 18;
 // W310 MOVED THIS AND DID NOT ADD A BLOCKED ROW. The parse above matched `W\d+`, so `SUP-1` and
 // `SUP-2` — blocked since W89 on G5 — had never been counted, named by a release path, or shown to
