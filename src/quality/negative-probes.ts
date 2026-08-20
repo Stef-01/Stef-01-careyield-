@@ -415,6 +415,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/hook-reach.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/hook-reach.test.ts :: reports a hand-built temporary directory nothing sweeps, and not the same probe once it is owned",
+      plants: "hook-probe-owned",
+    },
+  },
+  {
     register: "src/quality/import-cycles.ts",
     negative: {
       kind: "already_driven",

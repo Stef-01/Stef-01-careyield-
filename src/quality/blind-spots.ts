@@ -64,6 +64,7 @@ import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
 import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import { HOOK_BOUND, unreachedReclaimers } from "./hook-reach";
 import { CYCLE_BOUND, cyclicComponents, moduleGraph, runtimeMembers } from "./import-cycles";
 import { MOMENT_BOUND, momentsOf } from "./moments";
 import { TEMP_RESIDUE_BOUND, reclamationSites } from "./run-residue";
@@ -153,6 +154,31 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/hook-reach.ts": {
+    kind: "demonstrated",
+    bound: HOOK_BOUND,
+    witness:
+      "a suite that builds a hand-named temporary directory and removes it in a `finally`, which a kill skips exactly as it skips an `afterAll` and which this register does not see at all",
+    control:
+      "the same removal moved into an `afterAll`, which is the identical defect at a construct the population does hold and which must be reported",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/finally-probe.test.ts": fixtureText("hook-probe-finally"),
+          "src/planted/hook-probe.test.ts": fixtureText("hook-probe-unswept"),
+        },
+        (root) => {
+          const reported = unreachedReclaimers(root).map((r) => r.module);
+          return {
+            // The witness: the `finally` leaks the same directory and nothing here says so, so
+            // this stays false while the bound is true.
+            witnessSeen: reported.includes("src/planted/finally-probe.test.ts"),
+            controlSeen: reported.includes("src/planted/hook-probe.test.ts"),
           };
         },
       ),

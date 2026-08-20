@@ -66,8 +66,19 @@ export const treeCopyPrefix = (pid: number): string => `tree-${pid}-`;
  * a probe that throws and not a run that is killed — and with no pid in the name there was nothing
  * a later run could safely reclaim, because it could not tell an abandoned one from a live
  * sibling's. Two prefixes, one rule.
+ *
+ * W382: `probe-` IS THE THIRD, AND IT IS THE SAME FINDING NINE MORE TIMES. The two above are what
+ * the PLANTER builds; nine files built a temporary directory by hand, each named for the unit that
+ * wrote it — `w263-`, `w267-`, `w278-`, `w281-`, `w290-`, `w292-`, `w300-`, `w334-`, `w381-` — plus
+ * one named for the product. None carried a maker, so none could be reclaimed, and each was removed
+ * only by the `afterAll` or the `finally` that an interrupted run skips. They share one prefix now
+ * because the sweep's question is `whose is this and is that process alive`, which has nothing to
+ * do with which unit built it.
  */
-export const TEMP_PREFIXES = ["tree", "plant"] as const;
+export const TEMP_PREFIXES = ["tree", "plant", "probe"] as const;
+
+/** A hand-built probe directory's name, owned by the run that makes it. */
+export const probeDirPrefix = (pid: number): string => `probe-${pid}-`;
 
 /** Whether an entry is one of this process's own temporary directories. */
 export const ownedByThisRun = (entry: string, pid: number): boolean =>
@@ -76,7 +87,10 @@ export const ownedByThisRun = (entry: string, pid: number): boolean =>
 
 /** The pid a tree copy's name carries, or null when the entry is not one of ours. */
 export function copyMaker(entry: string): number | null {
-  const match = /^(?:tree|plant)-(\d+)-/.exec(entry);
+  // BUILT FROM `TEMP_PREFIXES` RATHER THAN SPELLING THEM AGAIN. W344's class: this regex and that
+  // list were two copies of one fact when W382 read them, and W382 went to add a third prefix and found only one of
+  // them said so. A copy that has to be edited twice is a copy that will be edited once.
+  const match = new RegExp(String.raw`^(?:${TEMP_PREFIXES.join("|")})-(\d+)-`).exec(entry);
   return match ? Number(match[1]) : null;
 }
 

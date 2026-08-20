@@ -37,13 +37,14 @@ import { emptyListDiff } from "./empty-list-sweep";
 import { SURVIVORS_AT_W296, UNTESTED_AT_W296, untestedModules } from "./mutation-sampling";
 import { Y5_FIRST_UNIT as RAIL_Y5 } from "@/compliance/rail-y5";
 import { Y5_FIRST_UNIT as ADM_Y5 } from "@/privacy/adm-y5";
+import { probeDirPrefix } from "./repository-clean";
 
 const ROOT = path.resolve(__dirname, "../..");
 
 let COPY: string;
 
 beforeAll(() => {
-  COPY = mkdtempSync(path.join(tmpdir(), "w290-"));
+  COPY = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
   cpSync(path.join(ROOT, "src"), path.join(COPY, "src"), { recursive: true });
 });
 

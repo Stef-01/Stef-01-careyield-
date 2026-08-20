@@ -778,6 +778,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W381's register is reviewer-facing: module paths and sentences about import edges. Nothing here renders and no practice sees it.",
   },
   {
+    module: "src/quality/hook-reach.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W382's register is reviewer-facing: file names, hook names and sentences about when a test run ends. Nothing here renders and no practice sees it.",
+  },
+  {
     module: "src/quality/moments.ts",
     operatorCopy: [],
     notCopy:

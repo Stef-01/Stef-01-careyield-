@@ -171,6 +171,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "Its subject IS the literal — a prose sentence composed inside a render function — so blanking literals would empty the thing it exists to find. Comments are subtracted because a quoted phrase inside a comment explaining what wording to avoid is not copy, which is the collision W278 recorded at `feeCaveat`.",
   },
   {
+    module: "src/quality/hook-reach.ts",
+    prep: { comments: "subtracted", literals: "blanked" },
+    why: "It finds a hook by its call and then reads the BODY by balancing brackets from the opening paren, so it needs the transform that preserves offsets — blanking does, subtracting comments does not move a line but does move every offset after it, which is why the two are applied in that order and the offsets are taken from the result. A brace inside a string would close a hook early; the call names the reading is actually about survive blanking untouched. The one place it steps outside this preparation is `tempPrefixes`, which reads the PREFIX a module hands `mkdtempSync` — a string, and blanking would leave every module looking as though it built nothing — so that reading keeps its literals and is the same shape W381 has for the same reason.",
+  },
+  {
     module: "src/quality/import-cycles.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "Its subject IS the import statement, and the specifier it points at is a STRING — blanking literals would erase every edge in the graph. Comments are subtracted because this tree's headers quote import lines while explaining cycles, and a quoted example would become an edge nobody wrote.",

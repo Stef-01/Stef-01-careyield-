@@ -310,6 +310,14 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // W375: what two people found by reading a disk, at the moments they read it. History about
   // those readings rather than a measurement this tree maintains — nothing here opens `/tmp`.
   { module: "src/quality/run-residue.ts", text: "426 copies", resolution: { kind: "at_the_unit" } },
+  // W382: what the hook register found when it was written — how many files had built a temporary
+  // directory nothing could reclaim, and how many spellings of the prefix list there were. History:
+  // every one was renamed in the same pass, and the suite re-derives that no unswept prefix is left
+  // rather than trusting the count. The eight is W331's, quoted for why `process_exit` is narrow.
+  { module: "src/quality/hook-reach.ts", text: "eight surviving copies", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/hook-reach.ts", text: "nine other files", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/repository-clean.ts", text: "nine files", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/repository-clean.ts", text: "two copies", resolution: { kind: "at_the_unit" } },  { module: "src/quality/run-residue.ts", text: "426 copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/bounds.ts", text: "two bounds", resolution: { kind: "at_the_unit" } },
   // W367: what the import cycle blanked while the unit was being built, not a count of anything now.
   { module: "src/quality/subject-and-walk.ts", text: "three bounds", resolution: { kind: "at_the_unit" } },

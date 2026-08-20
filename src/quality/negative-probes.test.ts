@@ -29,6 +29,7 @@ import { DORMANT_MODULES, diffReach } from "@/security/page-reach";
 import { coverageDiff, type RouteCoverage } from "./route-coverage";
 import * as walks from "./tree-walks";
 import { withPlantedIn } from "./planting";
+import { probeDirPrefix } from "./repository-clean";
 
 const ROOT = process.cwd();
 
@@ -255,7 +256,7 @@ const DRIVEN_SEPARATELY = ["src/quality/route-coverage.ts"];
 let COPY = "";
 
 beforeAll(() => {
-  COPY = mkdtempSync(path.join(tmpdir(), "w292-"));
+  COPY = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
   for (const dir of ["src", "app", "e2e", "supabase"]) {
     cpSync(path.join(ROOT, dir), path.join(COPY, dir), { recursive: true });
   }

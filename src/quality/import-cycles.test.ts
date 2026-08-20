@@ -31,6 +31,7 @@ import {
   valueGraph,
 } from "./import-cycles";
 import { fixtureText } from "./scan-text";
+import { probeDirPrefix } from "./repository-clean";
 
 const ROOT = process.cwd();
 const GRAPH = moduleGraph(ROOT);
@@ -48,7 +49,7 @@ const IN_A_FUNCTION = {
 };
 
 async function loadModule(pair: { a: string; b: string }, entry: "a" | "b"): Promise<Record<string, unknown>> {
-  const dir = mkdtempSync(path.join(tmpdir(), `w381-${process.pid}-`));
+  const dir = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
   try {
     writeFileSync(path.join(dir, "a.mjs"), pair.a);
     writeFileSync(path.join(dir, "b.mjs"), pair.b);

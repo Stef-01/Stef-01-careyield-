@@ -504,6 +504,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/hook-reach.ts",
+    census: {
+      derives:
+        "Every lifecycle and process hook this tree wires — under `src/`, under `e2e/` and in the root `vitest.global-setup.ts` — with the MOMENT its spelling means, and what its body reclaims, read from the call names in the body plus the body of any function defined beside it that the hook calls by name. For each module it also derives the temporary-directory names that module can leave on a disk, from its `mkdtempSync` prefixes and from whether it calls the planter.",
+      checkedAgainst:
+        "W382's `FIRES_UNDER`, in three directions: a reclaiming hook at a moment an interrupted run skips with nothing else reclaiming for it, the same hook once its module also reclaims at a moment nothing skips, and a module that builds no temporary name of its own — which gets no cover, because that is the case W375 met.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a suite is planted that builds a `w999-` directory and removes it in an `afterAll`, and must be reported; the same suite with the owned prefix must not be",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every hook in this tree that removes a path is either at a moment no ending skips, or its module's temporary names are all ones the run-level sweep owns.",
+        mutation:
+          "the live wiring is handed back with the `setup` half of the sweep reclaiming nothing — the tree as it stood before W375 — and `run_teardown` must be reported as missing the interrupted ending.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/moments.ts",
     census: {
       derives:

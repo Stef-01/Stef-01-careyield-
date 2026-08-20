@@ -31,6 +31,7 @@ import { type Plantable, withTree } from "./planting";
 import { privateCopies } from "./private-copies";
 import { filesUnder, sourceModules, typescriptFiles } from "./tree-walks";
 import { appliedExemptions } from "./exemption-reach";
+import { unreachedReclaimers } from "./hook-reach";
 import { cyclicComponents } from "./import-cycles";
 import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
@@ -87,6 +88,16 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/blind-spots.ts", "src/quality/spelling-markers.ts"],
     why:
       "W368's scan walks the tree for a detector's defaulted exemption parameter, and both holders plant one — `blind-spots.ts` as the positive control for that register's own blind spot, `spelling-markers.ts` as the pair a second spelling of the parameter is measured against. Written inline, each holder became an exemption the register reported as applied and unmeasured, which W355 caught first: its defaulted-register scan read the same literals as real parameters nobody drives.",
+  },
+  {
+    detector: "src/quality/hook-reach.ts::unreachedReclaimers",
+    sees: (root) => unreachedReclaimers(root).map((r) => r.module),
+    plant: { "src/planted/hook-probe.test.ts": fixtureText("hook-probe-unswept") },
+    marker: "planted/hook-probe",
+    holdersAppear: "never",
+    holders: ["src/quality/blind-spots.ts", "src/quality/hook-reach.test.ts"],
+    why:
+      "W382's rule reports a suite that builds a hand-named temporary directory and removes it at a moment an interrupted run skips — which is exactly what both holders plant, `blind-spots.ts` as the positive control beside its `finally` witness and the suite as the pair the remedy is driven on. Written inline, each holder would be a module building a `w999-` directory and would be reported by the register it is testing, which is the collision this whole file exists for.",
   },
   {
     detector: "src/quality/import-cycles.ts::cyclicComponents",

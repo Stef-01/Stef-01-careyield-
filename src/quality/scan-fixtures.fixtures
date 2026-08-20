@@ -405,3 +405,161 @@ export const readsB = () => ({ text: fromB() });
 import { nameA } from "./a.mjs";
 export const fromB = () => "b";
 export const readsA = () => ({ text: nameA() });
+
+=== hook-probe-unswept ===
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
+let DIR = "";
+beforeAll(() => {
+  DIR = mkdtempSync(path.join(tmpdir(), "w999-"));
+});
+afterAll(() => {
+  rmSync(DIR, { recursive: true, force: true });
+});
+
+describe("a probe", () => {
+  it("has somewhere to write", () => {
+    expect(DIR).not.toBe("");
+  });
+});
+
+=== hook-probe-owned ===
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { probeDirPrefix } from "./repository-clean";
+
+let DIR = "";
+beforeAll(() => {
+  DIR = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
+});
+afterAll(() => {
+  rmSync(DIR, { recursive: true, force: true });
+});
+
+describe("a probe", () => {
+  it("has somewhere to write", () => {
+    expect(DIR).not.toBe("");
+  });
+});
+
+=== hook-probe-sweeps-others ===
+import { readdirSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { afterAll, describe, expect, it } from "vitest";
+
+function reclaim(): void {
+  for (const entry of readdirSync(tmpdir())) {
+    rmSync(path.join(tmpdir(), entry), { recursive: true, force: true });
+  }
+}
+
+afterAll(() => {
+  reclaim();
+});
+
+describe("a sweeper", () => {
+  it("makes nothing of its own", () => {
+    expect(1).toBe(1);
+  });
+});
+
+=== hook-child-global-setup ===
+import { writeFileSync } from "node:fs";
+import path from "node:path";
+
+const DIR = process.env.W382_MARKERS as string;
+
+export function setup(): void {
+  writeFileSync(path.join(DIR, "setup-ran"), "1");
+}
+
+export function teardown(): void {
+  writeFileSync(path.join(DIR, "teardown-ran"), "1");
+}
+
+=== hook-child-quick-test ===
+import { expect, it } from "vitest";
+
+it("ends on its own", () => {
+  expect(1).toBe(1);
+});
+
+=== hook-child-slow-test ===
+import { it } from "vitest";
+
+it(
+  "waits long enough to be killed",
+  async () => {
+    await new Promise((resolve) => setTimeout(resolve, 30_000));
+  },
+  60_000,
+);
+
+=== hook-child-config ===
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  test: {
+    root: "DIR_HERE",
+    include: ["DIR_HERE/*.test.ts"],
+    globalSetup: ["DIR_HERE/gs.ts"],
+  },
+});
+
+=== hook-prefix-literal ===
+const d = mkdtempSync(path.join(tmpdir(), "w300-"));
+
+=== hook-probe-finally ===
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+
+describe("a probe", () => {
+  it("removes its directory when it returns or throws, and not when it is killed", () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "w998-"));
+    try {
+      expect(dir).not.toBe("");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+=== hook-spelling-one-level ===
+import { rmSync } from "node:fs";
+import { afterAll } from "vitest";
+
+let DIR = "";
+
+function cleanUp(): void {
+  rmSync(DIR, { recursive: true, force: true });
+}
+
+afterAll(() => {
+  cleanUp();
+});
+
+=== hook-spelling-two-levels ===
+import { rmSync } from "node:fs";
+import { afterAll } from "vitest";
+
+let DIR = "";
+
+function wipe(): void {
+  rmSync(DIR, { recursive: true, force: true });
+}
+
+function cleanUp(): void {
+  wipe();
+}
+
+afterAll(() => {
+  cleanUp();
+});

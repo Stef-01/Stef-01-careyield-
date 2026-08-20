@@ -29,6 +29,7 @@ import { describeAsk } from "@/outcomes/dashboard";
 import { renderForecast } from "@/capacity/forecast";
 import { renderOpening } from "@/capacity/opening";
 import { feeCaveat } from "@/directory/fees";
+import { probeDirPrefix } from "@/quality/repository-clean";
 
 const ROOT = path.resolve(__dirname, "../..");
 const key = (s: { module: string; fn: string }) => `${s.module}::${s.fn}`;
@@ -167,7 +168,7 @@ describe("W278 a string added to a render function and to no export fails", () =
     // the reason: half this tree's registers scan for exactly the kind of thing a probe is, so a
     // probe left behind by an interrupted run fails four other suites while looking like a real
     // defect. A `finally` that restores the file is not the same as never writing to it.
-    const copy = mkdtempSync(path.join(tmpdir(), "w278-"));
+    const copy = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
     try {
       cpSync(path.join(ROOT, "src"), path.join(copy, "src"), { recursive: true });
       const file = path.join(copy, "src", "directory", "search.ts");

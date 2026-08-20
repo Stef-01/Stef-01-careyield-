@@ -200,6 +200,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/hook-reach.ts",
+    // Its population is HOOKS, and a planted module with no `beforeAll`, `afterAll` or process
+    // handler in it wires none — outside by construction. A module that adds a hook removing a
+    // path owes an owned prefix rather than a row, which is the register's whole point: it holds
+    // no declarations to add to.
+    demands: () => false,
+  },
+  {
     file: "src/quality/import-cycles.ts",
     // Its population is CYCLES, and a planted module with one import is not in one — outside by
     // construction. A module joining a knot owes a row, which is the register's point.

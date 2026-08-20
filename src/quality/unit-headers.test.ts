@@ -30,6 +30,7 @@ import { FINDING_ANCHORS, deadAnchors } from "./latent-y5";
 import { OPERATOR_COPY_SURFACES } from "@/compliance/cdss-boundary";
 import { withPlantedIn } from "./planting";
 import { RECORD_CLASSES } from "@/privacy/record-classes";
+import { probeDirPrefix } from "./repository-clean";
 
 const ROOT = path.resolve(__dirname, "../..");
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
@@ -37,7 +38,7 @@ const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
 let COPY: string;
 
 beforeAll(() => {
-  COPY = mkdtempSync(path.join(tmpdir(), "w281-"));
+  COPY = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
   cpSync(path.join(ROOT, "src"), path.join(COPY, "src"), { recursive: true });
 });
 

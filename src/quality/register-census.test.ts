@@ -39,6 +39,7 @@ import { coverageDiff } from "@/quality/route-coverage";
 import { readFileSync } from "node:fs";
 import { withPlantedIn } from "./planting";
 import { resolveCitation } from "./citations";
+import { probeDirPrefix } from "./repository-clean";
 
 const ROOT = process.cwd();
 
@@ -46,7 +47,7 @@ const ROOT = process.cwd();
 let COPY = "";
 
 beforeAll(() => {
-  COPY = mkdtempSync(path.join(tmpdir(), "w267-"));
+  COPY = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
   cpSync(path.join(ROOT, "src"), path.join(COPY, "src"), { recursive: true });
   cpSync(path.join(ROOT, "app"), path.join(COPY, "app"), { recursive: true });
   // W284 added `e2e/`: its register reads the page suite as well as the routes, so a copy without

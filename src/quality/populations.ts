@@ -141,6 +141,7 @@ export const POPULATIONS: readonly Population[] = [
   { file: "src/quality/flattering-numbers.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },
   { file: "src/quality/g5-rehearsal.test.ts", source: { kind: "own_recursion" } },
   { file: "src/quality/hardening-q26.test.ts", source: { kind: "own_recursion" } },
+  { file: "src/quality/hook-reach.ts", source: { kind: "shared_walk", walks: ["filesUnder"] } },
   { file: "src/quality/import-cycles.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },
   { file: "src/quality/moments.ts", source: { kind: "shared_walk", walks: ["pageSpecFiles", "testModules"] } },
   { file: "src/quality/run-residue.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },

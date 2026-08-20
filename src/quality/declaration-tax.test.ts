@@ -38,6 +38,7 @@ import { withPlantedIn } from "./planting";
 import { withRoot } from "./refusal-branches";
 import { fixtureToken } from "./scan-text";
 import { DECLARATION_HOMES, homeDiff } from "./declaration-tax";
+import { probeDirPrefix } from "./repository-clean";
 
 const ROOT = process.cwd();
 const PLANTED = "src/planted/w300-probe.ts";
@@ -46,7 +47,7 @@ const PLANTED = "src/planted/w300-probe.ts";
 let COPY = "";
 
 beforeAll(() => {
-  COPY = mkdtempSync(path.join(tmpdir(), "w300-"));
+  COPY = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
   cpSync(path.join(ROOT, "src"), path.join(COPY, "src"), { recursive: true });
   cpSync(path.join(ROOT, "app"), path.join(COPY, "app"), { recursive: true });
   cpSync(path.join(ROOT, "BUILD-STATE.md"), path.join(COPY, "BUILD-STATE.md"));

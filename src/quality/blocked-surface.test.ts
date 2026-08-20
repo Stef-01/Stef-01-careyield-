@@ -21,6 +21,7 @@ import {
   blockersIn,
   ledgerRows,
 } from "./blocked-surface";
+import { probeDirPrefix } from "./repository-clean";
 
 const ROOT = path.resolve(__dirname, "../..");
 
@@ -32,7 +33,7 @@ function withLedger<T>(rows: string, probe: (root: string) => T): T {
 }
 
 beforeAll(() => {
-  FAKE = mkdtempSync(path.join(tmpdir(), "w263-"));
+  FAKE = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
 });
 afterAll(() => {
   if (FAKE) rmSync(FAKE, { recursive: true, force: true });

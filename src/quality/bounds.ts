@@ -69,6 +69,7 @@ import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
+import { HOOK_BOUND } from "./hook-reach";
 import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
@@ -512,6 +513,36 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/hook-reach.ts",
+    name: "HOOK_BOUND",
+    unit: "W382",
+    text: HOOK_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a `finally` read as a moment",
+      reads: "`hook-reach.ts`, for a removal in a `finally` taken as a hook at a moment of its own rather than excluded from the population by the shape of the construct",
+      // The clause that names something buildable. A `finally` is skipped by a kill exactly as an
+      // `afterAll` is, and reading one needs a block whose extent the scan already knows how to
+      // find. The predicate reads for the derivation that would settle it.
+      stillOpen: (root) =>
+        !/export function finallyMoments/.test(readFileSync(path.join(root, "src/quality/hook-reach.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/hook-reach.ts":
+            "// W382: when the check runs.\nexport function finallyMoments(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'exactly ONE level' — how far the reading follows a call, per hook, rather than a count of anything in the tree. It stays one however many hooks or helpers a module holds, and it is the depth the sentence is admitting to.",
       },
     ],
   },

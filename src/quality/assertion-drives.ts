@@ -36,6 +36,7 @@ import { diffCensus, discoverSurfaces, parseCensus } from "@/compliance/surfaces
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
+import { hookSites, unreachedReclaimers } from "./hook-reach";
 import { cycleDefects, cyclicComponents } from "./import-cycles";
 import { momentDefects } from "./moments";
 import { RECLAMATION_AT_W375, residueDefects as tempResidueDefects } from "./run-residue";
@@ -96,6 +97,20 @@ export type Drive = (root: string) => boolean;
 const BEYOND_EVERY_REVIEW = "2099-01-01";
 
 export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
+  "src/quality/hook-reach.ts": (root) => {
+    // The tree as it stood before W375: the sweep wired into `teardown` and nowhere else. The
+    // claim is that no hook removing a path sits at a moment an interrupted run skips with
+    // nothing reclaiming for it, and this is the wiring that made it false.
+    const before = hookSites(root).map((s) =>
+      s.module === "vitest.global-setup.ts" && s.moment === "run_setup"
+        ? { ...s, reclaims: "nothing" as const }
+        : s,
+    );
+    return unreachedReclaimers(root, before).some(
+      (r) => r.module === "vitest.global-setup.ts" && r.missed.includes("interrupted"),
+    );
+  },
+
   "src/quality/import-cycles.ts": (root) => {
     const largest = cyclicComponents(root)[0] ?? [];
     return cycleDefects(root, [{ members: largest, standing: { kind: "type_only" } }]).some((d) =>

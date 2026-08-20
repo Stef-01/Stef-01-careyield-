@@ -36,6 +36,7 @@ import { namingSites } from "./declaration-tax";
 import { numberReturningExports } from "./flattering-numbers";
 import { discoverFoldSites } from "./order-independence";
 import { copyTree, planterDiff, withPlantedIn, withTree as withRoot } from "./planting";
+import { hookSites } from "./hook-reach";
 import { moduleGraph } from "./import-cycles";
 import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
@@ -128,6 +129,24 @@ export const MARKERS: readonly Marker[] = [
           'const ledger = "BUILD-STATE.md";\nconst row = /^\\|/;\nexport const parse = [ledger, row];\n',
           'const ledger = "BUILD-STATE.md";\nexport function rows(line: string) {\n  return line.startsWith("|");\n}\n',
           (copy) => names(privateCopies(copy)),
+        ),
+    },
+  },
+  {
+    module: "src/quality/hook-reach.ts",
+    matches: "a hook call at the start of a line, and the body of a function defined beside it that the hook calls by name",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "`afterAll(() => cleanUp())` where `cleanUp` calls `wipe` and `wipe` is the one that removes — the same removal one call further away, which this reading does not follow.",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          fixtureText("hook-spelling-one-level"),
+          fixtureText("hook-spelling-two-levels"),
+          (copy) =>
+            hookSites(copy).some((site) => site.module === PROBE_FILE && site.reclaims === "outside_the_process"),
         ),
     },
   },

@@ -12,11 +12,12 @@ import {
   saveInterestSignup,
 } from "./store";
 import type { InterestSignup } from "./types";
+import { probeDirPrefix } from "@/quality/repository-clean";
 
 const dirs: string[] = [];
 
 function tempFile(): string {
-  const dir = mkdtempSync(path.join(tmpdir(), "careyield-interest-"));
+  const dir = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
   dirs.push(dir);
   return path.join(dir, "signups.jsonl");
 }
@@ -136,7 +137,7 @@ describe("W106 access and retention for the interest register", () => {
 
 describe("W334 the read says which nothing, which W279-CR-2 was waiting for", () => {
   it("tells a missing file from an unreadable one from an empty one", () => {
-    const dir = mkdtempSync(path.join(tmpdir(), "w334-"));
+    const dir = mkdtempSync(path.join(tmpdir(), probeDirPrefix(process.pid)));
     try {
       const missing = path.join(dir, "absent.jsonl");
       // Nobody has signed up. That is genuinely nothing yet, not a failure to read.
