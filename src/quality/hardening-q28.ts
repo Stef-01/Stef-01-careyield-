@@ -139,10 +139,10 @@ export const FINDINGS: readonly HardeningFinding[] = [
       "TWO WAYS TO READ SOURCE TEXT, AND THE REGISTER THAT EXISTS TO DECLARE THEM SEES ONE. W302's `SCAN_SITES` names every module that asks the shared `prepareForScan` and says what it wants and why, checked against the tree in both directions — a module that starts preparing text cannot do it without arguing for the answer it takes. Fourteen modules instead call `stripComments` directly and never enter that register at all: they take one preparation without declaring it, and nothing asks whether blanking literals would matter to them. Q28 ADDED TWO OF THE FOURTEEN — `spec-stores.ts` at W359 and `zero-meaning.ts` at W361 — so the quarter grew the population the register cannot see while the register stayed green in both directions.",
     raisedOn: "2026-08-19",
     disposition: {
-      kind: "deferred",
-      why:
-        "W318's rule: a deferral names ONE unit that can arrive, not a range and not a wish. W372 is that unit — `a register whose members are listed where they could be derived` is this finding with the subject filled in, because the honest fix DERIVES the fourteen rather than listing them. Converting them is mechanical only where the answer is obvious and it is not: each conversion is exactly the argument `SCAN_SITES` asks for — whether this scan's subject IS the literal — and getting it wrong silently empties a population or doubles it. Two of the fourteen are outside `src/quality` entirely.",
+      kind: "fixed",
       by: "W372",
+      evidence:
+        "`undeclaredTextReaders` derives them from the BEHAVIOUR — a module that calls `stripComments` and is not the home of the shared preparation — rather than from the call that opts in, and names the result. THE DERIVATION DISAGREES WITH THIS FINDING, which is the point of having one: it says eleven, not fourteen. The hand count was taken off a file listing and swept in two `.test.ts` neighbours and `scan-text.ts` itself, none of which is a module scanning outside the register. W372 also records the class this belongs to — `SCAN_SITES` is `derived_from_the_opt_in`, checked against the modules that CALL `prepareForScan`, so list and derivation agree exactly and neither has ever seen the eleven — and finds the same shape in two more registers, both this reader's own.",
     },
   },
   {

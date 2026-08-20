@@ -2509,6 +2509,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/derivable-lists.ts",
+    census: {
+      derives:
+        "Every exported `readonly T[]` under `src/` whose entries name a module path — the shape of a register ABOUT this tree, as opposed to a table of copy or of product rules — scanned out of the source rather than listed.",
+      checkedAgainst:
+        "`LISTED_REGISTERS`, where each row says whether the tree could derive that register's membership and what checks it today. Each row's checker is RESOLVED: a callable the module must export, or a test file that must name the register.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module exporting a register whose entries name a module path is planted in a copied tree and must join the derived population; and a row citing a callable the module does not export, or a test file that does not name the register, is reported",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "every hand-listed register in this tree says whether its membership could be derived, and every one that is checked names what checks it.",
+        mutation:
+          "a planted row citing a checker the tree does not hold is reported, in both the callable and the welded arm",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/exemption-reach.ts",
     census: {
       derives:

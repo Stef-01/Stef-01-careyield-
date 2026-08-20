@@ -354,6 +354,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/derivable-lists.ts",
+    // Asks whether each hand-listed register's membership could be derived. A planted module
+    // exports no register whose entries name a module path, so it owes this one nothing on arrival
+    // — and a module that did would be reported as a hand-listed register no row classifies rather
+    // than demanded of. In the population because the census holds it.
+    demands: () => false,
+  },
+  {
     file: "src/quality/exemption-reach.ts",
     // Asks how far each exemption this tree APPLIES reaches past its own key. A planted module
     // declares no detector taking a defaulted exemption parameter, so it owes this register

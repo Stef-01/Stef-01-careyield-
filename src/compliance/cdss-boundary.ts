@@ -988,6 +988,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W354's register of which way an error moves each figure this tree derives. Nobody but a developer reads it. Its longest strings are the argument for each figure and `FIGURE_BOUND`; the values it constructs are a handful of synthetic records built in the file itself — a probe practice, a probe clinician and an `@example.test` address — and no real patient, condition or appointment reason appears in any of it.",
   },
   {
+    module: "src/quality/derivable-lists.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W372's register of which hand-listed registers the tree could derive and which it actually checks. Nobody but a developer reads it. Its longest strings are the argument for each row and `DERIVABLE_BOUND`; it constructs no record of any kind — every value it handles is a module path or a register name from this repository's own source — and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/hardening-q28.ts",
     operatorCopy: [],
     notCopy:

@@ -54,6 +54,7 @@ import { BLIND_SPOTS, BLIND_SPOT_BOUND } from "./blind-spots";
 import { HATCH_BOUND } from "./escape-hatches";
 import { SPELLING_BOUND } from "./spelling-markers";
 import { REACH_BOUND, appliedExemptions } from "./exemption-reach";
+import { DERIVABLE_BOUND } from "./derivable-lists";
 import { resolveName } from "./typed-names";
 import { UNASKED_BOUND } from "./unasked-facts";
 import { PAGE_FACT_BOUND } from "./founder-page-facts";
@@ -1054,6 +1055,36 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "two",
         kind: "rate",
         why: "'the two' — the honest reading and the blinded one, which is the shape of a measurement rather than a figure about this repository. Two is what a comparison takes.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/derivable-lists.ts",
+    name: "DERIVABLE_BOUND",
+    unit: "W372",
+    text: DERIVABLE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a checker resolved by what it WALKS rather than by its name",
+      reads: "this register, for a checker that walks nothing",
+      // THE SECOND CLAUSE IS THE LIVE ONE. That the population is one shape of list is a statement
+      // about what the scan reads; that `not_derivable` is a judgement is a statement about what a
+      // judgement is. What moves is the RESOLUTION: today a checker is resolved by name, and the
+      // day something resolves it by what it WALKS, the sentence stops describing this register.
+      stillOpen: (root) =>
+        resolveName(root, "export", "src/quality/derivable-lists.ts::checkerWalks") !== true,
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/derivable-lists.ts": fixtureText("derivable-lists-lifted"),
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "ONE",
+        kind: "rate",
+        why: "'ONE SHAPE OF LIST' and 'THE ONE JUDGEMENT HERE' — the unit of what the scan reads and of which clause carries a judgement, not a count of anything the tree holds. Both stay one however many registers the population gains, which is W304's rule.",
       },
     ],
   },

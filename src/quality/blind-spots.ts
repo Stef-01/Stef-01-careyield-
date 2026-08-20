@@ -77,6 +77,7 @@ import { splitSites } from "./self-reference";
 import { proseClaims } from "./prose-numbers";
 import { FIGURE_BOUND, countingFigures } from "./flattering-numbers";
 import { REACH_BOUND, appliedExemptions } from "./exemption-reach";
+import { DERIVABLE_BOUND, handListedRegisters } from "./derivable-lists";
 import { EXCUSE_BOUND, sharedExcuses } from "./shared-excuses";
 import { SUPERSET_BOUND, type Selector, supersetDefects } from "./superset";
 import { PRIVATE_COPY_BOUND, privateCopies } from "./private-copies";
@@ -533,6 +534,28 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
       ),
   },
 
+  "src/quality/derivable-lists.ts": {
+    kind: "demonstrated",
+    bound: DERIVABLE_BOUND,
+    witness:
+      "a hand-listed register keyed by something other than a module path — a route, a unit id, a store name — which the bound's first clause says the scan does not read",
+    control:
+      "the same register with its entries naming a module path, which the scan must find",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/w295-route-list.ts": fixtureText("w295-route-keyed-register"),
+          "src/planted/w295-module-list.ts": fixtureText("w295-module-keyed-register"),
+        },
+        (root) => {
+          const seen = handListedRegisters(root);
+          return {
+            witnessSeen: seen.includes("src/planted/w295-route-list.ts::W295_ROUTES"),
+            controlSeen: seen.includes("src/planted/w295-module-list.ts::W295_MODULES"),
+          };
+        },
+      ),
+  },
   "src/quality/exemption-reach.ts": {
     kind: "demonstrated",
     bound: REACH_BOUND,

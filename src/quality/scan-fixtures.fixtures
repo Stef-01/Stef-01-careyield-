@@ -259,3 +259,43 @@ import type { PatientId } from "@/domain/types";
 export function inviteByIds(ids: readonly PatientId[]): PatientId[] {
   return [...ids];
 }
+=== derivable-lists-lifted ===
+export function checkerWalks(root: string, checker: string): boolean {
+  return [root, checker].every((part) => part.length > 0);
+}
+
+=== w295-route-keyed-register ===
+interface Row {
+  route: string;
+  why: string;
+}
+export const W295_ROUTES: readonly Row[] = [
+  { route: "/console/queue", why: "a planted row" },
+];
+
+=== w295-module-keyed-register ===
+interface Row {
+  module: string;
+  why: string;
+}
+export const W295_MODULES: readonly Row[] = [
+  { module: "src/quality/a.ts", why: "a planted row" },
+];
+
+=== w366-module-keyed-register ===
+interface Row {
+  module: string;
+  why: string;
+}
+export const PLANTED_LIST: readonly Row[] = [
+  { module: "src/quality/a.ts", why: "a planted row" },
+];
+
+=== w366-path-keyed-register ===
+interface Row {
+  path: string;
+  why: string;
+}
+export const PLANTED_LIST: readonly Row[] = [
+  { path: "src/quality/a.ts", why: "a planted row" },
+];

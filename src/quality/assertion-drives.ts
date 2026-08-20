@@ -50,6 +50,7 @@ import { undeclaredInstructionSinks } from "@/security/instruction-sinks";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { REFUSAL_BRANCHES, type RefusalBranch, driveBranches, withRoot } from "./refusal-branches";
 import { type Exemption, reachDefects } from "./exemption-reach";
+import { type Checker, type ListedRegister, checkerDefects } from "./derivable-lists";
 import { anchorCoverage, deadAnchors } from "./latent-y5";
 import { LATENT_FINDINGS, fired } from "./latent-findings";
 import { pinDiff } from "./pins";
@@ -410,6 +411,27 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   },
 
   "src/quality/pins.ts": (root) => pinDiff(root, []).undeclared.length > 0,
+
+  "src/quality/derivable-lists.ts": (root) => {
+    // W372's comparison, handed a row citing a callable the module does not export, one citing a
+    // test file that does not name the register, and one that resolves. The rows are constructed
+    // rather than planted on disk: what a row holds is a CITATION, so what this comparison has to
+    // reject is a table.
+    const row = (checker: Checker): ListedRegister => ({
+      id: "src/quality/bounds.ts::STATED_BOUNDS",
+      membership: { kind: "derived", by: checker },
+    });
+    const noCallable = checkerDefects(root, [
+      row({ kind: "callable", name: "src/quality/bounds.ts::w289Missing" }),
+    ]);
+    const wrongFile = checkerDefects(root, [
+      row({ kind: "welded", file: "src/quality/pins.test.ts" }),
+    ]);
+    const clean = checkerDefects(root, [
+      row({ kind: "callable", name: "src/quality/bounds.ts::unresolvedBounds" }),
+    ]);
+    return noCallable.length === 1 && wrongFile.length === 1 && clean.length === 0;
+  },
 
   "src/quality/exemption-reach.ts": (root) => {
     // W368's comparison, handed a row whose probe never applied, one declaring `exact` over an

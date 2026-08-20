@@ -31,6 +31,7 @@
 
 import { acceptanceCarryingModules } from "./acceptances";
 import { appliedExemptions } from "./exemption-reach";
+import { handListedRegisters } from "./derivable-lists";
 import { namingSites } from "./declaration-tax";
 import { numberReturningExports } from "./flattering-numbers";
 import { discoverFoldSites } from "./order-independence";
@@ -233,6 +234,26 @@ export const MARKERS: readonly Marker[] = [
           'export const PLANTED_BOUND = "x";\n',
           'export const\n  PLANTED_BOUND = "x";\n',
           (copy) => names(headerCensus(copy, "BUILD-STATE.md")),
+        ),
+    },
+  },
+  {
+    module: "src/quality/derivable-lists.ts",
+    matches:
+      "a register entry's key naming a module path — `module:`, `file:`, `register:`, `detector:`, " +
+      "`bound:` or `home:` followed by a quoted `.ts`",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "the same entry keyed `path:` — a seventh spelling of the one idea, which the register " +
+        "reads by an enumerated list of six",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          fixtureText("w366-module-keyed-register"),
+          fixtureText("w366-path-keyed-register"),
+          (copy) => handListedRegisters(copy).some((r) => r.includes("spelling-probe")),
         ),
     },
   },

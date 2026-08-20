@@ -491,6 +491,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/derivable-lists.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/derivable-lists.test.ts :: derives the population rather than listing it",
+      plants: 'expect(grown).toContain("src/quality/list-probe.ts::PLANTED_LIST")',
+    },
+  },
+  {
     register: "src/quality/exemption-reach.ts",
     negative: {
       kind: "already_driven",
