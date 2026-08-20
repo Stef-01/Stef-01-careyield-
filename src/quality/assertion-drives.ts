@@ -38,6 +38,7 @@ import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
 import { SILENT_AT_W384, silentDiff } from "@/console/rendered-zeros";
 import { hookSites, unreachedReclaimers } from "./hook-reach";
+import { orderDependent } from "./shared-state";
 import { cycleDefects, cyclicComponents } from "./import-cycles";
 import { momentDefects } from "./moments";
 import { RECLAMATION_AT_W375, residueDefects as tempResidueDefects } from "./run-residue";
@@ -65,7 +66,7 @@ import { BLIND_SPOTS, NOT_CALLABLE, boundDiff, falseBounds } from "./blind-spots
 import { unaskedDefects, unaskedFacts } from "./unasked-facts";
 import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptances";
 import { unacceptedTautologies } from "./tautology-sweep";
-import { fixtureToken } from "./scan-text";
+import { fixtureText, fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
 import { type Figure, figureDefects } from "./flattering-numbers";
 import { type Excuse, excuseDefects, excuses } from "./shared-excuses";
@@ -105,6 +106,14 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       ...SILENT_AT_W384,
       { route: "/console/dashboard", subject: "nothing.rendersThis", what: "a row about a list that is not there" },
     ]).stale.includes("/console/dashboard :: nothing.rendersThis"),
+
+  "src/quality/shared-state.ts": () =>
+    // The claim is that no pair of test files writes a shared path in the repository. Hand it the tree
+    // as it stood before W385 and it must name the pair.
+    orderDependent("", [
+      { module: "src/quality/repository-clean.test.ts", source: fixtureText("shared-probe-direct") },
+      { module: "src/quality/unread-bounds.test.ts", source: fixtureText("shared-probe-aliased") },
+    ]).some((c) => c.where === "src/planted"),
 
   "src/quality/hook-reach.ts": (root) => {
     // The tree as it stood before W375: the sweep wired into `teardown` and nowhere else. The

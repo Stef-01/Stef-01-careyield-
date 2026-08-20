@@ -29,6 +29,8 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. It reads and plants this repository's own source text.
 
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { acceptanceCarryingModules } from "./acceptances";
 import { appliedExemptions } from "./exemption-reach";
 import { handListedRegisters } from "./derivable-lists";
@@ -39,6 +41,7 @@ import { copyTree, planterDiff, withPlantedIn, withTree as withRoot } from "./pl
 import { hookSites } from "./hook-reach";
 import { silentZeros } from "@/console/rendered-zeros";
 import { moduleGraph } from "./import-cycles";
+import { repositoryWrites } from "./shared-state";
 import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
 import { privateCopies } from "./private-copies";
@@ -177,6 +180,23 @@ export const MARKERS: readonly Marker[] = [
           variant: saw(fixtureText("zero-probe-component-empty")),
         };
       },
+    },
+  },
+  {
+    module: "src/quality/shared-state.ts",
+    matches: "a write call whose target is `path.join(ROOT, \"…\")`, or a name bound to one",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "`path.resolve(ROOT, \"src/planted\")` — the other way this tree builds a path, which reaches the same directory and which this scan does not read at all.",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          'const p = path.join(ROOT, "src/planted");\nmkdirSync(p, { recursive: true });\n',
+          'const p = path.resolve(ROOT, "src/planted");\nmkdirSync(p, { recursive: true });\n',
+          (copy) => repositoryWrites(readFileSync(path.join(copy, PROBE_FILE), "utf8")).length > 0,
+        ),
     },
   },
   {

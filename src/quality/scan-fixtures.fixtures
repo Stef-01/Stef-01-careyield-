@@ -689,3 +689,81 @@ export default async function ProbePage() {
     </section>
   );
 }
+
+=== shared-child-config ===
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  test: {
+    root: "DIR_HERE",
+    include: ["DIR_HERE/*.test.ts"],
+    maxWorkers: 1,
+    minWorkers: 1,
+    sequence: { shuffle: false },
+  },
+});
+
+=== shared-child-a-writer ===
+import { writeFileSync } from "node:fs";
+import path from "node:path";
+import { expect, it } from "vitest";
+
+process.env.W385_PROBE = "written-by-a";
+
+it("writes a variable and a marker", () => {
+  writeFileSync(path.join(process.env.W385_MARKERS as string, "a-ran"), String(process.pid));
+  expect(process.env.W385_PROBE).toBe("written-by-a");
+});
+
+=== shared-child-b-reader ===
+import { writeFileSync } from "node:fs";
+import path from "node:path";
+import { expect, it } from "vitest";
+
+it("records what it can see of the other file", () => {
+  writeFileSync(
+    path.join(process.env.W385_MARKERS as string, "b-saw"),
+    `${process.env.W385_PROBE} pid=${process.pid}`,
+  );
+  expect(1).toBe(1);
+});
+
+=== shared-child-exit-handler ===
+import { writeFileSync } from "node:fs";
+import path from "node:path";
+import { expect, it } from "vitest";
+
+const DIR = process.env.W385_MARKERS as string;
+
+process.once("exit", () => {
+  writeFileSync(path.join(DIR, "exit-fired"), "yes");
+});
+
+it("registers a handler for the process ending", () => {
+  expect(typeof process.once).toBe("function");
+});
+
+=== shared-probe-direct ===
+const planted = path.join(ROOT, "src/planted");
+mkdirSync(planted, { recursive: true });
+rmdirSync(planted);
+
+=== shared-probe-aliased ===
+const RESIDUE = path.join(ROOT, "src/planted");
+mkdirSync(RESIDUE, { recursive: true });
+rmSync(RESIDUE, { recursive: true, force: true });
+
+=== shared-probe-elsewhere ===
+const OTHER = path.join(ROOT, "src/elsewhere");
+mkdirSync(OTHER, { recursive: true });
+rmSync(OTHER, { recursive: true, force: true });
+
+=== shared-probe-copy-source ===
+const COPY = copyTree(ROOT);
+cpSync(path.join(ROOT, "src"), path.join(COPY, "src"), { recursive: true });
+writeFileSync(path.join(COPY, "src/planted/probe.ts"), "export const x = 1;\n");
+
+=== shared-probe-other-name ===
+const HERE = path.join(REPO, "src/planted");
+mkdirSync(HERE, { recursive: true });
+rmSync(HERE, { recursive: true, force: true });

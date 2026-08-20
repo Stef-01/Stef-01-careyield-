@@ -548,6 +548,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     ],
   },
   {
+    module: "src/quality/shared-state.ts",
+    census: {
+      derives:
+        "What this suite actually shares between test files, and which files reach it. The scopes are MEASURED with real child runs rather than read from documentation — a variable written in one file and looked for in another, and an exit handler registered in a file that is allowed to finish — and from those the population: every test file touching `process.env`, a process-exit handler, or a path inside the repository, with the write target read from the call's own argument rather than from the call.",
+      checkedAgainst:
+        "The suite itself, in two directions: a path inside the repository that more than one test file writes is reported, and a file that only reads the repository, or writes into a copy of it, is not.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "two sources are handed to the rule that write one path in the repository and must be reported as a clash, and the same two writing different paths, or writing into a copy, must not be",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No two test files in this suite write the same path inside the repository, so no file's answer about the tree depends on which other file ran first.",
+        mutation:
+          "the tree as it stood before W385 — `unread-bounds.test.ts` and `repository-clean.test.ts` both creating `src/planted` — is handed to `orderDependent`, which must name the pair and the path.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/hook-reach.ts",
     census: {
       derives:

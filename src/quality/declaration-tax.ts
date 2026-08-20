@@ -207,6 +207,13 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/shared-state.ts",
+    // Its population is TEST FILES, and a planted module is not one — outside by construction. A
+    // planted test file that wrote the repository would owe a change to the file rather than a row
+    // here, which is the register's point: what it wants is one writer, not a declared second.
+    demands: () => false,
+  },
+  {
     file: "src/quality/hook-reach.ts",
     // Its population is HOOKS, and a planted module with no `beforeAll`, `afterAll` or process
     // handler in it wires none — outside by construction. A module that adds a hook removing a

@@ -32,6 +32,7 @@ import { privateCopies } from "./private-copies";
 import { filesUnder, sourceModules, typescriptFiles } from "./tree-walks";
 import { appliedExemptions } from "./exemption-reach";
 import { silentZeros } from "@/console/rendered-zeros";
+import { orderDependent } from "./shared-state";
 import { unreachedReclaimers } from "./hook-reach";
 import { cyclicComponents } from "./import-cycles";
 import { momentsOf } from "./moments";
@@ -89,6 +90,19 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/blind-spots.ts", "src/quality/spelling-markers.ts"],
     why:
       "W368's scan walks the tree for a detector's defaulted exemption parameter, and both holders plant one — `blind-spots.ts` as the positive control for that register's own blind spot, `spelling-markers.ts` as the pair a second spelling of the parameter is measured against. Written inline, each holder became an exemption the register reported as applied and unmeasured, which W355 caught first: its defaulted-register scan read the same literals as real parameters nobody drives.",
+  },
+  {
+    detector: "src/quality/shared-state.ts::orderDependent",
+    sees: (root) => orderDependent(root).map((clash) => clash.where),
+    plant: {
+      "src/quality/self-probe-a.test.ts": fixtureText("shared-probe-direct"),
+      "src/quality/self-probe-b.test.ts": fixtureText("shared-probe-aliased"),
+    },
+    marker: "src/planted",
+    holdersAppear: "never",
+    holders: ["src/quality/blind-spots.ts", "src/quality/assertion-drives.ts", "src/quality/shared-state.test.ts"],
+    why:
+      "W385's defect is a PAIR, so the plant is a pair: two test files that each write `src/planted` through the repository root, planted into a tree that holds nothing else. Written inline, each probe would carry `path.join(ROOT, \"src/planted\")` inside a module under `src/` — which is the exact text this register scans for, so a probe spelled in its own file would put its author into the register's population and the pair would be the author and whoever else spelled it. The fixture file is not a convenience here; it is what stops the probes reporting the modules that hold them. Three holders share the same blocks: this register's own suite drives the rule, `blind-spots.ts` drives the spelling its bound admits it misses, and `assertion-drives.ts` drives the claim.",
   },
   {
     detector: "src/console/rendered-zeros.ts::silentZeros",

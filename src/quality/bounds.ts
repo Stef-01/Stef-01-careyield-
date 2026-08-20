@@ -72,6 +72,7 @@ import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
 import { RENDERED_BOUND } from "@/console/rendered-zeros";
 import { HOOK_BOUND } from "./hook-reach";
+import { SHARED_BOUND } from "./shared-state";
 import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
@@ -545,6 +546,35 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'ONE OF THEM IS A GUESS' — which of the three exclusions rests on a single call rather than on a derivation, so it counts the sentence's own admission rather than anything in the tree. It stays one however many list renders the console grows.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/shared-state.ts",
+    name: "SHARED_BOUND",
+    unit: "W385",
+    text: SHARED_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a path resolved rather than a binding named",
+      reads: "`shared-state.ts`, for a write whose target is known to be inside the repository because it resolves there rather than because the binding was called `ROOT`",
+      // The clause that names something buildable. `ROOT` is a habit, and a habit is what this
+      // register reads. The predicate looks for the derivation that would settle it.
+      stillOpen: (root) =>
+        !/export function resolvesInside/.test(readFileSync(path.join(root, "src/quality/shared-state.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/shared-state.ts":
+            "// W385: once per file or once per run.\nexport function resolvesInside(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "two",
+        kind: "rate",
+        why: "'TWO WRITERS OF A PATH IS THE RULE' — the threshold the check applies, per path, rather than a count of anything in the tree. It stays two however many files the suite grows, because one writer is a file arranging its own fixture and two is a race.",
       },
     ],
   },

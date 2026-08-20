@@ -143,6 +143,7 @@ export const POPULATIONS: readonly Population[] = [
   { file: "src/quality/hardening-q26.test.ts", source: { kind: "own_recursion" } },
   { file: "src/console/rendered-zeros.ts", source: { kind: "shared_walk", walks: ["filesUnder"] } },
   { file: "src/quality/hook-reach.ts", source: { kind: "shared_walk", walks: ["filesUnder"] } },
+  { file: "src/quality/shared-state.ts", source: { kind: "shared_walk", walks: ["typescriptFiles"] } },
   { file: "src/quality/import-cycles.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },
   { file: "src/quality/moments.ts", source: { kind: "shared_walk", walks: ["pageSpecFiles", "testModules"] } },
   { file: "src/quality/run-residue.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },

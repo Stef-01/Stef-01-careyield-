@@ -127,6 +127,15 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/shared-state.ts::SHARED_BOUND",
+    condition: "writes the same disk and appears in no answer here",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/spelling-markers.ts::blindMarkers",
+      how: "W366 IS THE REGISTER FOR EXACTLY THIS SENTENCE, and W385 wrote its row on the way in. The marker plants the same write spelled `path.resolve(ROOT, …)` instead of `path.join(ROOT, …)`, drives `repositoryWrites` against both, and records that the canonical spelling is found and the alternative is not — so `blindMarkers()` names `src/quality/shared-state.ts` on every run, by name, in a list somebody reads. It is a narrower reading than the sentence: the bound says a file could reach the repository by ANY other route, and what is driven is one route. Widening it is the remedy the bound already names — a path resolved rather than a binding named — and until somebody builds that, the honest statement is that this gap has an instance, the instance is measured, and the measurement moves if the register does.",
+    },
+  },
+  {
     bound: "src/console/zero-meaning.ts::ZERO_MEANING_BOUND",
     condition: "a page that renders a number some other way is outside the population entirely",
     reading: {

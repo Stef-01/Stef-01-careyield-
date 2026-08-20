@@ -424,6 +424,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/shared-state.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/shared-state.test.ts :: does not report two files writing different paths",
+      plants: "shared-probe-elsewhere",
+    },
+  },
+  {
     register: "src/quality/hook-reach.ts",
     negative: {
       kind: "already_driven",

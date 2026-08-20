@@ -66,6 +66,7 @@ import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meani
 import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
 import { RENDERED_BOUND, silentZeros } from "@/console/rendered-zeros";
 import { HOOK_BOUND, unreachedReclaimers } from "./hook-reach";
+import { SHARED_BOUND, orderDependent } from "./shared-state";
 import { CYCLE_BOUND, cyclicComponents, moduleGraph, runtimeMembers } from "./import-cycles";
 import { MOMENT_BOUND, momentsOf } from "./moments";
 import { TEMP_RESIDUE_BOUND, reclamationSites } from "./run-residue";
@@ -183,6 +184,29 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           };
         },
       ),
+  },
+
+  "src/quality/shared-state.ts": {
+    kind: "demonstrated",
+    bound: SHARED_BOUND,
+    witness:
+      "two files writing one path in the repository through a binding this tree does not call `ROOT` — the same race, spelled with a name the reading does not know",
+    control:
+      "the same two files spelling the binding `ROOT`, which it does read as a clash",
+    probe: () => {
+      // BOTH NAMES SPELLED OUT: `fixtureText(name)` behind a parameter is a call W307's citation
+      // check cannot resolve, and an uncited block is one nothing keeps in step with its loader.
+      const clash = (source: string) =>
+        orderDependent("", [
+          { module: "src/a.test.ts", source },
+          { module: "src/b.test.ts", source },
+        ]).length > 0;
+      // `seen` is the register RECOGNISING the race. The witness stays unseen while the bound holds.
+      return {
+        witnessSeen: clash(fixtureText("shared-probe-other-name")),
+        controlSeen: clash(fixtureText("shared-probe-direct")),
+      };
+    },
   },
 
   "src/quality/hook-reach.ts": {

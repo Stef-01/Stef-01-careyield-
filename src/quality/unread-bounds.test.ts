@@ -9,7 +9,7 @@
 
 import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, describe, expect, it } from "vitest";
 import {
   GAP_PHRASES,
   NAMED_CONDITIONS,
@@ -104,7 +104,16 @@ describe("W339 every bound that names a gap says whether anything reads it", () 
 });
 
 describe("W339 the two the quarter walked through, driven on the checks that read them now", () => {
-  const RESIDUE = path.join(ROOT, "src/planted");
+  // W385: IN A COPY, NOT IN THE REPOSITORY. This drive used to create `src/planted` in the tree
+  // itself — and so does `repository-clean.test.ts`, which owns the sweep. Two files, one path,
+  // and the pool decides which runs first: whichever lost the race saw the other's directory in
+  // its own `the tree is not clean before the drive` control and went red with nothing wrong.
+  // `artefactsPresent` takes its root as a parameter, so a copy answers the same question and
+  // shares nothing.
+  const HOME = copyTree(ROOT, { directories: ["src"] });
+  const RESIDUE = path.join(HOME, "src/planted");
+
+  afterAll(() => rmSync(HOME, { recursive: true, force: true }));
 
   afterEach(() => {
     if (existsSync(RESIDUE)) rmSync(RESIDUE, { recursive: true, force: true });
@@ -115,13 +124,13 @@ describe("W339 the two the quarter walked through, driven on the checks that rea
     // reads it. Four callers had forgotten and the box held 426 copies. What answers it now is
     // W331's artefact sweep — driven here by creating the artefact it looks for and requiring it
     // to speak, then removing it.
-    expect(artefactsPresent(ROOT), "the tree is not clean before the drive").toEqual([]);
+    expect(artefactsPresent(HOME), "the tree is not clean before the drive").toEqual([]);
     mkdirSync(RESIDUE, { recursive: true });
-    expect(artefactsPresent(ROOT), "the sweep says nothing about a residue it exists to find").not.toEqual(
+    expect(artefactsPresent(HOME), "the sweep says nothing about a residue it exists to find").not.toEqual(
       [],
     );
     rmSync(RESIDUE, { recursive: true, force: true });
-    expect(artefactsPresent(ROOT)).toEqual([]);
+    expect(artefactsPresent(HOME)).toEqual([]);
     // And the row says so, quoting the bound's own sentence.
     const row = NAMED_CONDITIONS.find((c) => c.condition.includes("forgets its `afterAll`"))!;
     expect(row.reading.kind).toBe("read_by");

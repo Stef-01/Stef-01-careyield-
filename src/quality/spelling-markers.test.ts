@@ -64,6 +64,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
       "src/quality/order-independence.ts",
       "src/quality/private-copies.ts",
       "src/quality/run-residue.ts",
+      "src/quality/shared-state.ts",
       "src/quality/typed-names.ts",
     ]);
     // The distinction the unit turns on: some of those are spellings the formatter rewrites before
@@ -80,6 +81,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
       "src/quality/order-independence.ts",
       "src/quality/private-copies.ts",
       "src/quality/run-residue.ts",
+      "src/quality/shared-state.ts",
     ]);
   });
 });

@@ -176,6 +176,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "The words it looks for ARE literals. It asks whether the arm of a conditional a reader gets when a list is empty puts anything readable on the screen, and the readable things are the text between tags and the copy constant a page interpolates — blanking either would leave every empty state on this console looking exactly like silence. Comments are subtracted because this tree explains its pages in prose beside them, and a `//` note describing an empty state is a description rather than one.",
   },
   {
+    module: "src/quality/shared-state.ts",
+    prep: { comments: "subtracted", literals: "kept" },
+    why: "The path a write targets IS a literal — `path.join(ROOT, \"src/planted\")` — and blanking it would leave every write in this suite pointing at nowhere. Comments go because this tree writes about `src/planted` in prose beside the code that creates it, and a sentence naming a path is not a write to it: `repository-clean.test.ts` opens with a header describing exactly the write this register looks for.",
+  },
+  {
     module: "src/quality/hook-reach.ts",
     prep: { comments: "subtracted", literals: "blanked" },
     why: "It finds a hook by its call and then reads the BODY by balancing brackets from the opening paren, so it needs the transform that preserves offsets — blanking does, subtracting comments does not move a line but does move every offset after it, which is why the two are applied in that order and the offsets are taken from the result. A brace inside a string would close a hook early; the call names the reading is actually about survive blanking untouched. The one place it steps outside this preparation is `tempPrefixes`, which reads the PREFIX a module hands `mkdtempSync` — a string, and blanking would leave every module looking as though it built nothing — so that reading keeps its literals and is the same shape W381 has for the same reason.",
