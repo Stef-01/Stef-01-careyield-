@@ -147,6 +147,30 @@ export function withPlantedIn<T>(root: string, files: Plantable, probe: () => T)
   }
 }
 
+/**
+ * `withPlantedIn` for a probe that awaits.
+ *
+ * W380 NEEDED THIS AND FOUND OUT THE HARD WAY. Handed an async probe, the scoped version above
+ * removes the plant the moment the probe RETURNS ITS PROMISE — which is before the subprocess it
+ * started has read anything. The first async run of that unit deleted the ledger it had just
+ * planted and every suite came back red, so the harness reported nothing and read as green. A
+ * scope that does not await is not a scope; there is no unscoped version of this to reach for
+ * either.
+ */
+export async function withPlantedInAsync<T>(
+  root: string,
+  files: Plantable,
+  probe: () => Promise<T>,
+): Promise<T> {
+  refuseTheRepository(root);
+  const written = write(root, files);
+  try {
+    return await probe();
+  } finally {
+    for (const full of written) rmSync(full, { force: true });
+  }
+}
+
 /** The directories a copied tree needs for the tree-reading registers to behave as they do here. */
 export const COPIED_DIRECTORIES = ["src", "app", "e2e", "supabase", "docs", "scripts"] as const;
 

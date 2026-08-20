@@ -56,6 +56,7 @@ import { SPELLING_BOUND } from "./spelling-markers";
 import { REACH_BOUND, appliedExemptions } from "./exemption-reach";
 import { DERIVABLE_BOUND } from "./derivable-lists";
 import { WELDED_BOUND } from "./welded-comparisons";
+import { CLOSE_SENSITIVITY_BOUND } from "./close-sensitivity";
 import { resolveName } from "./typed-names";
 import { UNASKED_BOUND } from "./unasked-facts";
 import { PAGE_FACT_BOUND } from "./founder-page-facts";
@@ -1245,6 +1246,28 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "two",
         kind: "rate",
         why: "'the two' — the honest reading and the blinded one, which is the shape of a measurement rather than a figure about this repository. Two is what a comparison takes.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/close-sensitivity.ts",
+    name: "CLOSE_SENSITIVITY_BOUND",
+    unit: "W380",
+    text: CLOSE_SENSITIVITY_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Every clause is a property of what running a suite twice IS. The cost is two runs per file, so the population must be narrowed and the narrowing is a text scan; the harness closes one row because W315's rule says overlapping sessions make two a different question; a suite already red has not been turned by a close; and a pass/fail reading cannot say which assertion inside a suite moved. The recursion clause is the one that looks liftable and is not: this register's suite reads a row's status by construction — that is what it varies — so it will always be in its own population, and only an instrument that runs a suite without being one would change it.",
+    },
+    numbers: [
+      {
+        word: "two",
+        kind: "rate",
+        why: "'two suite runs per file' and 'two runs instead of one function call' — a rate per file rather than a count of anything the tree holds. It stays two however many suites the population gains.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'IT CLOSES ONE ROW' and 'one function call' — the unit of what the harness does per pass, not a measurement. W315's rule fixes it at one however many rows are in flight.",
       },
     ],
   },

@@ -157,6 +157,13 @@ export const WELDED_CHECKS: readonly WeldedCheck[] = [
   { file: "src/quality/spelling-markers.test.ts", standing: passing() },
   { file: "src/quality/timelines.test.ts", standing: planted() },
   {
+    file: "src/quality/close-sensitivity.test.ts",
+    standing: {
+      kind: "inherent",
+      why: "W380's harness, and it is the one file in this population that CANNOT have its comparison lifted for a reason of its own: what it compares is whether closing a row turns any other suite, so a callable version would take the whole population as its subject and the close gate would be running the sweep rather than a check. It is also the file that proved the point — its own suite reads a row's status, joins its own population, and the first run of it did not terminate.",
+    },
+  },
+  {
     file: "src/quality/welded-comparisons.test.ts",
     standing: {
       kind: "inherent",

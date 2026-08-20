@@ -218,10 +218,19 @@ describe("W355 the defaulted register is handed a different value, at home", () 
   // is a signature that reads as drivable while the only value it ever had is the default. W355
   // found twelve parameters in this tree whose parameter no call anywhere supplied; this is one of them.
 
-  it("takes a placeholder SHA it is given, not only its own", () => {
-    const other = closeGateDefects(ROOT, "0000000");
-    const own = closeGateDefects(ROOT, PLACEHOLDER_SHA);
-    expect(Array.isArray(other)).toBe(true);
-    expect(other, "the placeholder SHA is not read at all").not.toBe(own);
-  });
+  it(
+    "takes a placeholder SHA it is given, not only its own",
+    () => {
+      const other = closeGateDefects(ROOT, "0000000");
+      const own = closeGateDefects(ROOT, PLACEHOLDER_SHA);
+      expect(Array.isArray(other)).toBe(true);
+      expect(other, "the placeholder SHA is not read at all").not.toBe(own);
+    },
+    // W380: TWO FULL GATE RUNS, and the gate got slower when this unit registered a reader. It ran
+    // in about thirty-two seconds under the whole suite's load and the default is thirty, so it
+    // failed for the one reason that says nothing about the tree. The budget is stated rather than
+    // raised globally: every reader added here costs this test twice over, which is worth a reader
+    // noticing.
+    120_000,
+  );
 });

@@ -451,6 +451,40 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/close-sensitivity.ts::CLOSE_SENSITIVITY_BOUND",
+    condition: "a suite reaching a status through a helper this scan does not name",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/close-sensitivity.ts::censusDefects",
+      how: "THE GAP THE SENTENCE NAMES IS THE ONE THING HERE THAT IS READ, in the only sense a text scan can be. `censusDefects` compares the declared table against `statusReadingSuites` in both directions on every run, so a suite that starts reading a status by any spelling the markers DO cover joins the population without a hand edit, and a row for one that has stopped is reported. What no check settles is a suite reaching a status through a helper none of the five markers names — that one is invisible to both halves of the comparison, which is why the sentence calls the narrowing a text scan rather than a derivation.",
+    },
+  },
+  {
+    bound: "src/quality/close-sensitivity.ts::CLOSE_SENSITIVITY_BOUND",
+    condition: "IT CANNOT RUN ITSELF",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/close-sensitivity.ts::runnableSuites",
+      how: "The exclusion is a function rather than a note: `runnableSuites` subtracts exactly `RUNS_THE_HARNESS`, the suite asserts that the subtraction removes something and that the census still demands a row for it, so the recursion cannot be filtered quietly and cannot be forgotten. What the check cannot do is lift the exclusion — this register's suite reads a row's status because that is what it varies, so it will always be in its own population.",
+    },
+  },
+  {
+    bound: "src/quality/close-sensitivity.ts::CLOSE_SENSITIVITY_BOUND",
+    condition: "IT CLOSES ONE ROW",
+    reading: {
+      kind: "not_observable",
+      why: "A close that breaks a check only when two rows close together would need the harness to try every PAIR of in-flight rows, and W315's rule is the reason it does not: overlapping sessions are normal, so closing two together lets one builder's defect read as the other's. That is a choice about what the measurement means rather than a gap in it, and no derivation settles whether the pair case exists — finding one would mean running the pairs, which is the thing the rule refuses.",
+    },
+  },
+  {
+    bound: "src/quality/close-sensitivity.ts::CLOSE_SENSITIVITY_BOUND",
+    condition: "NOT AN ATTRIBUTION",
+    reading: {
+      kind: "not_observable",
+      why: "A red suite says some assertion noticed the close; nothing in a pass/fail reading says which. Mapping a failure back to the assertion that caused it is a different instrument — one that attributes a red to a line rather than counting reds — and W296 stated the same limit about mutation four quarters ago. Both inherit it from what a suite result IS.",
+    },
+  },
+  {
     bound: "src/quality/quarter-mutants-q28.ts::Q28_MUTANT_BOUND",
     condition: "a module can be riddled with holes none of the five reaches",
     reading: {

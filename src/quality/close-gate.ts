@@ -321,6 +321,10 @@ export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
     why: "W347's classification of the outstanding position. It names `parseLedgerRows` and `allLedgerRows` inside the IDS of the facts it classifies — `src/quality/blocked-surface.ts::allLedgerRows` is a row key, not a call — and it opens no ledger: what it reads is the founder page's source and the three modules' exports. Same class as `quarter-mutants.ts` above, and the same reason the scan keeps literals.",
   },
   {
+    module: "src/quality/close-sensitivity.ts",
+    why: "W380's harness, and the one module in this register whose subject IS the close. It is excused rather than watched because it does not answer a question a close could change: it RUNS other suites against a ledger a close would produce, so its own answer is about them. Watching it here would have this gate run the harness that runs the gate's own suite, which is the recursion `RUNS_THE_HARNESS` names and the reason the first run of that unit did not terminate.",
+  },
+  {
     module: "src/quality/welded-comparisons.ts",
     why: "W379's register of which welded ledger comparisons could be lifted. It reads the ledger's PRIMITIVE NAMES out of test files rather than the ledger itself — `readsTheLiveLedger` looks for the markers a comparison is written with, and would answer the same over an empty `BUILD-STATE.md`. A close changes rows; this register reads none of them. THE HONEST HALF is that its subject is exactly the checks this gate cannot reach, so a close that broke one of them would leave this register saying what it says now — which is the argument for excusing it, and would be the argument against if it ever asked the ledger a question.",
   },

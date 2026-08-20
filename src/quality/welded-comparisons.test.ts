@@ -61,6 +61,7 @@ describe("W379 the welded ledger checks, classified", () => {
   it("names the files whose comparison cannot leave a test, and argues each", () => {
     expect(inherentlyWelded()).toEqual([
       "src/quality/close-gate.test.ts",
+      "src/quality/close-sensitivity.test.ts",
       "src/quality/closing-state.test.ts",
       "src/quality/welded-comparisons.test.ts",
     ]);

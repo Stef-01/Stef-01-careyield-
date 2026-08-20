@@ -1024,6 +1024,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W374's survivors register over Q28's modules: the population, the one module the harness cannot reach, and the four mutants this run closed. Nobody but a developer reads it. Its longest strings are the argument for each exclusion and `Q28_MUTANT_BOUND`; it constructs no record of any kind, and no patient, condition or appointment reason appears in any of it.",
   },
   {
+    module: "src/quality/close-sensitivity.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W380's harness for running a suite against the ledger a close would produce. Nobody but a developer reads it. Its longest strings are the argument for each suite and `CLOSE_SENSITIVITY_BOUND`; the only value it constructs is a fabricated `BUILD-STATE.md` row, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/welded-comparisons.ts",
     operatorCopy: [],
     notCopy:

@@ -227,6 +227,7 @@ export const REVIEWED_AT_W345: readonly Review[] = [
   { id: "bounds::src/quality/hardening-q25.ts::Q25_HARDENING_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/manifest.ts::MANIFEST_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/planting.ts::PLANTING_BOUND", verdict: { kind: "still_correct" } },
+  { id: "bounds::src/quality/close-sensitivity.ts::CLOSE_SENSITIVITY_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/quarter-mutants-q28.ts::Q28_MUTANT_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/quarter-mutants.ts::QUARTER_MUTANT_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/register-counts.ts::COUNT_BOUND", verdict: { kind: "still_correct" } },

@@ -17,6 +17,7 @@ import {
   copyTree,
   planterDiff,
   withPlantedIn,
+  withPlantedInAsync,
   withTree,
 } from "./planting";
 import { withRoot } from "./refusal-branches";
@@ -81,6 +82,38 @@ describe("W303 a probe cannot outlive its scope, even when the probe throws", ()
         }),
       ).toThrow("the probe failed");
       expect(existsSync(probe), "a failing probe left its plant behind").toBe(false);
+    } finally {
+      rmSync(copy, { recursive: true, force: true });
+    }
+  });
+
+  it("removes what an ASYNC probe planted, after it resolves and after it throws", async () => {
+    // W380's addition and the reason for it. Handed an async probe, the scoped version removes the
+    // plant when the probe returns its PROMISE — before the subprocess it started has read
+    // anything. That unit deleted the ledger it had just planted, every suite came back red, and
+    // the harness reported nothing and read as green. Both arms are driven: the plant survives
+    // until the await resolves, and it is gone whether the probe resolved or threw.
+    const copy = copyTree(ROOT, { directories: ["src"] });
+    const probe = path.join(copy, "src/quality/w380-probe.ts");
+    try {
+      const seenDuring = await withPlantedInAsync(
+        copy,
+        { "src/quality/w380-probe.ts": "export const x = 1;\n" },
+        async () => {
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          return existsSync(probe);
+        },
+      );
+      expect(seenDuring, "the plant was removed before the probe finished awaiting").toBe(true);
+      expect(existsSync(probe), "a resolved async probe left its plant behind").toBe(false);
+
+      await expect(
+        withPlantedInAsync(copy, { "src/quality/w380-probe.ts": "export const x = 1;\n" }, async () => {
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          throw new Error("the probe failed, as a failing assertion does");
+        }),
+      ).rejects.toThrow("the probe failed");
+      expect(existsSync(probe), "a throwing async probe left its plant behind").toBe(false);
     } finally {
       rmSync(copy, { recursive: true, force: true });
     }

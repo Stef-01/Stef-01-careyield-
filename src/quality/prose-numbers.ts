@@ -512,7 +512,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/close-gate.ts", text: "four modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "six entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "three walks", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/hardening-q28.ts", text: "53 files", resolution: { kind: "derived", derive: weldedTests } },
+  { module: "src/quality/hardening-q28.ts", text: "54 files", resolution: { kind: "derived", derive: weldedTests } },
   { module: "src/quality/blocked-surface.ts", text: "two copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/blocked-surface.ts", text: "Two of those copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/spelling-markers.ts", text: "two files", resolution: { kind: "not_a_tree_count" } },

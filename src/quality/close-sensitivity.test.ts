@@ -1,0 +1,183 @@
+// W380: "the close is the moment nobody re-runs → verify: every check whose answer depends on a
+// ledger row's status enumerated and driven at a simulated close; a check that passes before the
+// close and fails after it is reported, and W326's own welded-check limit is closed or re-argued."
+//
+// THE LIVE RUN IS THE LAST TEST AND IT TAKES A MINUTE OR TWO. Everything above it is about the
+// population and about whether the harness can report anything at all — which is what a reader
+// should distrust first, because a harness that always answers "nothing flipped" and a tree where
+// nothing flips are the same green.
+
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { readFileSync, rmSync } from "node:fs";
+import path from "node:path";
+import {
+  CLOSE_SENSITIVITY_BOUND,
+  SENSITIVE_SUITES,
+  type CloseSensitive,
+  censusDefects,
+  greenAgainst,
+  readsARowStatus,
+  RUNS_THE_HARNESS,
+  runnableSuites,
+  statusReadingSuites,
+  suitesThatFlip,
+} from "./close-sensitivity";
+import { weldedLedgerTests } from "./close-gate";
+import { closeRow } from "./closing-state";
+import { copyTree, withPlantedInAsync } from "./planting";
+import { parseLedgerRows } from "./blocked-surface";
+
+const ROOT = process.cwd();
+const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
+let COPY = "";
+
+beforeAll(() => {
+  COPY = copyTree(ROOT, { withNodeModules: true });
+}, 180_000);
+
+afterAll(() => {
+  if (COPY) rmSync(COPY, { recursive: true, force: true });
+});
+
+describe("W380 the suites a close could turn", () => {
+  it("covers every one, and names none the derivation no longer holds", () => {
+    expect(censusDefects(ROOT)).toEqual([]);
+    // W293: both directions fire, on the same producer.
+    expect(censusDefects(ROOT, SENSITIVE_SUITES.slice(1))).toHaveLength(1);
+    expect(
+      censusDefects(ROOT, [...SENSITIVE_SUITES, { suite: "src/quality/gone.test.ts" } as CloseSensitive]),
+    ).toHaveLength(1);
+  });
+
+  it("is narrower than the files naming a ledger primitive, which is what makes it affordable", () => {
+    // The bound's own claim, measured: running every welded file twice would be the whole tree.
+    const welded = weldedLedgerTests(ROOT);
+    const reading = statusReadingSuites(ROOT);
+    expect(reading.length).toBeLessThan(welded.length);
+    expect(reading.length).toBe(SENSITIVE_SUITES.length);
+    // And the narrowing really excludes something: a file that names a primitive and reads no
+    // status is in one population and not the other.
+    expect(welded).toContain("src/quality/timelines.test.ts");
+    expect(reading).not.toContain("src/quality/timelines.test.ts");
+    expect(readsARowStatus(ROOT, "src/quality/horizon-q30.test.ts")).toBe(true);
+  });
+
+  it("subtracts its own suite, which it cannot run, and says so rather than filtering quietly", () => {
+    // W349's recursion in a third register: this suite reads a row's status, so it joins its own
+    // population. The first live run of this unit proved the point the hard way — a hundred vitest
+    // processes and 15 GB of `/tmp`. The exclusion is named, still needs a row in the census, and
+    // really removes something.
+    expect(statusReadingSuites(ROOT)).toContain(RUNS_THE_HARNESS);
+    expect(runnableSuites(ROOT)).not.toContain(RUNS_THE_HARNESS);
+    expect(runnableSuites(ROOT)).toHaveLength(statusReadingSuites(ROOT).length - 1);
+    expect(SENSITIVE_SUITES.map((s) => s.suite)).toContain(RUNS_THE_HARNESS);
+  });
+
+  it("says what each suite's answer turns on", () => {
+    for (const entry of SENSITIVE_SUITES) {
+      expect(entry.reads.length, `${entry.suite} says nothing about what it reads`).toBeGreaterThan(40);
+    }
+  });
+});
+
+describe("W380 the harness reports a flip, which is the only reason a green run means anything", () => {
+  it("reports a suite that passes before a close and fails after it", async () => {
+    // THE NON-VACUITY, and it is the whole test of the idea. A planted suite asserts that a
+    // fabricated row is NOT done; closing that row turns it red; the harness must say so. Nothing
+    // here is callable — the assertion is welded inside the plant, which is the point.
+    const probe = "src/quality/close-probe.test.ts";
+    const ledger = `${LEDGER}| W901 | claimed | builder-x | t | — | a planted row. |\n`;
+    const found = await withPlantedInAsync(
+      COPY,
+      {
+        [probe]:
+          'import { readFileSync } from "node:fs";\n' +
+          'import path from "node:path";\n' +
+          'import { describe, expect, it } from "vitest";\n' +
+          'describe("probe", () => {\n' +
+          '  it("W901 has not landed", () => {\n' +
+          '    const ledger = readFileSync(path.join(process.cwd(), "BUILD-STATE.md"), "utf8");\n' +
+          '    expect(ledger).not.toContain("| W901 | done |");\n' +
+          "  });\n" +
+          "});\n",
+      },
+      () => suitesThatFlip(COPY, ledger, [probe], "W901"),
+    );
+    expect(found, "the harness cannot see a check a close breaks").toEqual([probe]);
+  }, 300_000);
+
+  it("does not report a suite the close leaves alone", async () => {
+    const probe = "src/quality/close-probe.test.ts";
+    const ledger = `${LEDGER}| W902 | claimed | builder-x | t | — | a planted row. |\n`;
+    const found = await withPlantedInAsync(
+      COPY,
+      {
+        [probe]:
+          'import { describe, expect, it } from "vitest";\n' +
+          'describe("probe", () => {\n  it("says nothing about the ledger", () => {\n    expect(1).toBe(1);\n  });\n});\n',
+      },
+      () => suitesThatFlip(COPY, ledger, [probe], "W902"),
+    );
+    expect(found, "the harness reports a suite a close does not touch").toEqual([]);
+  }, 300_000);
+
+  it("skips a suite that was already red, rather than calling it close-sensitive", async () => {
+    // The flattering direction W354 is about, refused: a suite failing BEFORE the close has not
+    // been turned by it, and reporting it would credit this harness with somebody else's break.
+    const probe = "src/quality/close-probe.test.ts";
+    const body =
+      'import { describe, expect, it } from "vitest";\n' +
+      'describe("probe", () => {\n  it("is red whatever the ledger says", () => {\n    expect(1).toBe(2);\n  });\n});\n';
+    const found = await withPlantedInAsync(COPY, { [probe]: body }, () =>
+      suitesThatFlip(COPY, LEDGER, [probe], "W903"),
+    );
+    expect(found).toEqual([]);
+    // And the reading behind the skip is real: the suite really is red before anything is closed.
+    expect(await withPlantedInAsync(COPY, { [probe]: body }, () => greenAgainst(COPY, LEDGER, probe))).toBe(false);
+  }, 300_000);
+});
+
+describe("W380 the live tree, at a simulated close", () => {
+  it(
+    "closes each row in flight and turns no suite that reads a status",
+    async () => {
+      // W315's rule: ONE UNIT AT A TIME. Overlapping sessions are normal, so closing two rows
+      // together would let one builder's defect read as the other's.
+      const inFlight = parseLedgerRows(LEDGER)
+        .filter((row) => row.status === "claimed")
+        .map((row) => row.id);
+      expect(inFlight.length, "no row is in flight, so this check ran against nothing").toBeGreaterThan(0);
+      for (const unit of inFlight) {
+        expect(
+          await suitesThatFlip(COPY, LEDGER, runnableSuites(ROOT), unit),
+          `closing ${unit} turns a suite that reads a row's status`,
+        ).toEqual([]);
+      }
+    },
+    2_400_000,
+  );
+});
+
+describe("W380 the bound", () => {
+  it("says the limit it closes and the one it buys", () => {
+    expect(CLOSE_SENSITIVITY_BOUND).toContain("IT CLOSES W326's LIMIT AND BUYS A DIFFERENT ONE");
+    expect(CLOSE_SENSITIVITY_BOUND).toContain("TEXT SCAN");
+  });
+
+  it("says it closes one row, and why", () => {
+    expect(CLOSE_SENSITIVITY_BOUND).toContain("IT CLOSES ONE ROW");
+  });
+
+  it("says a pass/fail reading is not an attribution", () => {
+    expect(CLOSE_SENSITIVITY_BOUND).toContain("NOT AN ATTRIBUTION");
+  });
+
+  it("keeps the close simulation shared rather than writing a second one", () => {
+    // W341: `closeRow` is W315's, used rather than re-derived — this register writes no ledger
+    // parse and no row rewriter of its own.
+    expect(closeRow("| W1 | claimed | s | t | — | x |", "W1")).toContain("| W1 | done |");
+    expect(readFileSync(path.join(ROOT, "src/quality/close-sensitivity.ts"), "utf8")).not.toContain(
+      'cells[1] = "done"',
+    );
+  });
+});
