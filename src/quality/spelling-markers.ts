@@ -36,6 +36,7 @@ import { namingSites } from "./declaration-tax";
 import { numberReturningExports } from "./flattering-numbers";
 import { discoverFoldSites } from "./order-independence";
 import { copyTree, planterDiff, withPlantedIn, withTree as withRoot } from "./planting";
+import { moduleGraph } from "./import-cycles";
 import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
 import { privateCopies } from "./private-copies";
@@ -127,6 +128,23 @@ export const MARKERS: readonly Marker[] = [
           'const ledger = "BUILD-STATE.md";\nconst row = /^\\|/;\nexport const parse = [ledger, row];\n',
           'const ledger = "BUILD-STATE.md";\nexport function rows(line: string) {\n  return line.startsWith("|");\n}\n',
           (copy) => names(privateCopies(copy)),
+        ),
+    },
+  },
+  {
+    module: "src/quality/import-cycles.ts",
+    matches: "a line beginning `import`, up to the `from \"…\";` that ends the statement",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "`export { x } from \"./y\"` — a re-export, which is an edge the module graph carries at runtime exactly like an import and which this scan does not read at all.",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          'import { thing } from "@/quality/pins";\nexport const uses = () => thing;\n',
+          'export { PINS as thing } from "@/quality/pins";\n',
+          (copy) => JSON.stringify([...moduleGraph(copy).get(PROBE_FILE) ?? []]).includes("pins"),
         ),
     },
   },

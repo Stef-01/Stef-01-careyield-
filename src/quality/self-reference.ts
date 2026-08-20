@@ -31,6 +31,7 @@ import { type Plantable, withTree } from "./planting";
 import { privateCopies } from "./private-copies";
 import { filesUnder, sourceModules, typescriptFiles } from "./tree-walks";
 import { appliedExemptions } from "./exemption-reach";
+import { cyclicComponents } from "./import-cycles";
 import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
 import { patientRules } from "./patient-populations";
@@ -86,6 +87,19 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/blind-spots.ts", "src/quality/spelling-markers.ts"],
     why:
       "W368's scan walks the tree for a detector's defaulted exemption parameter, and both holders plant one — `blind-spots.ts` as the positive control for that register's own blind spot, `spelling-markers.ts` as the pair a second spelling of the parameter is measured against. Written inline, each holder became an exemption the register reported as applied and unmeasured, which W355 caught first: its defaulted-register scan read the same literals as real parameters nobody drives.",
+  },
+  {
+    detector: "src/quality/import-cycles.ts::cyclicComponents",
+    sees: (root) => cyclicComponents(root).flat(),
+    plant: {
+      "src/planted/cycle-a.ts": 'import { b } from "./cycle-b";\nexport const a = () => b();\n',
+      "src/planted/cycle-b.ts": 'import { a } from "./cycle-a";\nexport const b = () => a;\n',
+    },
+    marker: "planted/cycle-a",
+    holdersAppear: "for_other_reasons",
+    holders: ["src/quality/blind-spots.ts", "src/quality/import-cycles.test.ts"],
+    why:
+      "W381's walk reads every module's imports, and both holders plant a two-module cycle — `blind-spots.ts` as the control for that register's own blind spot, the suite as the pair whose crossing value leaves a hole. `blind-spots.ts` appears in this detector's answer and NOT because of the plant: it is a member of the twenty-seven-module knot around `manifest.ts` and `bounds.ts`, which is the register reporting a real fact about a module that happens also to hold a fixture. Written inline as `src/` modules the plants would be a cycle of their own, which is the register reporting a knot its own probe created.",
   },
   {
     detector: "src/quality/moments.ts::momentsOf",

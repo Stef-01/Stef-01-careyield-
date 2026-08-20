@@ -212,6 +212,14 @@ export const FOLD_SITES: readonly FoldSite[] = [
     },
   },
   {
+    module: "src/quality/import-cycles.ts",
+    folds: 2,
+    disposition: {
+      kind: "rationale",
+      why: "Neither is a fold over a collection whose order could vary: both are the top-of-stack peek of an EXPLICIT work stack in W381's iterative Tarjan, `work[work.length - 1]`, which is the recursion the language would otherwise hold on the call stack. `work` is a private local, pushed and popped by this function alone, and 'the frame currently being expanded' is a definition rather than a choice among equals — two frames cannot share the top of a stack. The traversal it drives is order-SENSITIVE in the ordinary way any depth-first search is, so the module fixes the two orders it depends on rather than arguing they do not matter: the roots are walked over `[...graph.keys()].sort()`, and each component is `.sort()`ed before it is recorded. Both are already pinned — `cyclicComponents` returns the same components in the same order on the same tree, and W381's suite asserts the membership of each rather than a position within it.",
+    },
+  },
+  {
     // W178: the register caught the corpus on its first run — the corpus's own pre-fix
     // reconstructions are folds, because they are copies of folds. Declared rather than
     // excluded by name: an excluded file is a place to hide something (W168's rule).

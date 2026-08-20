@@ -36,6 +36,7 @@ import { diffCensus, discoverSurfaces, parseCensus } from "@/compliance/surfaces
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
+import { cycleDefects, cyclicComponents } from "./import-cycles";
 import { momentDefects } from "./moments";
 import { RECLAMATION_AT_W375, residueDefects as tempResidueDefects } from "./run-residue";
 import { RULES_AT_W373, ruleDefects } from "./patient-populations";
@@ -95,6 +96,13 @@ export type Drive = (root: string) => boolean;
 const BEYOND_EVERY_REVIEW = "2099-01-01";
 
 export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
+  "src/quality/import-cycles.ts": (root) => {
+    const largest = cyclicComponents(root)[0] ?? [];
+    return cycleDefects(root, [{ members: largest, standing: { kind: "type_only" } }]).some((d) =>
+      d.what.includes("recorded as type-only"),
+    );
+  },
+
   "src/quality/moments.ts": (root) =>
     momentDefects(root, [{ file: "src/quality/no-such-module.ts" }], []).some((d) =>
       d.what.includes("answers at no moment"),

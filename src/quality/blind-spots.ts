@@ -64,6 +64,7 @@ import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
 import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import { CYCLE_BOUND, cyclicComponents, moduleGraph, runtimeMembers } from "./import-cycles";
 import { MOMENT_BOUND, momentsOf } from "./moments";
 import { TEMP_RESIDUE_BOUND, reclamationSites } from "./run-residue";
 import { RULE_BOUND, patientRules } from "./patient-populations";
@@ -152,6 +153,34 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/import-cycles.ts": {
+    kind: "demonstrated",
+    bound: CYCLE_BOUND,
+    witness: "a cycle whose crossing value is read only inside a function, which is safe and must not be reported as a runtime cycle's defect",
+    control: "the same pair with one edge written `import type`, which must drop out of the runtime graph entirely",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/cycle-a.ts": 'import { b } from "./cycle-b";\nexport const a = () => b();\n',
+          "src/planted/cycle-b.ts": 'import { a } from "./cycle-a";\nexport const b = () => a;\n',
+          "src/planted/typed-a.ts": 'import type { B } from "./typed-b";\nexport type A = { b: B };\nexport const a = 1;\n',
+          "src/planted/typed-b.ts": 'import type { A } from "./typed-a";\nexport type B = { a: A };\nexport const b = 1;\n',
+        },
+        (root) => {
+          const graph = moduleGraph(root);
+          const planted = cyclicComponents(root, graph).filter((c) => c.some((m) => m.startsWith("src/planted/")));
+          const valueCycle = planted.find((c) => c.includes("src/planted/cycle-a.ts")) ?? [];
+          const typeCycle = planted.find((c) => c.includes("src/planted/typed-a.ts")) ?? [];
+          return {
+            // The witness: a value cycle read only in functions is still a runtime cycle here, and
+            // this register cannot tell that from one that is read while evaluating.
+            witnessSeen: runtimeMembers(valueCycle, graph).length === 0,
+            controlSeen: typeCycle.length > 0 && runtimeMembers(typeCycle, graph).length === 0,
           };
         },
       ),

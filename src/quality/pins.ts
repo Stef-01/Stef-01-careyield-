@@ -254,6 +254,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/import-cycles.ts",
+    name: "CYCLES_AT_W381",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a module joining or leaving an import cycle, or an edge changing between a type import and a value import",
+      whyStopping:
+        "A NAMED ROW PER COMPONENT, each classified against its own edges and re-derived on every run — the members, whether a value crosses, and which of them are still cycling once the types are erased. A row arriving means the tree has grown a knot nobody has looked at; a row changing class means a one-word edit turned a type import into a value import, which is the change least likely to be read as dangerous and is exactly how W367's cycle closed. It cannot be satisfied by retyping a digit: the population is a graph walk and every classification is checked against the edges.",
+    },
+  },
+  {
     module: "src/quality/moments.ts",
     name: "MOMENTS_AT_W378",
     classification: {

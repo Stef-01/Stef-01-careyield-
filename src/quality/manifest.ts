@@ -482,6 +482,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/import-cycles.ts",
+    census: {
+      derives:
+        "Every module's imports under `src/`, resolved to files and marked for whether a VALUE crosses each edge, and from that the strongly connected components — the knots rather than the thousands of elementary cycles they contain. For each component it also derives which of its members are still in a cycle once the type edges are erased.",
+      checkedAgainst:
+        "W381's `CYCLES_AT_W381`, in four directions: a component with no row, a row for something that is not a cycle, a row recorded type-only whose members still cycle at runtime, and a row recorded as carrying a value that types alone hold together.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "two modules importing each other are planted and must be reported as a component, and the same pair with one edge written `import type` must not be reported as cycling at runtime",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No import cycle in this tree carries a value that is read while the graph is still evaluating, and none is classified by anything but its own edges.",
+        mutation:
+          "`cycleDefects` is given the largest component recorded as type-only, and must report that its members still cycle at runtime.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/moments.ts",
     census: {
       derives:

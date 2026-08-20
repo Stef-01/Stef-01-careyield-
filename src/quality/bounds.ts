@@ -69,6 +69,7 @@ import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
+import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
 import { TEMP_RESIDUE_BOUND } from "./run-residue";
@@ -511,6 +512,36 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/import-cycles.ts",
+    name: "CYCLE_BOUND",
+    unit: "W381",
+    text: CYCLE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a parse rather than a scan",
+      reads: "`import-cycles.ts`, for a use told apart by whether it sits in a function body rather than by whether a hole survives to be seen",
+      // The clause that names something buildable. `deferred` is an argument about WHERE a name is
+      // read, and telling a top-level initialiser from a function body in text needs a parse. The
+      // predicate reads for the derivation that would settle it.
+      stillOpen: (root) =>
+        !/export function readsAtEval/.test(readFileSync(path.join(root, "src/quality/import-cycles.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/import-cycles.ts":
+            "// W381: module-evaluation order.\nexport function readsAtEval(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one entry order per member' — the unit of the probe rather than a count anything maintains. It stays one however many members a component holds, and `cycleDefects` re-derives every component on each build.",
       },
     ],
   },

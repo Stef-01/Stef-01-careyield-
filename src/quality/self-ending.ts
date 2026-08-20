@@ -392,6 +392,8 @@ export function waitingModules(root: string): string[] {
 export const WAIT_FIXTURES: Readonly<Record<string, string>> = {
   "src/quality/blind-spots.ts":
     "Plants a wait spelled as a typed discriminant beside the same wait spelled as a sentence, so W330's own blind spot can be demonstrated rather than asserted. The probe body is a string handed to a constructed tree; the module holds no declaration of its own and nothing in it is waiting. It arrived in this list the moment the blind-spot probe was written, which is the tax the rule charges and the reason the rule is worth having.",
+  "src/quality/import-cycles.ts":
+    "The word is the same and the meaning is not. W381's `Standing` is a judgement about WHEN a module in a cycle reads the value crossing it, and `deferred` there means the read happens inside a function at call time rather than at module evaluation — a property of the code as it stands, decided and finished, with nothing owed by anybody. Nothing in that register is true only until an event, which is what this one is for. The discriminant matches because both units reached for the plainest English word for `later`, and this excuse is the register saying so out loud rather than widening the pattern until it stops finding real waits.",
   "src/quality/assertion-drives.ts":
     "Builds a bound-shaped probe with a `remedy` lifting arm so W306's `liftedDefects` has an input to answer about. The probe's `stillOpen` is a constant and its remedy is `a remedy nobody wrote` — it is the shape of a wait, presented to a check, and there is nothing behind it for anybody to be waiting on.",
 };

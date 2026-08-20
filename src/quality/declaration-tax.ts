@@ -200,6 +200,12 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/import-cycles.ts",
+    // Its population is CYCLES, and a planted module with one import is not in one — outside by
+    // construction. A module joining a knot owes a row, which is the register's point.
+    demands: () => false,
+  },
+  {
     file: "src/quality/moments.ts",
     // Its population is the CENSUS, and a planted module joins that only by being declared in the
     // manifest — which is a cost of the census rather than of a module arriving.

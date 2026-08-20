@@ -384,3 +384,24 @@ import { derives as run } from "@/planted/subject";
 it("asks it under another name", () => {
   expect(run(ROOT)).toEqual([]);
 });
+
+=== cycle-read-at-eval-a ===
+import { FROM_B, READS_A } from "./b.mjs";
+export var NAME_A = "a";
+export var READS_B = { text: FROM_B };
+export { READS_A };
+
+=== cycle-read-at-eval-b ===
+import { NAME_A } from "./a.mjs";
+export var FROM_B = "b";
+export var READS_A = { text: NAME_A };
+
+=== cycle-read-in-a-function-a ===
+import { fromB } from "./b.mjs";
+export const nameA = () => "a";
+export const readsB = () => ({ text: fromB() });
+
+=== cycle-read-in-a-function-b ===
+import { nameA } from "./a.mjs";
+export const fromB = () => "b";
+export const readsA = () => ({ text: nameA() });

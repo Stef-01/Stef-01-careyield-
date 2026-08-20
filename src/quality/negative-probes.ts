@@ -415,6 +415,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/import-cycles.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/import-cycles.test.ts :: leaves none when the crossing value is read inside a function",
+      plants: "cycle-read-in-a-function-a",
+    },
+  },
+  {
     register: "src/quality/moments.ts",
     negative: {
       kind: "already_driven",
