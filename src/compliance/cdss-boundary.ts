@@ -772,6 +772,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W376's gate is reviewer-facing: unit ids, derivation names and sentences about planted files. Nothing here renders and no practice sees it.",
   },
   {
+    module: "src/quality/moments.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W378's register is reviewer-facing: file names, export names and the moments a test run has. Nothing here renders and no practice sees it.",
+  },
+  {
     module: "src/quality/run-residue.ts",
     operatorCopy: [],
     notCopy:

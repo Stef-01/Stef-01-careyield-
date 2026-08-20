@@ -35,7 +35,8 @@ import { handListedRegisters } from "./derivable-lists";
 import { namingSites } from "./declaration-tax";
 import { numberReturningExports } from "./flattering-numbers";
 import { discoverFoldSites } from "./order-independence";
-import { copyTree, planterDiff, withPlantedIn } from "./planting";
+import { copyTree, planterDiff, withPlantedIn, withTree as withRoot } from "./planting";
+import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
 import { privateCopies } from "./private-copies";
 import { SCAN_SITES, fixtureText } from "./scan-text";
@@ -127,6 +128,29 @@ export const MARKERS: readonly Marker[] = [
           'const ledger = "BUILD-STATE.md";\nexport function rows(line: string) {\n  return line.startsWith("|");\n}\n',
           (copy) => names(privateCopies(copy)),
         ),
+    },
+  },
+  {
+    module: "src/quality/moments.ts",
+    matches: "an export name followed by an opening bracket, or a SCREAMING export taken bare",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "a call reached through an alias — `import { derives as run }` and then `run(root)` — which is the same module answering at the same moment under a name the scan was never told about.",
+      plausibility: "idiomatic",
+      // THE SUBJECT AND ITS CALLER ARE DIFFERENT MODULES, so `twoSpellings` cannot be used: it
+      // plants a single file, and what varies here is the caller's spelling of the import.
+      probe: () => {
+        const seen = (caller: string) =>
+          withRoot(
+            { "src/planted/subject.ts": fixtureText("moment-subject-module"), "src/planted/asks.test.ts": caller },
+            (root) => momentsOf(root, "src/planted/subject.ts").length > 0,
+          );
+        return {
+          control: seen(fixtureText("moment-caller-per-test")),
+          variant: seen(fixtureText("moment-caller-aliased")),
+        };
+      },
     },
   },
   {

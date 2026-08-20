@@ -254,6 +254,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/moments.ts",
+    name: "MOMENTS_AT_W378",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a census member starting or stopping being reached from outside its own suite",
+      whyStopping:
+        "A NAMED ROW PER CENSUS MEMBER THAT ANSWERS AT A MOMENT NO SUITE GIVES, each argued and each re-derived from where the module's exports are called rather than from what the module says about itself. A row arriving means a check has started answering at a moment its suite does not control — the gate stage, the run's setup, the run's teardown — which is the state this quarter exists to make visible; a row leaving means it stopped. It cannot be satisfied by retyping a digit: the population is a walk over call sites and every moment is re-read on each build.",
+    },
+  },
+  {
     module: "src/quality/horizon-q29-gate.ts",
     name: "POPULATIONS_AT_W376",
     classification: {

@@ -361,3 +361,26 @@ export const WELDED_CHECKS: readonly { file: string; standing: { kind: string; t
   { file: "src/quality/horizon-q30.test.ts", standing: { kind: "moved", to: "a::b" } },
   { file: "src/quality/pins.test.ts", standing: { kind: "moved", to: "a::b" } },
 ];
+=== moment-caller-per-test ===
+import { derives } from "@/planted/subject";
+it("asks it inside a test", () => {
+  expect(derives(ROOT)).toEqual([]);
+});
+
+=== moment-caller-file-load ===
+import { derives } from "@/planted/subject";
+const ANSWER = derives(ROOT);
+it("says nothing about the answer", () => {
+  expect(true).toBe(true);
+});
+
+=== moment-subject-module ===
+export function derives(root: string): string[] {
+  return [root];
+}
+
+=== moment-caller-aliased ===
+import { derives as run } from "@/planted/subject";
+it("asks it under another name", () => {
+  expect(run(ROOT)).toEqual([]);
+});

@@ -101,6 +101,13 @@ const welded = (file: string): Membership => ({ kind: "derived", by: { kind: "we
 
 export const LISTED_REGISTERS: readonly ListedRegister[] = [
   {
+    id: "src/quality/moments.ts::MOMENTS_AT_W378",
+    membership: {
+      kind: "derived",
+      by: { kind: "callable", name: "src/quality/moments.ts::momentDefects" },
+    },
+  },
+  {
     id: "src/quality/horizon-q29-gate.ts::POPULATIONS_AT_W376",
     membership: {
       kind: "derived",

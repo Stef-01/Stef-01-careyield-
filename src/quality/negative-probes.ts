@@ -415,6 +415,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/moments.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/moments.test.ts :: reports a census member nothing anywhere runs, which is the arm the gate turns on",
+      plants: "src/planted/subject.ts",
+    },
+  },
+  {
     register: "src/quality/run-residue.ts",
     negative: {
       kind: "already_driven",

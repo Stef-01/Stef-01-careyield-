@@ -200,6 +200,12 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/moments.ts",
+    // Its population is the CENSUS, and a planted module joins that only by being declared in the
+    // manifest — which is a cost of the census rather than of a module arriving.
+    demands: () => false,
+  },
+  {
     file: "src/quality/run-residue.ts",
     // Its population is `rmSync` sites, and the probe plants a module that removes nothing —
     // outside by construction. A module that removes something does owe a row, which is the

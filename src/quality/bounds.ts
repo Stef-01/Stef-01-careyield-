@@ -69,6 +69,7 @@ import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
+import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
 import { TEMP_RESIDUE_BOUND } from "./run-residue";
 import { RULE_BOUND } from "./patient-populations";
@@ -510,6 +511,44 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/moments.ts",
+    name: "MOMENT_BOUND",
+    unit: "W378",
+    text: MOMENT_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a parse rather than a scan",
+      reads: "`moments.ts`, for a call site attributed to the block it really sits in rather than to the last `it(` opened before it",
+      // The clause that names something buildable, and the one this tree has refused four times.
+      // The predicate reads for the derivation that would settle it.
+      stillOpen: (root) =>
+        !/export function blockOf/.test(readFileSync(path.join(root, "src/quality/moments.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/moments.ts": "// W378: the moment register.\nexport function blockOf(): string {\n  return \"\";\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "four",
+        kind: "unit_id",
+        why: "'refused four times' — how often this tree had declined to build a parser when this was written: W295, W307, W341 and W366 each widened a scan rather than parsing. History about a series of decisions rather than a count anything maintains, and a fifth refusal is a sentence somebody adds.",
+      },
+      {
+        word: "five",
+        kind: "fixed_by_a_gate",
+        why: "The moments the quarter's own gate names — file load, per test, run setup, run teardown, and the gate's own hook — fixed by `docs/HORIZON-Q30.md` and by W378's ledger row rather than measured. A sixth would be a moment somebody adds to the harness, which is a decision written down rather than a count that drifts.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one that is asserted', 'the block a call really sits in' — the unit of each phrase rather than a count anything maintains. `momentDefects` re-derives every member's moments on each build.",
       },
     ],
   },

@@ -482,6 +482,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/moments.ts",
+    census: {
+      derives:
+        "For every census member, the moments at which its exports are reached — read from the test modules, the vitest harness hook, the gate scripts and the page specs, with comments subtracted, literals blanked and whole import STATEMENTS blanked before anything is matched. A function needs its bracket; a SCREAMING register is taken bare.",
+      checkedAgainst:
+        "W378's `MOMENTS_AT_W378` and `ORDINARY_SHAPES`, in five directions: a member nothing anywhere runs, a member answering at a moment no suite gives with no row, a row whose moments the tree has moved past, a row for a member that answers inside its suite after all, and a row without an argument.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "one subject module is planted twice with the same body and a different caller — asked from inside an `it(...)` in one tree and from the top of a file in another — and the moments must differ",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No check in this census answers at a moment nobody has written down, and none of them answers at no moment at all.",
+        mutation:
+          "`momentDefects` is given a census naming a planted module no caller reaches, and must report that it answers at no moment.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/horizon-q29-gate.ts",
     // Reads ONE DOCUMENT — `docs/HORIZON-Q29.md` — and then the modules its rows name, one file at
     // a time. The probes each plant into a throwaway tree and run somebody else's walk over it, so

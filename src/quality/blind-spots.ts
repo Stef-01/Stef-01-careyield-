@@ -64,6 +64,7 @@ import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
 import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import { MOMENT_BOUND, momentsOf } from "./moments";
 import { TEMP_RESIDUE_BOUND, reclamationSites } from "./run-residue";
 import { RULE_BOUND, patientRules } from "./patient-populations";
 import { REACHED_BOUND, reachedDefects } from "./reached-pages";
@@ -152,6 +153,29 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
           };
+        },
+      ),
+  },
+
+  "src/quality/moments.ts": {
+    kind: "demonstrated",
+    bound: MOMENT_BOUND,
+    witness: "a call to a DIFFERENT export of the same module, which counts as the module answering and must not be reported as a new moment",
+    control: "the same module with no caller anywhere in the tree, which it must report as answering at no moment",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/subject.ts": fixtureText("moment-subject-module"),
+          "src/planted/asks.test.ts": fixtureText("moment-caller-per-test"),
+        },
+        (root) => {
+          const asked = momentsOf(root, "src/planted/subject.ts").length > 0;
+          const unasked = withRoot(
+            { "src/planted/subject.ts": fixtureText("moment-subject-module") },
+            (bare) => momentsOf(bare, "src/planted/subject.ts").length === 0,
+          );
+          // The witness is that ANY export counts: the register cannot tell the check from a helper.
+          return { witnessSeen: !asked, controlSeen: unasked };
         },
       ),
   },

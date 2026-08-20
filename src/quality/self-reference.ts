@@ -31,6 +31,7 @@ import { type Plantable, withTree } from "./planting";
 import { privateCopies } from "./private-copies";
 import { filesUnder, sourceModules, typescriptFiles } from "./tree-walks";
 import { appliedExemptions } from "./exemption-reach";
+import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
 import { patientRules } from "./patient-populations";
 import { emptyRegisters } from "./empty-populations";
@@ -85,6 +86,19 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/blind-spots.ts", "src/quality/spelling-markers.ts"],
     why:
       "W368's scan walks the tree for a detector's defaulted exemption parameter, and both holders plant one — `blind-spots.ts` as the positive control for that register's own blind spot, `spelling-markers.ts` as the pair a second spelling of the parameter is measured against. Written inline, each holder became an exemption the register reported as applied and unmeasured, which W355 caught first: its defaulted-register scan read the same literals as real parameters nobody drives.",
+  },
+  {
+    detector: "src/quality/moments.ts::momentsOf",
+    sees: (root) => momentsOf(root, "src/planted/subject.ts").map((site) => site.file),
+    plant: {
+      "src/planted/subject.ts": fixtureText("moment-subject-module"),
+      "src/planted/asks.test.ts": fixtureText("moment-caller-per-test"),
+    },
+    marker: "planted/asks",
+    holdersAppear: "never",
+    holders: ["src/quality/blind-spots.ts", "src/quality/moments.test.ts"],
+    why:
+      "W378's walk reads every test module for calls to a subject's exports, and both holders plant a caller — `blind-spots.ts` as the control for that register's own blind spot, the suite as the proof that a call inside a test and a call at the top of a file are different moments. Written inline, each holder became a caller the register attributed to whatever file held the string.",
   },
   {
     detector: "src/quality/run-residue.ts::reclamationSites",
