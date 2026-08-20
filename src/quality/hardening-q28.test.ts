@@ -11,7 +11,8 @@ import {
   finding,
   unaccountedUnits,
 } from "./hardening-q28";
-import { LEDGER_READERS, weldedLedgerTests } from "./close-gate";
+import { LEDGER_READERS, NOT_A_CLOSING_CHECK, readerDiff, weldedLedgerTests } from "./close-gate";
+import { type NamedCondition, staleOwedConditions } from "./unread-bounds";
 import { SCAN_SITES } from "./scan-text";
 import { EXEMPTIONS, widerThanTheirKey } from "./exemption-reach";
 import { MARKERS } from "./spelling-markers";
@@ -53,12 +54,35 @@ describe("W370 the pass covers the quarter it claims to", () => {
 });
 
 describe("W370 each finding is re-derived, so a fix that came undone fails here", () => {
+  const LEDGER_AT_W370 = [
+    "| Unit | Status | Session | Claimed | SHA | What |",
+    "| --- | --- | --- | --- | --- | --- |",
+    "| W900 | done | builder-B | 2026-01-01T00:00Z | abc1234 | a landed row. |",
+  ].join("\n");
+  const OWED_BY_A_LANDED_ROW: NamedCondition = {
+    bound: "src/planted/q28.ts::PLANTED_BOUND",
+    condition: "a planted condition",
+    reading: { kind: "owed", by: "W900", why: "a planted reason" },
+  };
+
   it("Q28-CR-1: the close gate still cannot reach the checks that read a row's status", () => {
     // The finding, measured rather than remembered. Both files that turned `main` red are on the
     // list the tree itself derives, and neither is a reader the close gate runs.
-    // THE FIX, re-derived: the check that fired at W363's close is now a reader the gate runs.
+    // THE FIX, re-derived — AND W380 RE-AIMED IT. What this pass bought was a CALLABLE: the
+    // comparison came out of its suite and takes the ledger as text, so something other than
+    // `unread-bounds.test.ts` can ask it about a ledger that does not exist yet. That still holds
+    // and is what this arm checks. Where W380 moved it is out of `LEDGER_READERS`: a
+    // difference-reader is blind to a promise owed by the row being closed, because at
+    // `verify:close` that row is already `done` in the file and sits in both of the two runs it
+    // compares. It is read as a truth in the gate's own close case instead — still at the close,
+    // still before the commit, and no longer reporting a sibling's claim to a session that cannot
+    // act on it. The disposition stays `fixed`; what the fix IS moved.
+    expect(staleOwedConditions(LEDGER_AT_W370, [OWED_BY_A_LANDED_ROW])).toHaveLength(1);
     const watched = LEDGER_READERS.map((r) => r.id);
-    expect(watched).toContain("src/quality/unread-bounds.ts::staleOwedConditions");
+    expect(watched).not.toContain("src/quality/unread-bounds.ts::staleOwedConditions");
+    expect(NOT_A_CLOSING_CHECK.map((e) => e.module)).toContain("src/quality/unread-bounds.ts");
+    // Both directions, so the move left no module unwatched and no excuse pointing at nothing.
+    expect(readerDiff(ROOT)).toEqual({ unwatched: [], stale: [] });
     expect(finding("Q28-CR-1").disposition.kind).toBe("fixed");
     // And the WIDER gap is untouched, which the disposition says outright: both files that turned
     // `main` red are still on the derived list of checks the gate cannot call, and the list is

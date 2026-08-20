@@ -23,6 +23,7 @@ import {
 } from "./close-gate";
 import { type ClassAnswer, classDefects } from "./claim-classes";
 import { PLACEHOLDER_SHA } from "./closing-state";
+import { type NamedCondition, staleOwedConditions } from "./unread-bounds";
 
 const ROOT = process.cwd();
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
@@ -186,6 +187,36 @@ describe("W326 the live tree", () => {
     expect(closeGateDefects(ROOT), "closing the row in flight breaks a check").toEqual([]);
   });
 
+  it("reports a promise owed by the row it is closing, which no difference-reader can see", () => {
+    // W380'S MOVE, DRIVEN. `staleOwedConditions` was a `LedgerReader` until this unit — run twice
+    // and diffed — and by the time `verify:close` runs, the closing row is already written `done`
+    // in the file, so a promise owed BY it sits in both runs and is no difference. The gate reads
+    // it as a TRUTH about the ledger as it will be committed instead, and that is the arm above.
+    const ledger = [
+      "| Unit | Status | Session | Claimed | SHA | What |",
+      "| --- | --- | --- | --- | --- | --- |",
+      "| W900 | done | builder-B | 2026-01-01T00:00Z | abc1234 | the row this commit lands. |",
+    ].join("\n");
+    const owed: NamedCondition = {
+      bound: "src/planted/w380.ts::PLANTED_BOUND",
+      condition: "a planted condition",
+      reading: { kind: "owed", by: "W900", why: "a planted reason" },
+    };
+    // Nothing is in flight on this ledger, so every difference-reader is silent and the only thing
+    // that can speak is the truth read.
+    expect(closeGateDefects(ROOT, PLACEHOLDER_SHA, [], ledger, [owed])).toEqual([
+      {
+        reader: "src/quality/unread-bounds.ts::staleOwedConditions",
+        what: "src/planted/w380.ts::PLANTED_BOUND is owed a reading by W900, which has landed",
+      },
+    ]);
+    // The other direction, W102's shape: the same promise over a ledger that holds the row as
+    // CLAIMED says nothing. That is what keeps a sibling's live promise from stopping every other
+    // session in the fleet, and it is the case the reader this replaced got wrong.
+    const inFlight = ledger.replace("| W900 | done | builder-B | 2026-01-01T00:00Z | abc1234 |", "| W900 | claimed | builder-B | 2026-01-01T00:00Z | — |");
+    expect(closeGateDefects(ROOT, PLACEHOLDER_SHA, [], inFlight, [owed])).toEqual([]);
+  });
+
   it("really closes the rows in flight, driven on a ledger of its own", () => {
     // THE MUTATION THAT SURVIVED THE FIRST DRAFT. `closeGateDefects` welded to the real ledger was
     // made to close nothing at all and every test still passed, because the live tree breaks on no
@@ -198,12 +229,14 @@ describe("W326 the live tree", () => {
       why: "y".repeat(130),
       run: (root) => (ledgerAt(root).includes("| W999 | done |") ? ["the planted row closed"] : []),
     };
-    expect(closeGateDefects(ROOT, PLACEHOLDER_SHA, [flips], ledger).map((b) => b.what)).toEqual([
+    // W380: the clock register is defaulted, and this ledger holds none of the units it names.
+    // Handed an empty one so this case stays about the reader it plants, which is what it is for.
+    expect(closeGateDefects(ROOT, PLACEHOLDER_SHA, [flips], ledger, []).map((b) => b.what)).toEqual([
       "the planted row closed",
     ]);
     // And nothing in flight is nothing to close — honest rather than convenient, W315's line.
     const settled = "| W999 | done | builder-A | 2026-08-14T00:00Z | abc1234 | a planted row |";
-    expect(closeGateDefects(ROOT, PLACEHOLDER_SHA, [flips], settled)).toEqual([]);
+    expect(closeGateDefects(ROOT, PLACEHOLDER_SHA, [flips], settled, [])).toEqual([]);
   });
 
   it("states what it does not cover, including the welded checks the Q25 close also broke", () => {

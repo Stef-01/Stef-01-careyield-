@@ -20,8 +20,11 @@ import {
   RUNS_THE_HARNESS,
   runnableSuites,
   statusReadingSuites,
+  hollowExcuses,
   suitesThatFlip,
+  unsimulableCloses,
 } from "./close-sensitivity";
+import { type NamedCondition } from "./unread-bounds";
 import { weldedLedgerTests } from "./close-gate";
 import { closeRow } from "./closing-state";
 import { copyTree, withPlantedInAsync } from "./planting";
@@ -101,9 +104,16 @@ describe("W380 the harness reports a flip, which is the only reason a green run 
           "  });\n" +
           "});\n",
       },
-      () => suitesThatFlip(COPY, ledger, [probe], "W901"),
+      async () => {
+        // W293: BOUND HERE ON PURPOSE. The live arm below asserts `suitesThatFlip` is EMPTY, and
+        // the sweep credits a witness by its producer — a `found` bound to `withPlantedInAsync`
+        // evidences the planter, not the harness. This is the non-empty case for the same source.
+        const flipped = await suitesThatFlip(COPY, ledger, [probe], "W901");
+        expect(flipped, "the harness cannot see a check a close breaks").toEqual([probe]);
+        return flipped;
+      },
     );
-    expect(found, "the harness cannot see a check a close breaks").toEqual([probe]);
+    expect(found).toEqual([probe]);
   }, 300_000);
 
   it("does not report a suite the close leaves alone", async () => {
@@ -147,15 +157,75 @@ describe("W380 the live tree, at a simulated close", () => {
         .filter((row) => row.status === "claimed")
         .map((row) => row.id);
       expect(inFlight.length, "no row is in flight, so this check ran against nothing").toBeGreaterThan(0);
+      // W380 RE-ARGUED THIS ARM ON ITS OWN CLOSE, and the exclusion is derived rather than listed.
+      // A row a clock names as its discharger flips every suite that reads the clock, on every
+      // run, because the discharge lives in that row's own diff and a planted ledger has none of
+      // it. `unsimulableCloses` NAMES those rows; the arm below is about the others.
       for (const unit of inFlight) {
+        const flipped = await suitesThatFlip(COPY, LEDGER, runnableSuites(ROOT), unit);
+        const named = unsimulableCloses(LEDGER).filter((u) => u.unit === unit);
+        if (named.length === 0) {
+          expect(flipped, `closing ${unit} turns a suite that reads a row's status`).toEqual([]);
+          continue;
+        }
+        // AND THE EXCLUSION HAS TO EARN ITSELF. A clock-named row is not waved through: it must
+        // actually turn something, or the exclusion is covering nothing and belongs deleted. This
+        // is the branch that keeps the arm from going quiet on a day when every row in flight is
+        // clock-named — which is the day it would otherwise assert nothing at all.
         expect(
-          await suitesThatFlip(COPY, LEDGER, runnableSuites(ROOT), unit),
-          `closing ${unit} turns a suite that reads a row's status`,
+          hollowExcuses(named, flipped),
+          `${unit} is excused by ${named.map((n) => n.bound).join(", ")} and turns nothing, so the excuse covers nothing`,
         ).toEqual([]);
       }
     },
     2_400_000,
   );
+
+  it("names the rows whose close it cannot simulate, and stays silent when a clock names nobody in flight", () => {
+    // W293: the arm above skips rows, so the skip needs same-producer evidence in BOTH directions
+    // rather than a sentence. Driven on a planted ledger and planted clocks, so it says the same
+    // thing on a day when no row in flight is owed anything.
+    const ledger = [
+      "| Unit | Status | Session | Claimed | SHA | What |",
+      "| --- | --- | --- | --- | --- | --- |",
+      "| W900 | claimed | builder-A | 2026-01-01T00:00Z | — | a row in flight a clock names. |",
+      "| W901 | claimed | builder-B | 2026-01-01T00:00Z | — | a row in flight nothing names. |",
+      "| W902 | done | builder-A | 2026-01-01T00:00Z | abc1234 | a landed row a clock names. |",
+    ].join("\n");
+    const owed = (by: `W${number}`): NamedCondition => ({
+      bound: `src/planted/${by}.ts::PLANTED_BOUND`,
+      condition: "a planted condition",
+      reading: { kind: "owed", by, why: "a planted reason" },
+    });
+    // The row in flight that a clock names is excluded, and the bound that names it is carried so
+    // a reader can go and look at the promise rather than take the exclusion on trust.
+    expect(unsimulableCloses(ledger, [owed("W900")])).toEqual([
+      { unit: "W900", bound: "src/planted/W900.ts::PLANTED_BOUND" },
+    ]);
+    // The other direction, twice. W901 is in flight and no clock names it, so the same call over
+    // the same ledger leaves it out; and W902 is named by a clock but has already LANDED, so its
+    // close is not being simulated at all and that promise is the one `close-gate.test.ts` reads
+    // as a truth.
+    expect(unsimulableCloses(ledger, [owed("W900")]).map((u) => u.unit)).not.toContain("W901");
+    expect(unsimulableCloses(ledger, [owed("W902")])).toEqual([]);
+    // And a clock reading that is not `owed` names nobody, so the filter is a filter.
+    const readBy: NamedCondition = {
+      bound: "src/planted/W900.ts::PLANTED_BOUND",
+      condition: "a planted condition",
+      reading: { kind: "read_by", check: "src/planted/W900.ts::check", how: "a planted how" },
+    };
+    expect(unsimulableCloses(ledger, [readBy])).toEqual([]);
+  });
+
+  it("refuses an excuse that covers nothing, which is the only thing keeping the skip honest", () => {
+    const excused = [{ unit: "W900", bound: "src/planted/W900.ts::PLANTED_BOUND" }];
+    // A row excused and turning NOTHING: the excuse is hollow and the arm must fail on it.
+    expect(hollowExcuses(excused, [])).toEqual(["W900"]);
+    // The same excuse over a row that really does turn a suite: earned, and silent.
+    expect(hollowExcuses(excused, ["src/quality/unread-bounds.test.ts"])).toEqual([]);
+    // And no excuse at all is not a hollow one — an empty answer for the right reason.
+    expect(hollowExcuses([], [])).toEqual([]);
+  });
 });
 
 describe("W380 the bound", () => {

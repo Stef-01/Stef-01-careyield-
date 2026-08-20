@@ -56,12 +56,12 @@ import { stripComments } from "@/security/reachability";
 import { sourceModules, testModules } from "./tree-walks";
 import { copyTree, withPlantedIn } from "./planting";
 import { PLACEHOLDER_SHA, closeRow, unitsInFlight } from "./closing-state";
+import { NAMED_CONDITIONS, type NamedCondition, staleOwedConditions } from "./unread-bounds";
 import { blockedSurfaceViolations } from "./blocked-surface";
 import { staleBounds } from "./bounds";
 import { classDefects } from "./claim-classes";
 import { controlDefects } from "./controls";
 import { FINDINGS as Q25_FINDINGS } from "./hardening-q25";
-import { staleOwedConditions } from "./unread-bounds";
 import { heldByOthers, parseLedgerRows } from "./blocked-surface";
 import { endedDeclarations } from "./self-ending";
 import { CLAIMS, claimDefects } from "./prose-numbers";
@@ -142,12 +142,6 @@ export const LEDGER_READERS: readonly LedgerReader[] = [
       );
       return heldByOthers(ledger, closing);
     },
-  },
-  {
-    id: "src/quality/unread-bounds.ts::staleOwedConditions",
-    why:
-      "W339's clock on a bound's `owed` reading, and W370 is why it is here. The arm refuses a promise aimed at a unit that has LANDED, so a close is the only event that can make it fire — and for a quarter it was welded inside `unread-bounds.test.ts`, where this gate had nothing to call. It fired at W363's close and turned `main` red, then W364's close did the same thing from the other side. `weldedLedgerTests` had been naming both files as unreachable on every run of that quarter.",
-    run: (root) => staleOwedConditions(ledgerOf(root)),
   },
   {
     id: "src/quality/self-ending.ts::endedDeclarations",
@@ -240,6 +234,11 @@ export interface ExcusedReader {
  * lesson: a narrowing nobody can see is one nobody re-reads.
  */
 export const NOT_A_CLOSING_CHECK: readonly ExcusedReader[] = [
+  {
+    module: "src/quality/unread-bounds.ts",
+    why:
+      "W339's owed clock, and W380 moved it OUT of the register above rather than leaving it there. A promise owed by unit U is discharged by U's own diff, and no simulation of U's close contains that diff — so this reader reports the same break on every run for as long as U's row is claimed, to every session in the fleet, and only one of them can act on it. Worse, it is BLIND in the case it was registered for: a difference-reader compares the live ledger against a planted one, and at `verify:close` the closing row is already written `done` in the file, so a promise owed by the row being closed sits in BOTH runs and is not a difference. What catches that promise is the same comparison read as a TRUTH rather than a difference, against the ledger as it will be committed — `closeGateDefects` calls it directly, so `verify:close` still runs it and a mutation that drops the call is caught rather than merely absent, and W339's arm in `unread-bounds.test.ts` reads it over the live tree as well. The module keeps `conditionDefects`, which reads rows for a different question.",
+  },
   {
     module: "src/quality/closing-state.ts",
     why: "W315's harness, and this module's own dependency. It is the thing being run at the close rather than a check the close can break; watching it here would be the tautology W316 exists for.",
@@ -452,8 +451,25 @@ export function closeGateDefects(
   sha: string = PLACEHOLDER_SHA,
   readers: readonly LedgerReader[] = LEDGER_READERS,
   ledger: string = ledgerOf(root),
+  conditions: readonly NamedCondition[] = NAMED_CONDITIONS,
 ): CloseBreak[] {
-  return unitsInFlight(ledger).flatMap((unit) => breaksOnClose(root, unit, readers, ledger, sha));
+  // TWO KINDS OF WRONG, AND W380 ADDED THE SECOND. The first is a DIFFERENCE: a reader that says
+  // something after the close and did not before it. The second is a TRUTH about the ledger as it
+  // will be committed — a clock aimed at a row that has landed. A difference-reader cannot answer
+  // the second, and that is not a gap in the register but a fact about the shape: at this moment
+  // the closing row is already written `done` in the file, so a promise owed BY it sits in both of
+  // the two runs compared and is no difference at all. It was a `LedgerReader` until this unit and
+  // was blind here for exactly that reason, while reporting every OTHER claimed row's promise to
+  // every session in the fleet — a stop none of them could act on, because a promise owed by unit
+  // U is discharged by U's own diff and no planted ledger carries it.
+  const clocks: CloseBreak[] = staleOwedConditions(ledger, conditions).map((what) => ({
+    reader: "src/quality/unread-bounds.ts::staleOwedConditions",
+    what,
+  }));
+  return [
+    ...unitsInFlight(ledger).flatMap((unit) => breaksOnClose(root, unit, readers, ledger, sha)),
+    ...clocks,
+  ];
 }
 
 /** What a green close gate does not prove. */

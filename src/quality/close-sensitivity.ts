@@ -34,6 +34,8 @@ import path from "node:path";
 import { weldedLedgerTests } from "./close-gate";
 import { closeRow } from "./closing-state";
 import { withPlantedInAsync } from "./planting";
+import { NAMED_CONDITIONS, type NamedCondition } from "./unread-bounds";
+import { parseLedgerRows } from "./blocked-surface";
 
 const execFileAsync = promisify(execFile);
 
@@ -146,7 +148,17 @@ export function censusDefects(
 export async function greenAgainst(copy: string, ledger: string, suite: string): Promise<boolean> {
   return withPlantedInAsync(copy, { "BUILD-STATE.md": ledger }, async () => {
     try {
-      await execFileAsync("npx", ["vitest", "run", suite], { cwd: copy, maxBuffer: 1 << 28 });
+      // `nice` AND `--no-file-parallelism`, AND BOTH ARE LOAD-BEARING. A child runs ONE file, so a
+      // worker pool of its own buys it nothing; and this harness runs fifty of them underneath a
+      // parent that is already running the quarter mutation sweeps. Without the two flags the
+      // machine oversubscribed and a PARENT worker missed its `onTaskUpdate` heartbeat — a run in
+      // which all 4,866 tests passed and the gate was still red. Measured rather than guessed: the
+      // same suite with this file excluded was clean, twice. The children are background work and
+      // the parent's heartbeat is not, which is exactly what a nice level is for.
+      await execFileAsync("nice", ["-n", "19", "npx", "vitest", "run", "--no-file-parallelism", suite], {
+        cwd: copy,
+        maxBuffer: 1 << 28,
+      });
       return true;
     } catch {
       return false;
@@ -177,6 +189,63 @@ export async function suitesThatFlip(
   return flipped.sort();
 }
 
+/** An in-flight row whose close this harness cannot simulate, and the clock that says so. */
+export interface UnsimulableClose {
+  unit: string;
+  bound: string;
+}
+
+/**
+ * The in-flight rows a clock names as its discharger.
+ *
+ * W380 FOUND THIS ON ITS OWN CLOSE AND IT IS THE UNIT'S REAL FINDING. A promise owed by unit U is
+ * discharged by U's OWN DIFF — the commit that closes U is the commit that converts the reading.
+ * No simulated close contains that diff: the harness plants a ledger with U's row `done` and
+ * leaves the tree exactly as it stands, so every suite that reads the clock flips, on every run,
+ * for as long as U's row is claimed. The flip is real and the reading is correct; what is wrong is
+ * calling it close-sensitivity, because nothing about U's close caused it.
+ *
+ * So these rows are excluded from the live arm and NAMED rather than filtered — an exclusion
+ * nobody can see is the shape W293 exists for. What still checks the clock is the other half of
+ * W380's move: it is read as a TRUTH at the closer's own close, in `close-gate.test.ts`, where the
+ * row IS `done` in the real file and the diff IS present.
+ */
+export function unsimulableCloses(
+  ledger: string,
+  conditions: readonly NamedCondition[] = NAMED_CONDITIONS,
+): UnsimulableClose[] {
+  const inFlight = new Set(
+    parseLedgerRows(ledger)
+      .filter((row) => row.status === "claimed")
+      .map((row) => row.id),
+  );
+  const out: UnsimulableClose[] = [];
+  for (const condition of conditions) {
+    const reading = condition.reading;
+    if (reading.kind !== "owed") continue;
+    if (!inFlight.has(reading.by)) continue;
+    out.push({ unit: reading.by, bound: condition.bound });
+  }
+  return out.sort((a, b) => (a.unit + a.bound).localeCompare(b.unit + b.bound));
+}
+
+/**
+ * An excused row that turns nothing.
+ *
+ * THE EXCUSE HAS TO EARN ITSELF. `unsimulableCloses` drops a row from the live arm, and a drop
+ * that covers nothing is a drop that should be deleted — so a row it excuses must actually turn a
+ * suite. This was an inline `toBeGreaterThan(0)` until the mutation check: weakening a comparison
+ * inside the only test that makes the claim is a mutant nothing can kill, and lifting it here is
+ * what gives the planted cases something to shoot at.
+ */
+export function hollowExcuses(
+  excused: readonly UnsimulableClose[],
+  flipped: readonly string[],
+): string[] {
+  if (flipped.length > 0) return [];
+  return [...new Set(excused.map((e) => e.unit))].sort();
+}
+
 export const CLOSE_SENSITIVITY_BOUND =
   "IT CLOSES W326's LIMIT AND BUYS A DIFFERENT ONE. The gate could not reach a comparison welded " +
   "inside a `.test.ts`; running the suite reaches every one of them, and costs two suite runs per " +
@@ -187,7 +256,23 @@ export const CLOSE_SENSITIVITY_BOUND =
   "SECOND, IT CANNOT RUN ITSELF, and that exclusion is permanent: this register's suite reads a " +
   "row's status, so it joins its own population, and running it would not terminate. " +
   "`RUNS_THE_HARNESS` names it rather than filtering it quietly — W349's recursion in a third " +
-  "register, and the same admission each time. THIRD, IT CLOSES ONE ROW. A close that breaks a check only when two rows close together — a " +
+  "register, and the same admission each time. IT ALSO RUNS IN A PASS OF ITS OWN, and that is a " +
+  "`package.json` fact rather than a preference: a child vitest run per suite per ledger, " +
+  "underneath a parent " +
+  "already running the quarter mutation sweeps starved the MAIN process, and a worker that misses " +
+  "its `onTaskUpdate` heartbeat fails a run in which every test passed. `nice` and " +
+  "`--no-file-parallelism` on the children were not enough on their own — the same gate went red " +
+  "again once the tree grew — so `pnpm test` runs everything else first and this file second. " +
+  "The cost is a second vitest startup; the gain is that the gate stops depending on how many " +
+  "cores the machine happened to have. THIRD, A CLOCK-NAMED ROW IS EXCUSED AND THE " +
+  "EXCUSE IS COARSER THAN THE FLIP IT COVERS. A promise owed by unit U is discharged by U's own " +
+  "diff, which no simulated close contains, so `unsimulableCloses` drops that row from the live " +
+  "arm — and it drops the WHOLE row, not just the suites the clock explains. A defect that " +
+  "closing U really would cause, in a suite that reads nothing about the promise, is invisible " +
+  "for as long as U is claimed. What holds the excuse honest is that it must earn itself: a " +
+  "row it excuses has to turn something, or the arm fails for covering nothing. What would " +
+  "close it properly is attributing a flip to the clock that explains it, which needs the " +
+  "suite to say WHICH reading turned it and no suite says that today. THIRD, IT CLOSES ONE ROW. A close that breaks a check only when two rows close together — a " +
   "sibling's and this session's — is invisible here, and W315's rule is why the harness works one " +
   "unit at a time: closing both would let one builder's defect read as the other's. THIRD, A " +
   "SUITE THAT WAS ALREADY RED IS SKIPPED RATHER THAN REPORTED, which is right and means this says " +
