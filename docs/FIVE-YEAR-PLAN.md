@@ -870,6 +870,47 @@ Q24's was wrong and its four replacements worked. **Q29 adds no blocked row.**
 - **W376** The populations re-read — this quarter's gate → verify: every population `docs/HORIZON-Q29.md` names is derived, and is shown both including a planted member and excluding a planted non-member; a population named and not shown both ways fails.
 - **W377** **QUARTER CLOSE.** Q30 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
 
+## 5o. Year 7 — Q30 (W378–W390)
+
+Expanded by W377 on 2026-08-20 under the §6 horizon rule, from `docs/AUDIT-Y5.md` and
+`docs/GATE-DOSSIER-Y5.md` — and from `src/quality/hardening-q28.ts` and the Q29 ledger rows, which
+are newer than both and are where the theme comes from. **One quarter, not a year.** See
+`docs/HORIZON-Q30.md` for the rule's six preconditions evaluated one at a time, and for the gate
+position recorded at this expansion.
+
+**Q30 — when the check runs.** Q29 asked what each check is over, and its units landed: the
+populations are derived, the empty ones argued, the product's own rules measured against a synthetic
+panel. What the quarter kept finding on the way is a different property, and Q28's hardening pass
+had already named it in one sentence — **it fails toward green, and it did so twice on `main` in one
+day**. Both of those checks read a ledger row's STATUS, so both could only go wrong AT THE CLOSE,
+and the close is the one commit whose suite is easiest not to re-run. Q29 then hit the same shape
+from four directions: W375 found the temp-directory sweep wired to `teardown` alone — the hook an
+interrupted run never reaches, which is the only case it exists for; W371 found a citation register
+whose rows resolved a test title and ran nothing, and two rows that still cannot be run because
+their comparison is welded inside a `.test.ts`; W367 found an import cycle whose symptom is
+`undefined` rather than a build error, so which file the graph is entered through decides the
+answer; and W376 found a scan reading a string literal in a register that exists to re-read
+populations. **A check is not only a comparison over a population. It is a comparison over a
+population AT A MOMENT**, and this tree has never written the moment down. W370 derived that fifty
+files hold a comparison nothing outside them can drive, measured it on every run of the quarter it
+cost two reds, and failed nothing because of it. So every unit below takes a check and establishes
+when it runs, whether that moment can see the failure it is for, and whether it can be run from
+anywhere else. **Q30 adds no blocked row.**
+
+- **W378** [P] The moment register: for every check in W267's census, when it runs → verify: every census member carries the moment it answers at — file load, per test, run setup, run teardown, or the gate's own hook — derived from the harness rather than declared; a member whose moment nothing can name fails.
+- **W379** [P] A comparison welded inside a test file, and the ones that can be moved out → verify: W370's fifty re-derived, each classified as movable or inherent with the change that would move it; one moved as the driven case, and the register shown reporting a comparison that has come back inside a `.test.ts`.
+- **W380** The close is the moment nobody re-runs → verify: every check whose answer depends on a ledger row's status enumerated and driven at a simulated close; a check that passes before the close and fails after it is reported, and W326's own welded-check limit is closed or re-argued.
+- **W381** [P] Module-evaluation order as a correctness condition → verify: every import cycle in `src/` derived, each classified by whether a value crosses it; a cycle whose symptom is `undefined` at module-eval is reported, and W367's own case is driven both ways.
+- **W382** [P] A hook wired to a moment its case never reaches → verify: every process hook and lifecycle callback enumerated with the event it answers to and the failure it exists for; one whose failure cannot reach its moment is reported, with W375's teardown-only sweep as the driven case.
+- **W383** Q29's hardening pass → verify: `code-review`, `security-review` and `simplify` over W365–W377; every finding disposed with a clock per W318; the pass's own bound stated.
+- **W384** [P] What a page RENDERS, not what it computes → verify: every console page's zero states derived from what the component renders rather than from the expressions it calls; a zero rendered as a list, an empty state or a sentence is in the population, and W361's stated gap — a page that renders a number some other way — is closed against the derivation or re-argued against it.
+- **W385** [P] Once per file or once per run → verify: every check that reads shared mutable state enumerated with which it needs; a check that is order-dependent across files is reported, and one is driven by running its file alone and with the suite.
+- **W386** The survivors register over Q29's modules → verify: W349's run over every module Q29 added, each survivor named with its kind and its argument, the modules the harness cannot reach declared and resolved, and the sampler's share of that population measured.
+- **W387** [P] The product's moments: when a rule decides about a patient → verify: every product rule that selects patients carries the moment its decision is taken and the moment its inputs were read; a rule deciding on state older than its own guard is reported, resolved against the synthetic set.
+- **W388** [P] A citation resolved but never run, everywhere else → verify: W371's `drivesItsCheck` shape applied to every citing register in the tree; each citation either resolved to something runnable and CALLED, or named with the change that would make it callable.
+- **W389** The moments re-read — this quarter's gate → verify: every moment `docs/HORIZON-Q30.md` names is derived, and is shown both catching a failure that happens at that moment and staying silent about one that happens at another; a moment named and not shown both ways fails.
+- **W390** **QUARTER CLOSE.** Q31 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
 ## 6. Horizon rule (supersedes the five-year expansion rule, W260)
 
 **The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,

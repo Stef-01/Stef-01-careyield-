@@ -260,6 +260,7 @@ export const DECLARED_COPIES: readonly DeclaredCopy[] = [
     ["horizon-q27", "Q27"],
     ["horizon-q28", "Q28"],
     ["horizon-q29", "Q29"],
+    ["horizon-q30", "Q30"],
   ].map(([file, quarter]) => ({
     file: `src/quality/${file}.test.ts`,
     parse: "the ledger row parse",
