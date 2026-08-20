@@ -114,21 +114,34 @@ describe("W377 the document reads the ledger it claims to read", () => {
     // `claimed` only: W56 has been `in-progress` since Year 1 with continuation notes, which is a
     // state of the ledger rather than a session holding a row, and pricing it as in flight would
     // exempt a row nobody is working on.
+    // W374: THIS REQUIRED THE NAMED ROW TO STILL BE `claimed`, which is the mistake the paragraph
+    // below cites W364 for, one line up and pointed at a SIBLING's row instead of this unit's own.
+    // A row that was in flight at the expansion is a row somebody held at that moment, and its
+    // closing does not un-happen it — so what the ledger must still hold is the ROW, not the
+    // status. A name that resolves to nothing is the defect; a name that has since landed is the
+    // list working.
     const held = asAtHorizon().filter((r) => r.status === "claimed");
     for (const id of IN_FLIGHT_AT_EXPANSION) {
+      const row = asAtHorizon().find((r) => r.id === id);
+      expect(row, `${id} is named as in flight and the ledger holds no such row`).toBeDefined();
       expect(
-        held.map((r) => r.id),
-        `${id} is named as in flight and the ledger does not hold it that way`,
-      ).toContain(id);
+        row?.n,
+        `${id} is named as in flight and it is this expansion's own closing row`,
+      ).not.toBe(Q30_HORIZON_LAST_UNIT);
     }
     // THE CLOSING ROW IS NOT A SIBLING'S — W364's correction, carried forward rather than
     // rediscovered. Its first version required the claimed set to BE its own row, so it held while
     // the unit was in flight and failed the moment it closed. What is claimed is that nobody ELSE
     // held a row except the one the list names.
-    const claimedByOthers = held
-      .filter((r) => r.n !== Q30_HORIZON_LAST_UNIT && !IN_FLIGHT_AT_EXPANSION.includes(r.id))
-      .map((r) => r.id);
-    expect(claimedByOthers, "a row was in flight and the list does not name it").toEqual([]);
+    const others = (rows: readonly Row[]): string[] =>
+      rows
+        .filter((r) => r.n !== Q30_HORIZON_LAST_UNIT && !IN_FLIGHT_AT_EXPANSION.includes(r.id))
+        .map((r) => r.id);
+    // W293's rule, and W374 is why it is here: once the named row closed, `held` emptied and the
+    // assertion below became an empty list over a source that is empty by construction. Shown
+    // holding one first, on the same producer, so the emptiness is a reading.
+    expect(others([...held, { id: "W999", n: 999, status: "claimed" } as Row])).toEqual(["W999"]);
+    expect(others(held), "a row was in flight and the list does not name it").toEqual([]);
     // And the exemption is load-bearing: counting W374 as done moves the number the document states.
     const counted = asAtHorizon().filter(
       (r) => r.status === "done" || r.n === Q30_HORIZON_LAST_UNIT || IN_FLIGHT_AT_EXPANSION.includes(r.id),
