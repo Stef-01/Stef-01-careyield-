@@ -84,7 +84,12 @@ export function handListedRegisters(root: string): string[] {
   for (const file of sourceModules(root)) {
     const rel = path.relative(root, file).split(path.sep).join("/");
     const code = prepareForScan(readFileSync(file, "utf8"), { literals: "kept" });
-    for (const m of code.matchAll(/export const ([A-Z][A-Z0-9_]*): readonly [^=]+= \[([\s\S]*?)\n\];/g)) {
+    // THE NEWLINE AFTER THE BRACKET IS LOAD-BEARING. Without it an EMPTY register written
+    // `= [];` on one line has no `\n];` of its own, so the non-greedy body ran forward to the next
+    // array's terminator and swallowed every declaration in between — the empty register was
+    // reported and the real one after it was invisible. W374 planted an empty register beside a
+    // real one and this scan reported exactly the wrong one of the two.
+    for (const m of code.matchAll(/export const ([A-Z][A-Z0-9_]*): readonly [^=]+= \[\n([\s\S]*?)\n\];/g)) {
       if (NAMES_A_MODULE.test(m[2]!)) found.push(`${rel}::${m[1]}`);
     }
   }
@@ -124,15 +129,9 @@ export const LISTED_REGISTERS: readonly ListedRegister[] = [
   { id: "src/quality/claim-classes.ts::CLASS_ANSWERS", membership: callable("src/quality/claim-classes.ts::classDefects") },
   { id: "src/quality/close-gate.ts::NOT_A_CLOSING_CHECK", membership: callable("src/quality/close-gate.ts::readerDiff") },
   { id: "src/quality/controls.ts::CONTROL_ANSWERS", membership: callable("src/quality/controls.ts::controlDefects") },
+  { id: "src/quality/declaration-tax.ts::EDIT_SITES_AT_W308", membership: welded("src/quality/declaration-tax.test.ts") },
   { id: "src/quality/declaration-tax.ts::DEMANDS", membership: callable("src/quality/declaration-tax.ts::taxDiff") },
   { id: "src/quality/declaration-tax.ts::DECLARATION_HOMES", membership: callable("src/quality/declaration-tax.ts::homeDiff") },
-  {
-    id: "src/quality/declaration-tax.ts::MOVED_SINCE_W313",
-    membership: {
-      kind: "not_derivable",
-      why: "A FROZEN RECORD, and freezing it is the point. W313 measured the declaration tax at a moment; a later unit that moves a declaration adds a row here rather than editing the measurement, because a record somebody edits to match the tree is not a record — it is the tree, written twice. A derivation would produce today's positions, which is precisely the number this register exists NOT to hold.",
-    },
-  },
   {
     id: "src/quality/exemption-reach.ts::EXEMPTIONS",
     membership: {
@@ -151,6 +150,14 @@ export const LISTED_REGISTERS: readonly ListedRegister[] = [
   { id: "src/quality/populations.ts::POPULATIONS", membership: callable("src/quality/populations.ts::populationDefects") },
   { id: "src/quality/private-copies.ts::DECLARED_COPIES", membership: callable("src/quality/private-copies.ts::copyDefects") },
   { id: "src/quality/prose-numbers.ts::CLAIMS", membership: callable("src/quality/prose-numbers.ts::claimDefects") },
+  { id: "src/quality/quarter-mutants-q28.ts::EXCLUDED_AT_W374", membership: callable("src/quality/quarter-mutants-q28.ts::populationDefects") },
+  {
+    id: "src/quality/quarter-mutants-q28.ts::CLOSED_BY_W374",
+    membership: {
+      kind: "not_derivable",
+      why: "The mutants a run found and closed. It is a RECORD OF AN EVENT — a sweep that happened once, over a tree that has since changed — and no walk of the tree today could reproduce it: the whole point of three of its four rows is that the line they name is still there and now has an assertion over it, and of the fourth that the line is gone. Deriving it would mean re-running the sweep, which is the thing the record exists to save.",
+    },
+  },
   { id: "src/quality/quarter-mutants-q26.ts::EXCLUDED_AT_W349", membership: callable("src/quality/quarter-mutants-q26.ts::populationDefects") },
   { id: "src/quality/quarter-mutants-q27.ts::EXCLUDED_AT_W362", membership: callable("src/quality/quarter-mutants-q27.ts::populationDefects") },
   { id: "src/quality/quarter-mutants-q27.ts::UNMUTATED_AT_W362", membership: callable("src/quality/quarter-mutants-q27.ts::populationDefects") },

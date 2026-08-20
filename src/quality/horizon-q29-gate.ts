@@ -41,6 +41,7 @@ import { emptyRegisters } from "./empty-populations";
 import { consoleRoutes } from "./reached-pages";
 import { handListedRegisters } from "./derivable-lists";
 import { patientRules } from "./patient-populations";
+import { q28Population } from "./quarter-mutants-q28";
 import { reclamationSites } from "./run-residue";
 
 /** The quarter's horizon, as the tree spells it. */
@@ -352,7 +353,19 @@ export const POPULATIONS_AT_W376: readonly QuarterPopulation[] = [
   },
   {
     unit: asUnitId("W374"),
-    standing: { kind: "not_landed", module: "src/quality/quarter-mutants-q28.ts" },
+    standing: {
+      kind: "population",
+      derivation: "src/quality/quarter-mutants-q28.ts::q28Population",
+      member: "a module Q28 added that has a sibling suite",
+      nonMember: "the module whose sibling suite is itself a mutation sweep, which the register excuses by name",
+      probe: (root) => {
+        const swept = q28Population(root);
+        return {
+          memberSeen: swept.includes("src/quality/superset.ts"),
+          nonMemberSeen: swept.includes("src/quality/quarter-mutants-q27.ts"),
+        };
+      },
+    },
   },
   {
     unit: asUnitId("W375"),

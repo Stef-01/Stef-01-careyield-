@@ -451,6 +451,31 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/quarter-mutants-q28.ts::Q28_MUTANT_BOUND",
+    condition: "a module can be riddled with holes none of the five reaches",
+    reading: {
+      kind: "not_observable",
+      why: "The mutation space is not enumerable and no instrument in this tree bounds it. Five operators find what five operators find; a sixth would widen the population and say nothing about the sixth-and-first gap. What CAN be observed is the other half of the sentence — a module the operators find nothing to change in — and that half is read on every run by `populationDefects`, which walks the whole population looking for one rather than trusting the register.",
+    },
+  },
+  {
+    bound: "src/quality/quarter-mutants-q28.ts::Q28_MUTANT_BOUND",
+    condition: "THE EXCLUSION IS PERMANENT AND GROWING",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/quarter-mutants-q28.ts::populationDefects",
+      how: "THE GAP THE SENTENCE NAMES IS THE ONE THING HERE THAT IS READ. The exclusion is not a note: the row names a module and the suite that makes it unreachable, and `populationDefects` reports an exclusion for a module the quarter did not add, one whose stated reason the tree contradicts, and a module with no sibling suite that nothing excuses. So the list cannot grow quietly — a second harness in a quarter has to be argued in writing — and it cannot shrink quietly either, which is what would happen if somebody changed the instrument and left the row. What no check can settle is whether the growth ever STOPS, because that is a property of building each quarter's sweep out of the last one.",
+    },
+  },
+  {
+    bound: "src/quality/quarter-mutants-q28.ts::Q28_MUTANT_BOUND",
+    condition: "A CAUGHT MUTANT IS NOT A TESTED LINE",
+    reading: {
+      kind: "not_observable",
+      why: "A red suite says some assertion noticed the change; nothing in the run says WHICH, and mapping a failure back to the assertion that caused it would be a different instrument — one that attributes a red to a line rather than counting reds. W296 stated this about the standing sample and four quarters of sweeps have inherited it unchanged, which is the mark of a limit in the kind of measurement rather than in this run of it.",
+    },
+  },
+  {
     bound: "src/quality/exemption-reach.ts::REACH_BOUND",
     condition: "An exemption welded inside a function",
     reading: {

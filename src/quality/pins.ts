@@ -323,6 +323,44 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/quarter-mutants-q28.ts",
+    name: "QUARTER_AT_W374",
+    classification: {
+      kind: "range_bound",
+      why: "W352 to W364, which is what the ledger holds and cannot change: a quarter is thirteen rows and this one is closed. The suite resolves both ends against the ledger rather than trusting the constant, so a range naming a unit the ledger does not hold fails — and that is the only way this pin can be wrong, because the range is history rather than a measurement of a tree that moves.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q28.ts",
+    name: "EXCLUDED_AT_W374",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "the excused module's sibling suite ceasing to be a mutation sweep, or another module of the quarter acquiring one",
+      whyStopping:
+        "ONE ROW, AND IT IS THE THIRD QUARTER RUNNING THAT IT IS THE SAME SHAPE. Each quarter that sweeps the previous quarter adds a module whose sibling suite is itself a sweep, so this list grows by exactly one per quarter and never shrinks. A row leaving means the instrument changed — something can now run a suite without spawning that suite's own sweep — and a row arriving means a second module of the quarter has become a harness. Neither can be satisfied by retyping a digit: the row names a module and a suite and both are resolved against the tree on every run.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q28.ts",
+    name: "UNMUTATED_AT_W374",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a module in the population losing every line one of W296's five operators matches",
+      whyStopping:
+        "EMPTY, AND THE EMPTINESS IS A MEASUREMENT. Q27 had one such module and had to name it so it could not read as cleared; every one of Q28's eleven reachable modules yields at least one mutant, the fewest being two. A module joining this list has lost the last line the operators can reach, which means the empty survivor register beside it stopped covering that module — worth a build stopping for, and the suite walks the whole population looking for one rather than trusting the list.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q28.ts",
+    name: "SURVIVORS_AT_W374",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a mutant surviving the quarter's suites, or a declared survivor being caught",
+      whyStopping:
+        "EMPTY, AND THE EMPTINESS IS THE CLAIM. Every mutant the quarter's reachable modules yield was run and four survived; all four were closed in the unit that found them rather than recorded, because W357 showed what recorded remedies are worth — four written into survivor registers and never built, the oldest since W296. `CLOSED_BY_W374` names them and where each fix landed. A survivor arriving is a hole somebody has to read; a declared one being caught means the register describes a suite that has moved. Neither can be satisfied by retyping a digit: the run below re-derives it.",
+    },
+  },
+  {
     module: "src/quality/quarter-mutants-q27.ts",
     name: "UNMUTATED_AT_W362",
     classification: {

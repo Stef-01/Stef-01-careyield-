@@ -128,6 +128,14 @@ export const ARGUED_EQUALITIES: readonly ArguedEquality[] = [
     why: "The same shape as W296's row below and right for the same reason: a NAMED LIST of surviving mutants, each with a kind and an argument. A new survivor over the quarter's modules cannot be absorbed by editing a total — it has to be described, and describing it means reading the change nothing noticed. That is exactly what the frozen-number shape allows and this does not.",
   },
   {
+    id: "src/quality/quarter-mutants-q28.test.ts :: catches every mutant but the ones this register names :: SURVIVORS_AT_W374",
+    why: "W332's row and W349's, two quarters on and right for the same reason: a NAMED LIST of surviving mutants, each with a kind and an argument. A new survivor over Q28's modules cannot be absorbed by editing a total — it has to be described, and describing it means reading the change nothing noticed. W374 is the case in point: the run found four, and closing them meant reading each one rather than counting them.",
+  },
+  {
+    id: "src/quality/quarter-mutants-q28.test.ts :: is smaller than what the quarter added, and says which module by name :: EXCLUDED_AT_W374",
+    why: "THE SAME SHAPE POINTED AT AN EXCLUSION. The equality is against a length, and it is the one place a count is the honest form: the assertion beside it names the excluded module outright, so the number cannot move without a name moving with it. A module joining the exclusion list is a second harness in the quarter and has to be argued in writing; a module leaving means the instrument changed. Neither is a digit somebody retypes.",
+  },
+  {
     id: "src/quality/quarter-mutants-q26.test.ts :: catches every mutant but the ones this register names :: SURVIVORS_AT_W349",
     why: "W332's row above, one quarter on and right for its reason: a NAMED LIST of surviving mutants, each with a kind and an argument. A new survivor over Q26's modules cannot be absorbed by editing a total — it has to be described, and describing it means reading the change nothing noticed. W349 is the case in point: the run found three, and one of them was a hole W332 had already described in another module.",
   },

@@ -114,6 +114,7 @@ import { PRIVATE_COPY_BOUND, SHARED_PARSES } from "./private-copies";
 import { PLANTED_NAMES, TYPED_NAME_BOUND } from "./typed-names";
 import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SELF } from "./hardening-q26";
 import { Q28_HARDENING_BOUND } from "./hardening-q28";
+import { Q28_MUTANT_BOUND } from "./quarter-mutants-q28";
 import { Q27_HARDENING_BOUND } from "./hardening-q27";
 import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
 import { HORIZON_CLAIM_BOUND, Q27_CLAIMS } from "./horizon-claims";
@@ -771,6 +772,28 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'the only mechanical thing standing behind it' is one thing — the unit of the sentence rather than a count of anything the tree holds. It stays one however many tokens the horizon quotes.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/quarter-mutants-q28.ts",
+    name: "Q28_MUTANT_BOUND",
+    unit: "W374",
+    text: Q28_MUTANT_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Every clause is a property of what a mutation sweep IS. Five operators are not the mutation space; a quarter's own modules are not the quarter's lines; a header is the only thing that says which quarter a module belongs to; a red suite says some assertion noticed and not which. The clause this quarter adds — that the exclusion is permanent and growing — is inherent to a harness whose population contains the previous harness: each run adds a module whose sibling suite is a sweep, and only a different instrument, one that runs a suite without spawning that suite's own sweep, would change it.",
+    },
+    numbers: [
+      {
+        word: "five",
+        kind: "fixed_by_a_gate",
+        why: "W296's operator set, which this module reads and does not measure. It is five because that register declares five, and a sixth arrives only with a unit that would rewrite this sentence anyway.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'loses exactly one module of its own making every time it runs' — a rate per quarter rather than a count of anything the tree holds. It stays one however many quarters follow.",
       },
     ],
   },

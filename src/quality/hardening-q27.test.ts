@@ -90,6 +90,11 @@ describe("W360 each finding is re-derived, so a fix that came undone fails here"
     const suite = read("src/quality/self-ending.test.ts");
     expect(suite, "the derivation is named and not called").toContain("proseWaits(root)");
     expect(suite).toContain("proseWaitDefects(");
+    // W374's sweep found the lookup itself unprotected: flipping `f.id === id` to `!==` returns
+    // the first finding that is NOT the one asked for, and every assertion here passed because the
+    // neighbour it returned happened to be `fixed` too. A lookup nobody checks the identity of is
+    // a lookup that can return anything.
+    expect(finding("Q27-CR-1").id).toBe("Q27-CR-1");
     expect(finding("Q27-CR-1").disposition.kind).toBe("fixed");
   });
 

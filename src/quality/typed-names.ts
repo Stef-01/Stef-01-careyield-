@@ -191,10 +191,6 @@ export const PLANTED_NAMES: readonly PlantedName[] = [
     why: "W376's reading of W366: a scan site with no marker declaring how it matches, handed to `censusDefects` so the missing-marker arm can be shown reporting and then shown silent once a marker names it.",
   },
   {
-    value: "src/quality/quarter-mutants-q28.ts",
-    why: "The module W374 will write. W376's gate records that unit as not landed and DERIVES that from the tree rather than from a ledger status that moves while the suite runs; the name is fabricated until the unit ships, at which point this register reports it and the gate must grow a probe.",
-  },
-  {
     value: "W9999",
     why: "W289's drive hands a register a unit id no ledger will ever hold, so the arm that reports an unresolvable unit can be shown firing. A four-digit unit is out of this plan's reach by construction.",
   },

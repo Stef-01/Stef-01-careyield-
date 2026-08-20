@@ -62,6 +62,31 @@ describe("W353 the tree's selectors", () => {
   });
 });
 
+describe("W353 a `narrows` row must actually narrow", () => {
+  it("answers strictly more on the honest input than on the degenerate one", () => {
+    // W374's sweep found this: `behaviourOf` returns "narrows" whenever the degenerate answer is
+    // not GREATER than the honest one, so a selector answering the same thing on both — or
+    // nothing on either — reads as narrowing. Flipping `=== null` to `!== null` in the
+    // `claimCommit` row made its honest reading zero, equal to its degenerate reading, and every
+    // assertion here stayed green. A wrong answer that looks like the right one is this register's
+    // own subject, arriving in the register.
+    for (const selector of SELECTORS) {
+      if (selector.expected !== "narrows") continue;
+      const honest = selector.honest(ROOT);
+      let degenerate: number | "refuses";
+      try {
+        degenerate = selector.degenerate(ROOT);
+      } catch {
+        continue;
+      }
+      if (degenerate === "refuses") continue;
+      expect(honest, `${selector.name} narrows by answering nothing on the honest input`).toBeGreaterThan(
+        degenerate,
+      );
+    }
+  });
+});
+
 describe("W353 the driven case: W349's mis-call", () => {
   it("refuses a range whose ends are not numbers", () => {
     // THE REPRODUCTION. Before this unit the same call returned every module under `src/` — every

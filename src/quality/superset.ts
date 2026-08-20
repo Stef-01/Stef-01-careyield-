@@ -147,10 +147,21 @@ import { TREE_DERIVED_REGISTERS } from "./manifest";
 import type { TreeDerivedRegister } from "./register-census";
 import { SHARED_PARSES, privateCopies } from "./private-copies";
 import { QUARTER_AT_W332, quarterModules } from "./quarter-mutants";
-import { GIT_LOG, claimCommit } from "./timelines";
+import { claimCommit } from "./timelines";
 import { sourceModules } from "./tree-walks";
 import { directions } from "./failure-direction";
 import { nameSites } from "./typed-names";
+
+/**
+ * A log holding one unit's claim, for the selector below.
+ *
+ * W374: constructed rather than read, because the tree the sweep runs in has no git history and a
+ * row whose honest reading comes back empty there is a row that cannot narrow.
+ */
+const CLAIM_LOG = [
+  { sha: "0000001", at: "2026-08-18T10:00:00+00:00", subject: "W352: claim — which way each register fails" },
+  { sha: "0000002", at: "2026-08-18T12:00:00+00:00", subject: "W352: which way each register fails" },
+];
 
 export const SELECTORS: readonly Selector[] = [
   {
@@ -228,8 +239,14 @@ export const SELECTORS: readonly Selector[] = [
   {
     name: "src/quality/timelines.ts::claimCommit",
     what: "the commit that opened a unit's work, out of the log",
-    honest: (root) => (claimCommit(GIT_LOG(root), "W352") === null ? 0 : 1),
-    degenerate: (root) => (claimCommit([], "W352") === null ? 0 : 1),
+    // W374: THE HONEST INPUT IS A FABRICATED LOG, NOT THE AMBIENT ONE. This row used to read
+    // `GIT_LOG(root)`, which is empty in a copied tree because `copyTree` does not copy `.git` — so
+    // its honest reading was zero there, equal to its degenerate reading, and `behaviourOf` calls
+    // equal "narrows". The row agreed with itself in the one place the mutation sweep runs, and
+    // W374's sweep is what found it. A selector whose honest input depends on the ambient tree is a
+    // selector that measures nothing where it is measured.
+    honest: () => (claimCommit(CLAIM_LOG, "W352") === null ? 0 : 1),
+    degenerate: () => (claimCommit([], "W352") === null ? 0 : 1),
     expected: "narrows",
     why:
       "An empty log opens no window, and `workWindow` then answers `null` rather than guessing one — which is the state W344's register calls `unreadable` and reports as itself rather than folding into a verdict.",

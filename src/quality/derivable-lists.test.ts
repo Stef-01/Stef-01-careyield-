@@ -119,6 +119,7 @@ describe("W372 the hand-listed registers, against what the tree could derive", (
       "src/privacy/erasure-y5.ts::ERASURE_PATHS",
       "src/privacy/record-classes.ts::RECORD_CLASSES",
       "src/quality/acceptances.ts::ACCEPTANCE_REGISTERS",
+      "src/quality/declaration-tax.ts::EDIT_SITES_AT_W308",
       "src/quality/tautology-sweep.ts::ACCEPTED_TAUTOLOGIES",
       "src/quality/unit-headers.ts::ADOPTED_MODULES",
       "src/security/page-reach.ts::DORMANT_MODULES",

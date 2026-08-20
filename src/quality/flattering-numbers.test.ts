@@ -92,6 +92,32 @@ describe("W354 the worked example: W340's thirty-five", () => {
     expect(resolved).toBeGreaterThan(0);
   });
 
+  it("excludes a fact's own module from its readers, and requires the name to appear", () => {
+    // W374's sweep found both halves of this line unprotected: flipping `!==` to `===` and `&&` to
+    // `||` each left every assertion above green, because they all read the DIRECTION the count
+    // moves and both mutants move it the same way. A direction is the finding; the reader set is
+    // what produces it, and it was pinned by nothing.
+    const facts = servedFacts(ROOT);
+    const scanned = textScannedFacts(ROOT, facts);
+    expect(scanned.length).toBeGreaterThan(0);
+
+    // `!==`: a module is not a reader of the fact it serves. With `===` the filter keeps exactly
+    // the fact's own module, which mentions its own name in its own declaration.
+    for (const fact of scanned) {
+      const [module] = fact.id.split("::");
+      expect(fact.readers, `${fact.id} lists its own module as a reader`).not.toContain(module);
+    }
+
+    // `&&`: BOTH halves have to hold. With `||` the filter keeps every file that is not the fact's
+    // own, so every fact would come back with the SAME number of readers — one less than the tree.
+    // Counted against each other rather than against a walk of the tree: this file has no business
+    // recursing, and the first draft of this assertion made it a walker W267 had to declare.
+    const widths = new Set(scanned.map((f) => f.readers.length));
+    expect(widths.size, "every fact has the same reader count, so the name test is doing nothing").toBeGreaterThan(
+      1,
+    );
+  });
+
   it("is the same measurement this register takes of everything else", () => {
     const facts = servedFacts(ROOT);
     expect(

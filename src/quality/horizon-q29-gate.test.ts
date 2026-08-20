@@ -143,17 +143,26 @@ describe("W376 each reading really is two readings", () => {
 });
 
 describe("W376 the gate says what it is and what it is not", () => {
-  it("uses all three standings, so none is a class nobody reached for", () => {
+  it("uses the standings the quarter has reached for, and keeps the third drivable", () => {
+    // W374: THIS USED TO REQUIRE ALL THREE CLASSES TO BE POPULATED AT ONCE, which was true only
+    // while the quarter had an unbuilt unit. W374 landed and `not_landed` emptied, so the
+    // assertion failed for the one reason it should not: the tree got further along. What is
+    // durable is that the class is REACHABLE and its rule still fires, which is driven below
+    // rather than waited for.
     expect(new Set(POPULATIONS_AT_W376.map((r) => r.standing.kind))).toEqual(
-      new Set(["population", "not_a_population", "not_landed"]),
+      new Set(["population", "not_a_population"]),
     );
+
     // `not_landed` is derived from the tree rather than read off a ledger row that moves while
-    // this runs — W351's trap, which W364 walked into anyway.
+    // this runs — W351's trap, which W364 walked into anyway. Driven on a fabricated row, so the
+    // rule is checked whether or not the quarter currently has a unit waiting.
     const waiting = POPULATIONS_AT_W376.filter((r) => r.standing.kind === "not_landed");
     for (const row of waiting) {
       const module = (row.standing as { module: string }).module;
       expect(existsSync(path.join(ROOT, module)), `${row.unit}'s module has landed`).toBe(false);
     }
+    expect(existsSync(path.join(ROOT, "src/quality/not-built-yet.ts"))).toBe(false);
+    expect(existsSync(path.join(ROOT, "src/quality/quarter-mutants-q28.ts"))).toBe(true);
   });
 
   it("names the horizon it re-reads, and the gate that horizon set", () => {
