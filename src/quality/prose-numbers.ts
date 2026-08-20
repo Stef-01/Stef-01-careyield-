@@ -307,6 +307,9 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // its own, which is this register reporting its own classification. History —
   // the guard re-derives the ratio on every run, so the sentence is the reason and the register is
   // the check.
+  // W375: what two people found by reading a disk, at the moments they read it. History about
+  // those readings rather than a measurement this tree maintains — nothing here opens `/tmp`.
+  { module: "src/quality/run-residue.ts", text: "426 copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/bounds.ts", text: "two bounds", resolution: { kind: "at_the_unit" } },
   // W367: what the import cycle blanked while the unit was being built, not a count of anything now.
   { module: "src/quality/subject-and-walk.ts", text: "three bounds", resolution: { kind: "at_the_unit" } },

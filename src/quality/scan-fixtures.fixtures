@@ -299,3 +299,29 @@ interface Row {
 export const PLANTED_LIST: readonly Row[] = [
   { path: "src/quality/a.ts", why: "a planted row" },
 ];
+
+=== call-in-a-string ===
+function refuses(): void {
+  throw new Error("Plant into copyTree(root) instead.");
+}
+
+=== call-under-a-backtick ===
+/** Prose about `tmp` that opens a backtick pair the scanner must not read as code. */
+function sweeps(): void {
+  return;
+}
+function calls(): void {
+  sweeps();
+}
+
+=== removal-by-rmsync ===
+import { rmSync } from "node:fs";
+export function clears(dir: string): void {
+  rmSync(dir, { recursive: true, force: true });
+}
+
+=== removal-by-promise ===
+import { rm } from "node:fs/promises";
+export async function clears(dir: string): Promise<void> {
+  await rm(dir, { recursive: true, force: true });
+}

@@ -36,6 +36,7 @@ import { diffCensus, discoverSurfaces, parseCensus } from "@/compliance/surfaces
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
+import { RECLAMATION_AT_W375, residueDefects as tempResidueDefects } from "./run-residue";
 import { RULES_AT_W373, ruleDefects } from "./patient-populations";
 import { REACHED_AT_W371, reachedDefects } from "./reached-pages";
 import { emptyPopulationDefects } from "./empty-populations";
@@ -93,6 +94,14 @@ export type Drive = (root: string) => boolean;
 const BEYOND_EVERY_REVIEW = "2099-01-01";
 
 export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
+  "src/quality/run-residue.ts": (root) =>
+    tempResidueDefects(
+      root,
+      RECLAMATION_AT_W375.map((r) =>
+        r.site === "vitest.global-setup.ts::sweepTreeCopies" ? { ...r, reachedFrom: ["teardown"] } : r,
+      ),
+    ).some((d) => d.what.includes("is reached from setup")),
+
   "src/quality/patient-populations.ts": (root) =>
     ruleDefects(root, new Map(), RULES_AT_W373).some((d) =>
       d.what.startsWith("is described here and nothing runs it"),

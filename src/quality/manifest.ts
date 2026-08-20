@@ -482,6 +482,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/run-residue.ts",
+    census: {
+      derives:
+        "Every place this tree removes something it made — an `rmSync` call in a module under `src/` or in the vitest harness file, attributed to the function holding it — and, for each, which named functions in that same file reach it, read with comments subtracted and literals blanked in that order.",
+      checkedAgainst:
+        "W375's `RECLAMATION_AT_W375`, in four directions: a removal site with no row, a row for a site the tree no longer holds, a row naming a caller that does not call it, and a caller the row leaves out.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module whose removal is written inside a named function is planted, and the site must be reported against that function rather than against the file",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No removal in this tree is written without a sentence about what an interrupted run leaves there, and the sweep's reachability from `setup` cannot be tidied away without this failing.",
+        mutation:
+          "`residueDefects` is given a row for `sweepTreeCopies` that names only `teardown`, and must report that it is also reached from `setup`.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/patient-populations.ts",
     census: {
       derives:

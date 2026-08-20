@@ -246,6 +246,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/run-residue.ts",
+    name: "RECLAMATION_AT_W375",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a module gaining or losing an `rmSync`, or a removal changing which functions reach it",
+      whyStopping:
+        "A NAMED ROW PER REMOVAL SITE, each carrying what an interrupted run leaves there and which functions reach it — the callers re-derived from the file on every run rather than described. A row arriving means this tree removes something new and nobody has said what a kill leaves behind; a row leaving means a removal went. The caller direction is the one this unit was built around: the sweep reached only `teardown` for a quarter while its own sentence said what it was FOR rather than when it ran, and residue accumulated to gigabytes twice with every register green.",
+    },
+  },
+  {
     module: "src/quality/patient-populations.ts",
     name: "RULES_AT_W373",
     classification: {

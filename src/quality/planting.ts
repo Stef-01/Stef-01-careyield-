@@ -91,7 +91,12 @@ function write(root: string, files: Plantable): string[] {
  * about the arms a healthy tree cannot produce.
  */
 export function withTree<T>(files: Plantable, probe: (root: string) => T): T {
-  const root = mkdtempSync(path.join(tmpdir(), "plant-"));
+  // W375: THE NAME CARRIES ITS OWNER HERE TOO. `finally` removes this directory when the probe
+  // returns or throws, which is every ordinary case and not the one that filled `/tmp`. A run that
+  // is KILLED never reaches a `finally`, and a `plant-` directory with no maker in its name was
+  // reclaimable by nothing: W343 gave tree copies a pid so a sibling's live copy would survive the
+  // sweep, and these were simply left out. Same prefix rule, same ownership argument.
+  const root = mkdtempSync(path.join(tmpdir(), `plant-${process.pid}-`));
   try {
     write(root, files);
     return probe(root);

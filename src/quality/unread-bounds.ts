@@ -559,6 +559,23 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/repository-clean.ts::CLEAN_BOUND",
+    condition: "nothing in this tree lists `/tmp` and reports what it finds",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/bounds.ts::staleBounds",
+      how: "THE GAP IS THE REMEDY OF THE BOUND NEXT DOOR, and that is what reads it. `TEMP_RESIDUE_BOUND` names the same absence as its own remedy and carries a predicate that derives it from the tree — the absence of a `residuePresent` export in `run-residue.ts` — so `staleBounds` re-derives on every run that nobody has built the check, and FAILS the moment somebody does. That is narrower than reporting the residue and it is the honest reading of this clause: what can be observed is whether the tree has grown the instrument, not whether a disk is full. W375 wrote the sentence into `CLEAN_BOUND` precisely because the register that could have caught the residue watched the repository and said nothing about the directory where it accumulates.",
+    },
+  },
+  {
+    bound: "src/quality/run-residue.ts::TEMP_RESIDUE_BOUND",
+    condition: "a removal written with `fs/promises`, with `rm`, or by shelling out is outside it entirely",
+    reading: {
+      kind: "not_observable",
+      why: "IT IS THE SAME CLASS AS W303'S, ONE VERB OVER, and it stops at the same place: a scan can be told about a spelling and cannot be told about the ones nobody has used yet. `rm` from `fs/promises` could be added to the pattern in a line — and so could `unlink`, `rmdir`, a `child_process` call, and a helper in another module that wraps any of them, which is where a text scan stops being a text scan. What would settle it is a call graph rather than a pattern, and a register that resolves imports to decide whether a function eventually removes something is a different instrument. The honest containment is that this tree removes things in seven places and every one of them is here.",
+    },
+  },
+  {
     bound: "src/quality/reached-pages.ts::REACHED_BOUND",
     condition: "a route linked through an `href` built at runtime, through a router push, or through a redirect is invisible to it",
     reading: {

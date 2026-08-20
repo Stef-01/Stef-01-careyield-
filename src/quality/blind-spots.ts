@@ -64,6 +64,7 @@ import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
 import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import { TEMP_RESIDUE_BOUND, reclamationSites } from "./run-residue";
 import { RULE_BOUND, patientRules } from "./patient-populations";
 import { REACHED_BOUND, reachedDefects } from "./reached-pages";
 import { EMPTY_BOUND, emptyPopulationDefects } from "./empty-populations";
@@ -150,6 +151,27 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/run-residue.ts": {
+    kind: "demonstrated",
+    bound: TEMP_RESIDUE_BOUND,
+    witness: "a removal written with `fs/promises` rather than with `rmSync`, which this cannot see and must not report",
+    control: "the same removal written with `rmSync`, which it must",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/promised.ts": fixtureText("removal-by-promise"),
+          "src/planted/sync.ts": fixtureText("removal-by-rmsync"),
+        },
+        (root) => {
+          const found = reclamationSites(root).map((s) => `${s.file}::${s.fn}`);
+          return {
+            witnessSeen: found.includes("src/planted/promised.ts::clears"),
+            controlSeen: found.includes("src/planted/sync.ts::clears"),
           };
         },
       ),

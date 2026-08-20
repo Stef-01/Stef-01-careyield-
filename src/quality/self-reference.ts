@@ -31,6 +31,7 @@ import { type Plantable, withTree } from "./planting";
 import { privateCopies } from "./private-copies";
 import { filesUnder, sourceModules, typescriptFiles } from "./tree-walks";
 import { appliedExemptions } from "./exemption-reach";
+import { reclamationSites } from "./run-residue";
 import { patientRules } from "./patient-populations";
 import { emptyRegisters } from "./empty-populations";
 import { violationReporters } from "./refusal-branches";
@@ -84,6 +85,16 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/blind-spots.ts", "src/quality/spelling-markers.ts"],
     why:
       "W368's scan walks the tree for a detector's defaulted exemption parameter, and both holders plant one — `blind-spots.ts` as the positive control for that register's own blind spot, `spelling-markers.ts` as the pair a second spelling of the parameter is measured against. Written inline, each holder became an exemption the register reported as applied and unmeasured, which W355 caught first: its defaulted-register scan read the same literals as real parameters nobody drives.",
+  },
+  {
+    detector: "src/quality/run-residue.ts::reclamationSites",
+    sees: (root) => reclamationSites(root).map((s) => `${s.file}::${s.fn}`),
+    plant: { "src/planted/sync.ts": fixtureText("removal-by-rmsync") },
+    marker: "planted/sync",
+    holdersAppear: "never",
+    holders: ["src/quality/blind-spots.ts", "src/quality/run-residue.test.ts"],
+    why:
+      "W375's walk looks for an `rmSync` call under `src/`, and both holders plant one — `blind-spots.ts` as the control for that register's own blind spot, the suite as the proof that the walk reaches a file nobody told it about. Written inline, each holder became a removal site the register reported against a function that removes nothing.",
   },
   {
     detector: "src/quality/patient-populations.ts::patientRules",

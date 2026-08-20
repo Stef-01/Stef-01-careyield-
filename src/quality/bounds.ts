@@ -68,6 +68,7 @@ import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
+import { TEMP_RESIDUE_BOUND } from "./run-residue";
 import { RULE_BOUND } from "./patient-populations";
 import { REACHED_BOUND } from "./reached-pages";
 import { EMPTY_BOUND } from "./empty-populations";
@@ -508,6 +509,32 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
       },
     ],
+  },
+  {
+    module: "src/quality/run-residue.ts",
+    name: "TEMP_RESIDUE_BOUND",
+    unit: "W375",
+    text: TEMP_RESIDUE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a check that lists the temp directory and reports what it finds",
+      reads: "`run-residue.ts`, for a check that reads the temp directory rather than only the source that writes to it",
+      // The clause that names something buildable, and the reason two quarters missed the same
+      // residue: every register watches source or the repository. The predicate reads for the
+      // derivation that would look at the disk.
+      stillOpen: (root) =>
+        !/export function residuePresent/.test(
+          readFileSync(path.join(root, "src/quality/run-residue.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/run-residue.ts":
+            "// W375: the /tmp residue nothing reads.\nexport function residuePresent(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [],
   },
   {
     module: "src/quality/patient-populations.ts",

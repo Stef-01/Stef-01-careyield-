@@ -171,6 +171,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "Its subject IS the literal — a prose sentence composed inside a render function — so blanking literals would empty the thing it exists to find. Comments are subtracted because a quoted phrase inside a comment explaining what wording to avoid is not copy, which is the collision W278 recorded at `feeCaveat`.",
   },
   {
+    module: "src/quality/run-residue.ts",
+    prep: { comments: "subtracted", literals: "blanked" },
+    why: "It reads CALL SITES, and both transforms earn their place for a different reason. Literals are blanked because `withPlantedIn`'s refusal message names `copyTree(root)` inside a string, which a call-shaped scan read as a call. Comments are subtracted because this harness explains itself with backticked names in prose, and blanking literals over prose takes the first backtick as an unterminated template — which blanked the rest of the file and made the sweep look as though nothing called it.",
+  },
+  {
     module: "src/quality/declaration-tax.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "A declaration IS a string literal — `\"src/quality/bounds.ts\"` in a register — so blanking literals would make every declaration site disappear and the quarter's baseline read as zero. Comments are subtracted because this tree's notes cite each other's paths constantly, and counting those would inflate the number Q24 is measured against.",

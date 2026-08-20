@@ -415,6 +415,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/run-residue.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/run-residue.test.ts :: reads a removal written with rmSync and not one written any other way",
+      plants: "src/planted/promised.ts",
+    },
+  },
+  {
     register: "src/quality/patient-populations.ts",
     negative: {
       kind: "already_driven",

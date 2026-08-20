@@ -36,6 +36,7 @@ import { namingSites } from "./declaration-tax";
 import { numberReturningExports } from "./flattering-numbers";
 import { discoverFoldSites } from "./order-independence";
 import { copyTree, planterDiff, withPlantedIn } from "./planting";
+import { reclamationSites } from "./run-residue";
 import { privateCopies } from "./private-copies";
 import { SCAN_SITES, fixtureText } from "./scan-text";
 import { nameSites } from "./typed-names";
@@ -125,6 +126,23 @@ export const MARKERS: readonly Marker[] = [
           'const ledger = "BUILD-STATE.md";\nconst row = /^\\|/;\nexport const parse = [ledger, row];\n',
           'const ledger = "BUILD-STATE.md";\nexport function rows(line: string) {\n  return line.startsWith("|");\n}\n',
           (copy) => names(privateCopies(copy)),
+        ),
+    },
+  },
+  {
+    module: "src/quality/run-residue.ts",
+    matches: "`rmSync` followed by an opening bracket, with comments subtracted and literals blanked first",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "`await rm(dir, { recursive: true })` from `fs/promises` — the same removal written with the API the rest of Node has moved to, and the one this tree's own bound names as outside the population.",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          'import { rmSync } from "node:fs";\nexport function clears(d: string): void {\n  rmSync(d, { recursive: true });\n}\n',
+          'import { rm } from "node:fs/promises";\nexport async function clears(d: string): Promise<void> {\n  await rm(d, { recursive: true });\n}\n',
+          (copy) => names(reclamationSites(copy)),
         ),
     },
   },

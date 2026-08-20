@@ -59,16 +59,19 @@ describe("W366 the text-scanning registers, against a second spelling of their o
       "src/quality/exemption-reach.ts",
       "src/quality/order-independence.ts",
       "src/quality/private-copies.ts",
+      "src/quality/run-residue.ts",
       "src/quality/typed-names.ts",
     ]);
-    // The distinction the unit turns on: two of those five are spellings the formatter rewrites
-    // before they could reach a commit, and three are ordinary code.
+    // The distinction the unit turns on: some of those are spellings the formatter rewrites before
+    // they could reach a commit, and the rest are ordinary code. W375 added the plainest of the
+    // second kind — `rm` from `fs/promises` is what the rest of Node has moved to.
     expect(reachableBlindness()).toEqual([
       "src/quality/declaration-tax.ts",
       "src/quality/derivable-lists.ts",
       "src/quality/exemption-reach.ts",
       "src/quality/order-independence.ts",
       "src/quality/private-copies.ts",
+      "src/quality/run-residue.ts",
     ]);
   });
 });

@@ -10,7 +10,7 @@
 import { existsSync, readdirSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { reclaimableCopies, uncleanMessage } from "./src/quality/repository-clean";
+import { ownedByThisRun, reclaimableCopies, uncleanMessage } from "./src/quality/repository-clean";
 
 /**
  * Temporary tree copies this run left behind, removed.
@@ -48,7 +48,7 @@ function isAlive(pid: number): boolean {
 function sweepTreeCopies(since: number): void {
   for (const entry of reclaimableCopies(readdirSync(tmpdir()), process.pid, isAlive)) {
     const full = path.join(tmpdir(), entry);
-    const mine = entry.startsWith(`tree-${process.pid}-`);
+    const mine = ownedByThisRun(entry, process.pid);
     try {
       // W360: THE WINDOW APPLIES TO THIS RUN'S OWN COPIES ONLY. It was there so a directory older
       // than the run would not be taken as this run's, which is a question about OUR pid being
@@ -67,6 +67,16 @@ export function setup(): void {
   // The one thing the first half is for: the moment the run began, so the teardown can tell this
   // run's temporary trees from a concurrent run's and sweep only its own.
   startedAt = Date.now();
+  // W375: AND THE SWEEP RUNS HERE TOO, WHICH IS THE MOMENT THE CASE IT EXISTS FOR IS ACTUALLY
+  // REACHABLE. W360 gave the sweep the ability to reclaim a dead maker's copy and wired it into
+  // `teardown` only — the hook an INTERRUPTED run never gets to. So residue from a killed run sat
+  // through the whole of the next run, and if that run was killed too it sat through that one as
+  // well: the 182 copies and 2.0 GB W360 measured came from a day of sessions where `pnpm verify`
+  // had been killed, and every one of those runs had a teardown that never ran. A dead maker's
+  // directory is reclaimable at any instant — that is what "dead" means — so the earliest moment a
+  // run can act is the right one. `startedAt` is set first because the window it feeds only ever
+  // applies to this run's OWN copies, of which there are none yet.
+  if (isTheRepository()) sweepTreeCopies(startedAt);
 }
 
 /**

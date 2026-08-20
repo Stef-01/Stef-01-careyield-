@@ -59,10 +59,24 @@ export const ARTEFACTS: readonly Artefact[] = [
  */
 export const treeCopyPrefix = (pid: number): string => `tree-${pid}-`;
 
+/**
+ * The prefixes a run's temporary directories carry, each ending in the maker's pid.
+ *
+ * W375: `plant-` WAS NOT ONE OF THEM. `withTree` removes its directory in a `finally`, which covers
+ * a probe that throws and not a run that is killed — and with no pid in the name there was nothing
+ * a later run could safely reclaim, because it could not tell an abandoned one from a live
+ * sibling's. Two prefixes, one rule.
+ */
+export const TEMP_PREFIXES = ["tree", "plant"] as const;
+
+/** Whether an entry is one of this process's own temporary directories. */
+export const ownedByThisRun = (entry: string, pid: number): boolean =>
+  TEMP_PREFIXES.some((prefix) => entry.startsWith(`${prefix}-${pid}-`));
+
 
 /** The pid a tree copy's name carries, or null when the entry is not one of ours. */
 export function copyMaker(entry: string): number | null {
-  const match = /^tree-(\d+)-/.exec(entry);
+  const match = /^(?:tree|plant)-(\d+)-/.exec(entry);
   return match ? Number(match[1]) : null;
 }
 
@@ -128,4 +142,11 @@ export const CLEAN_BOUND =
   "leaving its shadow somewhere unlisted leaves this quiet. What would widen it is a record of the " +
   "tree before the run compared with the tree after, which is `git status` and a different unit — " +
   "an untracked file is an ordinary state of a working tree and reporting them all is a " +
-  "check somebody turns off.";
+  "check somebody turns off. AND IT WATCHES THE REPOSITORY AND NOTHING ELSE, which is the sentence " +
+  "W375 added because its absence let the same finding be made by hand and then remade later: " +
+  "the residue that actually accumulates is " +
+  "under the system TEMP directory, this register names no path there, and so a run could leave " +
+  "gigabytes of abandoned tree copies and read green here every time. `reclaimableCopies` above " +
+  "decides what may be swept and `run-residue.ts` records where every removal is written, but " +
+  "neither is this check — nothing in this tree lists `/tmp` and reports what it finds, and the " +
+  "occasions it mattered were each a person looking at a disk.";
