@@ -200,6 +200,13 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/patient-populations.ts",
+    // Its population is functions taking a collection of PATIENTS, and the probe plants a plain
+    // module — outside by construction. A product rule arriving does owe a row, which is the
+    // register's point rather than a cost of a module arriving.
+    demands: () => false,
+  },
+  {
     file: "src/quality/reached-pages.ts",
     // Its population is console ROUTES, and the probe plants a module under `src/` — outside by
     // construction. A route arriving does owe a row, which is the register's point rather than a

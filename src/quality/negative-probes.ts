@@ -415,6 +415,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/patient-populations.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/patient-populations.test.ts :: reads a rule handed the panel and not one handed a list of ids",
+      plants: "src/planted/by-id.ts",
+    },
+  },
+  {
     register: "src/quality/reached-pages.ts",
     negative: {
       kind: "already_driven",

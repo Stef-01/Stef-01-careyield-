@@ -482,6 +482,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/patient-populations.ts",
+    census: {
+      derives:
+        "Every product rule handed a collection of patients — an exported function outside the build machinery whose parameters name `Patient[]` or `readonly Patient[]`, read from the signature because that is what being handed the panel means before anything runs.",
+      checkedAgainst:
+        "W373's `RULES_AT_W373`, in five directions: a rule with no row, a row for something that is not a rule, a row whose declared effect disagrees with a run over a seeded synthetic practice, a copy quote the named file does not carry, and a row recording that a rule reaches past what its own copy tells a practice.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module exporting a function that takes `readonly Patient[]` is planted beside one taking a single patient, and only the first may be reported as a rule handed the panel",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "No rule in this product is handed the panel without the register saying which patients it is over, and no ranking rule can start dropping people without this failing.",
+        mutation:
+          "`ruleDefects` is given a run in which `rankCandidates` returns one fewer patient than it was handed, and must report it as narrowing where it is recorded as reordering.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/reached-pages.ts",
     census: {
       derives:

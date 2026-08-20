@@ -64,6 +64,7 @@ import { PREMISE_BOUND, premiseDefects, stagedSpecs } from "./spec-premises";
 import { RESIDUE_BOUND, residueDefects } from "./spec-stores";
 import { ZERO_MEANING_BOUND, zeroDefects, zeroSites } from "@/console/zero-meaning";
 import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import { RULE_BOUND, patientRules } from "./patient-populations";
 import { REACHED_BOUND, reachedDefects } from "./reached-pages";
 import { EMPTY_BOUND, emptyPopulationDefects } from "./empty-populations";
 import { HORIZON_DIRECTION_BOUND, horizonDefects, horizonTokens } from "./horizon-directions";
@@ -148,6 +149,27 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           return {
             witnessSeen: seen.some((s) => s.startsWith("src/planted/unknown-spelling.test.ts")),
             controlSeen: seen.some((s) => s.startsWith("src/planted/known-spelling.test.ts")),
+          };
+        },
+      ),
+  },
+
+  "src/quality/patient-populations.ts": {
+    kind: "demonstrated",
+    bound: RULE_BOUND,
+    witness: "a rule that reaches patients through an id list rather than through a `Patient[]` parameter, which this cannot see and must not report",
+    control: "the same rule taking the panel itself, which it must",
+    probe: () =>
+      withRoot(
+        {
+          "src/planted/by-id.ts": fixtureText("rule-by-id"),
+          "src/planted/by-panel.ts": fixtureText("rule-by-panel"),
+        },
+        (root) => {
+          const found = patientRules(root);
+          return {
+            witnessSeen: found.includes("src/planted/by-id.ts::inviteByIds"),
+            controlSeen: found.includes("src/planted/by-panel.ts::inviteFromPanel"),
           };
         },
       ),

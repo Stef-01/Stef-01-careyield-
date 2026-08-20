@@ -140,6 +140,7 @@ export const POPULATIONS: readonly Population[] = [
   { file: "src/quality/flattering-numbers.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },
   { file: "src/quality/g5-rehearsal.test.ts", source: { kind: "own_recursion" } },
   { file: "src/quality/hardening-q26.test.ts", source: { kind: "own_recursion" } },
+  { file: "src/quality/patient-populations.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },
   { file: "src/quality/reached-pages.ts", source: { kind: "shared_walk", walks: ["filesUnder", "pageSpecFiles"] } },
   { file: "src/quality/empty-populations.ts", source: { kind: "shared_walk", walks: ["typescriptFiles"] } },
   { file: "src/quality/horizon-directions.ts", source: { kind: "shared_walk", walks: ["typescriptFiles"] } },

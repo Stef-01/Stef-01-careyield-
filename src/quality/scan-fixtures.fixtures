@@ -247,3 +247,15 @@ export const PLANTED_ARGUED: readonly string[] = [];
 
 === empty-register-unargued ===
 export const PLANTED_ARGUED: readonly string[] = [];
+
+=== rule-by-panel ===
+import type { Patient } from "@/domain/types";
+export function inviteFromPanel(panel: readonly Patient[]): Patient[] {
+  return [...panel];
+}
+
+=== rule-by-id ===
+import type { PatientId } from "@/domain/types";
+export function inviteByIds(ids: readonly PatientId[]): PatientId[] {
+  return [...ids];
+}

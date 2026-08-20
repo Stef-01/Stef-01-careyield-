@@ -246,6 +246,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/patient-populations.ts",
+    name: "RULES_AT_W373",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a product function starting or stopping taking a collection of patients, a rule changing what it does to the panel, or the copy naming a population changing",
+      whyStopping:
+        "A NAMED ROW PER RULE HANDED THE PANEL, each carrying what the rule does — re-measured by running it over a seeded synthetic practice on every build rather than described. A row arriving means the product has grown a rule over patients that nobody has said anything about; a row leaving means one went. The direction that matters is the effect: a ranking function is a permutation by contract, and one that starts narrowing is a patient silently dropped from an invitation batch, which is the failure a practice would never see. It cannot be satisfied by retyping a digit — the population is a walk over the product's signatures and every effect is a comparison of two id sets.",
+    },
+  },
+  {
     module: "src/quality/reached-pages.ts",
     name: "REACHED_AT_W371",
     classification: {

@@ -102,6 +102,7 @@ export const COMPARED_AT_W367: readonly Compared[] = [
   { bound: "src/quality/flattering-numbers.ts::FIGURE_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "A FIGURE SPELLED AS THE LENGTH OF A LIST IS INVISIBLE HERE" } },
   { bound: "src/quality/horizon-directions.ts::HORIZON_DIRECTION_BOUND", walk: ["typescriptFiles"], edge: { kind: "named", quote: "A check the horizon discusses in words without quoting it is outside the population entirely" } },
   { bound: "src/quality/manifest.ts::MANIFEST_BOUND", walk: ["own_recursion"], edge: { kind: "named", quote: "It does not reach TEST FILES" } },
+  { bound: "src/quality/patient-populations.ts::RULE_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "a rule reaching patients through a store, an id list or a query rather than through a `Patient[]` parameter is outside it entirely" } },
   { bound: "src/quality/pins.ts::SWEEP_BOUND", walk: ["typescriptFiles"], edge: { kind: "named", quote: "a named-constant sweep would have caught none of them" } },
   { bound: "src/quality/planting.ts::PLANTING_BOUND", walk: ["typescriptFiles"], edge: { kind: "named", quote: "A plant written with `fs/promises`, an `appendFileSync` or a shell-out is invisible to it" } },
   { bound: "src/quality/private-copies.ts::PRIVATE_COPY_BOUND", walk: ["typescriptFiles"], edge: { kind: "named", quote: "A copy of either parse written in `scripts/`, in `e2e/`, or in a `.mts` file is invisible to it" } },

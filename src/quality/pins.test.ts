@@ -108,6 +108,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
       "REMEDIES_AT_W357",
       "RESIDUE_AT_W359",
       "REVIEWED_AT_W345",
+      "RULES_AT_W373",
       "SURVIVORS_AT_W296",
       "SURVIVORS_AT_W332",
       "SURVIVORS_AT_W349",

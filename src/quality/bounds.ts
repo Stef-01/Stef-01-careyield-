@@ -67,6 +67,7 @@ import { DEFAULT_BOUND } from "./defaulted-registers";
 import { Q27_MUTANT_BOUND } from "./quarter-mutants-q27";
 import { HORIZON_DIRECTION_BOUND } from "./horizon-directions";
 import { POPULATION_BOUND } from "./populations";
+import { RULE_BOUND } from "./patient-populations";
 import { REACHED_BOUND } from "./reached-pages";
 import { EMPTY_BOUND } from "./empty-populations";
 import { SUBJECT_BOUND } from "./subject-and-walk";
@@ -504,6 +505,38 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "four",
         kind: "unit_id",
         why: "The remedies this register opened with, fixed at the unit that applied them — `namedRemedies` re-derives the population on every run and the rows are checked against it both ways, so the figure is history about a reading that happened rather than a count anything maintains. A fifth arrives with the survivor that names it.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/patient-populations.ts",
+    name: "RULE_BOUND",
+    unit: "W373",
+    text: RULE_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "deriving a population from copy",
+      reads: "`patient-populations.ts`, for the population a sentence promises derived from the sentence rather than judged against it",
+      // The clause that names something buildable. A row proves the words are really shown to a
+      // practice; what it cannot say is whether the rule's reach is inside what those words
+      // promise. The predicate reads for the derivation that would settle it.
+      stillOpen: (root) =>
+        !/export function populationFromCopy/.test(
+          readFileSync(path.join(root, "src/quality/patient-populations.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/patient-populations.ts":
+            "// W373: the product's populations.\nexport function populationFromCopy(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'one run over one synthetic practice' — the unit of the measurement rather than a count anything maintains. It stays one however many rules the register holds, and `ruleDefects` re-derives every row against the run on each build.",
       },
     ],
   },
