@@ -10,13 +10,13 @@
 import { describe, expect, it } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { resolvesInTree } from "./citations";
 import {
   HORIZON_Q29,
   POPULATIONS_AT_W376,
   QUARTER_GATE_BOUND,
   type QuarterPopulation,
   quarterDefects,
-  resolvesInTree,
   unitsInHorizon,
 } from "./horizon-q29-gate";
 

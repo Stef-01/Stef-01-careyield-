@@ -41,6 +41,7 @@ import { staleGuards } from "./decision-moments";
 import { cyclicComponents } from "./import-cycles";
 import { speaks } from "@/console/rendered-zeros";
 import { uncalledCitations } from "./cited-checks";
+import { resolvesInTree } from "./citations";
 
 export const HORIZON_Q30 = "docs/HORIZON-Q30.md";
 
@@ -98,14 +99,6 @@ export function unitsInHorizon(root: string): string[] {
 }
 
 /** Whether `module::export` names something this tree really exports. */
-export function resolvesInTree(root: string, derivation: string): boolean {
-  const [file, name] = derivation.split("::");
-  if (!file || !name) return false;
-  const full = path.join(root, file);
-  if (!existsSync(full)) return false;
-  return new RegExp(`export (?:function|const) ${name}\\b`).test(readFileSync(full, "utf8"));
-}
-
 /**
  * Where the quarter's gate and the tree disagree, in six directions.
  *

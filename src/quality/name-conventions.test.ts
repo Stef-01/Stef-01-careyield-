@@ -5,13 +5,13 @@
 
 import { describe, expect, it } from "vitest";
 import path from "node:path";
+import { resolvesInTree } from "./citations";
 import {
   CONVENTIONS_AT_W394,
   CONVENTION_BOUND,
   type NameConvention,
   conventionDefects,
   conventionSites,
-  resolvesInTree,
 } from "./name-conventions";
 
 const ROOT = path.resolve(__dirname, "..", "..");

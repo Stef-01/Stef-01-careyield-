@@ -43,6 +43,7 @@ import { handListedRegisters } from "./derivable-lists";
 import { patientRules } from "./patient-populations";
 import { q28Population } from "./quarter-mutants-q28";
 import { reclamationSites } from "./run-residue";
+import { resolvesInTree } from "./citations";
 
 /** The quarter's horizon, as the tree spells it. */
 export const HORIZON_Q29 = "docs/HORIZON-Q29.md";
@@ -93,14 +94,6 @@ export function unitsInHorizon(root: string): string[] {
 }
 
 /** Whether `module::export` names something this tree really exports. */
-export function resolvesInTree(root: string, derivation: string): boolean {
-  const [file, name] = derivation.split("::");
-  if (!file || !name) return false;
-  const full = path.join(root, file);
-  if (!existsSync(full)) return false;
-  return new RegExp(`export (?:function|const) ${name}\\b`).test(readFileSync(full, "utf8"));
-}
-
 /**
  * Where the quarter's gate and the tree disagree, in six directions.
  *

@@ -31,6 +31,7 @@ import path from "node:path";
 import { sourceModules } from "./tree-walks";
 import { prepareForScan } from "./scan-text";
 import { orderDependent } from "./shared-state";
+import { resolvesInTree } from "./citations";
 
 /** How a convention was established as costing something. */
 export type Cost =
@@ -63,14 +64,6 @@ export interface ConventionDefect {
 }
 
 /** Whether `module::export` names something this tree really exports. */
-export function resolvesInTree(root: string, derivation: string): boolean {
-  const [file, name] = derivation.split("::");
-  if (!file || !name) return false;
-  const full = path.join(root, file);
-  if (!existsSync(full)) return false;
-  return new RegExp(`(?:export )?(?:function|const) ${name}\\b`).test(readFileSync(full, "utf8"));
-}
-
 /**
  * Every module whose scanning code spells one of the declared conventions.
  *

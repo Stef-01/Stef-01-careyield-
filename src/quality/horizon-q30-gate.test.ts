@@ -11,10 +11,10 @@ import {
   Q30_GATE_BOUND,
   type QuarterMoment,
   quarterDefects,
-  resolvesInTree,
   unitsInHorizon,
 } from "./horizon-q30-gate";
 import { asUnitId } from "./typed-names";
+import { resolvesInTree } from "./citations";
 
 const ROOT = path.resolve(__dirname, "..", "..");
 
