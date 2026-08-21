@@ -251,4 +251,10 @@ export const Q29_MUTANT_BOUND =
   "run before it. AND THE COST IS NOW PART OF THE LIMIT: this file's sibling suite joins a gate " +
   "that already carries four of these sweeps, each hundreds of seconds of subprocess, which is why " +
   "the growth above is not merely untidy — the instrument that would lift the exclusion is the " +
-  "same one that would make the gate affordable, and neither exists.";
+  "same one that would make the gate affordable, and neither exists. W389 PAID THE FIRST " +
+  "INSTALMENT OF THAT: five sweeps in one vitest pass, each spawning subprocesses, starved the " +
+  "main process until a worker missed its heartbeat and a run in which every test passed came " +
+  "back red. They run in a pass of their own now, which buys nothing in wall time and stops the " +
+  "gate depending on how many cores the machine happened to have. It is a mitigation and not the " +
+  "instrument: the sweeps still cost what they cost, and the pass they run in will hold six of " +
+  "them next quarter.";

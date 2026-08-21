@@ -1046,6 +1046,16 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         why: "'loses one module of its own making every time it runs' — a rate rather than a count of anything the tree holds. It stays one however many quarters the instrument runs for, which is exactly what makes the growth predictable.",
       },
       {
+        word: "five",
+        kind: "unit_id",
+        why: "How many of these sweeps ran in one vitest pass on the day W389 moved them into their own — Q25's, Q26's, Q27's, Q28's and this one. History rather than a live count: the run that starved its main process had five, whatever the pass holds later. The clause beside it says the pass will hold six next quarter, which is the same growth `EXCLUDED_AT_W386` states and the tree resolves on every run.",
+      },
+      {
+        word: "six",
+        kind: "unit_id",
+        why: "The same list one quarter on, which is a prediction rather than a count of anything the tree holds today — the exclusion register grows by one per quarter and each new quarter's sweep is a new file in this pass. It is checkable the moment Q31's sweep lands, and wrong only if the instrument changes, which is what the clause above says would settle the whole limit.",
+      },
+      {
         word: "four",
         kind: "unit_id",
         why: "How many of these sweeps the gate already carried when this one joined — Q25's, Q26's, Q27's and Q28's, each a landed unit with its own register. History: a quarter that has run cannot stop having run, so the figure is fixed at this unit rather than derived from a tree that moves.",
