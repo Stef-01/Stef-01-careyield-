@@ -150,7 +150,7 @@ describe("W379 the one that was moved, which is the one that broke twice", () =>
 describe("W379 the bound", () => {
   it("says `movable` is a judgement and the largest class", () => {
     expect(WELDED_BOUND).toContain("`movable` IS A JUDGEMENT AND THE LARGEST CLASS");
-    expect(WELDED_BOUND).toContain("nothing here has run that change on it");
+    expect(WELDED_BOUND).toContain("the judgement is that the change COULD be run, not that it has been");
   });
 
   it("says the population is still a name scan", () => {

@@ -1452,20 +1452,21 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: WELDED_BOUND,
     lifting: {
       kind: "remedy",
-      remedy: "run that change on it",
-      reads: "this register, for a movable row somebody has moved",
-      // THE FIRST CLAUSE IS THE LIVE ONE. That the population is a name scan is a statement about
-      // what the derivation reads; that moving and registering are two facts is a statement about
-      // what those two words mean. What moves is the JUDGEMENT: every `movable` row says a change
-      // could be made and nobody has made it, and the day a second row becomes `moved` the
-      // sentence stops describing this register.
+      remedy: "the change being run on every `movable` row rather than on a chosen few",
+      reads: "this register, for a `movable` row nobody has moved",
+      // THE FIRST CLAUSE IS THE LIVE ONE, AND W389 HAD TO RE-AIM IT. The old predicate went false
+      // at the THIRD moved row, on the reading that a class saying "nobody has run this change"
+      // stops describing the register once somebody has. W390's quarter close supplied that third
+      // row and the bound went stale — correctly, and then the sentence had to say something
+      // truer, because three successes drawn from the rows that looked easiest are weak evidence
+      // and not none. What the class actually claims is that EVERY `movable` row could move, so
+      // what settles it is every one of them moving; while one remains unmoved the judgement is
+      // still a judgement. That is a predicate the tree can answer and the old one was a milestone.
       // READS THE TREE, not this module's own table: W306 plants the remedy into a constructed
       // tree and requires the predicate to go false there, which a predicate closing over the live
       // register can never do.
       stillOpen: (root) =>
-        (readFileSync(path.join(root, "src/quality/welded-comparisons.ts"), "utf8").match(
-          /kind: "moved",/g,
-        ) ?? []).length < 3,
+        /standing: movable\(/.test(readFileSync(path.join(root, "src/quality/welded-comparisons.ts"), "utf8")),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -1478,6 +1479,16 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "two",
         kind: "rate",
         why: "'those are two separate facts' — the number of things being distinguished in one sentence, not a count of anything the tree holds. It stays two however many comparisons are lifted.",
+      },
+      {
+        word: "THREE",
+        kind: "unit_id",
+        why: "How many `movable` rows have been moved: W379 moved one, W380 a second, and W390's quarter close the third. History rather than a live count — a row that has moved cannot un-move — and the sentence's point is what three successes are worth as evidence, which does not change when a fourth arrives. The tree resolves it anyway: `stillOpen` reads whether any `movable` row remains, so the claim beside the number is checked even though the number is not.",
+      },
+      {
+        word: "three",
+        kind: "unit_id",
+        why: "The same three, in lower case, where the sentence says what they cannot show — that the rows which have not moved would. Same reason it is history, and the same predicate stands behind the clause.",
       },
     ],
   },

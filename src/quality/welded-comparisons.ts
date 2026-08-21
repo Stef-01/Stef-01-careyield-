@@ -247,9 +247,14 @@ export function notComparisons(checks: readonly WeldedCheck[] = WELDED_CHECKS): 
 export const WELDED_BOUND =
   "`movable` IS A JUDGEMENT AND THE LARGEST CLASS, which is the honest shape of this register and " +
   "its weakest part. Every row so classified carries the same change — lift the comparison into a " +
-  "function taking the ledger text — and nothing here has run that change on it, so what the class " +
-  "really says is that this reader saw no reason it could not be done. A row that turns out to be " +
-  "`inherent` on the day somebody tries is not a defect this register can report. SECOND, THE " +
+  "function taking the ledger text — and the judgement is that the change COULD be run, not that " +
+  "it has been. THREE ROWS HAVE NOW BEEN MOVED and the class survived all three, which is weak " +
+  "evidence and is the strongest this register can offer: a sample somebody chose, drawn from the " +
+  "rows that looked easiest. A row that turns out to be `inherent` on the day somebody tries is " +
+  "still not a defect this register can report, and the three that moved cannot say anything about " +
+  "the ones that have not. WHAT WOULD SETTLE IT is the change being run on every `movable` row " +
+  "rather than on a chosen few, and the honest reading of three successes is that nobody has yet " +
+  "met the row that refuses. SECOND, THE " +
   "POPULATION IS STILL A NAME SCAN. It is `weldedLedgerTests`, which finds a file NAMING a ledger " +
   "primitive; `readsTheLiveLedger` narrows that to the files comparing something, and both are " +
   "text. A suite that reached the ledger through a helper this scan does not name is outside the " +
