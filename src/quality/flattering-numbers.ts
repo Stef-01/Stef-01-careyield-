@@ -520,6 +520,12 @@ export const FIGURES: readonly Figure[] = [
     },
   },
   {
+    name: "src/quality/patterns.ts::literalEnd",
+    direction: "not_a_count",
+    what: "the index just past the end of a regex literal, used to cut the literal's text out of a module",
+    why: "THE THIRD LENGTH THAT IS NOT A COUNT, and it is in the population for the reason W279 keeps: the scan cannot tell an index from a size, and a row saying so is worth more than a filter nobody reads. It walks a string one character at a time and returns a POSITION — the answer is a place in the text, not how much of anything there is, so a wrong value cuts a different literal rather than reporting more or fewer of them. What a wrong value costs is stated where it belongs: the register that calls this reports the cut text as a population whose declared source has moved, which is a build failure rather than a quiet number.",
+  },
+  {
     name: "src/quality/mutation-sampling.ts::siteHash",
     direction: "not_a_count",
     what: "a hash of a mutation site's text, used to draw the sample by arithmetic",
