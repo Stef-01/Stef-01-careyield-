@@ -7,12 +7,17 @@
 // than a reading. Two derivations of one population, and the diff between them is the finding.
 //
 // THE DIFF IS NOT SMALL. `exportsOf` — the reading W388's register uses to decide whether a cited
-// test runs its subject — cannot see twelve of the thirteen values `unit-headers.ts` exports, or
-// four of the seven in `blind-spots.ts`. The cause is `SCAN_BOUND` in its own words: `blankLiterals`
-// loses the rest of a file after an unbalanced backtick, and both modules open with one on their
-// fourth line. A citation whose subject is `unit-headers.ts` is being judged against an export list
-// that is essentially empty, and no source-reading register could ever have reported that, because
-// every one of them reads through the same scan.
+// test runs its subject — cannot see twelve of the thirteen values `unit-headers.ts` exports, four
+// of the seven in `blind-spots.ts`, or eight in `self-reference.ts`. A citation whose subject is
+// `unit-headers.ts` is being judged against an export list one name long, and no source-reading
+// register could have reported that, because every one of them reads through the same preparation.
+//
+// WHAT IS MEASURED AND WHAT IS NOT. The loss is measured: the same pattern over the RAW text finds
+// thirteen names and over the prepared text finds one. WHICH construct desynchronises the shared
+// preparation is NOT settled here — the declaration block prepares correctly in isolation, so the
+// trigger is a state carried in from elsewhere in the file, and several plausible culprits were
+// tried and cleared. Reporting the divergence is this unit; naming the trigger is the next one, and
+// the register would report its own rows going stale on the day somebody fixes it.
 //
 // TYPES ARE NOT A DIVERGENCE AND ARE EXCLUDED BY CONSTRUCTION. `export interface` and `export type`
 // are gone at runtime by design, so counting them would bury the finding under four hundred rows
@@ -177,7 +182,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "BLIND_SPOT_BOUND",
     cause: {
       kind: "lost_to_the_scan",
-      why: "The same desynchronisation, a thousand lines earlier than the exports it costs: a `witness` string quotes `// W<n>` in backticks, the scan takes it for a template literal, and the four values at the end of the file \u2014 this register's own bound and its two report functions among them \u2014 are invisible to any reading of the prepared text. The register that names what other registers cannot see cannot itself be seen.",
+      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same pattern: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions \u2014 so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
     },
   },
   {
@@ -185,7 +190,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "boundDiff",
     cause: {
       kind: "lost_to_the_scan",
-      why: "The same desynchronisation, a thousand lines earlier than the exports it costs: a `witness` string quotes `// W<n>` in backticks, the scan takes it for a template literal, and the four values at the end of the file \u2014 this register's own bound and its two report functions among them \u2014 are invisible to any reading of the prepared text. The register that names what other registers cannot see cannot itself be seen.",
+      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same pattern: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions \u2014 so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
     },
   },
   {
@@ -193,7 +198,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "deadProbes",
     cause: {
       kind: "lost_to_the_scan",
-      why: "The same desynchronisation, a thousand lines earlier than the exports it costs: a `witness` string quotes `// W<n>` in backticks, the scan takes it for a template literal, and the four values at the end of the file \u2014 this register's own bound and its two report functions among them \u2014 are invisible to any reading of the prepared text. The register that names what other registers cannot see cannot itself be seen.",
+      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same pattern: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions \u2014 so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
     },
   },
   {
@@ -201,7 +206,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "falseBounds",
     cause: {
       kind: "lost_to_the_scan",
-      why: "The same desynchronisation, a thousand lines earlier than the exports it costs: a `witness` string quotes `// W<n>` in backticks, the scan takes it for a template literal, and the four values at the end of the file \u2014 this register's own bound and its two report functions among them \u2014 are invisible to any reading of the prepared text. The register that names what other registers cannot see cannot itself be seen.",
+      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same pattern: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions \u2014 so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
     },
   },
   {
@@ -209,7 +214,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "MECHANISM",
     cause: {
       kind: "lost_to_the_scan",
-      why: "A `marker` field built as a real template literal sits beside `holdersAppear` strings that quote code in backticks, and after the first mismatched pair the scan blanks the rest of the file. Eight values go, this module's own bound among them \u2014 and this is the module whose subject IS a scan reading itself, losing its own exports to the scan it shares with everything else.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Eight names the module really exports, this module's own bound among them, are absent from the prepared text while present in the raw text. It is the sharpest place for the loss to fall: this is the module whose subject IS a scan that has to read itself, and it cannot read its own exports through the scan it shares with sixty other registers.",
     },
   },
   {
@@ -217,7 +222,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "SELF_REFERENCE_BOUND",
     cause: {
       kind: "lost_to_the_scan",
-      why: "A `marker` field built as a real template literal sits beside `holdersAppear` strings that quote code in backticks, and after the first mismatched pair the scan blanks the rest of the file. Eight values go, this module's own bound among them \u2014 and this is the module whose subject IS a scan reading itself, losing its own exports to the scan it shares with everything else.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Eight names the module really exports, this module's own bound among them, are absent from the prepared text while present in the raw text. It is the sharpest place for the loss to fall: this is the module whose subject IS a scan that has to read itself, and it cannot read its own exports through the scan it shares with sixty other registers.",
     },
   },
   {
@@ -225,7 +230,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "SPLIT_EXCEPTIONS",
     cause: {
       kind: "lost_to_the_scan",
-      why: "A `marker` field built as a real template literal sits beside `holdersAppear` strings that quote code in backticks, and after the first mismatched pair the scan blanks the rest of the file. Eight values go, this module's own bound among them \u2014 and this is the module whose subject IS a scan reading itself, losing its own exports to the scan it shares with everything else.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Eight names the module really exports, this module's own bound among them, are absent from the prepared text while present in the raw text. It is the sharpest place for the loss to fall: this is the module whose subject IS a scan that has to read itself, and it cannot read its own exports through the scan it shares with sixty other registers.",
     },
   },
   {
@@ -233,7 +238,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "fixtureFiles",
     cause: {
       kind: "lost_to_the_scan",
-      why: "A `marker` field built as a real template literal sits beside `holdersAppear` strings that quote code in backticks, and after the first mismatched pair the scan blanks the rest of the file. Eight values go, this module's own bound among them \u2014 and this is the module whose subject IS a scan reading itself, losing its own exports to the scan it shares with everything else.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Eight names the module really exports, this module's own bound among them, are absent from the prepared text while present in the raw text. It is the sharpest place for the loss to fall: this is the module whose subject IS a scan that has to read itself, and it cannot read its own exports through the scan it shares with sixty other registers.",
     },
   },
   {
@@ -241,7 +246,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "holderDiff",
     cause: {
       kind: "lost_to_the_scan",
-      why: "A `marker` field built as a real template literal sits beside `holdersAppear` strings that quote code in backticks, and after the first mismatched pair the scan blanks the rest of the file. Eight values go, this module's own bound among them \u2014 and this is the module whose subject IS a scan reading itself, losing its own exports to the scan it shares with everything else.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Eight names the module really exports, this module's own bound among them, are absent from the prepared text while present in the raw text. It is the sharpest place for the loss to fall: this is the module whose subject IS a scan that has to read itself, and it cannot read its own exports through the scan it shares with sixty other registers.",
     },
   },
   {
@@ -249,7 +254,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "selfScanDefects",
     cause: {
       kind: "lost_to_the_scan",
-      why: "A `marker` field built as a real template literal sits beside `holdersAppear` strings that quote code in backticks, and after the first mismatched pair the scan blanks the rest of the file. Eight values go, this module's own bound among them \u2014 and this is the module whose subject IS a scan reading itself, losing its own exports to the scan it shares with everything else.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Eight names the module really exports, this module's own bound among them, are absent from the prepared text while present in the raw text. It is the sharpest place for the loss to fall: this is the module whose subject IS a scan that has to read itself, and it cannot read its own exports through the scan it shares with sixty other registers.",
     },
   },
   {
@@ -257,7 +262,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "splitDiff",
     cause: {
       kind: "lost_to_the_scan",
-      why: "A `marker` field built as a real template literal sits beside `holdersAppear` strings that quote code in backticks, and after the first mismatched pair the scan blanks the rest of the file. Eight values go, this module's own bound among them \u2014 and this is the module whose subject IS a scan reading itself, losing its own exports to the scan it shares with everything else.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Eight names the module really exports, this module's own bound among them, are absent from the prepared text while present in the raw text. It is the sharpest place for the loss to fall: this is the module whose subject IS a scan that has to read itself, and it cannot read its own exports through the scan it shares with sixty other registers.",
     },
   },
   {
@@ -265,7 +270,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "splitSites",
     cause: {
       kind: "lost_to_the_scan",
-      why: "A `marker` field built as a real template literal sits beside `holdersAppear` strings that quote code in backticks, and after the first mismatched pair the scan blanks the rest of the file. Eight values go, this module's own bound among them \u2014 and this is the module whose subject IS a scan reading itself, losing its own exports to the scan it shares with everything else.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Eight names the module really exports, this module's own bound among them, are absent from the prepared text while present in the raw text. It is the sharpest place for the loss to fall: this is the module whose subject IS a scan that has to read itself, and it cannot read its own exports through the scan it shares with sixty other registers.",
     },
   },
   {
@@ -273,7 +278,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "ADOPTED_MODULES",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -281,7 +286,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "FOREIGN_CITATIONS",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -289,7 +294,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "HEADER_CITATION_BOUND",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -297,7 +302,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "adoptedModuleNames",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -305,7 +310,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "headerCensus",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -313,7 +318,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "headerNamesUnknown",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -321,7 +326,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "headerSubjectDefects",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -329,7 +334,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "headerUnit",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -337,7 +342,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "headerViolations",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -345,7 +350,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "knownUnits",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -353,7 +358,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "misplacedUnit",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
   {
@@ -361,7 +366,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "screamingExports",
     cause: {
       kind: "lost_to_the_scan",
-      why: "`HEADER_RULE`, the third export, is a double-quoted sentence QUOTING CODE \u2014 `// W<n>` and `BUILD_UNIT` in backticks, which is how this whole tree writes prose about itself. `blankLiterals` reads the first of those backticks as opening a template literal, loses the closing quote, and never resynchronises: twelve of the thirteen values below it are invisible to every register that reads prepared text. W388 judges a citation by whether the cited test names an export of its subject, and for this module that list is one name long.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
     },
   },
 ];
@@ -378,4 +383,8 @@ export const RUNTIME_BOUND =
   "NOT VALUES. A module whose export is bound to something other than what the source says is a " +
   "module both readings agree about, which is the deeper version of the same question and is not " +
   "asked here. FOURTH, THE POPULATION IS W267'S CENSUS. A module outside it is read by neither " +
-  "instrument, so the count of what the shared scan loses is a floor and never a total.";
+  "instrument, so the count of what the shared scan loses is a floor and never a total. FIFTH, " +
+  "IT REPORTS A DIVERGENCE AND DIAGNOSES NOTHING. Each row says which reading is missing a name " +
+  "and what was measured; none of them says which construct desynchronises the preparation, " +
+  "because that was tried and not settled. A register that guessed a cause would be a register " +
+  "somebody trusted instead of looking.";
