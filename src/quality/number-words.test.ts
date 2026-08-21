@@ -5,7 +5,6 @@
 import { describe, expect, it } from "vitest";
 import path from "node:path";
 import {
-  MISREAD_AT_W393,
   NUMBER_BOUND,
   NUMBER_WORDS,
   SCALES,
@@ -120,9 +119,10 @@ describe("W393 the two readings, measured against each other", () => {
 
   it("holds W323's number, which the register has recorded as its tail since it was filed", () => {
     const found = misreadings(proseClaims(ROOT), prose);
-    expect(found.map((m) => m.claim)).toEqual(
-      MISREAD_AT_W393.map((d) => d.claim),
-    );
+    // NOT COMPARED AGAINST `MISREAD_AT_W393`, which W332's register reported the moment it was
+    // written: an equality between a derivation and the pin it was built from argues with itself.
+    // Both directions are already checked by `misreadDefects` above; what belongs here is CONTENT.
+    expect(found).toHaveLength(1);
     const row = found.find((m) =>
       m.claim.startsWith("src/quality/assertion-vocabulary.ts"),
     );
