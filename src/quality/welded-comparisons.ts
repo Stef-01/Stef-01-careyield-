@@ -142,6 +142,13 @@ export const WELDED_CHECKS: readonly WeldedCheck[] = [
     file: "src/quality/horizon-q30.test.ts",
     standing: { kind: "moved", to: "src/quality/blocked-surface.ts::heldByOthers", by: "W379" },
   },
+  {
+    // The same comparison as the row above, in the quarter after it: W390's pin suite calls the
+    // lifted `heldByOthers` rather than writing the in-flight check out again, which is what W379's
+    // move was for. Recorded as `moved` for that reason and not as a second welded copy.
+    file: "src/quality/horizon-q31.test.ts",
+    standing: { kind: "moved", to: "src/quality/blocked-surface.ts::heldByOthers", by: "W379" },
+  },
   { file: "src/quality/horizon-y6.test.ts", standing: movable(LIFT) },
   { file: "src/quality/latent-y5.test.ts", standing: passing() },
   { file: "src/quality/ledger-integrity.test.ts", standing: passing() },

@@ -109,6 +109,7 @@ export const SENSITIVE_SUITES: readonly CloseSensitive[] = [
   { suite: "src/quality/horizon-q27.test.ts", reads: "the quarter's done count and the rows it prices, as every horizon suite does" },
   { suite: "src/quality/horizon-q28.test.ts", reads: "the quarter's done count and the rows it prices, as every horizon suite does" },
   { suite: "src/quality/horizon-q29.test.ts", reads: "the same, and its in-flight assertion is one of the three that broke — W364's, fixed by W365 and lifted by W379" },
+  { suite: "src/quality/horizon-q31.test.ts", reads: "the quarter's done count and the rows it prices, as every horizon suite does — and its in-flight assertion names a sibling's row, which a close is one way of changing" },
   { suite: "src/quality/horizon-q30.test.ts", reads: "the same, and its in-flight assertion is another — W377's, fixed by W374 and lifted by W379" },
   { suite: "src/quality/horizon-y6.test.ts", reads: "the year's done count, which is the same shape a quarter horizon reads over a longer range" },
   { suite: "src/quality/plan-ledger.test.ts", reads: "whether every plan row has a ledger row and what state it is in" },
