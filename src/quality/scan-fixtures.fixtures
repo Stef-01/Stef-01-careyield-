@@ -767,3 +767,44 @@ writeFileSync(path.join(COPY, "src/planted/probe.ts"), "export const x = 1;\n");
 const HERE = path.join(REPO, "src/planted");
 mkdirSync(HERE, { recursive: true });
 rmSync(HERE, { recursive: true, force: true });
+
+=== moment-probe-signature ===
+export function decide(
+  eligible: Patient[],
+  /**
+   * A doc block inside the parameter list, which is how `buildInvitationPool` writes its
+   * ranking seam — and a comma in here split the list before comments were subtracted.
+   */
+  config: PoolConfig,
+  sessionDate: string,
+): Invitation[] {
+  return [];
+}
+
+=== moment-probe-guarded ===
+import type { Patient } from "@/domain/types";
+
+/** A planted rule that decides at its own date about a set somebody else guarded. */
+export function probeDecide(eligible: Patient[], todayIso: string): Patient[] {
+  return eligible.filter((p) => p.lastAttendedAt !== null && p.lastAttendedAt < todayIso);
+}
+
+=== moment-probe-panel ===
+import type { Patient } from "@/domain/types";
+
+/** The same rule, handed the panel so it guards at its own moment. */
+export function probeDecide(patients: Patient[], todayIso: string): Patient[] {
+  return patients.filter((p) => p.lastAttendedAt !== null && p.lastAttendedAt < todayIso);
+}
+
+=== moment-probe-in-a-config ===
+import type { Patient } from "@/domain/types";
+
+interface ProbeConfig {
+  todayIso: string;
+}
+
+/** The same decision, with its instant inside a config rather than a parameter of its own. */
+export function probeDecide(eligible: Patient[], config: ProbeConfig): Patient[] {
+  return eligible.filter((p) => p.lastAttendedAt !== null && p.lastAttendedAt < config.todayIso);
+}

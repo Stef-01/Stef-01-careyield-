@@ -127,6 +127,15 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/decision-moments.ts::DECISION_BOUND",
+    condition: "names no moment here and reads as inheriting whatever its caller was at",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/spelling-markers.ts::blindMarkers",
+      how: "W366 IS THE REGISTER FOR THIS SENTENCE and W387 wrote its row on the way in. The marker plants the same rule with its date named `decidedOn` instead of `todayIso`, runs `parametersOf` over both, and records that the canonical spelling is read as a moment and the alternative is not — so `blindMarkers()` names `src/quality/decision-moments.ts` on every run, in a list somebody reads. It is narrower than the sentence: the bound also covers an instant taken from a CONFIG OBJECT or from a clock, and W295's blind-spot probe drives the config shape beside it, while a rule reading a clock is in neither. Both are the same remedy — a moment resolved rather than a parameter named — and until somebody builds it the honest statement is that this gap has instances, two of them are measured, and both measurements move if the register does.",
+    },
+  },
+  {
     bound: "src/quality/shared-state.ts::SHARED_BOUND",
     condition: "writes the same disk and appears in no answer here",
     reading: {

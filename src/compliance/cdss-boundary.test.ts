@@ -179,6 +179,7 @@ const NAMESPACES: Record<string, () => Promise<Record<string, unknown>>> = {
   "src/quality/horizon-q29-gate.ts": () => import("@/quality/horizon-q29-gate"),
   "src/console/rendered-zeros.ts": () => import("@/console/rendered-zeros"),
   "src/quality/hook-reach.ts": () => import("@/quality/hook-reach"),
+  "src/quality/decision-moments.ts": () => import("@/quality/decision-moments"),
   "src/quality/shared-state.ts": () => import("@/quality/shared-state"),
   "src/quality/import-cycles.ts": () => import("@/quality/import-cycles"),
   "src/quality/moments.ts": () => import("@/quality/moments"),

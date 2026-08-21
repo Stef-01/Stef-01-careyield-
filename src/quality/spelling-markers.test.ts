@@ -55,6 +55,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
     expect(blindMarkers()).toEqual([
       "src/console/rendered-zeros.ts",
       "src/quality/acceptances.ts",
+      "src/quality/decision-moments.ts",
       "src/quality/declaration-tax.ts",
       "src/quality/derivable-lists.ts",
       "src/quality/exemption-reach.ts",
@@ -72,6 +73,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
     // second kind — `rm` from `fs/promises` is what the rest of Node has moved to.
     expect(reachableBlindness()).toEqual([
       "src/console/rendered-zeros.ts",
+      "src/quality/decision-moments.ts",
       "src/quality/declaration-tax.ts",
       "src/quality/derivable-lists.ts",
       "src/quality/exemption-reach.ts",

@@ -33,6 +33,7 @@ import { filesUnder, sourceModules, typescriptFiles } from "./tree-walks";
 import { appliedExemptions } from "./exemption-reach";
 import { silentZeros } from "@/console/rendered-zeros";
 import { orderDependent } from "./shared-state";
+import { staleGuards } from "./decision-moments";
 import { unreachedReclaimers } from "./hook-reach";
 import { cyclicComponents } from "./import-cycles";
 import { momentsOf } from "./moments";
@@ -90,6 +91,19 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/blind-spots.ts", "src/quality/spelling-markers.ts"],
     why:
       "W368's scan walks the tree for a detector's defaulted exemption parameter, and both holders plant one — `blind-spots.ts` as the positive control for that register's own blind spot, `spelling-markers.ts` as the pair a second spelling of the parameter is measured against. Written inline, each holder became an exemption the register reported as applied and unmeasured, which W355 caught first: its defaulted-register scan read the same literals as real parameters nobody drives.",
+  },
+  {
+    detector: "src/quality/decision-moments.ts::staleGuards",
+    sees: (root) => staleGuards(root),
+    plant: { "src/engine/self-probe.ts": fixtureText("moment-probe-guarded") },
+    marker: "src/engine/self-probe.ts::probeDecide",
+    holdersAppear: "never",
+    holders: [
+      "src/quality/blind-spots.ts",
+      "src/quality/decision-moments.test.ts",
+    ],
+    why:
+      "The probes are RULES — exported functions taking a collection of `Patient` — and W373's population is every one of those outside the build machinery. Spelled inline in a module under `src/`, a probe would be a patient rule this tree holds: it would join W373's register, owe a row there, and appear in W387's own report as a second instance of the defect W387 exists to name. The fixture file is what keeps a planted rule out of the product's population, and both holders need the same body — `blind-spots.ts` drives it as the control against a spelling the bound admits it misses, and this register's suite drives it as the plant that must join.",
   },
   {
     detector: "src/quality/shared-state.ts::orderDependent",

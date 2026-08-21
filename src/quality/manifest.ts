@@ -82,6 +82,7 @@ import { instantDiff } from "./instant";
 import { dispositionDefects, registerDiff } from "./deferrals";
 import { OUTSTANDING_HEADING, dossierDiff } from "./dossier-derived";
 import { SILENT_AT_W384, silentDiff } from "@/console/rendered-zeros";
+import { STALE_AT_W387, decisions, momentDiff } from "./decision-moments";
 
 /**
  * Everything one module owes the registers that watch it.
@@ -543,6 +544,39 @@ export const MANIFEST: readonly ModuleEntry[] = [
               ...SILENT_AT_W384,
               { route: "/console/dashboard", subject: "nothing.rendersThis", what: "a row about a list that is not there" },
             ]).stale.length > 0,
+        },
+      },
+    ],
+  },
+  {
+    module: "src/quality/decision-moments.ts",
+    // A NULL IS A CLAIM. This module walks nothing: its population is W373's `patientRules`,
+    // handed in as a parameter, and what it adds is read from the signatures behind that list. It
+    // opens each of those files to read a parameter list and opens nothing else, so a census row
+    // saying it derives from the tree would be describing a walk it does not do — W267's own
+    // derivation contradicts such a row, which is how this one was caught.
+    census: null,
+    branches: [
+      {
+        fn: "momentDiff",
+        branch: "undeclared",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            momentDiff(process.cwd(), [], decisions(process.cwd())).undeclared.length > 0,
+        },
+      },
+      {
+        fn: "momentDiff",
+        branch: "stale",
+        reach: {
+          kind: "driven",
+          drive: () =>
+            momentDiff(
+              process.cwd(),
+              [...STALE_AT_W387, { rule: "src/engine/gone.ts::vanished", decidesAt: "atIso", costs: "x" }],
+              decisions(process.cwd()),
+            ).stale.length > 0,
         },
       },
     ],

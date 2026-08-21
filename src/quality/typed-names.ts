@@ -179,6 +179,10 @@ export interface PlantedName {
  */
 export const PLANTED_NAMES: readonly PlantedName[] = [
   {
+    value: "src/engine/self-probe.ts::probeDecide",
+    why: "W307's self-scan for W387 plants a patient rule into a constructed tree and looks for it by name, so the marker is the name of a file this repository must NOT hold: a real one would put a fabricated rule into the product's own population, where W373 would declare it and W387 would report it as a second instance of the defect it exists to name. The pair being fabricated is what keeps the demonstration a demonstration.",
+  },
+  {
     value: "src/planted/walker.ts",
     why: "W376's gate hands W367's `boundedWalkers` a bound whose module calls a shared walk, so the member half of that quarter's reading can be shown. The pair is fabricated on purpose: a real module would make the reading a fact about this tree rather than a demonstration that the derivation can see one arrive.",
   },

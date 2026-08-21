@@ -264,6 +264,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/decision-moments.ts",
+    name: "STALE_AT_W387",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a patient-selecting rule gaining or losing a moment of its own, or starting or stopping to take an already-guarded set",
+      whyStopping:
+        "A NAMED ROW PER RULE, each saying what the gap costs a patient, and the population is re-derived from the product's own signatures on every run. A row arriving means a rule has started deciding at an instant its guard did not answer for — the defect this unit exists to name, and the one that reaches a person rather than a reviewer. A row leaving means somebody made a rule re-guard at its own moment, which is the outcome. It cannot be satisfied by retyping a digit: the register compares rule names against what the tree's functions take.",
+    },
+  },
+  {
     module: "src/quality/import-cycles.ts",
     name: "CYCLES_AT_W381",
     classification: {

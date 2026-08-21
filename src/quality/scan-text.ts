@@ -176,6 +176,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "The words it looks for ARE literals. It asks whether the arm of a conditional a reader gets when a list is empty puts anything readable on the screen, and the readable things are the text between tags and the copy constant a page interpolates — blanking either would leave every empty state on this console looking exactly like silence. Comments are subtracted because this tree explains its pages in prose beside them, and a `//` note describing an empty state is a description rather than one.",
   },
   {
+    module: "src/quality/decision-moments.ts",
+    prep: { comments: "subtracted", literals: "kept" },
+    why: "Comments MUST go: this tree writes a doc block INSIDE a parameter list — `buildInvitationPool` explains its ranking seam there — and a comma in that prose split the list before the preparation was used. Literals stay because nothing here reads one and blanking them would cost a pass over every product module for no answer; the scan reads parameter names and types, which survive either way, so `kept` is the cheaper of two readings that agree.",
+  },
+  {
     module: "src/quality/shared-state.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "The path a write targets IS a literal — `path.join(ROOT, \"src/planted\")` — and blanking it would leave every write in this suite pointing at nowhere. Comments go because this tree writes about `src/planted` in prose beside the code that creates it, and a sentence naming a path is not a write to it: `repository-clean.test.ts` opens with a header describing exactly the write this register looks for.",

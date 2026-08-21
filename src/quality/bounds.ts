@@ -73,6 +73,7 @@ import { POPULATION_BOUND } from "./populations";
 import { RENDERED_BOUND } from "@/console/rendered-zeros";
 import { HOOK_BOUND } from "./hook-reach";
 import { SHARED_BOUND } from "./shared-state";
+import { DECISION_BOUND } from "./decision-moments";
 import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
@@ -548,6 +549,31 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         why: "'ONE OF THEM IS A GUESS' — which of the three exclusions rests on a single call rather than on a derivation, so it counts the sentence's own admission rather than anything in the tree. It stays one however many list renders the console grows.",
       },
     ],
+  },
+  {
+    module: "src/quality/decision-moments.ts",
+    name: "DECISION_BOUND",
+    unit: "W387",
+    text: DECISION_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "the guard read rather than described",
+      reads: "`decision-moments.ts`, for which of a guard's exclusions depend on the date it is handed, derived from the guard's own body rather than from a sentence somebody wrote",
+      // The clause that names something buildable. The row below asserts that every exclusion
+      // `evaluateEligibility` applies is time-dependent; nothing opens it to check.
+      stillOpen: (root) =>
+        !/export function timeDependentExclusions/.test(
+          readFileSync(path.join(root, "src/quality/decision-moments.ts"), "utf8"),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/decision-moments.ts":
+            "// W387: the product's moments.\nexport function timeDependentExclusions(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [],
   },
   {
     module: "src/quality/shared-state.ts",

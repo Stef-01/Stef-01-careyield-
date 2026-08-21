@@ -42,6 +42,7 @@ import { hookSites } from "./hook-reach";
 import { silentZeros } from "@/console/rendered-zeros";
 import { moduleGraph } from "./import-cycles";
 import { repositoryWrites } from "./shared-state";
+import { parametersOf } from "./decision-moments";
 import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
 import { privateCopies } from "./private-copies";
@@ -180,6 +181,26 @@ export const MARKERS: readonly Marker[] = [
           variant: saw(fixtureText("zero-probe-component-empty")),
         };
       },
+    },
+  },
+  {
+    module: "src/quality/decision-moments.ts",
+    matches: "a parameter named `todayIso`, `sessionDate`, `atIso`, `sentAtIso`, `nowIso`, `asOfIso` or `window`",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "`decidedOn: string` — a date parameter named for what it is about rather than for its shape, which this tree could write tomorrow and which the register would read as naming no moment at all.",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          "export function probeDecide(eligible: Patient[], todayIso: string): Patient[] {\n  return eligible;\n}\n",
+          "export function probeDecide(eligible: Patient[], decidedOn: string): Patient[] {\n  return eligible;\n}\n",
+          (copy) =>
+            parametersOf(readFileSync(path.join(copy, PROBE_FILE), "utf8"), "probeDecide").some((p) =>
+              /^(?:todayIso|nowIso|atIso|sentAtIso|sessionDate|asOfIso|window)$/.test(p.name),
+            ),
+        ),
     },
   },
   {
