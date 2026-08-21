@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import {
   DIVERGENCE_AT_W396,
-  RUNTIME_BOUND,
+  LOADED_BOUND,
   divergenceDefects,
   divergences,
   typeNames,
@@ -217,7 +217,7 @@ describe("W396 the readings, driven on a planted module", () => {
 
 describe("W396 the bound", () => {
   it("says the reading that would report a cycle is the one that cannot run on it", () => {
-    expect(RUNTIME_BOUND).toContain("import time");
-    expect(RUNTIME_BOUND).toContain("W381");
+    expect(LOADED_BOUND).toContain("import time");
+    expect(LOADED_BOUND).toContain("W381");
   });
 });

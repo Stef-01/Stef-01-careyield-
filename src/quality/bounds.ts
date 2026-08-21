@@ -77,7 +77,7 @@ import { DECISION_BOUND } from "./decision-moments";
 import { CITED_BOUND } from "./cited-checks";
 import { PATTERN_BOUND } from "./patterns";
 import { NUMBER_BOUND } from "./number-words";
-import { RUNTIME_BOUND as POPULATION_RUNTIME_BOUND } from "./runtime-population";
+import { LOADED_BOUND } from "./runtime-population";
 import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
@@ -597,9 +597,9 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
   },
   {
     module: "src/quality/runtime-population.ts",
-    name: "RUNTIME_BOUND",
+    name: "LOADED_BOUND",
     unit: "W396",
-    text: POPULATION_RUNTIME_BOUND,
+    text: LOADED_BOUND,
     lifting: {
       kind: "remedy",
       remedy: "which construct desynchronises the preparation",
