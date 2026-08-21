@@ -46,6 +46,7 @@ import { boundsInTree } from "./bounds";
 import { pinsInTree } from "./pins";
 import { headerViolations } from "./unit-headers";
 import { manifestDiff } from "./manifest";
+import { conventionSites } from "./name-conventions";
 
 /** A planted module's shape, named by what it contains rather than by what it is for. */
 export type ModuleShape =
@@ -91,6 +92,12 @@ const names = (found: readonly string[], planted: string) => found.some((f) => f
  * `namingSites` exists beside this.
  */
 export const DEMANDS: readonly Demand[] = [
+  {
+    file: "src/quality/name-conventions.ts",
+    // A planted module is a site only if its code KEYS on a declared name. An ordinary module
+    // arriving in the tree demands nothing of this register, which is the negative W292 drives.
+    demands: (root, planted) => names(conventionSites(root, "ROOT"), planted),
+  },
   {
     file: "src/compliance/copy-y6.ts",
     demands: (root, planted) => names(copySurfaceMembers(root), planted),

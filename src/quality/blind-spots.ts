@@ -91,6 +91,7 @@ import { SUPERSET_BOUND, type Selector, supersetDefects } from "./superset";
 import { PRIVATE_COPY_BOUND, privateCopies } from "./private-copies";
 import { TYPED_NAME_BOUND, nameDefects } from "./typed-names";
 import { DEFERRAL_BOUND, hardeningRegisterModules } from "./deferrals";
+import { CONVENTION_BOUND, conventionSites } from "./name-conventions";
 
 /** How a register's stated bound has been shown to be true. */
 export type Blindness =
@@ -140,6 +141,31 @@ export const NOT_A_SILENCE =
 const LEDGER_ROW = "| W1 | done | builder-A | 2026-08-14T00:00Z | abc1234 | a row |";
 
 export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
+  "src/quality/name-conventions.ts": {
+    kind: "demonstrated",
+    bound: CONVENTION_BOUND,
+    witness:
+      "a SECOND register keyed to an identifier nobody has declared as a convention, which this register cannot find because finding it is the same problem one level up",
+    control:
+      "a second register keyed to `ROOT`, which is a name already declared and which `conventionSites` therefore does find",
+    probe: () =>
+      withRoot(
+        {
+          // Two SCANNERS, not two users: the register's subject is code that keys on a name.
+          "src/planted/w394-known.ts":
+            "export const finds = (code: string): boolean => /path\\.join\\(\\s*ROOT\\s*,/.test(code);\n",
+          "src/planted/w394-unknown.ts":
+            "export const finds = (code: string): boolean => /path\\.join\\(\\s*WORKSPACE\\s*,/.test(code);\n",
+        },
+        (root) => {
+          const keyed = conventionSites(root, "ROOT");
+          return {
+            witnessSeen: keyed.includes("src/planted/w394-unknown.ts"),
+            controlSeen: keyed.includes("src/planted/w394-known.ts"),
+          };
+        },
+      ),
+  },
   // ── Demonstrated: the detector takes a root, so a witness can be put in front of it ─────────
   "src/quality/assertion-vocabulary.ts": {
     kind: "demonstrated",

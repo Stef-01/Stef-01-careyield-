@@ -92,6 +92,15 @@ export const EXEMPT_PHRASE = "Nothing of its own";
 
 export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
   {
+    register: "src/quality/name-conventions.ts",
+    negative: {
+      kind: "driven_here",
+      plants: "a module that USES a declared convention rather than keying on it — `path.join(ROOT, …)` in ordinary code, not inside a pattern",
+      aBroadDetectorWouldReportIt:
+        "The subject is a register RESTING on a naming habit, and almost every module in this tree mentions `ROOT` somewhere: a walk that reported each one would make the whole tree a second register keyed to the convention and the finding would mean nothing. What makes a module a site is that the name appears inside a comparison or a pattern — code that reads for it — which is why `conventionSites` matches the name in a regex, in quotes, or spaced as a capture, and not simply anywhere.",
+    },
+  },
+  {
     register: "src/compliance/copy-y6.ts",
     negative: {
       kind: "driven_here",

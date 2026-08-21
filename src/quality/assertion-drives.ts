@@ -121,6 +121,7 @@ import { nameDefects } from "./typed-names";
 import { registerDiff } from "./deferrals";
 import { instantDiff } from "./instant";
 import { SURVIVORS_AT_W332 } from "./quarter-mutants";
+import { CONVENTIONS_AT_W394, conventionDefects } from "./name-conventions";
 
 /**
  * A comparison handed an input it must reject, keyed by the register the census names.
@@ -135,6 +136,14 @@ export type Drive = (root: string) => boolean;
 const BEYOND_EVERY_REVIEW = "2099-01-01";
 
 export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
+  "src/quality/name-conventions.ts": (root) =>
+    // The claim is that every declared convention still resolves and still spells the identifier
+    // it is recorded as resting on. Hand the register a row recording a convention its module does
+    // not spell and it must report that the derivation no longer spells it.
+    conventionDefects(root, [
+      { ...CONVENTIONS_AT_W394[0]!, rests: "A_NAME_NO_MODULE_SPELLS" },
+    ]).some((d) => d.what.includes("no longer spells it")),
+
   "src/console/rendered-zeros.ts": (root) =>
     // The claim is that every silent list on this console is one of the declared rows. Hand the
     // register a declaration for a list the console does not render and it must report it stale.

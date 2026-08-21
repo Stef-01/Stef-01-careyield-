@@ -30,6 +30,7 @@ import { coverageDiff, type RouteCoverage } from "./route-coverage";
 import * as walks from "./tree-walks";
 import { withPlantedIn } from "./planting";
 import { probeDirPrefix } from "./repository-clean";
+import { conventionSites } from "./name-conventions";
 
 const ROOT = process.cwd();
 
@@ -51,6 +52,25 @@ interface Pair {
 const HEADER = "// W999: a W292 probe.\n";
 
 const PAIRS: readonly Pair[] = [
+  {
+    register: "src/quality/name-conventions.ts",
+    sees: (root) => conventionSites(root, "ROOT").join("\n"),
+    positive: {
+      // A second SCANNER keyed to the convention — the thing a register resting on `ROOT` is.
+      files: {
+        "src/w292-pos-conv.ts": "export const finds = (code: string): boolean => /path\\.join\\(\\s*ROOT\\s*,/.test(code);\n",
+      },
+      token: "w292-pos-conv.ts",
+    },
+    negative: {
+      // A module that merely USES the convention. Almost every module in this tree does, which is
+      // why a walk reporting them would make the whole tree a site and the finding worthless.
+      files: {
+        "src/w292-neg-conv.ts": 'import path from "node:path";\nconst ROOT = process.cwd();\nexport const where = path.join(ROOT, "x");\n',
+      },
+      token: "w292-neg-conv.ts",
+    },
+  },
   {
     register: "src/compliance/copy-y6.ts",
     sees: (root) => copySurfaceMembers(root).join("\n"),

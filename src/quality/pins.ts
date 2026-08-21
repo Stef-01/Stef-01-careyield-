@@ -411,6 +411,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/name-conventions.ts",
+    name: "CONVENTIONS_AT_W394",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a reader finding another derivation keyed to a name, or one of these being rewritten to key on a structure instead",
+      whyStopping:
+        "ONE ROW PER NAME-KEYED DERIVATION SOMEBODY HAS READ, and the register says outright that the number is a measure of the reading rather than of the tree — deriving the population would be the same problem one level up, because a scan that found name-keyed registers would be keyed to how THOSE are written. What a row carries is an identifier the module must still spell and a cost stated in the register's own terms, neither satisfiable by retyping a digit: `conventionDefects` resolves the derivation, re-reads the spelling and re-runs the measured probe on every run, and `conventionSites` grows the second direction on its own for any name already named.",
+    },
+  },
+  {
     module: "src/quality/horizon-q30-gate.ts",
     name: "MOMENTS_AT_W389",
     classification: {
