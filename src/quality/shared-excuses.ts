@@ -43,6 +43,7 @@ import { STORE_READS } from "@/tenancy/store-reads";
 import { NOT_A_SILENCE, NOT_CALLABLE } from "./blind-spots";
 import { callableDetectorsBorrowingTheSentence } from "./escape-hatches";
 import { prepareForScan } from "./scan-text";
+import { preparationLoses } from "./runtime-population";
 import { sourceModules } from "./tree-walks";
 
 /** A reason-string, and every entry in the tree that stands behind it. */
@@ -275,6 +276,30 @@ export function excuses(): readonly Excuse[] {
 }
 
 const ROWS = (): readonly Excuse[] => [
+  {
+    name: "lost-in-unit-headers",
+    text: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
+    claim: "the shared preparation loses exported names this module really declares",
+    falsifier: (root) =>
+      preparationLoses(readFileSync(path.join(root, "src/quality/unit-headers.ts"), "utf8")).length === 0 ? ["src/quality/unit-headers.ts"] : [],
+    why: "W396's finding, one module at a time, and the sentence is shared because the CAUSE is: one preparation loses all of them, so twelve rows standing behind one reason is the honest shape rather than twelve paraphrases of it. It is falsifiable and the falsifier is the point — the day somebody repairs the preparation this module stops losing names, the excuse is contradicted, and the rows that rest on it have to be re-read instead of quietly outliving the repair.",
+  },
+  {
+    name: "lost-in-blind-spots",
+    text: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same line: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions \u2014 so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
+    claim: "the shared preparation loses exported names this module really declares",
+    falsifier: (root) =>
+      preparationLoses(readFileSync(path.join(root, "src/quality/blind-spots.ts"), "utf8")).length === 0 ? ["src/quality/blind-spots.ts"] : [],
+    why: "The same sentence for the same cause, kept separate per module because what each one costs is different and a reader deciding whether to act needs to know WHICH exports go. Four here, and they are this register's own bound and its report functions, which is why this row is worth reading twice: the register that names what other registers cannot see is the one whose own names are missing.",
+  },
+  {
+    name: "lost-in-self-reference",
+    text: "MEASURED RATHER THAN DIAGNOSED. Eight names the module really exports, this module's own bound among them, are absent from the prepared text while present in the raw text. It is the sharpest place for the loss to fall: this is the module whose subject IS a scan that has to read itself, and it cannot read its own exports through the scan it shares with sixty other registers.",
+    claim: "the shared preparation loses exported names this module really declares",
+    falsifier: (root) =>
+      preparationLoses(readFileSync(path.join(root, "src/quality/self-reference.ts"), "utf8")).length === 0 ? ["src/quality/self-reference.ts"] : [],
+    why: "The third module and the sharpest, so the row says so rather than folding into the other two: this is the module whose subject IS a scan that has to read itself, and eight of its values — its own bound among them — are absent from the text the shared preparation returns. Falsified the same way, by the module ceasing to lose names.",
+  },
   {
     name: "NOT_CALLABLE",
     text: NOT_CALLABLE,

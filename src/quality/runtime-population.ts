@@ -64,6 +64,22 @@ export function typeNames(source: string): string[] {
   );
 }
 
+/**
+ * The exported names a module's RAW text yields that its prepared text does not.
+ *
+ * THE MEASUREMENT BEHIND THE `lost_to_the_scan` ROWS, exported so the sentence they share can be
+ * falsified rather than believed: the day somebody repairs the shared preparation this returns
+ * nothing for these modules, and W356's register reports the excuse as one the tree contradicts.
+ */
+export function preparationLoses(source: string): string[] {
+  const declared = (text: string) =>
+    [...text.matchAll(/^export (?:async )?(?:function|const|class) (\w+)/gm)].map((m) => m[1]!);
+  const prepared = declared(
+    prepareForScan(source, { comments: "subtracted", literals: "blanked" }),
+  );
+  return declared(source).filter((name) => !prepared.includes(name));
+}
+
 /** A name one reading has and the other does not. */
 export interface Divergence {
   module: string;
@@ -156,6 +172,8 @@ export function divergenceDefects(
   );
 }
 
+
+
 export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
   {
     module: "src/quality/acceptances.ts",
@@ -182,7 +200,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "BLIND_SPOT_BOUND",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same pattern: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions \u2014 so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
+      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same line: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions — so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
     },
   },
   {
@@ -190,7 +208,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "boundDiff",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same pattern: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions \u2014 so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
+      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same line: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions — so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
     },
   },
   {
@@ -198,7 +216,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "deadProbes",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same pattern: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions \u2014 so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
+      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same line: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions — so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
     },
   },
   {
@@ -206,7 +224,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "falseBounds",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same pattern: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions \u2014 so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
+      why: "MEASURED RATHER THAN DIAGNOSED, the same way and with the same line: seven names in the raw text, three in the prepared text. The four that go are this register's own bound and its report functions — so the register that exists to name what other registers cannot see is itself unreadable to any reading built on the shared preparation. The trigger is not isolated here either; the whole file is needed to reproduce it.",
     },
   },
   {
@@ -278,7 +296,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "ADOPTED_MODULES",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -286,7 +304,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "FOREIGN_CITATIONS",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -294,7 +312,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "HEADER_CITATION_BOUND",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -302,7 +320,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "adoptedModuleNames",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -310,7 +328,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "headerCensus",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -318,7 +336,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "headerNamesUnknown",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -326,7 +344,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "headerSubjectDefects",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -334,7 +352,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "headerUnit",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -342,7 +360,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "headerViolations",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -350,7 +368,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "knownUnits",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -358,7 +376,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "misplacedUnit",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
   {
@@ -366,7 +384,7 @@ export const DIVERGENCE_AT_W396: readonly DeclaredDivergence[] = [
     name: "screamingExports",
     cause: {
       kind: "lost_to_the_scan",
-      why: "MEASURED RATHER THAN DIAGNOSED. Matching `^export (function|const) (\\w+)` against this module's RAW text finds thirteen names; matching the same pattern against the text `prepareForScan` returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it \u2014 W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work `RUNTIME_BOUND` leaves open.",
+      why: "MEASURED RATHER THAN DIAGNOSED. Matching an export-declaration line against this module's RAW text finds thirteen names; matching the same line against the text prepareForScan returns finds one. The shared preparation loses the region these twelve declarations sit in, and every register that reads prepared text loses them with it — W388 judges a citation by whether the cited test names an export of its subject, and for this module it is asking that of a list one name long. WHICH construct desynchronises the preparation is not settled here: the block in isolation prepares correctly, so the trigger is a state carried in from elsewhere in the file, and naming it is the work RUNTIME_BOUND leaves open.",
     },
   },
 ];
