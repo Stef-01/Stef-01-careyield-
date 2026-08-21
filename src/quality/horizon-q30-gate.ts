@@ -30,6 +30,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { withTree } from "./planting";
+import { fixtureText } from "./scan-text";
 import { type UnitId, asUnitId } from "./typed-names";
 import { momentDefects } from "./moments";
 import { readsTheLiveLedger } from "./welded-comparisons";
@@ -200,11 +201,8 @@ export const MOMENTS_AT_W389: readonly QuarterMoment[] = [
       probe: (root) =>
         withTree(
           {
-            "src/planted/w389-live.test.ts":
-              'import { readFileSync } from "node:fs";\nimport path from "node:path";\n' +
-              'const ROOT = process.cwd();\nconst L = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");\nexport const a = L;\n',
-            "src/planted/w389-planted.test.ts":
-              'const L = "| W900 | done | b | t | abc1234 | a planted row. |";\nexport const a = L;\n',
+            "src/planted/w389-live.test.ts": fixtureText("w389-live-ledger"),
+            "src/planted/w389-planted.test.ts": fixtureText("w389-planted-ledger"),
           },
           (planted) => ({
             caughtHere: readsTheLiveLedger(planted, "src/planted/w389-live.test.ts"),
@@ -224,10 +222,8 @@ export const MOMENTS_AT_W389: readonly QuarterMoment[] = [
       probe: (root) =>
         withTree(
           {
-            "src/planted/w389-status.test.ts":
-              'const rows: { status: string }[] = [];\nexport const a = rows.filter((r) => r.status === "claimed");\n',
-            "src/planted/w389-nostatus.test.ts":
-              'import { readFileSync } from "node:fs";\nexport const a = readFileSync("BUILD-STATE.md", "utf8").length;\n',
+            "src/planted/w389-status.test.ts": fixtureText("w389-reads-status"),
+            "src/planted/w389-nostatus.test.ts": fixtureText("w389-names-no-status"),
           },
           (planted) => ({
             caughtHere: readsARowStatus(planted, "src/planted/w389-status.test.ts"),

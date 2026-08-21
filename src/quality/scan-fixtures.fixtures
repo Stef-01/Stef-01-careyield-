@@ -843,3 +843,26 @@ export const PROBE_ROWS = [
 
 === cited-absent-citation ===
 src/gone.test.ts :: a title nobody wrote
+
+=== w389-live-ledger ===
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+const ROOT = process.cwd();
+const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
+export const a = LEDGER;
+
+=== w389-planted-ledger ===
+const LEDGER = "| W900 | done | builder-x | t | abc1234 | a planted row. |";
+export const a = LEDGER;
+
+=== w389-reads-status ===
+const rows: { status: string }[] = [];
+export const a = rows.filter((r) => r.status === "claimed");
+
+=== w389-names-no-status ===
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+const ROOT = process.cwd();
+export const a = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8").length;

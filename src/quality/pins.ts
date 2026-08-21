@@ -383,6 +383,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/horizon-q30-gate.ts",
+    name: "MOMENTS_AT_W389",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a unit arriving in or leaving the horizon document's table, or one whose moment this gate could not previously show both ways",
+      whyStopping:
+        "ONE ROW PER UNIT THE QUARTER'S HORIZON NAMES, and the number is not the thing: `quarterDefects` reads the table out of `docs/HORIZON-Q30.md` and reports in BOTH directions, so a row cannot be added without the document naming the unit and cannot be dropped while it does. What a row carries is a moment in words and a probe run both ways, neither of which is satisfiable by retyping a digit — a new row has to say when its check answers and show it telling a failure at that moment from one at another.",
+    },
+  },
+  {
     module: "src/quality/quarter-mutants-q29.ts",
     name: "QUARTER_AT_W386",
     classification: {

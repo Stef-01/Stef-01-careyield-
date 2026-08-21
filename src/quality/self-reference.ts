@@ -283,9 +283,13 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     plant: { "src/planted/w341-walk.ts": fixtureText("private-tree-recursion") },
     marker: "planted/w341-walk",
     holdersAppear: "never",
-    holders: ["src/quality/private-copies.ts", "src/quality/private-copies.test.ts"],
+    holders: [
+      "src/quality/horizon-q30-gate.ts",
+      "src/quality/private-copies.ts",
+      "src/quality/private-copies.test.ts",
+    ],
     why:
-      "W341's detector looks for a module holding its own copy of a shared parse, and the markers it looks for ARE such a copy in miniature. Written inline they would make this register the largest private copy in the tree by its own measure — the collision W295 shipped, W298 found twice, and this file exists to stop.",
+      "W341's detector looks for a module holding its own copy of a shared parse, and the markers it looks for ARE such a copy in miniature. Written inline they would make this register the largest private copy in the tree by its own measure — the collision W295 shipped, W298 found twice, and this file exists to stop. W389'S GATE JOINED THE LIST BY BEING CAUGHT, which is the register working: two of its probes plant a `.test.ts` reading the live ledger, to show that W379's derivation reports a comparison welded against it and W380's ignores one that names the file and reads no status. Written inline those planted sources made the GATE a private copy of the ledger row parse, reported twice, and moving them here is the same fix this row describes for the register above.",
   },
 ];
 

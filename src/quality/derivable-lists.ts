@@ -157,6 +157,7 @@ export const LISTED_REGISTERS: readonly ListedRegister[] = [
   { id: "src/quality/populations.ts::POPULATIONS", membership: callable("src/quality/populations.ts::populationDefects") },
   { id: "src/quality/private-copies.ts::DECLARED_COPIES", membership: callable("src/quality/private-copies.ts::copyDefects") },
   { id: "src/quality/prose-numbers.ts::CLAIMS", membership: callable("src/quality/prose-numbers.ts::claimDefects") },
+  { id: "src/quality/horizon-q30-gate.ts::MOMENTS_AT_W389", membership: callable("src/quality/horizon-q30-gate.ts::quarterDefects") },
   { id: "src/quality/quarter-mutants-q29.ts::EXCLUDED_AT_W386", membership: callable("src/quality/quarter-mutants-q29.ts::populationDefects") },
   { id: "src/quality/quarter-mutants-q29.ts::UNMUTATED_AT_W386", membership: callable("src/quality/quarter-mutants-q29.ts::populationDefects") },
   {
