@@ -19,6 +19,12 @@
 // What replaced it is a SCANNER that walks the literal tracking character classes and escapes,
 // which is a parse rather than a match and is the remedy this register recommends everywhere else.
 //
+// AND THE BOUND'S SECOND CLAUSE WAS DEMONSTRATED BEFORE THE UNIT LANDED. Reading the finished rows
+// back against their own literals turned up alternation sizes stated wrongly in the sentences — a
+// list described as longer than it is, in more than one row. Nothing here reports that and nothing
+// here could: the register checks that a sentence EXISTS, not that it is true, and the gap between
+// those is the quarter. The rows are corrected; the way they got in is the subject.
+//
 // WHAT THIS DOES NOT PROVE is `PATTERN_BOUND`, exported below and read by W297's register.
 //
 // FOUNDER GATE (plan §4): nothing crossed. It reads this repository's own source text.
@@ -373,10 +379,10 @@ export const PATTERNS_AT_W391: readonly DeclaredPattern[] = [
     source:
       "/\\b(?:restoreAllMocks|resetAllMocks|clearAllMocks|unstubAllEnvs|unstubAllGlobals|useRealTimers|useFakeTimers|resetModules)\\s*\\(/",
     claims:
-      "A reclaimer that only reaches this process: the nine vitest restore and reset calls, by name.",
+      "A reclaimer that only reaches this process: the eight vitest restore and reset calls, by name.",
     reading: {
       kind: "only_this",
-      why: "The list is nine names written out, so a reclaimer added to vitest tomorrow, or one this tree wraps in a helper of its own, is classified by the other arm as reaching outside the process and gets held to a stricter rule than it needs. Whether that is right is a judgement no second derivation makes.",
+      why: "The list is eight names written out, so a reclaimer added to vitest tomorrow, or one this tree wraps in a helper of its own, is classified by the other arm as reaching outside the process and gets held to a stricter rule than it needs. Whether that is right is a judgement no second derivation makes.",
     },
   },
   {
@@ -388,7 +394,7 @@ export const PATTERNS_AT_W391: readonly DeclaredPattern[] = [
       "A reclaimer that touches the disk: the three synchronous removal calls, or a bare rm or unlink.",
     reading: {
       kind: "only_this",
-      why: "It decides which cleanups outlive the process, and it decides it from six call names. A removal reached through a helper this tree wrote, or through a library, removes the same directory and is not in the population, so the hook holding it is not one this register asks to be reachable.",
+      why: "It decides which cleanups outlive the process, and it decides it from five call names. A removal reached through a helper this tree wrote, or through a library, removes the same directory and is not in the population, so the hook holding it is not one this register asks to be reachable.",
     },
   },
   {
