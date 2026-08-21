@@ -136,6 +136,15 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/number-words.ts::NUMBER_BOUND",
+    condition: "invisible to both readings at once",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/blind-spots.ts::falseBounds",
+      how: "W295'S WITNESS IS THE READING, AND W393 WROTE IT ON THE WAY IN. The probe plants one sentence twice into a bare tree, differing in a single word: `one hundred and forty defaults`, whose noun this tree does not count, and `one hundred and forty modules`, whose noun it does. The first is reported by neither reading and the second by both, so the clause is measured on every run rather than argued — and what it measures is the NOUN, because the number is identical across the pair. WHAT IS NOT READ is the sharper half of the same sentence: two readings blind in the same direction are one reading, and no check here can say whether a THIRD derivation would be blind with them. The remedy the clause implies is a population that comes from somewhere other than W314's noun list, which is a unit rather than a row.",
+    },
+  },
+  {
     bound: "src/quality/cited-checks.ts::CITED_BOUND",
     condition: "a body that reaches the subject THROUGH a shared harness does not satisfy it and should",
     reading: {

@@ -200,9 +200,13 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
       // bare tree makes the pair cheap enough that this probe adds nothing to W347's class. The
       // sentence differs between witness and control in ONE WORD, so what the pair measures is the
       // noun and not the number.
+      // NO TEMPLATE LITERAL, and the reason is a finding rather than a style note. Written with
+      // backticks this probe blanked the REST OF THIS FILE under `prepareForScan` — `SCAN_BOUND`
+      // says so in its own words — and W375's register promptly lost the `rmSync` site below it.
+      // A shared scanner's stated bound, arriving as a missing row in a different register.
       const sees = (noun: string) =>
         withTree(
-          { "src/probe.ts": `// It walks one hundred and forty ${noun} today.\n` },
+          { "src/probe.ts": "// It walks one hundred and forty " + noun + " today.\n" },
           (root) => misreadings(proseClaims(root), proseInTree(root, proseOf)).length > 0,
         );
       // `seen` is the register RECOGNISING the case. The witness stays unseen while the bound holds.

@@ -101,6 +101,7 @@ export const COMPARED_AT_W367: readonly Compared[] = [
   { bound: "src/quality/derivable-lists.ts::DERIVABLE_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "A hand-listed register keyed by something else — a route, a unit id, a store name, a record class — is outside the scan entirely" } },
   { bound: "src/quality/exemption-reach.ts::REACH_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "An exemption welded inside a function, one keyed by a typed record rather than a string map, or one spelled as a skip list in an array is outside the scan entirely" } },
   { bound: "src/quality/flattering-numbers.ts::FIGURE_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "A FIGURE SPELLED AS THE LENGTH OF A LIST IS INVISIBLE HERE" } },
+  { bound: "src/quality/number-words.ts::NUMBER_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "A run of number-words in front of a noun this tree does not count is invisible to both readings at once" } },
   { bound: "src/quality/cited-checks.ts::CITED_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "THIS MODULE IS EXCLUDED FROM ITS OWN WALK BY NAME" } },
   { bound: "src/console/rendered-zeros.ts::RENDERED_BOUND", walk: ["filesUnder"], edge: { kind: "named", quote: "a zero rendered as a chart, a progress bar, a disabled control or an empty form is in neither register" } },
   { bound: "src/quality/shared-state.ts::SHARED_BOUND", walk: ["typescriptFiles"], edge: { kind: "named", quote: "writes the same disk and appears in no answer here" } },
