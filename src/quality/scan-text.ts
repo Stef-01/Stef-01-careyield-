@@ -166,6 +166,11 @@ export interface ScanSite {
  */
 export const SCAN_SITES: readonly ScanSite[] = [
   {
+    module: "src/quality/name-conventions.ts",
+    prep: { comments: "subtracted", literals: "kept" },
+    why: "W394's subject is a module whose SCANNING CODE keys on a name, and a scan looking for that must keep the literals: the identifier it is hunting appears inside a regex or in quotes, which is precisely what blanking literals would empty. Comments are subtracted for the reason this register exists — this tree explains its conventions at length, and a module writing `\\`ROOT\\` is a convention` in prose is not a module keyed to it. Without that subtraction the register would report itself, and every other module that discusses the habit, as a second site.",
+  },
+  {
     module: "src/quality/mutation-sampling.ts",
     prep: { comments: "subtracted", literals: "blanked" },
     why: "W349's mutation sites, and the defaults are what it wants for the reason this tree keeps rediscovering: a module explaining `===` in prose is not a module comparing with it, and a `===` inside a string literal is not an operator either. It arrived in this register at W383 rather than at W349, and how is the point — it had been doing exactly this by hand, `stripComments` on one line and `blankLiterals` on the next, which is the right order written where `SCAN_ORDER_RULE` could not reach it. Declaring the site is what calling the named composition buys. Its OFFSETS are into the comment-stripped text with literals intact, which is a second string it still derives itself.",

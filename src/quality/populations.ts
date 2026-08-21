@@ -158,6 +158,7 @@ export const POPULATIONS: readonly Population[] = [
   { file: "src/quality/manifest.ts", source: { kind: "own_recursion" } },
   { file: "src/quality/mutation-sampling.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },
   { file: "src/quality/negative-probes.test.ts", source: { kind: "shared_walk", walks: ["dossierTestFiles", "exportedResetters", "migrationSql", "modulesWithNoUnitHeader", "pageSpecFiles", "sourceModules", "storeModules", "textFiles", "verticalModules"] } },
+  { file: "src/quality/name-conventions.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },
   { file: "src/quality/order-independence.ts", source: { kind: "shared_walk", walks: ["sourceModules"] } },
   { file: "src/quality/page-suite.test.ts", source: { kind: "shared_walk", walks: ["pageSpecFiles"] } },
   { file: "src/quality/page-suite.ts", source: { kind: "shared_walk", walks: ["pageSpecFiles"] } },
