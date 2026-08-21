@@ -142,7 +142,7 @@ export const EMPTY_AT_W369: readonly DeclaredEmpty[] = [
   { module: "src/quality/horizon-q29.test.ts", name: "IN_FLIGHT_AT_EXPANSION", emptiness: { kind: "by_design", quote: "EMPTY, AND THE EMPTINESS IS A FACT ABOUT THE MOMENT rather than a field nobody filled" } },
   // The second. A run happened and found nothing left, which is not the same as no run.
   { module: "src/quality/quarter-mutants-q28.ts", name: "SURVIVORS_AT_W374", emptiness: { kind: "because_fixed", quote: "EMPTY BECAUSE THE RUN CLOSED WHAT IT FOUND, not because nobody ran it" } },
-  { module: "src/quality/quarter-mutants-q28.ts", name: "UNMUTATED_AT_W374", emptiness: { kind: "by_design", quote: "EMPTY THIS QUARTER, and that is a measurement rather than an omission" } },
+  { module: "src/quality/quarter-mutants-q29.ts", name: "SURVIVORS_AT_W386", emptiness: { kind: "because_fixed", quote: "EMPTY BECAUSE THE RUN CLOSED WHAT IT FOUND, not because nobody ran it" } },
   { module: "src/quality/quarter-mutants-q27.ts", name: "SURVIVORS_AT_W362", emptiness: { kind: "because_fixed", quote: "The survivor W362 did find was fixed in `typed-names.test.ts` rather than recorded here, per W357" } },
   { module: "src/quality/register-counts.ts", name: "RATCHETS", emptiness: { kind: "because_fixed", quote: "the two this unit found were rewritten in place instead" } },
   { module: "src/registers/authoring.ts", name: "SHIPPED_WORKSPACE", emptiness: { kind: "by_design", quote: "no clinical content exists in this tree, so nothing is signed off and nothing is usable" } },

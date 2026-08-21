@@ -65,12 +65,24 @@ export const EXCLUDED_AT_W374: readonly Excluded[] = [
 /**
  * Modules in the population that the operators find nothing to change in.
  *
- * EMPTY THIS QUARTER, and that is a measurement rather than an omission: all eleven reachable
- * modules yield mutants, the fewest being two. W362 had one such module and recorded it so it could
- * not read as cleared; this quarter has none, and `populationDefects` walks the population looking
- * for one on every run so the emptiness cannot go stale.
+ * ONE, ADDED BY A LATER QUARTER'S FIX RATHER THAN BY THIS RUN. When W374 ran, all eleven reachable
+ * modules yielded mutants and this list was empty. W386's sweep then found, in Q29's population,
+ * the same identity mutant this run had closed in `hardening-q27.ts` — alive in Q28's copy of the
+ * same function — and closed it by SHARING the lookup rather than copying the fix a third time.
+ * That removed the only lines W296's five operators can reach in `hardening-q27.ts`, so a module
+ * this run measured has no verdict any more.
+ *
+ * IT IS RECORDED HERE RATHER THAN IN W386'S REGISTER because the module belongs to this quarter's
+ * population, and a row in the wrong quarter's list would be invisible to the walk that checks it.
+ * `populationDefects` looks for such a module on every run, which is how this one was found the
+ * moment it appeared.
  */
-export const UNMUTATED_AT_W374: readonly Unmutated[] = [];
+export const UNMUTATED_AT_W374: readonly Unmutated[] = [
+  {
+    module: "src/quality/hardening-q27.ts",
+    why: "Q27's pass record: findings, dispositions, the units read, and a `finding(id)` that was the only line any of the five operators could reach. This run found the identity mutant in it and closed it in Q27's suite; W386 found the same mutant one copy over and merged all three copies into `hardening-q22.ts::findingIn`. What is left here is a register of literals — a range, two string lists, an array of findings and a bound — with no comparison, no conjunction and no threshold, so the operators find nothing and this module has no verdict from this instrument until it grows one.",
+  },
+];
 
 /**
  * The modules this sweep really runs over: the quarter's own, minus what it cannot reach.
@@ -214,9 +226,15 @@ export const CLOSED_BY_W374: readonly Closed[] = [
     where: "suite",
   },
   {
+    // W386 MOVED THIS ONE FROM `suite` TO `module`, and the reason is the finding of that unit. The
+    // fix here was an assertion beside a line left in place — and one quarter later W386's sweep
+    // found the IDENTICAL mutant in Q28's own copy of the same function, because a fix applied to a
+    // copy is not applied to the copy beside it. The three copies are one shared `findingIn` now,
+    // so the line this row names is gone from `hardening-q27.ts` and the fix lives where the
+    // function does.
     id: "src/quality/hardening-q27.ts :: eq-to-neq :: const found = FINDINGS.find((f) => f.id === id);",
-    file: "src/quality/hardening-q27.test.ts",
-    where: "suite",
+    file: "src/quality/hardening-q22.ts",
+    where: "module",
   },
   {
     id: 'src/quality/superset.ts :: eq-to-neq :: honest: (root) => (claimCommit(GIT_LOG(root), "W352") === null ? 0 : 1),',

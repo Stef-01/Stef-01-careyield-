@@ -58,6 +58,19 @@ describe("W386 the population is the quarter's own modules", () => {
     expect(q29Population(ROOT).length).toBe(added.length - EXCLUDED_AT_W386.length);
   });
 
+  it("takes its exclusions and its range from the caller, not only from its own defaults", () => {
+    // W355'S RULE: a defaulted parameter nobody ever varies is a parameter that does not work.
+    // Handed no exclusions, the module this sweep cannot reach comes back into the population.
+    expect(q29Population(ROOT, [])).toContain("src/quality/quarter-mutants-q28.ts");
+    expect(q29Population(ROOT)).not.toContain("src/quality/quarter-mutants-q28.ts");
+    // Handed another quarter's range, it answers about that quarter — so the range is read rather
+    // than decorative, and this register could measure a quarter it was not written for.
+    const overQ28 = q29Population(ROOT, [], { first: 352, last: 364 });
+    expect(overQ28).toContain("src/quality/quarter-mutants-q27.ts");
+    expect(overQ28).not.toContain("src/quality/spelling-markers.ts");
+    expect(q29Population(ROOT)).toContain("src/quality/spelling-markers.ts");
+  });
+
   it("reports an excused module the quarter did not add", () => {
     const defects = populationDefects(ROOT, [
       ...EXCLUDED_AT_W386,
