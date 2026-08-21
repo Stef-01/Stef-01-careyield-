@@ -1739,9 +1739,7 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       lifted: {
         kind: "constructed_tree",
         files: {
-          "src/quality/welded-comparisons.ts": fixtureText(
-            "welded-comparisons-lifted",
-          ),
+          "src/quality/welded-comparisons.ts": fixtureText("welded-comparisons-lifted"),
         },
       },
     },
@@ -1775,9 +1773,7 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       lifted: {
         kind: "constructed_tree",
         files: {
-          "src/quality/derivable-lists.ts": fixtureText(
-            "derivable-lists-lifted",
-          ),
+          "src/quality/derivable-lists.ts": fixtureText("derivable-lists-lifted"),
         },
       },
     },
@@ -1814,9 +1810,7 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
           // W307's rule, and W355 is what enforced it here: spelled inline, the planted module's
           // source sat in THIS file as a literal, and the defaulted-register scan read it as a real
           // parameter nobody drives. A fixture is not a module.
-          "src/quality/exemption-reach-probe.ts": fixtureText(
-            "exemption-reach-lifted",
-          ),
+          "src/quality/exemption-reach-probe.ts": fixtureText("exemption-reach-lifted"),
         },
       },
     },
