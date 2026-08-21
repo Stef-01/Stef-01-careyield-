@@ -45,6 +45,7 @@ import { moduleGraph } from "./import-cycles";
 import { repositoryWrites } from "./shared-state";
 import { parametersOf } from "./decision-moments";
 import { citationsInTree } from "./cited-checks";
+import { patternSites } from "./patterns";
 import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
 import { privateCopies } from "./private-copies";
@@ -219,6 +220,23 @@ export const MARKERS: readonly Marker[] = [
           'export const ROWS = [{ module: "src/quality/planting.ts", citation: "src/quality/planting.test.ts :: refuses a root" }];\n',
           "export const ROWS = [{ module: 'src/quality/planting.ts', citation: 'src/quality/planting.test.ts :: refuses a root' }];\n",
           (copy) => citationsInTree(copy).some((c) => c.citing === PROBE_FILE),
+        ),
+    },
+  },
+  {
+    module: "src/quality/patterns.ts",
+    matches: "a regex literal assigned to an ALL-CAPS-or-camel name by a `const` starting its own line",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "a group of patterns held together in one object — `const SPELLINGS = { unit: /^W\\d+$/, module: /^src\\// }` — which is ordinary code, defines two populations exactly as two constants would, and reaches this register as nothing at all.",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          "export const PROBE_UNIT = /^W\\d+$/;\n",
+          "export const PROBE_SPELLINGS = { unit: /^W\\d+$/ };\n",
+          (copy) => patternSites(copy, [PROBE_FILE]).length > 0,
         ),
     },
   },
