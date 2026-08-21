@@ -411,10 +411,33 @@ export const PATTERNS_AT_W391: readonly DeclaredPattern[] = [
   },
   {
     module: "src/quality/patient-populations.ts",
-    name: "SIGNATURE",
-    source: "/^export function (\\w+)\\(([\\s\\S]*?)\\)\\s*(?::|\\{)/gm",
+    name: "ARROW",
+    source: "/^export const (\\w+)\\s*(?::[^=]*)?=\\s*(?:async\\s*)?\\(([\\s\\S]*?)\\)\\s*(?::|=>)/gm",
     claims:
-      "Every exported function's name and its whole parameter list, read to the parenthesis before the return type or the body.",
+      "Every exported arrow constant's name and its parameter list — the other way this tree writes a function.",
+    reading: {
+      kind: "only_this",
+      why: "W392 added it because the register it serves is about which product rules hold a patient panel, and how a rule is DECLARED has nothing to do with that. The tree writes one product export this way today, so the pattern is carrying almost no weight and the risk is the reverse of the usual one: a second arrow rule would join the population silently and correctly, while a rule written some third way — a method on a class, a default export — is invisible to this and to `SIGNATURE` both, with nothing to disagree.",
+    },
+  },
+  {
+    module: "src/quality/patient-populations.ts",
+    name: "PATIENT_CONSTRAINT",
+    source: "/(?<![A-Za-z])Patient\\s*(?:\\[|\\{|<|\\.|\\[\")/",
+    claims:
+      "A type-parameter constraint that says the things it constrains are patients — `Patient[]`, `Patient[\"id\"]`, a member of one, or an object type opening on one.",
+    reading: {
+      kind: "only_this",
+      why: "THE PATTERN W392 EXISTS BECAUSE OF, and it is doing the work a type checker would. A generic rule spells its parameter `readonly T[]`, which says nothing; what says the members are patients is the CONSTRAINT, so this decides whether `T` counts. It is deliberately narrow — `scopeToPractice<T extends { practiceId: string }>` filters rows of every kind and must not count — and being narrow is also its whole exposure: a constraint naming a patient in a way not listed here leaves a rule outside the population exactly as `narrowToCareGaps` was, and no second reading would notice. `RULE_BOUND` says so and names the remedy: resolving types rather than matching them.",
+    },
+  },
+  {
+    module: "src/quality/patient-populations.ts",
+    name: "SIGNATURE",
+    source:
+      "/^export (?:async )?function (\\w+)\\s*(?:<[^>]*>)?\\(([\\s\\S]*?)\\)\\s*(?::|\\{)/gm",
+    claims:
+      "Every exported function declaration's name and its whole parameter list — `async` or not, generic or not — read to the parenthesis before the return type or the body.",
     reading: {
       kind: "second_reading",
       by: "src/quality/decision-moments.ts::parametersOf",
