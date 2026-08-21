@@ -36,7 +36,7 @@
 // FOUNDER GATE (plan §4): nothing crossed. This reads diffs, registers, a console page and the
 // system temp directory.
 
-import { type HardeningFinding, unaccountedFor } from "./hardening-q22";
+import { type HardeningFinding, findingIn, unaccountedFor } from "./hardening-q22";
 
 /**
  * The quarter, and the EXACT range of diff that was read.
@@ -159,9 +159,7 @@ export const FINDINGS: readonly HardeningFinding[] = [
 
 /** The findings this pass raised, by id, for a suite that re-derives each. */
 export function finding(id: string): HardeningFinding {
-  const found = FINDINGS.find((f) => f.id === id);
-  if (found === undefined) throw new Error(`no finding ${id}`);
-  return found;
+  return findingIn(FINDINGS, id);
 }
 
 /**

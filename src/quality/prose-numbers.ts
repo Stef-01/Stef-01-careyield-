@@ -542,7 +542,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/close-gate.ts", text: "four modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "six entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "three walks", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/hardening-q28.ts", text: "55 files", resolution: { kind: "derived", derive: weldedTests } },
+  { module: "src/quality/hardening-q28.ts", text: "56 files", resolution: { kind: "derived", derive: weldedTests } },
   { module: "src/quality/blocked-surface.ts", text: "two copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/blocked-surface.ts", text: "Two of those copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/spelling-markers.ts", text: "two files", resolution: { kind: "not_a_tree_count" } },
@@ -620,6 +620,10 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/prose-numbers.ts", text: "forty-nine files", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/prose-numbers.ts", text: "twenty-seven routes", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/prose-numbers.ts", text: "Four live rows", resolution: { kind: "at_the_unit" } },
+  // W386's sweep. Each says what that run found or how many copies it merged — history.
+  { module: "src/quality/hardening-q22.ts", text: "Three copies", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/quarter-mutants-q29.ts", text: "eleven reachable modules", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/quarter-mutants-q29.ts", text: "three copies", resolution: { kind: "at_the_unit" } },
   // W383's pass. Each says what that reading FOUND, which is history and does not go stale.
   { module: "src/quality/hardening-q29.ts", text: "four live rows", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q29.ts", text: "Two registers", resolution: { kind: "at_the_unit" } },

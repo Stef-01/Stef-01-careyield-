@@ -151,6 +151,7 @@ export const WELDED_CHECKS: readonly WeldedCheck[] = [
   { file: "src/quality/quarter-mutants-q26.test.ts", standing: movable(LIFT) },
   { file: "src/quality/quarter-mutants-q27.test.ts", standing: movable(LIFT) },
   { file: "src/quality/quarter-mutants-q28.test.ts", standing: movable(LIFT) },
+  { file: "src/quality/quarter-mutants-q29.test.ts", standing: movable(LIFT) },
   { file: "src/quality/quarter-mutants.test.ts", standing: movable(LIFT) },
   { file: "src/quality/review-w279.test.ts", standing: movable(LIFT) },
   { file: "src/quality/self-defeating.test.ts", standing: movable(LIFT) },

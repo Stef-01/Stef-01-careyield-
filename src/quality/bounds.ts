@@ -125,6 +125,7 @@ import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SEL
 import { Q28_HARDENING_BOUND } from "./hardening-q28";
 import { Q29_HARDENING_BOUND } from "./hardening-q29";
 import { Q28_MUTANT_BOUND } from "./quarter-mutants-q28";
+import { Q29_MUTANT_BOUND } from "./quarter-mutants-q29";
 import { Q27_HARDENING_BOUND } from "./hardening-q27";
 import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
 import { HORIZON_CLAIM_BOUND, Q27_CLAIMS } from "./horizon-claims";
@@ -998,6 +999,33 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'the only mechanical thing standing behind it' is one thing — the unit of the sentence rather than a count of anything the tree holds. It stays one however many tokens the horizon quotes.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/quarter-mutants-q29.ts",
+    name: "Q29_MUTANT_BOUND",
+    unit: "W386",
+    text: Q29_MUTANT_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Every clause is a property of what a mutation sweep IS, and this quarter's addition is the sharpest of them. Five operators are not the mutation space; a quarter's own modules are not the quarter's lines; a header is the only thing that says which quarter a module belongs to; a red suite says some assertion noticed and not which. The permanent, growing exclusion is inherent to a harness whose population contains the previous harness. What this run adds is that the growth now has a price attached: the gate carries a sweep per quarter, each hundreds of seconds of subprocess, so the instrument that would lift the exclusion — one that runs a suite without spawning that suite's own sweep — is the same instrument that would make the gate affordable. Neither exists, and no amount of care inside this register produces either.",
+    },
+    numbers: [
+      {
+        word: "five",
+        kind: "fixed_by_a_gate",
+        why: "W296's operator set, read by this module and not measured by it. This quarter is the first to have the number's consequence in its own register rather than only in this sentence: closing a survivor removed the last line any of the five could reach in one of the population's modules, so that module now has no verdict at all. Five is five because W296 declares five; a sixth arrives only with a unit that would rewrite both this sentence and that row.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'loses one module of its own making every time it runs' — a rate rather than a count of anything the tree holds. It stays one however many quarters the instrument runs for, which is exactly what makes the growth predictable.",
+      },
+      {
+        word: "four",
+        kind: "unit_id",
+        why: "How many of these sweeps the gate already carried when this one joined — Q25's, Q26's, Q27's and Q28's, each a landed unit with its own register. History: a quarter that has run cannot stop having run, so the figure is fixed at this unit rather than derived from a tree that moves.",
       },
     ],
   },

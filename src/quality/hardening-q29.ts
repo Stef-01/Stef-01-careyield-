@@ -25,7 +25,7 @@
 //
 // WHAT THIS DOES NOT PROVE is `Q29_HARDENING_BOUND`, exported below and read by W297's register.
 
-import { type HardeningFinding, unaccountedFor } from "./hardening-q22";
+import { type HardeningFinding, findingIn, unaccountedFor } from "./hardening-q22";
 
 /**
  * The quarter, and the EXACT range of diff that was read.
@@ -134,9 +134,7 @@ export const FINDINGS: readonly HardeningFinding[] = [
 
 /** The findings this pass raised, by id, for a suite that re-derives each. */
 export function finding(id: string): HardeningFinding {
-  const found = FINDINGS.find((f) => f.id === id);
-  if (found === undefined) throw new Error(`no finding ${id}`);
-  return found;
+  return findingIn(FINDINGS, id);
 }
 
 /**

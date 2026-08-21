@@ -106,6 +106,50 @@ describe("W371 every console route says how a person arrives at it", () => {
       { route: "/console/unvisited", what: "is a console route no spec navigates to" },
     ]);
   });
+
+  it("counts a dynamic route as linked only when something links BELOW its prefix", () => {
+    // W386'S SURVIVOR, and both halves of the conjunction are the finding. A dynamic route is
+    // reached when a link points at a concrete instance of it, so `linkedNow` asks for a target
+    // that starts with the prefix AND is not the bare prefix itself. Widening that `&&` to `||`
+    // made it true for essentially every target — and the whole suite stayed green, because every
+    // case here linked something and none asserted the shape that must read as UNLINKED. A link to
+    // the bare prefix is exactly that shape: the parent page exists and nothing reaches an instance.
+    const linkedToInstance = withTree(
+      {
+        "app/console/page.tsx": page('<a href="/console/case/42">a case</a>'),
+        "app/console/case/[id]/page.tsx": page("<p>one case</p>"),
+        "e2e/case.spec.ts": 'test("x", async ({ page }) => { await page.goto("/console/case/42"); });\n',
+      },
+      (root) =>
+        reachedDefects(root, [
+          { route: "/console", wayIn: { kind: "walked" } },
+          { route: "/console/case/[id]", wayIn: { kind: "walked" } },
+        ]).filter((d) => d.route === "/console/case/[id]"),
+    );
+    expect(linkedToInstance, "a link to a concrete instance is what `walked` means here").toEqual([]);
+
+    // The other direction, same producer: the ONLY link is the bare prefix, so nothing reaches an
+    // instance and the route is not walked to. Under the widened conjunction this reads as linked.
+    const linkedToPrefixOnly = withTree(
+      {
+        "app/console/page.tsx": page('<a href="/console/case/">the index</a>'),
+        "app/console/case/[id]/page.tsx": page("<p>one case</p>"),
+        "e2e/case.spec.ts": 'test("x", async ({ page }) => { await page.goto("/console/case/"); });\n',
+      },
+      (root) =>
+        reachedDefects(root, [
+          { route: "/console", wayIn: { kind: "walked" } },
+          { route: "/console/case/[id]", wayIn: { kind: "walked" } },
+        ]).filter((d) => d.route === "/console/case/[id]"),
+    );
+    expect(
+      linkedToPrefixOnly.map((d) => d.what).sort(),
+      "a link to the bare prefix reaches no instance of the route",
+    ).toEqual([
+      "is a console route no spec navigates to",
+      "is recorded as linked and nothing in this product links to it",
+    ]);
+  });
 });
 
 describe("W371 the link graph is read in both spellings, and the walk is not the mention", () => {

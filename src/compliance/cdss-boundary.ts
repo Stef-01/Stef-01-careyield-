@@ -1042,6 +1042,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W354's register of which way an error moves each figure this tree derives. Nobody but a developer reads it. Its longest strings are the argument for each figure and `FIGURE_BOUND`; the values it constructs are a handful of synthetic records built in the file itself — a probe practice, a probe clinician and an `@example.test` address — and no real patient, condition or appointment reason appears in any of it.",
   },
   {
+    module: "src/quality/quarter-mutants-q29.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W386's record of the mutation sweep over Q29's modules — the population, what it could not reach, and what it closed. Nobody but a developer reads it. Its longest strings are each row's argument and `Q29_MUTANT_BOUND`; it constructs no record of any kind, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/quarter-mutants-q28.ts",
     operatorCopy: [],
     notCopy:

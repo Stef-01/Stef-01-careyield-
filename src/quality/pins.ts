@@ -383,6 +383,44 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/quarter-mutants-q29.ts",
+    name: "QUARTER_AT_W386",
+    classification: {
+      kind: "range_bound",
+      why: "W365 to W377, which is what the ledger holds and cannot change: a quarter is thirteen rows and this one is closed. The suite resolves both ends against the ledger rather than trusting the constant, so a range naming a unit the ledger does not hold fails — and that is the only way this pin can be wrong, because the range is history rather than a measurement of a tree that moves.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q29.ts",
+    name: "EXCLUDED_AT_W386",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "the excused module's sibling suite ceasing to be a mutation sweep, or another module of the quarter acquiring one",
+      whyStopping:
+        "ONE ROW, AND IT IS THE FOURTH QUARTER RUNNING THAT IT IS THE SAME SHAPE. Each quarter that sweeps the previous quarter adds a module whose sibling suite is itself a sweep, so this list grows by exactly one per quarter and never shrinks. A row leaving means the instrument changed — something can now run a suite without spawning that suite's own sweep — and a row arriving means a second module of the quarter has become a harness. Neither can be satisfied by retyping a digit: the row names a module and a suite and both are resolved against the tree on every run.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q29.ts",
+    name: "UNMUTATED_AT_W386",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a module in the population losing every line one of W296's five operators matches, or the recorded one growing a line they reach",
+      whyStopping:
+        "ONE ROW, AND THIS RUN PRODUCED IT. Every one of the quarter's eleven reachable modules yielded mutants when the sweep started; closing a survivor by SHARING the lookup it lived in — rather than copying the fix into a third pass — removed the only lines the operators can reach in `hardening-q28.ts`. A module joining this list has lost the last line the operators reach, which means the survivor register beside it stopped covering that module. Worth a build stopping for, and the suite walks the whole population looking for another rather than trusting the row.",
+    },
+  },
+  {
+    module: "src/quality/quarter-mutants-q29.ts",
+    name: "SURVIVORS_AT_W386",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a mutant surviving the quarter's suites, or a declared survivor being caught",
+      whyStopping:
+        "EMPTY, AND THE EMPTINESS IS THE CLAIM. Every mutant the quarter's reachable modules yield was run and five survived; all five were closed in the unit that found them rather than recorded, because W357 showed what recorded remedies are worth. `CLOSED_BY_W386` names them and where each fix landed — and one of them is a mutant W374 had already closed one copy over, which is why that fix shared the function instead of adding a third copy of the pin. A survivor arriving is a hole somebody has to read; a declared one being caught means the register describes a suite that has moved. Neither can be satisfied by retyping a digit: the run below re-derives it.",
+    },
+  },
+  {
     module: "src/quality/quarter-mutants-q28.ts",
     name: "QUARTER_AT_W374",
     classification: {

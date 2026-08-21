@@ -16,8 +16,12 @@ import {
   REVIEWED_UNITS,
   unaccountedUnits,
   undisposed,
+  findingIn,
   type Lens,
 } from "./hardening-q22";
+import { finding as q27Finding } from "./hardening-q27";
+import { finding as q28Finding } from "./hardening-q28";
+import { finding as q29Finding } from "./hardening-q29";
 import { ROUTE_COVERAGE, coverageDiff, coverageIsClean, specOpens } from "./route-coverage";
 import { knownUnits } from "./unit-headers";
 import { parseLedgerRows } from "./blocked-surface";
@@ -30,6 +34,47 @@ import {
 
 const ROOT = path.resolve(__dirname, "../..");
 const LEDGER = readFileSync(path.join(ROOT, "BUILD-STATE.md"), "utf8");
+
+describe("W386 the shared finding lookup, pinned once", () => {
+  it("returns the finding asked for rather than a neighbour that happens to match", () => {
+    // W386'S SURVIVOR, AND ITS SECOND APPEARANCE. `f.id === id` inverted returns the first finding
+    // that is NOT the one asked for; every caller in this tree reads `disposition.kind` off the
+    // result, and a neighbour usually shares it, so the mutant survived. W374's sweep found it in
+    // Q27's copy of this function and closed it in Q27's suite; W386's sweep found the identical
+    // mutant in Q28's copy, because a fix applied to a copy is not applied to the copies beside it.
+    // There is one function now and this is the pin. Driven on a planted register so it says the
+    // same thing whatever the passes hold.
+    const planted: HardeningFinding[] = [
+      {
+        id: "P-1",
+        lens: "code-review",
+        unit: "W900",
+        what: "a planted finding",
+        raisedOn: "2026-01-01",
+        disposition: { kind: "fixed", by: "W900", evidence: "e".repeat(130) },
+      },
+      {
+        id: "P-2",
+        lens: "code-review",
+        unit: "W901",
+        what: "a planted neighbour sharing the disposition, which is what hid the mutant",
+        raisedOn: "2026-01-01",
+        disposition: { kind: "fixed", by: "W901", evidence: "e".repeat(130) },
+      },
+    ];
+    expect(findingIn(planted, "P-1").id).toBe("P-1");
+    expect(findingIn(planted, "P-2").id).toBe("P-2");
+    expect(() => findingIn(planted, "P-3")).toThrow("no finding P-3");
+  });
+
+  it("is the one every pass with a lookup calls, so the pin above reaches all of them", () => {
+    // W341: shared rather than copied. Asserted on the real passes, so a fourth copy appearing
+    // beside them fails here rather than waiting for a sweep to reach that quarter.
+    expect(q27Finding("Q27-CR-1").id).toBe("Q27-CR-1");
+    expect(q28Finding("Q28-CR-1").id).toBe("Q28-CR-1");
+    expect(q29Finding("Q29-CR-1").id).toBe("Q29-CR-1");
+  });
+});
 
 describe("W285 every finding carries a disposition and a date", () => {
   it("disposes all of them, with review dates on the accepted ones", () => {

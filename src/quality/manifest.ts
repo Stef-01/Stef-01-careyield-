@@ -817,6 +817,15 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/quarter-mutants-q29.ts",
+    // W386's sweep over Q29's modules: the population, the exclusions, the unmutated row and what
+    // the run closed. `census: null` for the same reason as Q28's below — it walks nothing itself,
+    // the quarter's modules come from the shared `quarterModules`. It is here because it states a
+    // bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/quarter-mutants-q28.ts",
     // Derives its population from a walk it does not perform, exactly as Q27's register does:
     // `quarterModules` walks and `siblingSuite` resolves, and this module reads the answers. W267's

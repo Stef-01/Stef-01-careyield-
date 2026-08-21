@@ -195,13 +195,24 @@ export const POPULATIONS_AT_W376: readonly QuarterPopulation[] = [
       probe: (root) => {
         void root;
         const site = [{ module: "src/planted/scanner.ts" }];
-        const marker = MARKERS.filter((m) => m.module === "src/quality/private-copies.ts").map((m) => ({
-          ...m,
-          module: "src/planted/scanner.ts",
-        }));
+        // W386 REPLACED A BORROWED MARKER WITH A PLANTED ONE, and two survivors are why. This built
+        // the declared marker by filtering `MARKERS` for `private-copies.ts` and relabelling it, and
+        // read the answer with `.some((d) => d.module === …)`. Both comparisons could be inverted
+        // with no test noticing: any marker relabelled to the planted module serves as well as that
+        // one, and the `.some` runs over a list that is EMPTY in the case it is asked about, where
+        // every predicate answers false. A probe whose two arms are a planted literal and the
+        // length of a list has neither hole, and it no longer depends on what another register
+        // happens to hold about an unrelated module.
+        const marker = [
+          {
+            module: "src/planted/scanner.ts",
+            matches: "a planted marker, so this probe owns both of its arms",
+            standing: { kind: "untried", why: "u".repeat(130) },
+          } as (typeof MARKERS)[number],
+        ];
         return {
-          memberSeen: censusDefects([], site).some((d) => d.module === "src/planted/scanner.ts"),
-          nonMemberSeen: censusDefects(marker, site).some((d) => d.module === "src/planted/scanner.ts"),
+          memberSeen: censusDefects([], site).length > 0,
+          nonMemberSeen: censusDefects(marker, site).length > 0,
         };
       },
     },

@@ -157,6 +157,15 @@ export const LISTED_REGISTERS: readonly ListedRegister[] = [
   { id: "src/quality/populations.ts::POPULATIONS", membership: callable("src/quality/populations.ts::populationDefects") },
   { id: "src/quality/private-copies.ts::DECLARED_COPIES", membership: callable("src/quality/private-copies.ts::copyDefects") },
   { id: "src/quality/prose-numbers.ts::CLAIMS", membership: callable("src/quality/prose-numbers.ts::claimDefects") },
+  { id: "src/quality/quarter-mutants-q29.ts::EXCLUDED_AT_W386", membership: callable("src/quality/quarter-mutants-q29.ts::populationDefects") },
+  { id: "src/quality/quarter-mutants-q29.ts::UNMUTATED_AT_W386", membership: callable("src/quality/quarter-mutants-q29.ts::populationDefects") },
+  {
+    id: "src/quality/quarter-mutants-q29.ts::CLOSED_BY_W386",
+    membership: {
+      kind: "not_derivable",
+      why: "The mutants a run found and closed. It is a RECORD OF AN EVENT — a sweep that happened once, over a tree that has since changed — and no walk of the tree today could reproduce it: two of its rows name a line that is still there and now has an assertion over it, and three name lines the fix replaced. Deriving it would mean re-running the sweep, which is the thing the record exists to save.",
+    },
+  },
   { id: "src/quality/quarter-mutants-q28.ts::EXCLUDED_AT_W374", membership: callable("src/quality/quarter-mutants-q28.ts::populationDefects") },
   {
     id: "src/quality/quarter-mutants-q28.ts::CLOSED_BY_W374",

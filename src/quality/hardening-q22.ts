@@ -320,6 +320,23 @@ export function unaccountedFor(
     .sort();
 }
 
+/**
+ * One pass's finding, by id.
+ *
+ * W386 SHARED IT, AND THE SWEEP IS WHY. `finding` was copied into each pass that has one, and its
+ * `f.id === id` is a lookup nobody checks the identity of: inverted, it returns the first finding
+ * that is NOT the one asked for, and a caller reading only `disposition.kind` cannot tell — the
+ * neighbour usually shares it. W374's sweep found that mutant in Q27's copy and closed it THERE,
+ * in Q27's suite. W386's sweep found the identical mutant in Q28's copy one quarter later, because
+ * a fix applied to one copy is not applied to a copy. Three copies became this, so the identity is
+ * pinned in one place and a fourth pass inherits the pin instead of the hole.
+ */
+export function findingIn(findings: readonly HardeningFinding[], id: string): HardeningFinding {
+  const found = findings.find((f) => f.id === id);
+  if (found === undefined) throw new Error(`no finding ${id}`);
+  return found;
+}
+
 export const HARDENING_REGISTERS: Readonly<Record<string, readonly HardeningFinding[]>> = {
   "src/quality/hardening-q22.ts": FINDINGS,
   "src/quality/hardening-q23.ts": Q23_FINDINGS,
