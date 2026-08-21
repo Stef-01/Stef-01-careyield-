@@ -84,9 +84,6 @@ describe("W379 the one that was moved, which is the one that broke twice", () =>
     expect(movedOut()).toEqual([
       "src/quality/horizon-q29.test.ts",
       "src/quality/horizon-q30.test.ts",
-      // W390: the quarter after, calling the lifted comparison rather than writing a third copy —
-      // which is what the move was for, and the first occasion since that shows it taking.
-      "src/quality/horizon-q31.test.ts",
     ]);
     for (const check of WELDED_CHECKS) {
       if (check.standing.kind !== "moved") continue;

@@ -261,6 +261,7 @@ export const DECLARED_COPIES: readonly DeclaredCopy[] = [
     ["horizon-q28", "Q28"],
     ["horizon-q29", "Q29"],
     ["horizon-q30", "Q30"],
+    ["horizon-q31", "Q31"],
   ].map(([file, quarter]) => ({
     file: `src/quality/${file}.test.ts`,
     parse: "the ledger row parse",
@@ -269,10 +270,11 @@ export const DECLARED_COPIES: readonly DeclaredCopy[] = [
       cost:
         `${quarter}'s horizon test holds the six-column row regex character for character, and it ` +
         "is there because the quarter before it had one: W351 wrote Q28's by copying Q27's, which "  +
-        "W338 had copied from Q26's, and W364 wrote Q29's by copying Q28's. Nine " +
-        "copies of one parse in nine documents is `tree-walks.ts`'s own sentence about how the " +
-        "third copy gets written, and the day the ledger grows a column all eight go quiet " +
-        "together while the shared parse is fixed once.",
+        "W338 had copied from Q26's, W364 wrote Q29's by copying Q28's, and W390 wrote Q31's by " +
+        "copying Q30's — which is this register being right about its own subject on the very " +
+        "unit that added the next copy. TEN copies of one parse in ten documents is " +
+        "`tree-walks.ts`'s own sentence about how the third copy gets written, and the day the " +
+        "ledger grows a column all ten go quiet together while the shared parse is fixed once.",
     },
   })),
   {
