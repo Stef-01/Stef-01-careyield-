@@ -1480,16 +1480,6 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         kind: "rate",
         why: "'those are two separate facts' — the number of things being distinguished in one sentence, not a count of anything the tree holds. It stays two however many comparisons are lifted.",
       },
-      {
-        word: "THREE",
-        kind: "unit_id",
-        why: "How many `movable` rows have been moved: W379 moved one, W380 a second, and W390's quarter close the third. History rather than a live count — a row that has moved cannot un-move — and the sentence's point is what three successes are worth as evidence, which does not change when a fourth arrives. The tree resolves it anyway: `stillOpen` reads whether any `movable` row remains, so the claim beside the number is checked even though the number is not.",
-      },
-      {
-        word: "three",
-        kind: "unit_id",
-        why: "The same three, in lower case, where the sentence says what they cannot show — that the rows which have not moved would. Same reason it is history, and the same predicate stands behind the clause.",
-      },
     ],
   },
   {
