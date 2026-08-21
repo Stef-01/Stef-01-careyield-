@@ -203,6 +203,14 @@ export const REVIEWED_AT_W345: readonly Review[] = [
   { id: "bounds::src/quality/controls.ts::CONTROL_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/declaration-tax.ts::TAX_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/deferrals.ts::DEFERRAL_BOUND", verdict: { kind: "still_correct" } },
+  // W390, on the quarter close, re-reading the gate its own quarter set. `inherent` is right and
+  // it is the same argument every quarter gate makes: what the sentence admits — that a probe
+  // plants ONE alternative moment where the gate says `another`, and that whether a unit
+  // establishes an instant at all is a person's reading — are limits in the kind of claim rather
+  // than in the tree. A check that decided how near an alternative instant was would need a
+  // definition of nearness between moments, which is a judgement about the harness rather than a
+  // derivation over it.
+  { id: "bounds::src/quality/horizon-q30-gate.ts::Q30_GATE_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/console/waiting.ts::WAITING_BOUND", verdict: { kind: "still_correct" } },
   // W342: back to `inherent` because its one liftable clause was LIFTED, which is the opposite of
   // the drift this register watches for. W338 typed it `remedy` for the clause about an id-shaped
