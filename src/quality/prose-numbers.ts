@@ -617,6 +617,11 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   // W391: how many of Q29's hardening findings wear the shape this quarter opens on — a pattern
   // standing in for a population with nothing else able to read it. History about a pass that is
   // closed, and the register beneath the sentence is what keeps the reading honest going forward.
+  // W393: Q29-CR-1's live rows, and what this unit's first attempt at attribution reported before
+  // the anchor was tightened. Both are history about a Tuesday, and both are recorded because a
+  // count of what a reading got wrong is the kind of sentence that quietly becomes a claim.
+  { module: "src/quality/number-words.ts", text: "four rows", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/number-words.ts", text: "ten rows", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/patterns.ts", text: "four findings", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/pins.ts", text: "eighteen blocked rows", resolution: { kind: "derived", derive: blockedRows } },
   { module: "src/quality/pins.ts", text: "two modules", resolution: { kind: "at_the_unit" } },

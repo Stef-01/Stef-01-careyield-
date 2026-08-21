@@ -424,6 +424,15 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/number-words.ts",
+    negative: {
+      kind: "already_driven",
+      citation:
+        "src/quality/number-words.test.ts :: does not report the same sentence once the number is one the vocabulary holds",
+      plants: "It walks forty modules today.",
+    },
+  },
+  {
     register: "src/quality/cited-checks.ts",
     negative: {
       kind: "already_driven",

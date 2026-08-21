@@ -9,7 +9,7 @@
 // happens to be a word the map knows.
 //
 // AND THE TREE WRITES THEM. `assertion-vocabulary.ts` says *"measured at one hundred and fifty-two of
-// them"*; the register holds `fifty-two sites` and the number 52. That row is `at_the_unit`, where
+// them"*; the register holds that sentence's tail and the number 52. That row is `at_the_unit`, where
 // nothing is ever re-derived, so the misreading has sat there since W323 with no way to surface —
 // which is the same reason Q29-CR-1's four rows sat: history is the class this register never
 // checks, and a misread number becomes history the moment somebody files it.

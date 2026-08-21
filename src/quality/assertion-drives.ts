@@ -32,17 +32,30 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. Fabricated declared lists and temporary directories.
 
-import { diffCensus, discoverSurfaces, parseCensus } from "@/compliance/surfaces";
+import {
+  diffCensus,
+  discoverSurfaces,
+  parseCensus,
+} from "@/compliance/surfaces";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { samplingReport } from "./mutation-sampling";
 import { SILENT_AT_W384, silentDiff } from "@/console/rendered-zeros";
 import { hookSites, unreachedReclaimers } from "./hook-reach";
 import { orderDependent } from "./shared-state";
-import { SUBJECTS_AT_W388, UNRUN_AT_W388, citationsInTree, uncalledCitations } from "./cited-checks";
+import { MISREAD_AT_W393, misreadDefects } from "./number-words";
+import {
+  SUBJECTS_AT_W388,
+  UNRUN_AT_W388,
+  citationsInTree,
+  uncalledCitations,
+} from "./cited-checks";
 import { cycleDefects, cyclicComponents } from "./import-cycles";
 import { momentDefects } from "./moments";
-import { RECLAMATION_AT_W375, residueDefects as tempResidueDefects } from "./run-residue";
+import {
+  RECLAMATION_AT_W375,
+  residueDefects as tempResidueDefects,
+} from "./run-residue";
 import { RULES_AT_W373, ruleDefects } from "./patient-populations";
 import { REACHED_AT_W371, reachedDefects } from "./reached-pages";
 import { emptyPopulationDefects } from "./empty-populations";
@@ -55,17 +68,35 @@ import { coverageByBand } from "@/compliance/copy-y6";
 import { diffFoldRegister, discoverFoldSites } from "./order-independence";
 import { undeclaredInstructionSinks } from "@/security/instruction-sinks";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
-import { REFUSAL_BRANCHES, type RefusalBranch, driveBranches, withRoot } from "./refusal-branches";
+import {
+  REFUSAL_BRANCHES,
+  type RefusalBranch,
+  driveBranches,
+  withRoot,
+} from "./refusal-branches";
 import { type Exemption, reachDefects } from "./exemption-reach";
-import { type Checker, type ListedRegister, checkerDefects } from "./derivable-lists";
+import {
+  type Checker,
+  type ListedRegister,
+  checkerDefects,
+} from "./derivable-lists";
 import { anchorCoverage, deadAnchors } from "./latent-y5";
 import { LATENT_FINDINGS, fired } from "./latent-findings";
 import { pinDiff } from "./pins";
 import { demandingRegisters, namingSites } from "./declaration-tax";
 import { numberDefects, staleBounds, unresolvedBounds } from "./bounds";
-import { BLIND_SPOTS, NOT_CALLABLE, boundDiff, falseBounds } from "./blind-spots";
+import {
+  BLIND_SPOTS,
+  NOT_CALLABLE,
+  boundDiff,
+  falseBounds,
+} from "./blind-spots";
 import { unaskedDefects, unaskedFacts } from "./unasked-facts";
-import { allAcceptances, expiredAcceptances, staleAcceptances } from "./acceptances";
+import {
+  allAcceptances,
+  expiredAcceptances,
+  staleAcceptances,
+} from "./acceptances";
 import { unacceptedTautologies } from "./tautology-sweep";
 import { fixtureText, fixtureToken } from "./scan-text";
 import { claimDefects } from "./prose-numbers";
@@ -76,7 +107,11 @@ import { endingDiff } from "./self-ending";
 import { PREMISES_AT_W358, premiseDefects, stagedSpecs } from "./spec-premises";
 import { residueDefects } from "./spec-stores";
 import { ZERO_CLAIMS, zeroDefects } from "@/console/zero-meaning";
-import { DRIVEN_AT_W355, defaultDefects, defaultedParameters } from "./defaulted-registers";
+import {
+  DRIVEN_AT_W355,
+  defaultDefects,
+  defaultedParameters,
+} from "./defaulted-registers";
 import { horizonDefects, horizonTokens } from "./horizon-directions";
 import { unreachedByUnitSuite } from "./unrun";
 import { vocabularyDefects } from "./assertion-vocabulary";
@@ -105,8 +140,29 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // register a declaration for a list the console does not render and it must report it stale.
     silentDiff(root, [
       ...SILENT_AT_W384,
-      { route: "/console/dashboard", subject: "nothing.rendersThis", what: "a row about a list that is not there" },
+      {
+        route: "/console/dashboard",
+        subject: "nothing.rendersThis",
+        what: "a row about a list that is not there",
+      },
     ]).stale.includes("/console/dashboard :: nothing.rendersThis"),
+
+  "src/quality/number-words.ts": () =>
+    // The claim is that every numeric claim W314 holds states the number its own sentence states,
+    // or is declared. Add a declaration for a claim the two readings agree about — there is nothing
+    // to disagree about in an empty found-list — and it must be reported as one the tree moved past.
+    misreadDefects(
+      [],
+      [
+        ...MISREAD_AT_W393,
+        {
+          claim: "src/gone.ts :: two files",
+          parsed: 102,
+          recorded: 2,
+          disposition: "x".repeat(130),
+        },
+      ],
+    ).some((d) => d.claim === "src/gone.ts :: two files"),
 
   "src/quality/cited-checks.ts": (root) =>
     // The claim is that every citation resolves and points at a test that runs its subject. Add a
@@ -115,15 +171,24 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // own walk would report the drive that proves W388 works.
     uncalledCitations(root, SUBJECTS_AT_W388, citationsInTree(root), [
       ...UNRUN_AT_W388,
-      { citation: fixtureToken("cited-absent-citation"), remedy: "a citation about nothing" },
+      {
+        citation: fixtureToken("cited-absent-citation"),
+        remedy: "a citation about nothing",
+      },
     ]).some((d) => d.citation === fixtureToken("cited-absent-citation")),
 
   "src/quality/shared-state.ts": () =>
     // The claim is that no pair of test files writes a shared path in the repository. Hand it the tree
     // as it stood before W385 and it must name the pair.
     orderDependent("", [
-      { module: "src/quality/repository-clean.test.ts", source: fixtureText("shared-probe-direct") },
-      { module: "src/quality/unread-bounds.test.ts", source: fixtureText("shared-probe-aliased") },
+      {
+        module: "src/quality/repository-clean.test.ts",
+        source: fixtureText("shared-probe-direct"),
+      },
+      {
+        module: "src/quality/unread-bounds.test.ts",
+        source: fixtureText("shared-probe-aliased"),
+      },
     ]).some((c) => c.where === "src/planted"),
 
   "src/quality/hook-reach.ts": (root) => {
@@ -136,27 +201,31 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
         : s,
     );
     return unreachedReclaimers(root, before).some(
-      (r) => r.module === "vitest.global-setup.ts" && r.missed.includes("interrupted"),
+      (r) =>
+        r.module === "vitest.global-setup.ts" &&
+        r.missed.includes("interrupted"),
     );
   },
 
   "src/quality/import-cycles.ts": (root) => {
     const largest = cyclicComponents(root)[0] ?? [];
-    return cycleDefects(root, [{ members: largest, standing: { kind: "type_only" } }]).some((d) =>
-      d.what.includes("recorded as type-only"),
-    );
+    return cycleDefects(root, [
+      { members: largest, standing: { kind: "type_only" } },
+    ]).some((d) => d.what.includes("recorded as type-only"));
   },
 
   "src/quality/moments.ts": (root) =>
-    momentDefects(root, [{ file: "src/quality/no-such-module.ts" }], []).some((d) =>
-      d.what.includes("answers at no moment"),
+    momentDefects(root, [{ file: "src/quality/no-such-module.ts" }], []).some(
+      (d) => d.what.includes("answers at no moment"),
     ),
 
   "src/quality/run-residue.ts": (root) =>
     tempResidueDefects(
       root,
       RECLAMATION_AT_W375.map((r) =>
-        r.site === "vitest.global-setup.ts::sweepTreeCopies" ? { ...r, reachedFrom: ["teardown"] } : r,
+        r.site === "vitest.global-setup.ts::sweepTreeCopies"
+          ? { ...r, reachedFrom: ["teardown"] }
+          : r,
       ),
     ).some((d) => d.what.includes("is reached from setup")),
 
@@ -166,18 +235,25 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     ),
 
   "src/quality/reached-pages.ts": (root) =>
-    reachedDefects(root, REACHED_AT_W371.filter((r) => r.route !== "/console")).some(
-      (d) => d.route === "/console",
-    ),
+    reachedDefects(
+      root,
+      REACHED_AT_W371.filter((r) => r.route !== "/console"),
+    ).some((d) => d.route === "/console"),
 
   "src/quality/empty-populations.ts": (root) =>
     emptyPopulationDefects(root, [
-      { module: "src/gone.ts", name: "GONE_REGISTER", emptiness: { kind: "by_design", quote: "a sentence no module makes" } },
+      {
+        module: "src/gone.ts",
+        name: "GONE_REGISTER",
+        emptiness: { kind: "by_design", quote: "a sentence no module makes" },
+      },
     ]).length > 0,
 
-  "src/quality/citations.ts": (root) => separatorDiff(root, {}).undeclared.length > 0,
+  "src/quality/citations.ts": (root) =>
+    separatorDiff(root, {}).undeclared.length > 0,
 
-  "src/quality/planting.ts": (root) => planterDiff(root, {}).undeclared.length > 0,
+  "src/quality/planting.ts": (root) =>
+    planterDiff(root, {}).undeclared.length > 0,
 
   "src/quality/self-defeating.ts": (root) => {
     void root;
@@ -185,11 +261,14 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   },
 
   "src/quality/manifest.ts": (root) =>
-    manifestDiff(root, [{ module: "src/gone.ts", census: null, branches: [] }]).stale.length > 0,
+    manifestDiff(root, [{ module: "src/gone.ts", census: null, branches: [] }])
+      .stale.length > 0,
 
   "src/quality/blind-spots.ts": (root) => {
     void root;
-    const unstated = boundDiff(BLIND_SPOTS, [{ file: "src/w289-probe.ts" }]).unstated.length > 0;
+    const unstated =
+      boundDiff(BLIND_SPOTS, [{ file: "src/w289-probe.ts" }]).unstated.length >
+      0;
     const refuted =
       falseBounds({
         "src/w289-probe.ts": {
@@ -204,19 +283,26 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   },
 
   "src/quality/register-counts.ts": (root) =>
-    countDiff(root, [{ id: "src/gone.test.ts :: t :: REG", direction: "floor", why: "x" }]).stale.length > 0,
+    countDiff(root, [
+      { id: "src/gone.test.ts :: t :: REG", direction: "floor", why: "x" },
+    ]).stale.length > 0,
 
   "src/quality/mutation-sampling.ts": () => {
     // W296's report, handed a survivor no register declares. The runner spawns processes and lives
     // in the test; the COMPARISON is what this register drives, which is the distinction W289 is
     // about — a walk and a run are not an assertion.
-    return samplingReport(["src/x.ts :: eq-to-neq :: a === b"], [], []).unexplained.length > 0;
+    return (
+      samplingReport(["src/x.ts :: eq-to-neq :: a === b"], [], []).unexplained
+        .length > 0
+    );
   },
 
   "src/compliance/surfaces.ts": (root) => {
     // The census with one row removed, against the tree's real surfaces.
     const surfaces = discoverSurfaces(path.join(root, "app"));
-    const census = parseCensus(readFileSync(path.join(root, "docs/COMPLIANCE-DOSSIER.md"), "utf8"));
+    const census = parseCensus(
+      readFileSync(path.join(root, "docs/COMPLIANCE-DOSSIER.md"), "utf8"),
+    );
     return diffCensus(surfaces, census.slice(1)).unmapped.length > 0;
   },
 
@@ -237,7 +323,10 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     void root;
     return (
       undeclaredInstructionSinks([
-        { file: "src/w289-probe.ts", marker: fixtureToken("openai-endpoint-host") },
+        {
+          file: "src/w289-probe.ts",
+          marker: fixtureToken("openai-endpoint-host"),
+        },
       ]).length > 0
     );
   },
@@ -261,14 +350,22 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // acceptance register. Naming the constant is ordinary code, not a contortion, and it leaves
     // the detector's rule intact rather than carving an exemption into it.
     void root;
-    const expired = expiredAcceptances(BEYOND_EVERY_REVIEW).length === allAcceptances().length;
+    const expired =
+      expiredAcceptances(BEYOND_EVERY_REVIEW).length ===
+      allAcceptances().length;
     const stale = staleAcceptances([
       {
         unit: "W289",
         module: "src/w289-probe.ts",
         register: "PROBE",
-        entries: () => [{ id: "W289::probe", reviewBy: BEYOND_EVERY_REVIEW, why: "a probe" }],
-        rederivation: { kind: "rederived_here", sweep: "nothing", stale: () => ["W289::probe"] },
+        entries: () => [
+          { id: "W289::probe", reviewBy: BEYOND_EVERY_REVIEW, why: "a probe" },
+        ],
+        rederivation: {
+          kind: "rederived_here",
+          sweep: "nothing",
+          stale: () => ["W289::probe"],
+        },
       },
     ]);
     return expired && stale.length > 0;
@@ -289,7 +386,10 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
         // W306: the lifting declaration this probe would need to satisfy `liftedDefects`. It says
         // the predicate reads no tree, which is true of `() => false` and is exactly the claim
         // `liftedDefects` checks — so the probe below is also the drive for a bound stuck closed.
-        lifted: { kind: "derived_without_a_tree" as const, why: "a probe, and it reads nothing" },
+        lifted: {
+          kind: "derived_without_a_tree" as const,
+          why: "a probe, and it reads nothing",
+        },
       },
       numbers: [],
     };
@@ -313,7 +413,11 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // own suites noticed and nobody has written down.
     void root;
     return (
-      samplingReport(["src/planted/x.ts :: and-to-or :: a && b"], [], SURVIVORS_AT_W332).unexplained.length > 0
+      samplingReport(
+        ["src/planted/x.ts :: and-to-or :: a && b"],
+        [],
+        SURVIVORS_AT_W332,
+      ).unexplained.length > 0
     );
   },
 
@@ -329,7 +433,8 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
           instant: "x".repeat(40),
           cannotSee: "y".repeat(40),
           mayMove: false,
-          run: (planted) => (existsSync(path.join(planted, "node_modules")) ? [1, 2] : [1]),
+          run: (planted) =>
+            existsSync(path.join(planted, "node_modules")) ? [1, 2] : [1],
         },
       ]).length > 0
     );
@@ -347,8 +452,14 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // fabrications declared must report it as unresolved rather than excuse it.
     void root;
     return withRoot(
-      { "src/planted/w342-drive.ts": 'export const ROWS = [{ module: "src/planted/absent-forever.ts" }];\n' },
-      (planted) => nameDefects(planted, undefined, []).some((d) => d.kind === "unresolved"),
+      {
+        "src/planted/w342-drive.ts":
+          'export const ROWS = [{ module: "src/planted/absent-forever.ts" }];\n',
+      },
+      (planted) =>
+        nameDefects(planted, undefined, []).some(
+          (d) => d.kind === "unresolved",
+        ),
     );
   },
 
@@ -356,7 +467,9 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // W341's comparison with the declaration table emptied, which is the state where every private
     // copy in the tree is undeclared. The arm that must fire is the one saying a module holds a
     // copy of a shared parse and says nothing about why.
-    return copyDefects(root, SHARED_PARSES, []).some((d) => d.kind === "undeclared");
+    return copyDefects(root, SHARED_PARSES, []).some(
+      (d) => d.kind === "undeclared",
+    );
   },
 
   "src/quality/close-gate.ts": (root) => {
@@ -373,15 +486,30 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     void root;
     return withRoot(
       {
-        "app/page.tsx": 'import { asked } from "@/facts";\nexport default function P() { return asked(); }\n',
-        "src/facts.ts": "export function asked(): number {\n  return 1;\n}\nexport function unread(): number {\n  return 2;\n}\n",
+        "app/page.tsx":
+          'import { asked } from "@/facts";\nexport default function P() { return asked(); }\n',
+        "src/facts.ts":
+          "export function asked(): number {\n  return 1;\n}\nexport function unread(): number {\n  return 2;\n}\n",
       },
       (planted) => {
         const found = unaskedFacts(planted);
-        if (found.length !== 1 || found[0] !== "src/facts.ts::unread") return false;
+        if (found.length !== 1 || found[0] !== "src/facts.ts::unread")
+          return false;
         return (
-          unaskedDefects(planted, [{ id: "src/facts.ts::unread", why: { kind: "no_surface_asks", where: "a page could render it and none does, which is the whole register" } }], found)
-            .length === 0
+          unaskedDefects(
+            planted,
+            [
+              {
+                id: "src/facts.ts::unread",
+                why: {
+                  kind: "no_surface_asks",
+                  where:
+                    "a page could render it and none does, which is the whole register",
+                },
+              },
+            ],
+            found,
+          ).length === 0
         );
       },
     );
@@ -396,7 +524,8 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       {
         "src/orphan.ts": "export const orphan = 1;\n",
         "src/seen.ts": "export const seen = 2;\n",
-        "src/seen.test.ts": 'import { seen } from "./seen";\nit("t", () => { expect(seen).toBe(2); });\n',
+        "src/seen.test.ts":
+          'import { seen } from "./seen";\nit("t", () => { expect(seen).toBe(2); });\n',
       },
       (planted) => {
         const found = unreachedByUnitSuite(planted);
@@ -460,11 +589,20 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // says a number went past unread.
     void root;
     return withRoot(
-      { "src/planted/w289-prose.ts": "// W1: four registers walk this tree.\nexport const x = 1;\n" },
+      {
+        "src/planted/w289-prose.ts":
+          "// W1: four registers walk this tree.\nexport const x = 1;\n",
+      },
       (planted) =>
-        claimDefects(planted, []).some((d) => d.what.includes("nobody classified")) &&
+        claimDefects(planted, []).some((d) =>
+          d.what.includes("nobody classified"),
+        ) &&
         claimDefects(planted, [
-          { module: "src/planted/w289-prose.ts", text: "four registers", resolution: { kind: "at_the_unit" } },
+          {
+            module: "src/planted/w289-prose.ts",
+            text: "four registers",
+            resolution: { kind: "at_the_unit" },
+          },
         ]).length === 0,
     );
   },
@@ -472,8 +610,11 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
   "src/quality/declaration-tax.ts": (root) => {
     // Both arms of W300's measurement, each given the input it exists to refuse: an unplanted tree
     // must demand nothing, and a module path the tree does not hold must have no naming sites.
-    const quiet = demandingRegisters(root, "src/planted/w289-never-planted.ts").length === 0;
-    const unnamed = namingSites(root, fixtureToken("absent-module-path-w289")).length === 0;
+    const quiet =
+      demandingRegisters(root, "src/planted/w289-never-planted.ts").length ===
+      0;
+    const unnamed =
+      namingSites(root, fixtureToken("absent-module-path-w289")).length === 0;
     return quiet && unnamed;
   },
 
@@ -495,9 +636,14 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       row({ kind: "welded", file: "src/quality/pins.test.ts" }),
     ]);
     const clean = checkerDefects(root, [
-      row({ kind: "callable", name: "src/quality/bounds.ts::unresolvedBounds" }),
+      row({
+        kind: "callable",
+        name: "src/quality/bounds.ts::unresolvedBounds",
+      }),
     ]);
-    return noCallable.length === 1 && wrongFile.length === 1 && clean.length === 0;
+    return (
+      noCallable.length === 1 && wrongFile.length === 1 && clean.length === 0
+    );
   },
 
   "src/quality/exemption-reach.ts": (root) => {
@@ -514,13 +660,22 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       reach,
     });
     const noControl = reachDefects(root, [
-      row("nocontrol", { kind: "exact", probe: () => ({ named: false, sibling: false }) }),
+      row("nocontrol", {
+        kind: "exact",
+        probe: () => ({ named: false, sibling: false }),
+      }),
     ]);
     const tooWide = reachDefects(root, [
-      row("toowide", { kind: "exact", probe: () => ({ named: true, sibling: true }) }),
+      row("toowide", {
+        kind: "exact",
+        probe: () => ({ named: true, sibling: true }),
+      }),
     ]);
     const clean = reachDefects(root, [
-      row("clean", { kind: "exact", probe: () => ({ named: true, sibling: false }) }),
+      row("clean", {
+        kind: "exact",
+        probe: () => ({ named: true, sibling: false }),
+      }),
     ]);
     return noControl.length === 1 && tooWide.length === 1 && clean.length === 0;
   },
@@ -529,22 +684,33 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // W354's comparison, handed a row whose declaration its derivation contradicts and one whose
     // blinding moves nothing. The rows are constructed rather than planted on disk: what a figure
     // row holds is a pair of FUNCTIONS, so the input this comparison must reject is a table.
-    const row = (name: string, honest: number, blinded: number, direction: Figure["direction"]): Figure => ({
+    const row = (
+      name: string,
+      honest: number,
+      blinded: number,
+      direction: Figure["direction"],
+    ): Figure => ({
       name,
       what: "a planted figure",
       direction,
       why: "a planted row",
       probe: { honest: () => honest, blinded: () => blinded },
     });
-    const wrongWay = figureDefects(root, [row("src/planted/w289-fig.ts::wrong", 9, 3, "high")], [
-      "src/planted/w289-fig.ts::wrong",
-    ]);
-    const unmoved = figureDefects(root, [row("src/planted/w289-fig.ts::still", 9, 9, "low")], [
-      "src/planted/w289-fig.ts::still",
-    ]);
-    const clean = figureDefects(root, [row("src/planted/w289-fig.ts::fine", 9, 3, "low")], [
-      "src/planted/w289-fig.ts::fine",
-    ]);
+    const wrongWay = figureDefects(
+      root,
+      [row("src/planted/w289-fig.ts::wrong", 9, 3, "high")],
+      ["src/planted/w289-fig.ts::wrong"],
+    );
+    const unmoved = figureDefects(
+      root,
+      [row("src/planted/w289-fig.ts::still", 9, 9, "low")],
+      ["src/planted/w289-fig.ts::still"],
+    );
+    const clean = figureDefects(
+      root,
+      [row("src/planted/w289-fig.ts::fine", 9, 3, "low")],
+      ["src/planted/w289-fig.ts::fine"],
+    );
     return wrongWay.length === 1 && unmoved.length === 1 && clean.length === 0;
   },
 
@@ -568,8 +734,14 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       },
     ];
     const clean = excuseDefects(root, beside({}));
-    const unshared = excuseDefects(root, beside({ text: "a planted sentence nothing in this tree gives" }));
-    const contradicted = excuseDefects(root, beside({ falsifier: () => ["src/planted/w289.ts"] }));
+    const unshared = excuseDefects(
+      root,
+      beside({ text: "a planted sentence nothing in this tree gives" }),
+    );
+    const contradicted = excuseDefects(
+      root,
+      beside({ falsifier: () => ["src/planted/w289.ts"] }),
+    );
     const unsettled = excuseDefects(root, beside({ falsifier: null }));
     return (
       clean.length === 0 &&
@@ -583,7 +755,12 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // W353's comparison, handed a selector that widens and one that refuses where it should not.
     // The rows are constructed rather than planted on disk: what a selector row holds is a pair of
     // FUNCTIONS, so the input this comparison must reject is a table and not a file.
-    const row = (name: string, honest: number, degenerate: number, expected: Widening): Selector => ({
+    const row = (
+      name: string,
+      honest: number,
+      degenerate: number,
+      expected: Widening,
+    ): Selector => ({
       name,
       what: "a planted population",
       honest: () => honest,
@@ -591,9 +768,15 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       expected,
       why: "a planted row",
     });
-    const widens = supersetDefects(root, [row("src/planted/w289-wide.ts::wide", 3, 9, "narrows")]);
-    const quiet = supersetDefects(root, [row("src/planted/w289-quiet.ts::quiet", 3, 0, "refuses")]);
-    const clean = supersetDefects(root, [row("src/planted/w289-fine.ts::fine", 3, 1, "narrows")]);
+    const widens = supersetDefects(root, [
+      row("src/planted/w289-wide.ts::wide", 3, 9, "narrows"),
+    ]);
+    const quiet = supersetDefects(root, [
+      row("src/planted/w289-quiet.ts::quiet", 3, 0, "refuses"),
+    ]);
+    const clean = supersetDefects(root, [
+      row("src/planted/w289-fine.ts::fine", 3, 1, "narrows"),
+    ]);
     return widens.length === 1 && quiet.length === 1 && clean.length === 0;
   },
 
@@ -646,7 +829,11 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // name, and a `not_a_check` for one that resolves to a module. The arriving direction is driven
     // in the module's own suite against a token added to the derived population.
     const tokens = horizonTokens(root);
-    const gone = horizonDefects(root, [{ token: "vanished", standing: { kind: "not_a_check", why: "x" } }], []);
+    const gone = horizonDefects(
+      root,
+      [{ token: "vanished", standing: { kind: "not_a_check", why: "x" } }],
+      [],
+    );
     const wrong = horizonDefects(
       root,
       [{ token: "page-reach.ts", standing: { kind: "not_a_check", why: "x" } }],
@@ -662,8 +849,16 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // be made to exist.
     const params = defaultedParameters(root);
     const first = DRIVEN_AT_W355[0]!;
-    const drifted = defaultDefects(root, [{ parameter: first.parameter, drivenBy: ["src/nowhere.ts"] }], params);
-    const gone = defaultDefects(root, [{ parameter: "src/gone.ts::gone::2", drivenBy: ["src/x.ts"] }], []);
+    const drifted = defaultDefects(
+      root,
+      [{ parameter: first.parameter, drivenBy: ["src/nowhere.ts"] }],
+      params,
+    );
+    const gone = defaultDefects(
+      root,
+      [{ parameter: "src/gone.ts::gone::2", drivenBy: ["src/x.ts"] }],
+      [],
+    );
     return drifted.length > 0 && gone.length > 0;
   },
 
@@ -672,7 +867,11 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // count rendered with nothing classifying it. The arriving direction is driven on a planted
     // page in the module's own suite, where a console page can be made to exist.
     const orphan = zeroDefects(root, ZERO_CLAIMS, []);
-    const unclassified = zeroDefects(root, [], [{ route: "/console/w289", expression: "rows.length" }]);
+    const unclassified = zeroDefects(
+      root,
+      [],
+      [{ route: "/console/w289", expression: "rows.length" }],
+    );
     return orphan.length > 0 && unclassified.length > 0;
   },
 
@@ -680,10 +879,16 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // Both stale directions off one register: an argument for a spec that already resets the store,
     // and an argument for a spec the suite does not hold. The arriving direction is driven on a
     // planted tree in the module's own suite, where a store can be made to exist.
-    const closed = residueDefects(root, [{ spec: "e2e/ops.spec.ts", store: "src/ops/store.ts", why: "x" }], [
-      "e2e/ops.spec.ts",
-    ]);
-    const gone = residueDefects(root, [{ spec: "e2e/gone.spec.ts", store: "src/ops/store.ts", why: "x" }], []);
+    const closed = residueDefects(
+      root,
+      [{ spec: "e2e/ops.spec.ts", store: "src/ops/store.ts", why: "x" }],
+      ["e2e/ops.spec.ts"],
+    );
+    const gone = residueDefects(
+      root,
+      [{ spec: "e2e/gone.spec.ts", store: "src/ops/store.ts", why: "x" }],
+      [],
+    );
     return closed.length > 0 && gone.length > 0;
   },
 
@@ -693,7 +898,10 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     // describing a file that moved. A drive exercising only the first would leave the arm that
     // reads as coverage undriven.
     const staged = stagedSpecs(root);
-    const arriving = premiseDefects(root, PREMISES_AT_W358, [...staged, "e2e/w289-probe.spec.ts"]);
+    const arriving = premiseDefects(root, PREMISES_AT_W358, [
+      ...staged,
+      "e2e/w289-probe.spec.ts",
+    ]);
     const departed = premiseDefects(root, PREMISES_AT_W358, staged.slice(1));
     return arriving.length > 0 && departed.length > 0;
   },
@@ -704,7 +912,8 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
     void root;
     return withRoot(
       {
-        "src/w289-probe/vacuous.test.ts": 'it("a probe", () => {\n  expect(true).toBe(true);\n});\n',
+        "src/w289-probe/vacuous.test.ts":
+          'it("a probe", () => {\n  expect(true).toBe(true);\n});\n',
       },
       (planted) => unacceptedTautologies(planted).length > 0,
     );
@@ -713,7 +922,9 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
 
 /** Every census entry whose assertion this unit claims is driven, by file. */
 export function drivenRegisters(): string[] {
-  return TREE_DERIVED_REGISTERS.filter((r) => r.assertion.kind === "driven_here")
+  return TREE_DERIVED_REGISTERS.filter(
+    (r) => r.assertion.kind === "driven_here",
+  )
     .map((r) => r.file)
     .sort();
 }
@@ -728,9 +939,12 @@ export function resolveBranch(
   id: string,
   branches: readonly RefusalBranch[] = REFUSAL_BRANCHES,
 ): { drive: () => boolean } | string {
-  const branch = branches.find((b) => `${b.module}::${b.fn}::${b.branch}` === id);
+  const branch = branches.find(
+    (b) => `${b.module}::${b.fn}::${b.branch}` === id,
+  );
   if (!branch) return `${id}: cited, and W291 has no such branch`;
-  if (branch.reach.kind !== "driven") return `${id}: cited, and W291 lists it as unreachable`;
+  if (branch.reach.kind !== "driven")
+    return `${id}: cited, and W291 lists it as unreachable`;
   return { drive: branch.reach.drive };
 }
 

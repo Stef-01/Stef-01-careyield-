@@ -50,7 +50,7 @@ import { acceptanceCarryingModules } from "./acceptances";
 import { violationReporters, withRoot } from "./refusal-branches";
 import { mutantsIn } from "./mutation-sampling";
 import { CITATION_BOUND, separatorDiff } from "./citations";
-import { PLANTING_BOUND, copyTree, planterDiff, withPlantedIn } from "./planting";
+import { PLANTING_BOUND, copyTree, planterDiff, withPlantedIn, withTree } from "./planting";
 import { ENDING_BOUND, waitingModules } from "./self-ending";
 import { UNRUN_BOUND, unreachedByUnitSuite } from "./unrun";
 import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
@@ -68,6 +68,7 @@ import { RENDERED_BOUND, silentZeros } from "@/console/rendered-zeros";
 import { HOOK_BOUND, unreachedReclaimers } from "./hook-reach";
 import { SHARED_BOUND, orderDependent } from "./shared-state";
 import { CITED_BOUND, citationsInTree, uncalledCitations } from "./cited-checks";
+import { NUMBER_BOUND, misreadings, proseInTree } from "./number-words";
 import { CYCLE_BOUND, cyclicComponents, moduleGraph, runtimeMembers } from "./import-cycles";
 import { MOMENT_BOUND, momentsOf } from "./moments";
 import { TEMP_RESIDUE_BOUND, reclamationSites } from "./run-residue";
@@ -81,7 +82,7 @@ import {
 } from "./assertion-vocabulary";
 import { fixtureText } from "./scan-text";
 import { splitSites } from "./self-reference";
-import { proseClaims } from "./prose-numbers";
+import { proseClaims, proseOf } from "./prose-numbers";
 import { FIGURE_BOUND, countingFigures } from "./flattering-numbers";
 import { REACH_BOUND, appliedExemptions } from "./exemption-reach";
 import { DERIVABLE_BOUND, handListedRegisters } from "./derivable-lists";
@@ -185,6 +186,28 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           };
         },
       ),
+  },
+
+  "src/quality/number-words.ts": {
+    kind: "demonstrated",
+    bound: NUMBER_BOUND,
+    witness:
+      "a sentence stating a number above the vocabulary's ceiling in front of a noun this tree does NOT count — `defaults` rather than `modules` — which W314 records no claim about, so the second reading has nothing to disagree with and both are silent together",
+    control:
+      "the same sentence with a noun this tree does count, which both readings see and disagree about",
+    probe: () => {
+      // A TREE OF ONE FILE, which is all either reading needs: both take a root and walk it, and a
+      // bare tree makes the pair cheap enough that this probe adds nothing to W347's class. The
+      // sentence differs between witness and control in ONE WORD, so what the pair measures is the
+      // noun and not the number.
+      const sees = (noun: string) =>
+        withTree(
+          { "src/probe.ts": `// It walks one hundred and forty ${noun} today.\n` },
+          (root) => misreadings(proseClaims(root), proseInTree(root, proseOf)).length > 0,
+        );
+      // `seen` is the register RECOGNISING the case. The witness stays unseen while the bound holds.
+      return { witnessSeen: sees("defaults"), controlSeen: sees("modules") };
+    },
   },
 
   "src/quality/cited-checks.ts": {
