@@ -68,6 +68,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
       "src/quality/patterns.ts",
       "src/quality/private-copies.ts",
       "src/quality/run-residue.ts",
+      "src/quality/runtime-population.ts",
       "src/quality/shared-state.ts",
       "src/quality/typed-names.ts",
     ]);
@@ -89,6 +90,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
       "src/quality/patterns.ts",
       "src/quality/private-copies.ts",
       "src/quality/run-residue.ts",
+      "src/quality/runtime-population.ts",
       "src/quality/shared-state.ts",
     ]);
   });

@@ -186,6 +186,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "A citation IS a literal, so blanking would erase the whole population. Comments are subtracted for the reason `citations.ts` records about itself: this tree discusses the citation format at length in prose beside the rows that use it, and a paragraph naming `<file> :: <assertion>` is a description rather than a citation. The same preparation reads the cited test's body, where the assertion titles are literals too.",
   },
   {
+    module: "src/quality/runtime-population.ts",
+    prep: { comments: "subtracted", literals: "kept" },
+    why: "It asks which exported names are declared as a TYPE, and the answer decides what the register excludes rather than what it reports — so this preparation is doing the opposite job to the one the module is about. Comments are subtracted for the usual reason and a sharp one: this tree explains type exports in prose beside them, and a doc block quoting `export type Foo` is a description. LITERALS ARE KEPT DELIBERATELY, and blanking them would be self-defeating here: the whole finding is that the shared preparation LOSES declarations when it blanks, so a classification built on blanked text would inherit the loss it exists to measure. The module reads the raw source for that reason and this site is the one place it does not.",
+  },
+  {
     module: "src/quality/patterns.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "The regex literal IS the subject, so blanking literals would leave this register reading a tree of empty slashes and declaring thirty-four populations it could not see. Comments are subtracted for the reason this whole tree keeps rediscovering, and here it is sharper than usual: the modules being read explain their own patterns in prose beside them — `assertion-vocabulary.ts` writes `COUNT = /\\.(?:length|size)$/` inside a `//` header to say the literal is shared with another module — and a sentence quoting a pattern is not a pattern. Only a BLOCK comment can carry one past the scan, because the declaration match is anchored to the start of a line; the suite drives that arm with a block comment after a line one turned out to prove nothing.",

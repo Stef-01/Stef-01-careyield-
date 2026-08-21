@@ -37,7 +37,12 @@ import { handListedRegisters } from "./derivable-lists";
 import { namingSites } from "./declaration-tax";
 import { numberReturningExports } from "./flattering-numbers";
 import { discoverFoldSites } from "./order-independence";
-import { copyTree, planterDiff, withPlantedIn, withTree as withRoot } from "./planting";
+import {
+  copyTree,
+  planterDiff,
+  withPlantedIn,
+  withTree as withRoot,
+} from "./planting";
 import { hookSites } from "./hook-reach";
 import { mutantsIn } from "./mutation-sampling";
 import { silentZeros } from "@/console/rendered-zeros";
@@ -46,6 +51,7 @@ import { repositoryWrites } from "./shared-state";
 import { parametersOf } from "./decision-moments";
 import { citationsInTree } from "./cited-checks";
 import { patternSites } from "./patterns";
+import { typeNames } from "./runtime-population";
 import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
 import { privateCopies } from "./private-copies";
@@ -86,7 +92,12 @@ export type SpellingStanding =
   /** Driven: the register finds the variant. */
   | { kind: "caught"; looksLike: string; probe: Probe }
   /** Driven: the register misses the variant. The finding. */
-  | { kind: "blind"; looksLike: string; plausibility: Plausibility; probe: Probe }
+  | {
+      kind: "blind";
+      looksLike: string;
+      plausibility: Plausibility;
+      probe: Probe;
+    }
   /**
    * Nobody has tried a second spelling against this marker.
    *
@@ -112,12 +123,14 @@ function twoSpellings(
   find: (root: string) => boolean,
 ): Reading {
   const copy = copyTree(root);
-  const saw = (body: string) => withPlantedIn(copy, { [PROBE_FILE]: body }, () => find(copy));
+  const saw = (body: string) =>
+    withPlantedIn(copy, { [PROBE_FILE]: body }, () => find(copy));
   return { control: saw(canonical), variant: saw(variant) };
 }
 
 /** Whether a register's answer names the planted file. */
-const names = (answer: unknown): boolean => JSON.stringify(answer).includes("spelling-probe");
+const names = (answer: unknown): boolean =>
+  JSON.stringify(answer).includes("spelling-probe");
 
 export const MARKERS: readonly Marker[] = [
   {
@@ -136,7 +149,11 @@ export const MARKERS: readonly Marker[] = [
           "export const same = (a: number, b: number): boolean => a === b;\n",
           "export const same = (a: number, b: number): boolean => a == b;\n",
           (copy) =>
-            mutantsIn(PROBE_FILE, readFileSync(path.join(copy, PROBE_FILE), "utf8"), "none").length > 0,
+            mutantsIn(
+              PROBE_FILE,
+              readFileSync(path.join(copy, PROBE_FILE), "utf8"),
+              "none",
+            ).length > 0,
         ),
     },
   },
@@ -148,7 +165,7 @@ export const MARKERS: readonly Marker[] = [
     standing: {
       kind: "blind",
       looksLike:
-        "a module that reads `BUILD-STATE.md` and splits its rows with `line.startsWith(\"|\")` " +
+        'a module that reads `BUILD-STATE.md` and splits its rows with `line.startsWith("|")` ' +
         "instead of a `/^\\|` regex — the same parse, one marker short of the conjunction.",
       plausibility: "happened",
       probe: (root) =>
@@ -162,7 +179,8 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/hook-reach.ts",
-    matches: "a hook call at the start of a line, and the body of a function defined beside it that the hook calls by name",
+    matches:
+      "a hook call at the start of a line, and the body of a function defined beside it that the hook calls by name",
     standing: {
       kind: "blind",
       looksLike:
@@ -174,7 +192,11 @@ export const MARKERS: readonly Marker[] = [
           fixtureText("hook-spelling-one-level"),
           fixtureText("hook-spelling-two-levels"),
           (copy) =>
-            hookSites(copy).some((site) => site.module === PROBE_FILE && site.reclaims === "outside_the_process"),
+            hookSites(copy).some(
+              (site) =>
+                site.module === PROBE_FILE &&
+                site.reclaims === "outside_the_process",
+            ),
         ),
     },
   },
@@ -196,8 +218,11 @@ export const MARKERS: readonly Marker[] = [
         // BOTH NAMES SPELLED OUT. `fixtureText(name)` behind a parameter is a call W307's citation
         // check cannot resolve, and an uncited block is one nothing keeps in step with its loader.
         const saw = (body: string) =>
-          withPlantedIn(copy, { [page]: body }, () =>
-            !silentZeros(copy).includes("/console/spelling-probe :: rows"),
+          withPlantedIn(
+            copy,
+            { [page]: body },
+            () =>
+              !silentZeros(copy).includes("/console/spelling-probe :: rows"),
           );
         return {
           control: saw(fixtureText("zero-probe-ternary")),
@@ -208,7 +233,8 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/cited-checks.ts",
-    matches: "a double-quoted string of the form `<file>.test.ts :: <assertion>`, in exactly two parts",
+    matches:
+      "a double-quoted string of the form `<file>.test.ts :: <assertion>`, in exactly two parts",
     standing: {
       kind: "blind",
       looksLike:
@@ -224,8 +250,30 @@ export const MARKERS: readonly Marker[] = [
     },
   },
   {
+    module: "src/quality/runtime-population.ts",
+    matches:
+      "a line beginning `export interface` or `export type` followed by a name",
+    standing: {
+      kind: "blind",
+      looksLike:
+        '`export type { Probe } from "./x";` — a type RE-EXPORT, which is ordinary TypeScript and is a type by every definition, and which reaches this classification as nothing because the name it exports is inside braces.',
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          "export type Probe = string;\n",
+          'export type { Probe } from "./planting";\n',
+          (copy) =>
+            typeNames(
+              readFileSync(path.join(copy, PROBE_FILE), "utf8"),
+            ).includes("Probe"),
+        ),
+    },
+  },
+  {
     module: "src/quality/patterns.ts",
-    matches: "a regex literal assigned to an ALL-CAPS-or-camel name by a `const` starting its own line",
+    matches:
+      "a regex literal assigned to an ALL-CAPS-or-camel name by a `const` starting its own line",
     standing: {
       kind: "blind",
       looksLike:
@@ -242,7 +290,8 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/decision-moments.ts",
-    matches: "a parameter named `todayIso`, `sessionDate`, `atIso`, `sentAtIso`, `nowIso`, `asOfIso` or `window`",
+    matches:
+      "a parameter named `todayIso`, `sessionDate`, `atIso`, `sentAtIso`, `nowIso`, `asOfIso` or `window`",
     standing: {
       kind: "blind",
       looksLike:
@@ -254,49 +303,62 @@ export const MARKERS: readonly Marker[] = [
           "export function probeDecide(eligible: Patient[], todayIso: string): Patient[] {\n  return eligible;\n}\n",
           "export function probeDecide(eligible: Patient[], decidedOn: string): Patient[] {\n  return eligible;\n}\n",
           (copy) =>
-            parametersOf(readFileSync(path.join(copy, PROBE_FILE), "utf8"), "probeDecide").some((p) =>
-              /^(?:todayIso|nowIso|atIso|sentAtIso|sessionDate|asOfIso|window)$/.test(p.name),
+            parametersOf(
+              readFileSync(path.join(copy, PROBE_FILE), "utf8"),
+              "probeDecide",
+            ).some((p) =>
+              /^(?:todayIso|nowIso|atIso|sentAtIso|sessionDate|asOfIso|window)$/.test(
+                p.name,
+              ),
             ),
         ),
     },
   },
   {
     module: "src/quality/shared-state.ts",
-    matches: "a write call whose target is `path.join(ROOT, \"…\")`, or a name bound to one",
+    matches:
+      'a write call whose target is `path.join(ROOT, "…")`, or a name bound to one',
     standing: {
       kind: "blind",
       looksLike:
-        "`path.resolve(ROOT, \"src/planted\")` — the other way this tree builds a path, which reaches the same directory and which this scan does not read at all.",
+        '`path.resolve(ROOT, "src/planted")` — the other way this tree builds a path, which reaches the same directory and which this scan does not read at all.',
       plausibility: "idiomatic",
       probe: (root) =>
         twoSpellings(
           root,
           'const p = path.join(ROOT, "src/planted");\nmkdirSync(p, { recursive: true });\n',
           'const p = path.resolve(ROOT, "src/planted");\nmkdirSync(p, { recursive: true });\n',
-          (copy) => repositoryWrites(readFileSync(path.join(copy, PROBE_FILE), "utf8")).length > 0,
+          (copy) =>
+            repositoryWrites(readFileSync(path.join(copy, PROBE_FILE), "utf8"))
+              .length > 0,
         ),
     },
   },
   {
     module: "src/quality/import-cycles.ts",
-    matches: "a line beginning `import`, up to the `from \"…\";` that ends the statement",
+    matches:
+      'a line beginning `import`, up to the `from "…";` that ends the statement',
     standing: {
       kind: "blind",
       looksLike:
-        "`export { x } from \"./y\"` — a re-export, which is an edge the module graph carries at runtime exactly like an import and which this scan does not read at all.",
+        '`export { x } from "./y"` — a re-export, which is an edge the module graph carries at runtime exactly like an import and which this scan does not read at all.',
       plausibility: "idiomatic",
       probe: (root) =>
         twoSpellings(
           root,
           'import { thing } from "@/quality/pins";\nexport const uses = () => thing;\n',
           'export { PINS as thing } from "@/quality/pins";\n',
-          (copy) => JSON.stringify([...moduleGraph(copy).get(PROBE_FILE) ?? []]).includes("pins"),
+          (copy) =>
+            JSON.stringify([
+              ...(moduleGraph(copy).get(PROBE_FILE) ?? []),
+            ]).includes("pins"),
         ),
     },
   },
   {
     module: "src/quality/moments.ts",
-    matches: "an export name followed by an opening bracket, or a SCREAMING export taken bare",
+    matches:
+      "an export name followed by an opening bracket, or a SCREAMING export taken bare",
     standing: {
       kind: "blind",
       looksLike:
@@ -307,7 +369,10 @@ export const MARKERS: readonly Marker[] = [
       probe: () => {
         const seen = (caller: string) =>
           withRoot(
-            { "src/planted/subject.ts": fixtureText("moment-subject-module"), "src/planted/asks.test.ts": caller },
+            {
+              "src/planted/subject.ts": fixtureText("moment-subject-module"),
+              "src/planted/asks.test.ts": caller,
+            },
             (root) => momentsOf(root, "src/planted/subject.ts").length > 0,
           );
         return {
@@ -319,7 +384,8 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/run-residue.ts",
-    matches: "`rmSync` followed by an opening bracket, with comments subtracted and literals blanked first",
+    matches:
+      "`rmSync` followed by an opening bracket, with comments subtracted and literals blanked first",
     standing: {
       kind: "blind",
       looksLike:
@@ -336,10 +402,12 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/acceptances.ts",
-    matches: "`reviewBy:` immediately followed by a quote, so the field and its value are one token",
+    matches:
+      "`reviewBy:` immediately followed by a quote, so the field and its value are one token",
     standing: {
       kind: "blind",
-      looksLike: "`reviewBy :` with a space before the colon, or the field quoted as `\"reviewBy\":`",
+      looksLike:
+        '`reviewBy :` with a space before the colon, or the field quoted as `"reviewBy":`',
       plausibility: "formatter_forbids",
       probe: (root) =>
         twoSpellings(
@@ -352,10 +420,11 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/typed-names.ts",
-    matches: "`unit: \"W318\"` — the field, a colon, a space, and the quoted citation",
+    matches:
+      '`unit: "W318"` — the field, a colon, a space, and the quoted citation',
     standing: {
       kind: "blind",
-      looksLike: "`unit:\"W318\"` with the space closed up",
+      looksLike: '`unit:"W318"` with the space closed up',
       plausibility: "formatter_forbids",
       probe: (root) =>
         twoSpellings(
@@ -371,7 +440,8 @@ export const MARKERS: readonly Marker[] = [
     matches: "`.reduce(` — the fold this tree writes",
     standing: {
       kind: "blind",
-      looksLike: "`.reduceRight(`, which is the same fold with the same order-dependence",
+      looksLike:
+        "`.reduceRight(`, which is the same fold with the same order-dependence",
       plausibility: "idiomatic",
       probe: (root) =>
         twoSpellings(
@@ -384,26 +454,31 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/declaration-tax.ts",
-    matches: "a module path written as one string literal — `\"src/quality/bounds.ts\"`",
+    matches:
+      'a module path written as one string literal — `"src/quality/bounds.ts"`',
     standing: {
       kind: "blind",
-      looksLike: 'the same path built from pieces — `"src/quality/" + "bounds.ts"`',
+      looksLike:
+        'the same path built from pieces — `"src/quality/" + "bounds.ts"`',
       plausibility: "idiomatic",
       probe: (root) =>
         twoSpellings(
           root,
           'export const D = ["src/quality/bounds.ts"];\n',
           'export const D = ["src/quality/" + "bounds.ts"];\n',
-          (copy) => namingSites(copy, "src/quality/bounds.ts").includes(PROBE_FILE),
+          (copy) =>
+            namingSites(copy, "src/quality/bounds.ts").includes(PROBE_FILE),
         ),
     },
   },
   {
     module: "src/quality/flattering-numbers.ts",
-    matches: "`): number` on the signature line, read from the text after the parameter list",
+    matches:
+      "`): number` on the signature line, read from the text after the parameter list",
     standing: {
       kind: "caught",
-      looksLike: "the return type wrapped onto the next line — `export function n():\\n  number`",
+      looksLike:
+        "the return type wrapped onto the next line — `export function n():\\n  number`",
       probe: (root) =>
         twoSpellings(
           root,
@@ -415,10 +490,12 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/planting.ts",
-    matches: "a `writeFileSync` call in a module the planter register does not except",
+    matches:
+      "a `writeFileSync` call in a module the planter register does not except",
     standing: {
       kind: "caught",
-      looksLike: 'the call reached through a namespace import — `import * as fs` then `fs.writeFileSync`',
+      looksLike:
+        "the call reached through a namespace import — `import * as fs` then `fs.writeFileSync`",
       probe: (root) =>
         twoSpellings(
           root,
@@ -430,10 +507,12 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/unit-headers.ts",
-    matches: "`export const NAME` on one line, which is how W320 learns what a module owns",
+    matches:
+      "`export const NAME` on one line, which is how W320 learns what a module owns",
     standing: {
       kind: "caught",
-      looksLike: "the declaration wrapped — `export const` and the name on the next line",
+      looksLike:
+        "the declaration wrapped — `export const` and the name on the next line",
       probe: (root) =>
         twoSpellings(
           root,
@@ -459,7 +538,8 @@ export const MARKERS: readonly Marker[] = [
           root,
           fixtureText("w366-module-keyed-register"),
           fixtureText("w366-path-keyed-register"),
-          (copy) => handListedRegisters(copy).some((r) => r.includes("spelling-probe")),
+          (copy) =>
+            handListedRegisters(copy).some((r) => r.includes("spelling-probe")),
         ),
     },
   },
@@ -481,7 +561,8 @@ export const MARKERS: readonly Marker[] = [
           // defaulted-register scan read the wrapped one as a real parameter nobody drives.
           fixtureText("w366-exemption-parameter-wrapped"),
           fixtureText("w366-exemption-parameter-inline"),
-          (copy) => appliedExemptions(copy).some((e) => e.includes("spelling-probe")),
+          (copy) =>
+            appliedExemptions(copy).some((e) => e.includes("spelling-probe")),
         ),
     },
   },
@@ -500,7 +581,8 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/shared-excuses.ts",
-    matches: "the reason sentence itself, as a literal, matched against the other reasons in the tree",
+    matches:
+      "the reason sentence itself, as a literal, matched against the other reasons in the tree",
     standing: {
       kind: "untried",
       why:
@@ -512,7 +594,7 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/self-ending.ts",
-    matches: "`kind: \"deferred\"` — how this tree spells a wait",
+    matches: '`kind: "deferred"` — how this tree spells a wait',
     standing: {
       kind: "untried",
       why:
@@ -525,7 +607,8 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/tautology-sweep.ts",
-    matches: "the assertion forms this tree writes — `expect(x).toEqual(y)` and its siblings",
+    matches:
+      "the assertion forms this tree writes — `expect(x).toEqual(y)` and its siblings",
     standing: {
       kind: "untried",
       why:
@@ -537,7 +620,8 @@ export const MARKERS: readonly Marker[] = [
   },
   {
     module: "src/quality/self-reference.ts",
-    matches: "a literal assembled from fragments — an array of strings with `.join(\"\")`",
+    matches:
+      'a literal assembled from fragments — an array of strings with `.join("")`',
     standing: {
       kind: "untried",
       why:
@@ -565,12 +649,18 @@ export function censusDefects(
   const defects: MarkerDefect[] = [];
   for (const site of scanning) {
     if (!declared.has(site)) {
-      defects.push({ module: site, what: "prepares text for scanning and no marker declares how it matches" });
+      defects.push({
+        module: site,
+        what: "prepares text for scanning and no marker declares how it matches",
+      });
     }
   }
   for (const marker of markers) {
     if (!scanning.has(marker.module)) {
-      defects.push({ module: marker.module, what: "is declared as a marker and no longer prepares text for scanning" });
+      defects.push({
+        module: marker.module,
+        what: "is declared as a marker and no longer prepares text for scanning",
+      });
     }
   }
   return defects.sort((a, b) => a.module.localeCompare(b.module));
@@ -582,21 +672,33 @@ export function censusDefects(
  * A control that does not fire is its own defect: it means the row's `blind` or `caught` was
  * measured against a plant the register never saw, which is the reading W295 calls no reading.
  */
-export function drivenDefects(root: string, markers: readonly Marker[] = MARKERS): MarkerDefect[] {
+export function drivenDefects(
+  root: string,
+  markers: readonly Marker[] = MARKERS,
+): MarkerDefect[] {
   const defects: MarkerDefect[] = [];
   for (const marker of markers) {
     const standing = marker.standing;
     if (standing.kind === "untried") continue;
     const reading = standing.probe(root);
     if (!reading.control) {
-      defects.push({ module: marker.module, what: "the control plant is not found, so the reading measures nothing" });
+      defects.push({
+        module: marker.module,
+        what: "the control plant is not found, so the reading measures nothing",
+      });
       continue;
     }
     if (standing.kind === "caught" && !reading.variant) {
-      defects.push({ module: marker.module, what: "declared `caught` and the second spelling is missed" });
+      defects.push({
+        module: marker.module,
+        what: "declared `caught` and the second spelling is missed",
+      });
     }
     if (standing.kind === "blind" && reading.variant) {
-      defects.push({ module: marker.module, what: "declared `blind` and the second spelling is found — the marker has been widened" });
+      defects.push({
+        module: marker.module,
+        what: "declared `blind` and the second spelling is found — the marker has been widened",
+      });
     }
   }
   return defects;
@@ -604,18 +706,30 @@ export function drivenDefects(root: string, markers: readonly Marker[] = MARKERS
 
 /** The markers nobody has tried a second spelling against, by name. */
 export function untriedMarkers(markers: readonly Marker[] = MARKERS): string[] {
-  return markers.filter((m) => m.standing.kind === "untried").map((m) => m.module).sort();
+  return markers
+    .filter((m) => m.standing.kind === "untried")
+    .map((m) => m.module)
+    .sort();
 }
 
 /** The markers a second spelling gets past, by name. The finding. */
 export function blindMarkers(markers: readonly Marker[] = MARKERS): string[] {
-  return markers.filter((m) => m.standing.kind === "blind").map((m) => m.module).sort();
+  return markers
+    .filter((m) => m.standing.kind === "blind")
+    .map((m) => m.module)
+    .sort();
 }
 
 /** The blind markers the tree could really acquire — the ones that are holes rather than curiosities. */
-export function reachableBlindness(markers: readonly Marker[] = MARKERS): string[] {
+export function reachableBlindness(
+  markers: readonly Marker[] = MARKERS,
+): string[] {
   return markers
-    .filter((m) => m.standing.kind === "blind" && m.standing.plausibility !== "formatter_forbids")
+    .filter(
+      (m) =>
+        m.standing.kind === "blind" &&
+        m.standing.plausibility !== "formatter_forbids",
+    )
     .map((m) => m.module)
     .sort();
 }
