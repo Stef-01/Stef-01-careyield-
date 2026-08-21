@@ -144,6 +144,25 @@ function leadingComment(source: string): string {
   return lines.join("\n");
 }
 
+/**
+ * A module's prose: the header block, and every comment below it.
+ *
+ * W393 PULLED THIS OUT OF THE LOOP BELOW rather than writing it a second time. The surface is the
+ * argument — the comments recorded above are exactly what four narrowings of this register settled
+ * on — and a second reading of the same prose that read a DIFFERENT surface would be comparing two
+ * things at once. W341's register would have reported the copy, and rightly.
+ */
+export function proseOf(source: string): { header: string; docs: string } {
+  const cut = source.indexOf("\nimport ");
+  const header = cut > 0 ? source.slice(0, cut) : leadingComment(source);
+  const body = source.slice(cut > 0 ? cut : header.length);
+  const docs = [
+    ...[...body.matchAll(/\/\*\*[\s\S]*?\*\//g)].map((m) => m[0]),
+    ...body.split("\n").filter((line) => line.trimStart().startsWith("//")),
+  ].join("\n");
+  return { header, docs };
+}
+
 export function proseClaims(root: string): ProseClaim[] {
   const found = new Map<string, ProseClaim>();
   for (const file of sourceModules(root)) {
@@ -154,18 +173,12 @@ export function proseClaims(root: string): ProseClaim[] {
     // had their entire body read as header prose — a number in a string literal or an identifier
     // counted as a claim this tree's prose makes about itself. The declared negative probe *does
     // not read a claim out of code* passed only because its fixture happened to contain an import.
-    const cut = source.indexOf("\nimport ");
-    const header = cut > 0 ? source.slice(0, cut) : leadingComment(source);
-    const body = source.slice(cut > 0 ? cut : header.length);
+    const { header, docs } = proseOf(source);
     // Block comments AND standalone line comments, which together are the module's prose and
     // nothing else. The first narrowing of this — header to the leading block — dropped four
     // declared claims, all of them `//` notes further down an import-less module: real prose the
     // whole-file fallback had been catching by accident. A surface that is exactly the comments
     // keeps them and still reads no code, which is what the negative probe requires.
-    const docs = [
-      ...[...body.matchAll(/\/\*\*[\s\S]*?\*\//g)].map((m) => m[0]),
-      ...body.split("\n").filter((line) => line.trimStart().startsWith("//")),
-    ].join("\n");
     for (const [where, body] of [["header", header], ["doc", docs]] as const) {
       for (const match of body.matchAll(CLAIM_RE)) {
         const text = match[0].replace(/\s+/g, " ");
