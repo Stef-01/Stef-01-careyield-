@@ -77,14 +77,13 @@ export function resolveCitation(root: string, citation: string): true | string {
   return text.includes(parsed.assertion) ? true : `${citation}: the file does not contain that assertion`;
 }
 
-/** Every citation in a list that does not resolve, with its reason. */
 /**
  * Whether `module::export` names something this tree really exports.
  *
  * SHARED BECAUSE IT WAS ABOUT TO BE WRITTEN A THIRD TIME. W376's gate and W389's each held their
  * own copy — the same six lines, resolving a `module::name` pair against the tree — and W394 was
- * one paste away from a third, which W331's CR-7 reports as a name two modules export and nobody
- * owns. It lives here because that is what this module already does: `resolveCitation` resolves
+ * one paste away from a third, which W331's CR-7 reports as a name several modules export and
+ * nobody owns. It lives here because that is what this module already does: `resolveCitation` resolves
  * `file :: assertion` and this resolves `module::export`, the same question about the other half
  * of the tree.
  */
@@ -96,6 +95,7 @@ export function resolvesInTree(root: string, derivation: string): boolean {
   return new RegExp(`(?:export )?(?:function|const) ${name}\\b`).test(readFileSync(full, "utf8"));
 }
 
+/** Every citation in a list that does not resolve, with its reason. */
 export function unresolved(root: string, citations: readonly string[]): string[] {
   return citations
     .map((citation) => resolveCitation(root, citation))
