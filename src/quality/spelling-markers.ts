@@ -39,6 +39,7 @@ import { numberReturningExports } from "./flattering-numbers";
 import { discoverFoldSites } from "./order-independence";
 import { copyTree, planterDiff, withPlantedIn, withTree as withRoot } from "./planting";
 import { hookSites } from "./hook-reach";
+import { mutantsIn } from "./mutation-sampling";
 import { silentZeros } from "@/console/rendered-zeros";
 import { moduleGraph } from "./import-cycles";
 import { repositoryWrites } from "./shared-state";
@@ -117,6 +118,26 @@ function twoSpellings(
 const names = (answer: unknown): boolean => JSON.stringify(answer).includes("spelling-probe");
 
 export const MARKERS: readonly Marker[] = [
+  {
+    module: "src/quality/mutation-sampling.ts",
+    matches:
+      "the operator TOKENS themselves — `===`, `!==`, `&&`, `>=`, `<=` — found as text in the " +
+      "prepared source, which is as keyed to a spelling as a register gets",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "`if (a == b)` — loose equality, the same comparison written the other way. There is no `eq-to-neq` operator for it, so a module written with `==` and `!=` yields no mutants at all and reads in every sweep as a module whose every line is already covered.",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          "export const same = (a: number, b: number): boolean => a === b;\n",
+          "export const same = (a: number, b: number): boolean => a == b;\n",
+          (copy) =>
+            mutantsIn(PROBE_FILE, readFileSync(path.join(copy, PROBE_FILE), "utf8"), "none").length > 0,
+        ),
+    },
+  },
   {
     module: "src/quality/private-copies.ts",
     matches:

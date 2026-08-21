@@ -113,7 +113,7 @@ export const FINDINGS: readonly HardeningFinding[] = [
       kind: "fixed",
       by: "W383",
       evidence:
-        "`mutantsIn` calls `prepareForScan(source)`. `code` is still bound from `stripComments` separately and deliberately: the mutation OFFSETS are into comment-stripped text with literals INTACT, which is a different string from the one matched against, and collapsing them would move every mutation site. The module's own suite passes unchanged, which is the point — this changes where the rule lives, not what the scan sees.",
+        "`mutantsIn` calls `prepareForScan(source)`. `code` is still bound from `stripComments` separately and deliberately: the mutation OFFSETS are into comment-stripped text with literals INTACT, which is a different string from the one matched against, and collapsing them would move every mutation site. The module's own suite passes unchanged, which is the point — this changes where the rule lives, not what the scan sees. AND MOVING IT FOUND SOMETHING NOBODY WAS LOOKING FOR, which is the best argument in this record for the instrument the bound asks for: declaring the site put the module into W366's population, and W366 immediately reported a blind spot with a driven probe — `mutantsIn` keys on the operator TOKENS, there is no operator for loose equality, so a module written with `==` and `!=` yields no mutants at all and reads in every sweep as a module already covered. That row is in `MARKERS` with its probe rather than restated here, because a register that plants is where a finding of that shape belongs.",
     },
   },
   {
