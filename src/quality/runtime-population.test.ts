@@ -60,9 +60,11 @@ describe("W396 the two readings", () => {
         "export interface A { x: number }\nexport type B = A;\nexport const c = 1;\n",
       ),
     ).toEqual(["A", "B"]);
-    // A comment discussing a type is not a declaration of one.
+    // A comment discussing a type is not a declaration of one. A BLOCK comment, because the match
+    // is anchored to the start of a line and a `//` prefix could never have matched anyway — the
+    // first version of this probe used one and left the subtraction undriven.
     expect(
-      typeNames("// export type Ghost = 1;\nexport type Real = 2;\n"),
+      typeNames("/*\nexport type Ghost = 1;\n*/\nexport type Real = 2;\n"),
     ).toEqual(["Real"]);
     const withTypes = readings.find((r) => r.types.length > 3);
     expect(
@@ -84,6 +86,17 @@ describe("W396 what the tree loads versus what the tree says", () => {
     // EVERY DIVERGENCE RUNS ONE WAY. Nothing in this census is claimed by the source reading and
     // missing at runtime; all of it is the module exporting something the scan never saw.
     expect(found.every((d) => d.side === "runtime_only")).toBe(true);
+    // AND THE OTHER DIRECTION IS DRIVEN ON A HAND-BUILT READING, because the tree holds no instance
+    // and the reason is structural: `exportsOf` and `typeNames` match the same two kinds, so a name
+    // the first calls a type is always one the second removes, and a `function`, `const` or `class`
+    // absent at runtime is not something valid TypeScript produces. The arm is defence against
+    // those two patterns DRIFTING apart, which does happen, so it is kept and driven rather than
+    // removed as unreachable.
+    expect(
+      divergences([
+        { module: "m.ts", source: ["gone"], types: [], runtime: [] },
+      ]),
+    ).toEqual([{ module: "m.ts", name: "gone", side: "source_only" }]);
     expect(found.length).toBeGreaterThan(20);
     // THE SHARPEST INSTANCE. `unit-headers.ts` exports thirteen values and the prepared text shows
     // one of them, so W388 — which asks whether a cited test names an export of its subject — is
