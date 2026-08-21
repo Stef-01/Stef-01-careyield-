@@ -512,6 +512,40 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/quarter-mutants-q29.ts::Q29_MUTANT_BOUND",
+    condition: "a module can be riddled with holes none of the five reaches, and a module they find NOTHING to change in gets no verdict at all",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/quarter-mutants-q29.ts::populationDefects",
+      how: "HALF OF IT IS UNOBSERVABLE AND HALF OF IT FIRED THIS QUARTER, which is why this row reads `read_by` where Q28's reads `not_observable`. The mutation space is not enumerable and no instrument here bounds it, so the first clause cannot be checked. The SECOND clause can, and `populationDefects` walks the whole population on every run looking for a module the operators fall silent on rather than trusting the register — and this quarter it found one. Closing a survivor by sharing the function it lived in removed the last line the five could reach in `hardening-q28.ts`, so a module that had a verdict lost it, and the walk reported that rather than a reader noticing. The same walk found the same thing in Q28's own population for the same reason.",
+    },
+  },
+  {
+    bound: "src/quality/quarter-mutants-q29.ts::Q29_MUTANT_BOUND",
+    condition: "THE EXCLUSION IS PERMANENT AND GROWING",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/quarter-mutants-q29.ts::populationDefects",
+      how: "THE ROW NAMES A MODULE AND THE SUITE THAT MAKES IT UNREACHABLE, and `populationDefects` reports an exclusion for a module the quarter did not add, one whose stated reason the tree contradicts, and a module with no sibling suite that nothing excuses — so the list cannot grow or shrink quietly. What is new here is that the growth was PREDICTED and the prediction is now checked: W362 wrote that the exclusion would recur, and this suite asserts that sentence is in Q27's module, absent from Q28's, and re-issued in this one. What no check can settle is whether the growth ever STOPS, because that is a property of building each quarter's sweep out of the last one.",
+    },
+  },
+  {
+    bound: "src/quality/quarter-mutants-q29.ts::Q29_MUTANT_BOUND",
+    condition: "THE COST IS NOW PART OF THE LIMIT",
+    reading: {
+      kind: "not_observable",
+      why: "The clause says the gate carries a sweep per quarter and that the instrument which would lift the exclusion is the same one that would make the gate affordable. Neither half is a property of this tree that a walk can resolve: what a run COSTS is a fact about the machine it runs on, and the tree has no register of that, while the instrument that does not exist cannot be looked for. What is observable is the count of sweeps, which this register does not state as a total precisely because it would be a number nobody re-derives.",
+    },
+  },
+  {
+    bound: "src/quality/quarter-mutants-q29.ts::Q29_MUTANT_BOUND",
+    condition: "A CAUGHT MUTANT IS NOT A TESTED LINE",
+    reading: {
+      kind: "not_observable",
+      why: "A red suite says some assertion noticed the change; nothing in a pass/fail reading says WHICH assertion, or whether it was about the line that moved. Settling it would mean resolving a failure back to the assertion that produced it and that assertion back to its subject, which is a different instrument from a mutation sweep and is the same gap W380's harness states about running a suite rather than calling a check.",
+    },
+  },
+  {
     bound: "src/quality/quarter-mutants-q28.ts::Q28_MUTANT_BOUND",
     condition: "a module can be riddled with holes none of the five reaches",
     reading: {

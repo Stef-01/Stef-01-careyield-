@@ -624,6 +624,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/hardening-q22.ts", text: "Three copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/quarter-mutants-q29.ts", text: "eleven reachable modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/quarter-mutants-q29.ts", text: "three copies", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/quarter-mutants-q28.ts", text: "three copies", resolution: { kind: "at_the_unit" } },
   // W383's pass. Each says what that reading FOUND, which is history and does not go stale.
   { module: "src/quality/hardening-q29.ts", text: "four live rows", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q29.ts", text: "Two registers", resolution: { kind: "at_the_unit" } },

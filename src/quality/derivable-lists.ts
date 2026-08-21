@@ -167,6 +167,7 @@ export const LISTED_REGISTERS: readonly ListedRegister[] = [
     },
   },
   { id: "src/quality/quarter-mutants-q28.ts::EXCLUDED_AT_W374", membership: callable("src/quality/quarter-mutants-q28.ts::populationDefects") },
+  { id: "src/quality/quarter-mutants-q28.ts::UNMUTATED_AT_W374", membership: callable("src/quality/quarter-mutants-q28.ts::populationDefects") },
   {
     id: "src/quality/quarter-mutants-q28.ts::CLOSED_BY_W374",
     membership: {

@@ -133,7 +133,7 @@ export const ARGUED_EQUALITIES: readonly ArguedEquality[] = [
   },
   {
     id: "src/quality/quarter-mutants-q29.test.ts :: derives the quarter from the headers rather than holding a list :: EXCLUDED_AT_W386",
-    why: "THE SAME SHAPE POINTED AT AN EXCLUSION. The equality is against a length, and it is the one place a count is the honest form: the assertion beside it names the excluded module outright, so the number cannot move without a name moving with it. A module joining the exclusion list is a second harness in the quarter and has to be argued in writing; a module leaving means the instrument changed. Neither is a digit somebody retypes.",
+    why: "AN EXCLUSION LENGTH, AND THIS QUARTER'S IS THE FOURTH OF A SEQUENCE THAT WAS PREDICTED. The equality is against a length and the assertion beside it names the excluded module outright, so the number cannot move without a name moving with it. What makes the count honest HERE rather than merely tolerable is that its growth was written down before it happened: W362 said the list would gain a row every quarter until the instrument changed, and this is the fourth row it has gained. A number whose next value is stated in advance is not a number somebody can quietly retype — a fifth arriving on schedule confirms the prediction and one arriving early means a second module of the quarter became a harness, which has to be argued in writing.",
   },
   {
     id: "src/quality/quarter-mutants-q28.test.ts :: catches every mutant but the ones this register names :: SURVIVORS_AT_W374",
