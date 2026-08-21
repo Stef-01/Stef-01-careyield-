@@ -219,9 +219,11 @@ describe("W391 what the register found", () => {
     const alone = PATTERNS_AT_W391.filter(
       (p) => p.reading.kind === "only_this",
     );
-    // THE ANSWER THE QUARTER OPENS ON. Three quarters of this tree's populations are defined by a
-    // pattern that is also the only reading of them, so a pattern matching the wrong thing has no
-    // second instrument to disagree with it — Q29-CR-2's shape, counted rather than argued.
+    // THE ANSWER THE QUARTER OPENS ON. Most of this tree's populations are defined by a pattern
+    // that is also the only reading of them, so a pattern matching the wrong thing has no second
+    // instrument to disagree with it — Q29-CR-2's shape, counted rather than argued. The comparison
+    // below is the figure; a fraction retyped here would be a number nobody re-derives, which is
+    // the class W314's register exists for and one this unit had already got wrong once.
     expect(alone.length).toBeGreaterThan(PATTERNS_AT_W391.length / 2);
     expect(alone.length).toBeLessThan(PATTERNS_AT_W391.length);
   });
