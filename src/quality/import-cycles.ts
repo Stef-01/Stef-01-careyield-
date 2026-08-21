@@ -216,6 +216,7 @@ export const CYCLES_AT_W381: readonly DeclaredCycle[] = [
       "src/quality/failure-direction.ts",
       "src/quality/horizon-directions.ts",
       "src/quality/horizon-q29-gate.ts",
+      "src/quality/horizon-q30-gate.ts",
       "src/quality/instant.ts",
       "src/quality/latent-findings.ts",
       "src/quality/latent-y5.ts",
