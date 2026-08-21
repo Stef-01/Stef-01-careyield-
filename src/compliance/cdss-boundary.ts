@@ -766,6 +766,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W360's pass is reviewer-facing: unit ids, module paths, what each finding is and what was done about it. The longest strings on it are arguments addressed to whoever reads the quarter next, and nothing here renders or reaches a practice.",
   },
   {
+    module: "src/quality/horizon-q30-gate.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W389's re-read of the moments Q30's horizon names — one row per unit, each saying when that unit's check answers and what was planted to show it. Nobody but a developer reads it. Its longest strings are each row's argument and `Q30_GATE_BOUND`; it constructs no record of any kind, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/horizon-q29-gate.ts",
     operatorCopy: [],
     notCopy:

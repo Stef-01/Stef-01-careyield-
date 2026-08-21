@@ -679,6 +679,14 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/horizon-q30-gate.ts",
+    // W389's re-read of Q30's moments. `census: null` for the same reason as Q29's gate below: it
+    // walks nothing itself — the population is the horizon document's own table, read from the
+    // document, and each probe builds its own inputs. It is here because it states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/horizon-q29-gate.ts",
     // Reads ONE DOCUMENT — `docs/HORIZON-Q29.md` — and then the modules its rows name, one file at
     // a time. The probes each plant into a throwaway tree and run somebody else's walk over it, so

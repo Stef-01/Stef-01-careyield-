@@ -78,6 +78,7 @@ import { CITED_BOUND } from "./cited-checks";
 import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
+import { Q30_GATE_BOUND } from "./horizon-q30-gate";
 import { TEMP_RESIDUE_BOUND } from "./run-residue";
 import { RULE_BOUND } from "./patient-populations";
 import { REACHED_BOUND } from "./reached-pages";
@@ -736,6 +737,28 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'one that is asserted', 'the block a call really sits in' — the unit of each phrase rather than a count anything maintains. `momentDefects` re-derives every member's moments on each build.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/horizon-q30-gate.ts",
+    name: "Q30_GATE_BOUND",
+    unit: "W389",
+    text: Q30_GATE_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "THE SHARPEST CLAUSE IS THE ONE NOTHING CAN LIFT, and it is a fact about what a probe is rather than about how these were written. A population can be planted whole — you build the set and hand it over — and a MOMENT cannot: to plant one you would have to start a process, close a row, render a page, and then ask the check what it saw. What every probe here varies is the SHAPE of an input, so each row is evidence that a derivation tells two situations apart and inference that it therefore tells two instants apart. Closing that gap is not a better register: it is a harness that runs checks at real moments, which is what W380's suite runner is and why the bound names it as the single exception. The rest follow from the same shape as every quarter gate since Q25 — the document's table is the population, so a check the horizon does not list is outside the gate, and `not_a_moment` is a judgement no walk derives.",
+    },
+    numbers: [
+      {
+        word: "two",
+        kind: "rate",
+        why: "'two planted inputs', 'two situations', 'two moments' — the pair a probe compares, not a count of anything the tree holds. It stays two however many rows the register grows, because a reading is one comparison.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'the one unit whose probe runs at a real moment' and 'a unit that established two is re-read on one of them' — a single instance of the sentence's subject in both places rather than a total. W380 is named outright beside the first, so the claim is checkable by reading the register rather than by trusting the digit.",
       },
     ],
   },
