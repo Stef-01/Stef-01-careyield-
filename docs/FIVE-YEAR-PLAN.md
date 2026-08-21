@@ -911,6 +911,30 @@ anywhere else. **Q30 adds no blocked row.**
 - **W389** The moments re-read — this quarter's gate → verify: every moment `docs/HORIZON-Q30.md` names is derived, and is shown both catching a failure that happens at that moment and staying silent about one that happens at another; a moment named and not shown both ways fails.
 - **W390** **QUARTER CLOSE.** Q31 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
 
+## 5p. Year 7 — Q31 (W391–W403)
+
+**Theme: what the pattern cannot see.** Q29's hardening pass is four findings and they are one
+finding wearing four coats: a pattern stands in for a population, the pattern and the check are the
+same object, and so a pattern that matches the wrong thing reports green. Q29-CR-2 is the sharpest —
+nothing escapes the patient-rule signature today, *which is precisely why nothing caught* that it is
+narrow four ways and wide one. Q30 met the same shape four more times without naming it. Every unit
+here measures a pattern against a SECOND, independent reading of the same population, and the
+disagreement is the finding. Recorded in `docs/HORIZON-Q31.md`.
+
+- **W391** [P] The pattern register: every population defined by a regex, and what it is over → verify: every register whose population comes from a pattern is derived, with the pattern's own text and the thing it claims to enumerate; a register whose population nothing else could read is named as such.
+- **W392** [P] Q29-CR-2 closed: the patient-rule signature read four ways it is written → verify: a rule taking a callback parameter, one typed `ReadonlyArray<Patient>`, one typed `Array<Patient>` and one named `SyntheticPatient[]` are each planted, and the register's answer about each is shown to be what W373 meant rather than what its regex matched.
+- **W393** [P] A number vocabulary that cannot be outgrown by a compound → verify: W314's number reading is measured against a second derivation over every number-word the tree writes; a compound the vocabulary has never seen is planted and must not resolve to the unit on its right.
+- **W394** The name conventions a register rests on, enumerated → verify: every register whose derivation turns on a NAME — `ROOT`, `COPY`, `eligible`, a `*_AT_W<n>` suffix — carries the convention it rests on and what a file spelling it otherwise would cost; one is driven by planting the other spelling.
+- **W395** Q30's hardening pass → verify: `code-review`, `security-review` and `simplify` over W378–W390; every finding disposed with a clock per W318; the pass's own bound stated.
+- **W396** [P] A population measured against the runtime, not against the source → verify: at least one source-derived population is re-derived by LOADING the modules and reading what they export, and the two readings are shown disagreeing about a planted instance before they agree about the tree.
+- **W397** The survivors register over Q30's modules → verify: W349's run over every module Q30 added, each survivor named with its kind and its argument, the modules the harness cannot reach declared and resolved, and the sampler's share of that population measured.
+- **W398** [P] Every scan site read in both spellings this tree writes → verify: W366's markers extended so each scan site is driven against BOTH spellings the tree actually contains rather than one, and a site whose second spelling nobody can write is argued.
+- **W399** [P] The product's patterns: what a rule matches that nobody meant → verify: every product rule whose selection turns on a pattern — a condition code, a template match, a message filter — is measured against a second reading over the synthetic set, and a patient selected by the pattern and not by the intent is reported.
+- **W400** [P] A guard whose vocabulary is shared with the world → verify: Q29-SR-1 closed or re-argued — every guard whose test is a name in a namespace this tree does not own is enumerated, with what it would take for a stranger to satisfy it.
+- **W401** [P] Two derivations of one population, and the diff between them → verify: a register is chosen whose population two independent walks can produce, both are built, and the diff between them is reported as the finding rather than reconciled away.
+- **W402** The patterns re-read — this quarter's gate → verify: every pattern `docs/HORIZON-Q31.md` names is measured against a second reading of its own population, and the two are shown disagreeing about a planted instance before they are shown agreeing about the tree; a pattern named and not shown both ways fails.
+- **W403** **QUARTER CLOSE.** Q32 expansion under the horizon rule → verify: the rule's preconditions evaluated and RECORDED in this plan before any unit is written; `plan-ledger` green over the whole ledger.
+
 ## 6. Horizon rule (supersedes the five-year expansion rule, W260)
 
 **The five-year arc is spent.** §5's ledger ran W1–W260 and §6's theme lines, written in Year 1,
