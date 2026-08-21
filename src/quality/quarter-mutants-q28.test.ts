@@ -138,12 +138,21 @@ describe("W374 the population is Q28's own modules, minus the one the harness ca
     // fact about this tree rather than about the type.
     const named = (extra: readonly Unmutated[]): string[] =>
       [...UNMUTATED_AT_W374, ...extra].map((u) => u.module);
+    // W386 PUT A ROW IN THIS LIST, one quarter after the run, and the arms move with it: closing
+    // the identity mutant by sharing `finding` removed the last line the operators could reach in
+    // `hardening-q27.ts`. The shape is still shown holding a planted row beside the real one, so
+    // the list is a reading rather than something that could only ever be what it is.
     expect(named([{ module: "src/planted/w374.ts", why: "a planted row" }])).toEqual([
+      "src/quality/hardening-q27.ts",
       "src/planted/w374.ts",
     ]);
-    expect(named([])).toEqual([]);
+    expect(named([])).toEqual(["src/quality/hardening-q27.ts"]);
     expect(UNMUTATED_AT_W362.map((u) => u.module).length).toBeGreaterThan(0);
+    // Every module the register does NOT record must still yield something, walked rather than
+    // assumed — the skip is over the one row above and nothing else.
+    const recorded = new Set(UNMUTATED_AT_W374.map((u) => u.module));
     for (const module of q28Population(ROOT)) {
+      if (recorded.has(module)) continue;
       expect(quarterMutants(ROOT, [module]).length, `${module} yields no mutant`).toBeGreaterThan(0);
     }
     // AND THE ARM REALLY REPORTS, driven on the quarter where such a module exists: over Q27's
@@ -214,15 +223,21 @@ describe("W374 the four this run closed", () => {
   });
 
   it("closed them where they live rather than owing them to a later unit, which is W357's rule", () => {
-    // Not recorded as owed. Three are assertions in the module's OWN sibling suite, so the mutant
-    // dies where a reader of that module would look; one is a change to the module, because the
-    // selector could not be measured in the tree the sweep runs in.
+    // Not recorded as owed. Two are assertions in the module's OWN sibling suite, so the mutant
+    // dies where a reader of that module would look; two are changes to a module.
+    //
+    // AND ONE OF THEM MOVED FROM `suite` TO `module` AFTERWARDS, which is worth more than the tidy
+    // split it spoils. The lookup fix here was an assertion beside a line left in place — and one
+    // quarter later W386's sweep found the IDENTICAL mutant in Q28's own copy of the same function.
+    // A fix applied to a copy is not applied to the copy beside it, so the three copies became one
+    // shared `findingIn` and this row now points at the module that holds it. A row changing its
+    // `where` after the fact is the record staying true rather than the register being wrong.
     expect(CLOSED_BY_W374.filter((c) => c.where === "suite").map((c) => c.file)).toEqual([
       "src/quality/flattering-numbers.test.ts",
       "src/quality/flattering-numbers.test.ts",
-      "src/quality/hardening-q27.test.ts",
     ]);
     expect(CLOSED_BY_W374.filter((c) => c.where === "module").map((c) => c.file)).toEqual([
+      "src/quality/hardening-q22.ts",
       "src/quality/superset.ts",
     ]);
   });
