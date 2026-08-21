@@ -3,7 +3,6 @@
 // does not resolve to the unit on its right.
 
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
 import path from "node:path";
 import {
   MISREAD_AT_W393,
@@ -16,22 +15,16 @@ import {
   tailAfterScale,
   tokens,
   valueOf,
+  proseInTree,
   wordsInTree,
   type Prose,
 } from "./number-words";
 import { CLAIMS, proseClaims, proseOf } from "./prose-numbers";
-import { sourceModules } from "./tree-walks";
 
 const ROOT = path.resolve(__dirname, "..", "..");
 
-/** The prose W314 reads, read once and handed to both. */
-const prose: Prose[] = sourceModules(ROOT).map((file) => {
-  const { header, docs } = proseOf(readFileSync(file, "utf8"));
-  return {
-    module: path.relative(ROOT, file).split(path.sep).join("/"),
-    text: `${header}\n${docs}`,
-  };
-});
+/** The prose W314 reads, read once through W314's own extractor and handed to both. */
+const prose: Prose[] = proseInTree(ROOT, proseOf);
 
 describe("W393 the parse", () => {
   it("adds a hyphenated compound rather than looking one up", () => {

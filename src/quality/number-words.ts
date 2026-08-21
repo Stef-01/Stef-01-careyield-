@@ -32,6 +32,10 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. It reads this repository's own comments.
 
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { sourceModules } from "./tree-walks";
+
 /** 1–9, the atoms every larger word is built from. */
 export const UNITS: Readonly<Record<string, number>> = {
   one: 1,
@@ -227,6 +231,27 @@ export function runsIn(text: string): NumberRun[] {
   return out;
 }
 
+/**
+ * Every first-party module's prose, read through the extractor it is handed.
+ *
+ * THE WALK IS HERE AND THE SURFACE IS NOT. `sourceModules` is the shared rooted walk, so this file
+ * is a census member and its walk is provable by pointing it at a constructed tree — W267's whole
+ * point. What it does NOT own is which comments count as prose: that argument belongs to W314 and
+ * is handed in, so two readings of one population cannot quietly end up reading two populations.
+ */
+export function proseInTree(
+  root: string,
+  read: (source: string) => { header: string; docs: string },
+): Prose[] {
+  return sourceModules(root).map((file) => {
+    const { header, docs } = read(readFileSync(file, "utf8"));
+    return {
+      module: path.relative(root, file).split(path.sep).join("/"),
+      text: `${header}\n${docs}`,
+    };
+  });
+}
+
 /** One module's prose, as W314's own surface spells it. */
 export interface Prose {
   module: string;
@@ -417,15 +442,16 @@ export function misreadDefects(
 
 export const NUMBER_BOUND =
   "IT READS THE PROSE AND NOT THE TREE, SO IT SAYS WHICH NUMBER THE SENTENCE STATES AND NEVER " +
-  "WHETHER THAT NUMBER IS RIGHT. A claim reading `one hundred and fifty-two sites` when the tree " +
-  "holds nine is a claim this reading calls correct, because both readings agree about the words. " +
-  "SECOND, THE POPULATION IS W314'S CLAIMS AND NOT EVERY NUMBER IN THE PROSE. A run of " +
-  "number-words in front of a noun this tree does not count is invisible to both readings at once, " +
-  "which is a blind spot the two derivations SHARE — and two readings that share a blind spot are " +
-  "one reading with a second opinion. THIRD, IT STOPS AT A THOUSAND. `million` and `billion` are " +
-  "not in the scales, and a comparative sentence about a market size would parse as its own tail; " +
-  "the argument for stopping is that this reads engineering prose about a repository, and the " +
-  "remedy when that stops being true is a scale word, not a unit. FOURTH, THE `and` RULE IS ABOUT " +
-  "ENGLISH AND NOT ABOUT THIS CORPUS. A sentence writing `four hundred and twelve` to mean two " +
-  "numbers would be read as one, and no scan can tell the two apart — a person reading the run " +
-  "beside its sentence is the only check there is.";
+  "WHETHER THAT NUMBER IS RIGHT. A claim naming a count of sites the tree does not hold is a claim " +
+  "this reading calls correct, because both readings agree about the words and neither of them has " +
+  "been anywhere near the sites. SECOND, THE POPULATION IS W314'S CLAIMS AND NOT EVERY NUMBER IN " +
+  "THE PROSE. A run of number-words in front of a noun this tree does not count is invisible to " +
+  "both readings at once, which is a blind spot the two of them share — and two readings that " +
+  "share a blind spot are one reading with a second opinion. THIRD, IT STOPS AT A THOUSAND. " +
+  "`million` and `billion` are not in the scales, so a sentence about a market size would parse as " +
+  "its own tail exactly as W314 parses a scaled number as its own; the argument for stopping there " +
+  "is that this reads engineering prose about a repository, and the remedy when that stops being " +
+  "true is a scale word, not a unit. FOURTH, THE `and` RULE IS ABOUT ENGLISH AND NOT ABOUT THIS " +
+  "CORPUS. A sentence that spells out a scaled number while meaning two separate ones would be " +
+  "read as one, and no scan can tell those apart — a person reading the run beside its sentence is " +
+  "the only check there is.";

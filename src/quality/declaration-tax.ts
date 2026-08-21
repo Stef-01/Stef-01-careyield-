@@ -207,6 +207,14 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/number-words.ts",
+    // Its population is NUMBERS IN PROSE, and a planted module whose header states none is outside
+    // by construction. A planted module that DID write one would owe a corrected sentence rather
+    // than a row here, which is the register's point: what it wants is prose that says what it
+    // means, not a declaration recording that it does not.
+    demands: () => false,
+  },
+  {
     file: "src/quality/cited-checks.ts",
     // A planted module owes a row here only if it HOLDS A CITATION, which the tax's probe does not.
     // That is the register's point: what it wants is a citation pointing at a test that runs the

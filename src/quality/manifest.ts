@@ -558,6 +558,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     ],
   },
   {
+    module: "src/quality/number-words.ts",
+    census: {
+      derives:
+        "Every run of number-words in the prose of every first-party module — the header block and each comment below it, read through W314's OWN extractor handed in as an argument rather than a second one of its own — and what each run comes to as a token parse: `hundred` multiplies what is standing, `thousand` banks it, and `and` joins two words of one number only while a scale is already standing.",
+      checkedAgainst:
+        "`MISREAD_AT_W393`, in both directions: a claim W314 records whose number is not the number its own sentence states and that nothing declares fails, and a declaration for a claim the two readings now agree about fails.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a module is planted whose prose writes a number with a scale in it in front of a noun this tree counts, and the run must be reported; the same sentence with a number the vocabulary holds must not be",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every numeric claim W314's register holds states the number its own sentence states, or is declared with what the sentence really says and why the row stands.",
+        mutation:
+          "a declaration is added for a claim the two readings agree about, and must be reported as one the tree has moved past.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/patterns.ts",
     // A NULL IS A CLAIM, and W387's argument applies here almost word for word. This module walks
     // nothing: its population is W267's census, handed in as `members`, and it opens each of those

@@ -76,6 +76,7 @@ import { SHARED_BOUND } from "./shared-state";
 import { DECISION_BOUND } from "./decision-moments";
 import { CITED_BOUND } from "./cited-checks";
 import { PATTERN_BOUND } from "./patterns";
+import { NUMBER_BOUND } from "./number-words";
 import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
@@ -552,6 +553,41 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'ONE OF THEM IS A GUESS' — which of the three exclusions rests on a single call rather than on a derivation, so it counts the sentence's own admission rather than anything in the tree. It stays one however many list renders the console grows.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/number-words.ts",
+    name: "NUMBER_BOUND",
+    unit: "W393",
+    text: NUMBER_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a scale word, not a unit",
+      reads: "`number-words.ts`, for a run of number-words above a thousand, which this reading would parse as its own tail exactly as W314 parses a hundred as its own",
+      // The clause that names something buildable, and it is one line of table rather than a unit.
+      // What stops it being written now is that nothing in this repository's prose needs it, and a
+      // scale added before a sentence wants it is a row nobody can drive.
+      stillOpen: (root) =>
+        !/million:/.test(readFileSync(path.join(root, "src/quality/number-words.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/number-words.ts":
+            "// W393: the scale above a thousand.\nexport const SCALES = { hundred: 100, thousand: 1000, million: 1000000 };\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "two",
+        kind: "rate",
+        why: "'a sentence writing `four hundred and twelve` to mean TWO numbers' — the arity of the ambiguity rather than a count of anything in the tree, and it stays two because a connective joins two things or it joins nothing. It does not move when the tree writes more numbers.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "'two readings that share a blind spot are ONE reading with a second opinion' — what a pair of derivations is worth when both are blind in the same direction, counted as the number of independent instruments rather than the number of instruments. It stays one however many readings are added, as long as they share the population.",
       },
     ],
   },

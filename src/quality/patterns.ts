@@ -410,6 +410,18 @@ export const PATTERNS_AT_W391: readonly DeclaredPattern[] = [
     },
   },
   {
+    module: "src/quality/number-words.ts",
+    name: "JOINABLE",
+    source: "/^[\\s\\-*/]*$/",
+    claims:
+      "What may sit between two words of one number: whitespace, a hyphen, and the comment furniture this tree writes down the left margin of a block.",
+    reading: {
+      kind: "only_this",
+      why:
+        "It is the seam between one number and two, and nothing else decides it. A full stop is deliberately outside the class so that `held four. Five arrived` reads as two numbers — which means any punctuation the tree starts writing inside a spelled-out number breaks the run silently, and the only witness is a value that suddenly reads as its own tail.",
+    },
+  },
+  {
     module: "src/quality/patient-populations.ts",
     name: "ARROW",
     source: "/^export const (\\w+)\\s*(?::[^=]*)?=\\s*(?:async\\s*)?\\(([\\s\\S]*?)\\)\\s*(?::|=>)/gm",

@@ -262,6 +262,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/number-words.ts",
+    name: "MISREAD_AT_W393",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a numeric claim in this tree's prose starting or stopping to state a number W314's vocabulary cannot hold",
+      whyStopping:
+        "A NAMED ROW PER DISAGREEMENT, each carrying what the sentence says, what the register recorded, and the argument for leaving the row rather than rewriting the sentence — and the population is re-derived by parsing the prose on every run. A row arriving means somebody has written a number above ninety-nine in front of something this tree counts and the register beneath it has taken the tail for the whole; a row LEAVING is the outcome, and it fails too, because a register still declaring a disagreement the readings no longer have is recording history in the class it exists to keep out of history. It cannot be satisfied by retyping a digit: both numbers are re-read from the tree's own comments.",
+    },
+  },
+  {
     module: "src/quality/patterns.ts",
     name: "PATTERNS_AT_W391",
     classification: {
