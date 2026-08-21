@@ -153,17 +153,27 @@ describe("W380 the live tree, at a simulated close", () => {
     async () => {
       // W315's rule: ONE UNIT AT A TIME. Overlapping sessions are normal, so closing two rows
       // together would let one builder's defect read as the other's.
-      const inFlight = parseLedgerRows(LEDGER)
+      // W392 FOUND THIS ARM DEPENDING ON THE FLEET'S TIMING, at a close, which is the class of
+      // defect the whole register is about — pointed at the register. The guard below exists so a
+      // green run cannot mean "nothing was closed", and it was written as `inFlight.length > 0`,
+      // which is a fact about whether any OTHER session happens to hold a row at the moment the
+      // gate runs. A quiet fleet is an ordinary state and it failed the build. A row of this
+      // harness's own is planted when the tree has none, so what is closed is never nothing and
+      // never depends on somebody else being awake.
+      const live = parseLedgerRows(LEDGER)
         .filter((row) => row.status === "claimed")
         .map((row) => row.id);
-      expect(inFlight.length, "no row is in flight, so this check ran against nothing").toBeGreaterThan(0);
+      const PLANTED_ROW = "| W901 | claimed | builder-x | 2026-01-01T00:00Z | — | a planted row. |";
+      const ledger = live.length > 0 ? LEDGER : `${LEDGER}${PLANTED_ROW}\n`;
+      const inFlight = live.length > 0 ? live : ["W901"];
+      expect(inFlight.length, "nothing was closed, so this check ran against nothing").toBeGreaterThan(0);
       // W380 RE-ARGUED THIS ARM ON ITS OWN CLOSE, and the exclusion is derived rather than listed.
       // A row a clock names as its discharger flips every suite that reads the clock, on every
       // run, because the discharge lives in that row's own diff and a planted ledger has none of
       // it. `unsimulableCloses` NAMES those rows; the arm below is about the others.
       for (const unit of inFlight) {
-        const flipped = await suitesThatFlip(COPY, LEDGER, runnableSuites(ROOT), unit);
-        const named = unsimulableCloses(LEDGER).filter((u) => u.unit === unit);
+        const flipped = await suitesThatFlip(COPY, ledger, runnableSuites(ROOT), unit);
+        const named = unsimulableCloses(ledger).filter((u) => u.unit === unit);
         if (named.length === 0) {
           expect(flipped, `closing ${unit} turns a suite that reads a row's status`).toEqual([]);
           continue;
