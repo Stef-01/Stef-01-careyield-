@@ -11,10 +11,10 @@
 // ledger row's STATUS, so both could only go wrong AT THE CLOSE — and the close is the one commit
 // whose suite is easiest not to re-run. W326's close gate exists for exactly that and saw neither,
 // because both live welded inside `.test.ts` files. `CLOSE_GATE_BOUND` names that limit and
-// `weldedLedgerTests` DERIVES the list; the list holds 56 files — this pass's own suite among them — and nothing fails because
-// of it. (The figure was 50 when this pass wrote it; W377 added one and W374 another, which is a
-// derived claim doing its job: the number moved and the register said so rather than the prose
-// quietly outliving the measurement.) The tree measured the gap on every run of the quarter it cost two reds.
+// `weldedLedgerTests` DERIVES the list; the list holds 57 files — this pass's own suite among them — and nothing fails because
+// of it. (The figure was 50 when this pass wrote it; W377 added one, W374 another and W390's Q31
+// pin suite a third, which is a derived claim doing its job: the number moved and the register said
+// so rather than the prose quietly outliving the measurement.) The tree measured the gap on every run of the quarter it cost two reds.
 //
 // AND TWO OF THE FIVE ARE THE PREVIOUS PASS STOPPING SHORT, in the same shape twice. W360 found a
 // detector keyed to a spelling and fixed the COPY, leaving the marker; W366 measured the register
