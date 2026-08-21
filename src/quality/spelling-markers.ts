@@ -40,6 +40,7 @@ import { discoverFoldSites } from "./order-independence";
 import { copyTree, planterDiff, withPlantedIn, withTree as withRoot } from "./planting";
 import { hookSites } from "./hook-reach";
 import { mutantsIn } from "./mutation-sampling";
+import { conventionSites } from "./name-conventions";
 import { silentZeros } from "@/console/rendered-zeros";
 import { moduleGraph } from "./import-cycles";
 import { repositoryWrites } from "./shared-state";
@@ -121,6 +122,24 @@ function twoSpellings(
 const names = (answer: unknown): boolean => JSON.stringify(answer).includes("spelling-probe");
 
 export const MARKERS: readonly Marker[] = [
+  {
+    module: "src/quality/name-conventions.ts",
+    matches:
+      "the declared identifier itself, built into a pattern at call time — `conventionSites(root, \"ROOT\")` looks for that text inside a regex, in quotes, or spaced as a capture",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "a scanner that keys on the same name INDIRECTLY — `const KEY = \"ROOT\"; new RegExp(`\\\\b${KEY}\\\\b`)` — which rests on the convention exactly as a literal does and never spells it beside the pattern.",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          "export const finds = (code: string): boolean => /path\\.join\\(\\s*ROOT\\s*,/.test(code);\n",
+          'const KEY = "RO" + "OT";\nexport const finds = (code: string): boolean => new RegExp(`\\\\b${KEY}\\\\b`).test(code);\n',
+          (copy) => conventionSites(copy, "ROOT").includes(PROBE_FILE),
+        ),
+    },
+  },
   {
     module: "src/quality/mutation-sampling.ts",
     matches:

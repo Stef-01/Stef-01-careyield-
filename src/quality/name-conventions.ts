@@ -199,4 +199,7 @@ export const CONVENTION_BOUND =
   "THE SAME WAY, which is worth saying because a register of blind spots reads as though they do: " +
   "three of these hide a finding and the fourth MANUFACTURES one, and a `blind` row that is " +
   "really a reporting-shape mismatch is a false sentence about the tree rather than a missing " +
-  "true one.";
+  "true one. AND THE WALK IS `sourceModules`, WHICH EXCLUDES TESTS. A `.test.ts` keying on one of "
+  "these names — planting a fixture that spells `ROOT`, asserting on a constant whose name ends "
+  "`_AT_W<n>` — rests on the convention exactly as a module does and is outside the second "
+  "direction entirely, so `conventionSites` can never report it however many names are declared.";

@@ -87,6 +87,14 @@ export function boundedWalkers(
  * bound is a concatenated string and where its author broke the line is not part of what it says.
  */
 export const COMPARED_AT_W367: readonly Compared[] = [
+  {
+    bound: "src/quality/name-conventions.ts::CONVENTION_BOUND",
+    walk: ["sourceModules"],
+    edge: {
+      kind: "named",
+      quote: "AND THE WALK IS `sourceModules`, WHICH EXCLUDES TESTS",
+    },
+  },
   { bound: "src/console/zero-meaning.ts::ZERO_MEANING_BOUND", walk: ["filesUnder"], edge: { kind: "named", quote: "a page that renders a number some other way is outside the population entirely" } },
   { bound: "src/quality/acceptances.ts::ACCEPTANCE_BOUND", walk: ["sourceModules"], edge: { kind: "named", quote: "an acceptance register in a test file is outside the walk entirely" } },
   { bound: "src/quality/assertion-vocabulary.ts::VOCABULARY_BOUND", walk: ["testModules"], edge: { kind: "named", quote: "A spelling nobody has thought of yet is invisible" } },
