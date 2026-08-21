@@ -206,15 +206,6 @@ export const MARKERS: readonly Marker[] = [
     },
   },
   {
-    module: "src/quality/mutation-sampling.ts",
-    matches: "a decision operator in comment-stripped, literal-blanked source — `===`, `!==`, `&&`, `||` and the boundary comparisons W349 mutates",
-    standing: {
-      kind: "untried",
-      why:
-        "W383 moved this site onto the named composition and declared it in `SCAN_SITES`, and the marker it owes was not written with it — which is how this register found the site: the census reports a scan site with no marker on the run after the site arrives. Trying a second spelling here means deciding what a differently-spelled DECISION is, and the honest candidates are not text at all: `a > b` against `b < a`, a ternary against an `if`, a guard clause against a negated condition. Each is the same decision spelled another way and none of them is a variant of the operator this scan matches, so a probe would be measuring whether the mutation sampler's population is complete rather than whether its pattern is narrow. That is W349's question and it has its own register — the survivors list — which is why this row is `untried` rather than `blind`.",
-    },
-  },
-  {
     module: "src/quality/cited-checks.ts",
     matches: "a double-quoted string of the form `<file>.test.ts :: <assertion>`, in exactly two parts",
     standing: {

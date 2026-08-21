@@ -44,7 +44,6 @@ describe("W366 the text-scanning registers, against a second spelling of their o
     // trying a spelling against it has to appear here, by name, in a diff somebody reads.
     expect(untriedMarkers()).toEqual([
       "src/compliance/composed-copy.ts",
-      "src/quality/mutation-sampling.ts",
       "src/quality/self-ending.ts",
       "src/quality/self-reference.ts",
       "src/quality/shared-excuses.ts",
