@@ -19,7 +19,7 @@ pinned row by row by `src/quality/horizon-q31.test.ts`.
 
 ## The gate position, re-read
 
-The ledger holds **390 week-units** before this expansion and **403 after it**, of which **376 are
+The ledger holds **390 week-units** before this expansion and **403 after it**, of which **372 are
 done** as this is written. **18 rows are blocked**, which is the count over every row the ledger
 holds rather than over the week-units alone — sixteen week-units plus `SUP-1` and `SUP-2`.
 
@@ -36,6 +36,16 @@ holds rather than over the week-units alone — sixteen week-units plus `SUP-1` 
 
 **G1, G2, G4 and G7 still block nothing**, five years and ten quarters in.
 
+**Decisions on this page the loop may take: zero.** Unchanged. Restated because the rule requires it
+restated at every expansion, and because ten quarters of building have not moved it.
+
+The wait figures above are **as at this expansion** and derived that way rather than live, so they
+say what they said on the day. **One sibling row was in flight when the figures were taken** —
+W389, the moments re-read, held by the other builder — so it is named in `IN_FLIGHT_AT_EXPANSION`
+and excluded from the done count rather than silently priced as either. That mechanism was kept
+through the expansions that needed no exemption, on the argument that a list which disappears
+between the occasions it is needed is one somebody re-invents badly.
+
 ## Where the theme comes from
 
 Q29's hardening pass is four findings and they are one finding wearing four coats.
@@ -45,15 +55,16 @@ number vocabulary was a hand-typed map, and a compound nobody had typed in did n
 `\b` matches at the hyphen, so the scan took the unit on the right as the whole number. Four rows
 were live and wrong, every one classified `at_the_unit`, which is never re-derived.
 
-**Q29-CR-2** — the register that decides which product rules hold a patient panel was narrow four
-ways and wide one. `[^)]*` stops at the first `)`, so a rule taking a callback truncates before its
+**Q29-CR-2** — the register W373 built, deciding which product rules hold a patient panel, was
+narrow four ways and wide one. `[^)]*` stops at the first `)`, so a rule taking a callback truncates before its
 panel; one type spelling is known, so `ReadonlyArray<Patient>` is not counted; and with no left
 boundary `SyntheticPatient[]` is.
 
-**Q29-SIMP-1** — the scan-order rule protects every site except the one that wrote it out by hand.
+**Q29-SIMP-1** — the scan-order rule protects every site except the one that wrote it out by hand,
+which W374's own quarter sweep had already named as reading source text undeclared.
 
-**Q29-SR-1** — the sweep's guard against removing something it did not make is three ordinary
-English words in a directory the operating system shares with every other program.
+**Q29-SR-1** — the guard W375 built against removing something this tree did not make is three
+ordinary English words in a directory the operating system shares with every other program.
 
 In every one, A PATTERN IS STANDING IN FOR A POPULATION. The register's subject is whatever a regex
 or a name happens to match, the pattern and the check are the same object, and so a pattern that
@@ -64,7 +75,7 @@ Q30 met the same shape without naming it, four more times. W388 tried three read
 citation's subject is and each was wrong for a register spelled differently. W387's first draft read
 a parameter's NAME and pulled in `pool: PoolConfig`, a configuration. W384's population was
 expression names and missed the zero a page actually renders. W385 finds a repository write by the
-binding being called `ROOT`.
+binding being called `ROOT`. Every one of those figures is **as at this expansion**.
 
 So: **Q31 — what the pattern cannot see.** Every unit takes a register whose population is defined
 by a pattern and measures that pattern against a SECOND, independent reading of the same
