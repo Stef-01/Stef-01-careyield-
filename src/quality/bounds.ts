@@ -887,6 +887,16 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     },
     numbers: [
       {
+        word: "Three",
+        kind: "unit_id",
+        why: "How many declaration forms the scan reads after W392 — a plain function, an `async` one and an exported arrow constant. History rather than a live count: the sentence's point is that the list IS a list, so a fourth form arriving is the defect it describes rather than a number to retype, and the clause beside it says exactly that.",
+      },
+      {
+        word: "three",
+        kind: "unit_id",
+        why: "The type spellings beside them — `Patient[]`, `Array<Patient>` and `ReadonlyArray<Patient>` — counted for the same reason and carrying the same admission: a fourth spelling is invisible in the way the generic one was, which is what the rest of the clause is about.",
+      },
+      {
         word: "one",
         kind: "rate",
         why: "'one run over one synthetic practice' — the unit of the measurement rather than a count anything maintains. It stays one however many rules the register holds, and `ruleDefects` re-derives every row against the run on each build.",

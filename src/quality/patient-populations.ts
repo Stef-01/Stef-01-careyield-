@@ -51,7 +51,17 @@ export const NOT_PRODUCT = ["src/quality/", "src/sim/", "src/synthetic/", "src/d
  * it truncated to `pick: (p: Patient`, and the panel in the SECOND parameter went unseen. Reading to
  * the parenthesis before the return type or the body reaches the whole list.
  */
-const SIGNATURE = /^export function (\w+)\(([\s\S]*?)\)\s*(?::|\{)/gm;
+const SIGNATURE =
+  /^export (?:async )?function (\w+)\s*(?:<[^>]*>)?\(([\s\S]*?)\)\s*(?::|\{)/gm;
+
+/**
+ * A rule written as an exported arrow constant rather than a function declaration.
+ *
+ * W392: THE SAME SUBJECT IN THE OTHER SPELLING. `patientRules` is about which product rules hold a
+ * patient panel, and how the rule is DECLARED has nothing to do with that. The tree writes one
+ * product export this way today; a second would have joined it silently.
+ */
+const ARROW = /^export const (\w+)\s*(?::[^=]*)?=\s*(?:async\s*)?\(([\s\S]*?)\)\s*(?::|=>)/gm;
 
 /**
  * A parameter typed as a collection of patients, in every spelling this tree can write it.
@@ -67,6 +77,41 @@ const SIGNATURE = /^export function (\w+)\(([\s\S]*?)\)\s*(?::|\{)/gm;
 const PANEL = /(?<![A-Za-z])(?:readonly\s+)?(?:Patient\s*\[\]|(?:Readonly)?Array\s*<\s*Patient\s*>)/;
 
 /**
+ * The type parameters a module constrains to a patient, by name.
+ *
+ * W392: A GENERIC RULE IS STILL A RULE, AND THIS IS THE ONE THAT ESCAPED. `narrowToCareGaps<T
+ * extends { id: Patient["id"] }>(baseEligible: readonly T[], …)` narrows a patient panel — its own
+ * sentence says "the patients a care-gap-driven run should contact… returns a subset of
+ * `baseEligible` by construction" — and `patientRules` could not see it at all, because the name
+ * is followed by `<` rather than `(`. Widening the signature scan to step over the type parameters
+ * finds the declaration; it does not find the PANEL, because the parameter is spelled `readonly
+ * T[]` and `T` says nothing. What says it is the CONSTRAINT, so the constraints are read first and
+ * a parameter typed by one of them counts as the thing it is constrained to be.
+ *
+ * The constraint has to name a patient rather than merely be generic: `scopeToPractice<T extends {
+ * practiceId: string }>` filters rows of any kind and is not a patient rule, which is the judgement
+ * `SCOPES_ROWS` records rather than leaves to the regex.
+ */
+export function typeParameters(source: string): string[] {
+  const out = new Set<string>();
+  for (const m of source.matchAll(/<\s*([A-Z]\w*)\s+extends\s+([^>]*)>/g)) {
+    if (PATIENT_CONSTRAINT.test(m[2]!)) out.add(m[1]!);
+  }
+  return [...out].sort();
+}
+
+/** A type-parameter constraint that says its members are patients. */
+const PATIENT_CONSTRAINT = /(?<![A-Za-z])Patient\s*(?:\[|\{|<|\.|\[")/;
+
+/** Whether a parameter list holds a collection of patients, in any spelling this tree writes. */
+export function holdsAPanel(parameters: string, generics: readonly string[] = []): boolean {
+  if (PANEL.test(parameters)) return true;
+  return generics.some((name) =>
+    new RegExp(String.raw`(?<![A-Za-z])(?:readonly\s+)?${name}\s*\[\]`).test(parameters),
+  );
+}
+
+/**
  * Every product rule handed a collection of patients.
  *
  * Read from the signature, because that is what "is over" means before anything runs: a function
@@ -78,8 +123,12 @@ export function patientRules(root: string): string[] {
     const rel = path.relative(root, file).split(path.sep).join("/");
     if (NOT_PRODUCT.some((d) => rel.startsWith(d))) continue;
     const source = readFileSync(file, "utf8");
-    for (const m of source.matchAll(SIGNATURE)) {
-      if (PANEL.test(m[2]!)) out.push(`${rel}::${m[1]!}`);
+    const generics = typeParameters(source);
+    for (const re of [SIGNATURE, ARROW]) {
+      re.lastIndex = 0;
+      for (const m of source.matchAll(re)) {
+        if (holdsAPanel(m[2]!, generics)) out.push(`${rel}::${m[1]!}`);
+      }
     }
   }
   return out.sort();
@@ -165,6 +214,19 @@ export const RULES_AT_W373: readonly PatientRule[] = [
     claims: {
       file: "src/console/results-copy.ts",
       quote: "Appointments your practice would not have had if Meherr had never sent a message.",
+    },
+    scope: { kind: "no_wider" },
+  },
+  {
+    // W392: THE ONE THAT ESCAPED, and it escaped on how it is DECLARED rather than on what it does.
+    // `narrowToCareGaps<T extends { id: Patient["id"] }>` is a selection rule over a patient panel
+    // by its own sentence, and W373's scan could not see it because the name is followed by `<`.
+    rule: "src/registers/eligibility.ts::narrowToCareGaps",
+    selectsFrom: "the patients W4 already allows, narrowed to those with an open care gap",
+    effect: "narrows",
+    claims: {
+      file: "app/console/rules/page.tsx",
+      quote: "Patients outside these rules are never invited.",
     },
     scope: { kind: "no_wider" },
   },
@@ -311,7 +373,16 @@ export const RULE_BOUND =
   "the generator's calibration is a set of rates somebody picked rather than a distribution taken " +
   "from anywhere. THE POPULATION IS SIGNATURES: a rule reaching patients through a store, an id " +
   "list or a query rather than through a `Patient[]` parameter is outside it entirely, which is " +
-  "most of the console. AND `no_wider` IS A READING OF A SENTENCE, not a derivation — the quote " +
+  "most of the console — AND THE POPULATION IS ALSO SPELLINGS, which W392 is the evidence for. The " +
+  "scan reads a DECLARATION and a TYPE as text: it stepped over no type parameters, knew one way " +
+  "of writing a function, and one way of writing an array, so a rule that narrowed a patient panel " +
+  "by its own sentence sat outside the population for a quarter because its name was followed by " +
+  "`<`. Three declaration forms and three type spellings are read now, and the list of forms is " +
+  "still a list — a rule reached through a type ALIAS, or through a constraint naming a patient " +
+  "some way this scan has not met, is invisible in exactly the way that one was, and the register " +
+  "cannot tell an empty population from an unread one. What would settle it is resolving types " +
+  "rather than matching them, which is a compiler and not a regex. AND `no_wider` IS A READING OF " +
+  "A SENTENCE, not a derivation — the quote " +
   "is resolved against the file that renders it, so the words are really shown to a practice, but " +
   "whether a rule's reach is inside what those words promise is a person's judgement and nothing " +
   "here can check it. Settling that means deriving a population from copy, which is a different " +

@@ -25,6 +25,7 @@ import {
 import { withTree } from "./planting";
 import { fixtureText } from "./scan-text";
 import { generatePractice } from "@/synthetic/generate";
+import { narrowToCareGaps } from "@/registers/eligibility";
 import { armDrift, assertArmsUnchanged } from "@/engine/arm-stability";
 import { countAttribution } from "@/engine/attribution";
 import { buildBackfillPool } from "@/engine/backfill";
@@ -119,6 +120,12 @@ const RUNS = new Map<string, RuleRun>([
     "src/registers/ranking.ts::rankGapAware",
     { from: ids(ELIGIBLE), selected: ids(rankGapAware(ELIGIBLE, LAYER.gaps)) },
   ],
+  [
+    "src/registers/eligibility.ts::narrowToCareGaps",
+    // W392. The rule W373's scan could not see, run over the same synthetic cohort as its
+    // neighbours: the patients W4 already allows, narrowed to those the register layer flags.
+    { from: ids(ELIGIBLE), selected: ids(narrowToCareGaps(ELIGIBLE, LAYER.gaps)) },
+  ],
   ["src/registers/sim-registers.ts::buildRegisterLayer", { from: IDS, selected: null }],
 ]);
 
@@ -178,6 +185,81 @@ describe("W373 every product rule handed the panel says which patients it is ove
       "src/planted/plain-array.ts::plainArray",
       "src/planted/readonly-array.ts::readonlyArray",
     ]);
+  });
+
+  it("W392: reads the four spellings as W373 MEANT them, not as its regex matched them", () => {
+    // THE UNIT. W383 widened the scan and drove the four spellings; this asks the sharper question
+    // the plan wrote down afterwards — whether each answer is the one W373 intended. Three must be
+    // IN because they hold a panel however the type is written, and the fourth must be OUT because
+    // a longer name that merely ends in `Patient` is a different type. Planted together, so a scan
+    // that widened by dropping the boundary would report four and fail here rather than pass three
+    // arms separately.
+    const found = withTree(
+      {
+        "src/planted/w392-callback.ts":
+          'import type { Patient } from "@/synthetic/types";\n' +
+          "export function behindACallback(pick: (p: Patient) => boolean, panel: Patient[]): Patient[] {\n" +
+          "  return panel.filter(pick);\n}\n",
+        "src/planted/w392-readonly-array.ts":
+          'import type { Patient } from "@/synthetic/types";\n' +
+          "export function readonlyArray(panel: ReadonlyArray<Patient>): number {\n  return panel.length;\n}\n",
+        "src/planted/w392-array.ts":
+          'import type { Patient } from "@/synthetic/types";\n' +
+          "export function plainArray(panel: Array<Patient>): number {\n  return panel.length;\n}\n",
+        "src/planted/w392-prefixed.ts":
+          "interface SyntheticPatient { id: string }\n" +
+          "export function prefixed(panel: SyntheticPatient[]): number {\n  return panel.length;\n}\n",
+      },
+      (root) => patientRules(root).filter((r) => r.startsWith("src/planted/w392-")),
+    );
+    expect(found).toEqual([
+      "src/planted/w392-array.ts::plainArray",
+      "src/planted/w392-callback.ts::behindACallback",
+      "src/planted/w392-readonly-array.ts::readonlyArray",
+    ]);
+  });
+
+  it("W392: sees a rule however it is DECLARED, which is where the live one escaped", () => {
+    // THE FINDING. W373 read `^export function name(`, so a rule whose name is followed by `<`,
+    // or written `export async function`, or bound to a const, was not narrower than its subject —
+    // it was invisible to it. The tree held one: `narrowToCareGaps<T extends { id: Patient["id"] }>`
+    // narrows a patient panel by its own sentence and was outside the population entirely.
+    const found = withTree(
+      {
+        "src/planted/w392-generic.ts":
+          'import type { Patient } from "@/synthetic/types";\n' +
+          'export function generic<T extends { id: Patient["id"] }>(panel: readonly T[]): T[] {\n' +
+          "  return [...panel];\n}\n",
+        "src/planted/w392-async.ts":
+          'import type { Patient } from "@/synthetic/types";\n' +
+          "export async function later(panel: Patient[]): Promise<number> {\n  return panel.length;\n}\n",
+        "src/planted/w392-arrow.ts":
+          'import type { Patient } from "@/synthetic/types";\n' +
+          "export const bound = (panel: Patient[]): number => panel.length;\n",
+        // The judgement beside them: generic over ROWS rather than over patients. A scan that
+        // counted every constrained type parameter would take this, and it is not a patient rule.
+        "src/planted/w392-rows.ts":
+          "export function rows<T extends { practiceId: string }>(all: readonly T[]): T[] {\n" +
+          "  return [...all];\n}\n",
+      },
+      (root) => patientRules(root).filter((r) => r.startsWith("src/planted/w392-")),
+    );
+    expect(found).toEqual([
+      "src/planted/w392-arrow.ts::bound",
+      "src/planted/w392-async.ts::later",
+      "src/planted/w392-generic.ts::generic",
+    ]);
+  });
+
+  it("W392: the live rule that escaped is in the population and is described", () => {
+    // Re-derived rather than remembered, and both halves: the walk finds it, and the register says
+    // what it does with the panel it is handed.
+    expect(patientRules(ROOT)).toContain("src/registers/eligibility.ts::narrowToCareGaps");
+    const row = RULES_AT_W373.find((r) => r.rule === "src/registers/eligibility.ts::narrowToCareGaps");
+    expect(row?.effect, "a rule that returns a subset by construction narrows").toBe("narrows");
+    // And the tenancy filter beside it is NOT in, which is the judgement rather than the regex:
+    // it is generic over anything with a practice, and rows are not patients.
+    expect(patientRules(ROOT)).not.toContain("src/tenancy/tenancy.ts::scopeToPractice");
   });
 
   it("refuses a type whose name merely ends in the one it is looking for", () => {

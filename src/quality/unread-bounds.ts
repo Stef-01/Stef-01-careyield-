@@ -118,6 +118,15 @@ export interface NamedCondition {
  */
 export const NAMED_CONDITIONS: readonly NamedCondition[] = [
   {
+    bound: "src/quality/patient-populations.ts::RULE_BOUND",
+    condition: "THE POPULATION IS ALSO SPELLINGS",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/patient-populations.ts::patientRules",
+      how: "READ BY THE REGISTER'S OWN WALK, AND W392 IS WHY THE CLAUSE EXISTS. The gap it names is not hypothetical: a rule that narrows a patient panel by its own sentence sat outside this population for a quarter because its name was followed by `<`, and the walk found it the moment the scan stepped over type parameters. The suite drives both directions on planted modules — three declaration forms and three type spellings taken, a longer name that merely ends in `Patient` refused, and a type parameter constrained to ROWS rather than to patients refused beside it. WHAT NO CHECK HERE CAN SETTLE is the rest of the clause: a spelling this scan has never met is invisible to the scan AND to the arm that would report it, which is why the sentence says the register cannot tell an empty population from an unread one, and why the remedy it names is a compiler rather than a wider pattern.",
+    },
+  },
+  {
     bound: "src/quality/quarter-mutants-q27.ts::Q27_MUTANT_BOUND",
     condition: "a module they find NOTHING to change in gets no verdict at all",
     reading: {
