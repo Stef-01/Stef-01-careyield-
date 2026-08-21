@@ -143,6 +143,15 @@ export interface ResidueDefect {
  */
 export const RECLAMATION_AT_W375: readonly Reclamation[] = [
   {
+    site: "src/quality/blind-spots.ts::BLIND_SPOTS",
+    // `<top>`, because nothing NAMES this site: the removal sits inside a probe closure stored in
+    // the record, and `falseBounds` and `deadProbes` reach it as `b.probe()` off a value. A caller
+    // list resolved against the file finds none, and saying so is truer than naming the two.
+    reachedFrom: ["<top>"],
+    afterKill:
+      "W388's blind-spot probe copies the tree, because a citation names a real test file and resolves against it — a root holding only the probe reports every citation unresolved and the control never fires. Killed mid-probe the copy survives with the maker's pid in its name, so the next run's setup sweep reclaims it. The `finally` here covers a probe that throws, which is the ordinary case and not the one that filled `/tmp`.",
+  },
+  {
     site: "src/quality/close-gate.ts::breaksOnClose",
     reachedFrom: ["closeGateDefects"],
     afterKill:

@@ -181,6 +181,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "The words it looks for ARE literals. It asks whether the arm of a conditional a reader gets when a list is empty puts anything readable on the screen, and the readable things are the text between tags and the copy constant a page interpolates — blanking either would leave every empty state on this console looking exactly like silence. Comments are subtracted because this tree explains its pages in prose beside them, and a `//` note describing an empty state is a description rather than one.",
   },
   {
+    module: "src/quality/cited-checks.ts",
+    prep: { comments: "subtracted", literals: "kept" },
+    why: "A citation IS a literal, so blanking would erase the whole population. Comments are subtracted for the reason `citations.ts` records about itself: this tree discusses the citation format at length in prose beside the rows that use it, and a paragraph naming `<file> :: <assertion>` is a description rather than a citation. The same preparation reads the cited test's body, where the assertion titles are literals too.",
+  },
+  {
     module: "src/quality/decision-moments.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "Comments MUST go: this tree writes a doc block INSIDE a parameter list — `buildInvitationPool` explains its ranking seam there — and a comma in that prose split the list before the preparation was used. Literals stay because nothing here reads one and blanking them would cost a pass over every product module for no answer; the scan reads parameter names and types, which survive either way, so `kept` is the cheaper of two readings that agree.",

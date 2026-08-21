@@ -254,6 +254,26 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/cited-checks.ts",
+    name: "SUBJECTS_AT_W388",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a register gaining or losing a citation whose row names no module, or one of them being rekeyed so the walk can read it",
+      whyStopping:
+        "A NAMED ROW PER CITATION, each carrying what a person read off a row nothing keys, and the population is re-derived from the tree's own source on every run. A row arriving means a register has written a citation the structural reading cannot attribute; a row leaving means somebody keyed the row. It cannot be satisfied by retyping a digit: every entry is checked against the citations the tree actually holds.",
+    },
+  },
+  {
+    module: "src/quality/cited-checks.ts",
+    name: "UNRUN_AT_W388",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a citation starting or stopping to point at a test that names something its subject exports",
+      whyStopping:
+        "A NAMED ROW PER CITATION, each carrying the change that would make it callable, re-derived against the tree on every run. A row arriving means a register has written a citation that points at a test running nothing it claims — W371's finding, which cost a quarter of coverage that was not there. A row leaving means somebody repointed the citation or exported the reading, which is the outcome.",
+    },
+  },
+  {
     module: "src/console/rendered-zeros.ts",
     name: "SILENT_AT_W384",
     classification: {

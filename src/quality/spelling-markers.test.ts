@@ -44,6 +44,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
     // trying a spelling against it has to appear here, by name, in a diff somebody reads.
     expect(untriedMarkers()).toEqual([
       "src/compliance/composed-copy.ts",
+      "src/quality/mutation-sampling.ts",
       "src/quality/self-ending.ts",
       "src/quality/self-reference.ts",
       "src/quality/shared-excuses.ts",
@@ -55,6 +56,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
     expect(blindMarkers()).toEqual([
       "src/console/rendered-zeros.ts",
       "src/quality/acceptances.ts",
+      "src/quality/cited-checks.ts",
       "src/quality/decision-moments.ts",
       "src/quality/declaration-tax.ts",
       "src/quality/derivable-lists.ts",
@@ -74,6 +76,7 @@ describe("W366 the text-scanning registers, against a second spelling of their o
     // second kind — `rm` from `fs/promises` is what the rest of Node has moved to.
     expect(reachableBlindness()).toEqual([
       "src/console/rendered-zeros.ts",
+      "src/quality/cited-checks.ts",
       "src/quality/decision-moments.ts",
       "src/quality/declaration-tax.ts",
       "src/quality/derivable-lists.ts",

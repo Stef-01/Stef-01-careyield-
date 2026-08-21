@@ -558,6 +558,28 @@ export const MANIFEST: readonly ModuleEntry[] = [
     ],
   },
   {
+    module: "src/quality/cited-checks.ts",
+    census: {
+      derives:
+        "Every two-part `<file> :: <assertion>` citation in the tree, with the module its row is about — read by walking OUTWARD through the enclosing object literals until one carries a `module`, `register`, `file` or `check` key — and the body of the `it` or `describe` each one points at. A three-part id is not a citation and is out of the population by definition. This module is excluded from its own walk by name, because the declarations it holds quote every citation they dispose of.",
+      checkedAgainst:
+        "W388's `SUBJECTS_AT_W388` and `UNRUN_AT_W388`, in both directions: a citation whose row names no module and that nothing declares fails, a citation pointing at a test that names none of its subject's exports and that nothing declares fails, and a declaration for a citation the tree no longer holds fails.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a register is planted citing a test that runs nothing its subject exports and must be reported; the same register citing a test that does run it must not be",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "Every citation in this tree resolves under W301's resolver and points at a test that names something its subject exports, or is declared with the change that would make it callable.",
+        mutation:
+          "a declaration is added for a citation the tree does not hold, and must be reported stale.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/decision-moments.ts",
     // A NULL IS A CLAIM. This module walks nothing: its population is W373's `patientRules`,
     // handed in as a parameter, and what it adds is read from the signatures behind that list. It

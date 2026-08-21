@@ -117,6 +117,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
       "RULES_AT_W373",
       "SILENT_AT_W384",
       "STALE_AT_W387",
+      "SUBJECTS_AT_W388",
       "SURVIVORS_AT_W296",
       "SURVIVORS_AT_W332",
       "SURVIVORS_AT_W349",
@@ -127,6 +128,7 @@ describe("W290 the live pins, and why live is not the defect", () => {
       "UNMUTATED_AT_W362",
       "UNMUTATED_AT_W374",
       "UNPROVEN_AT_W290",
+      "UNRUN_AT_W388",
       "UNTESTED_AT_W296",
     ]);
     // Each is asserted against the tree, so "live" is a fact rather than a label.

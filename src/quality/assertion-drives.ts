@@ -39,6 +39,7 @@ import { samplingReport } from "./mutation-sampling";
 import { SILENT_AT_W384, silentDiff } from "@/console/rendered-zeros";
 import { hookSites, unreachedReclaimers } from "./hook-reach";
 import { orderDependent } from "./shared-state";
+import { SUBJECTS_AT_W388, UNRUN_AT_W388, citationsInTree, uncalledCitations } from "./cited-checks";
 import { cycleDefects, cyclicComponents } from "./import-cycles";
 import { momentDefects } from "./moments";
 import { RECLAMATION_AT_W375, residueDefects as tempResidueDefects } from "./run-residue";
@@ -106,6 +107,16 @@ export const ASSERTION_DRIVES: Readonly<Record<string, Drive>> = {
       ...SILENT_AT_W384,
       { route: "/console/dashboard", subject: "nothing.rendersThis", what: "a row about a list that is not there" },
     ]).stale.includes("/console/dashboard :: nothing.rendersThis"),
+
+  "src/quality/cited-checks.ts": (root) =>
+    // The claim is that every citation resolves and points at a test that runs its subject. Add a
+    // declaration for a citation the tree does not hold and it must be reported stale. THE STRING
+    // LIVES IN THE FIXTURE FILE: spelled here it would be a citation this tree holds, and W388's
+    // own walk would report the drive that proves W388 works.
+    uncalledCitations(root, SUBJECTS_AT_W388, citationsInTree(root), [
+      ...UNRUN_AT_W388,
+      { citation: fixtureToken("cited-absent-citation"), remedy: "a citation about nothing" },
+    ]).some((d) => d.citation === fixtureToken("cited-absent-citation")),
 
   "src/quality/shared-state.ts": () =>
     // The claim is that no pair of test files writes a shared path in the repository. Hand it the tree

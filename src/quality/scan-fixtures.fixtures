@@ -808,3 +808,38 @@ interface ProbeConfig {
 export function probeDecide(eligible: Patient[], config: ProbeConfig): Patient[] {
   return eligible.filter((p) => p.lastAttendedAt !== null && p.lastAttendedAt < config.todayIso);
 }
+
+=== cited-probe-runs-it ===
+export const PROBE_ROWS = [
+  {
+    module: "src/quality/planting.ts",
+    citation: "src/quality/planting.test.ts :: refuses a root inside the repository",
+  },
+];
+
+=== cited-probe-runs-nothing ===
+export const PROBE_ROWS = [
+  {
+    module: "src/quality/citations.ts",
+    citation: "src/quality/citations.test.ts :: does not count a module that only MENTIONS the format in prose",
+  },
+];
+
+=== cited-probe-no-subject ===
+export const PROBE_ROWS = [
+  {
+    note: "a row with no module key at all",
+    citation: "src/quality/planting.test.ts :: refuses a root inside the repository",
+  },
+];
+
+=== cited-probe-through-a-harness ===
+export const PROBE_ROWS = [
+  {
+    module: "src/quality/unit-headers.ts",
+    citation: "src/quality/unit-headers.test.ts :: catches a module whose unit is recorded where the census cannot read it",
+  },
+];
+
+=== cited-absent-citation ===
+src/gone.test.ts :: a title nobody wrote

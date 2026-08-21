@@ -44,6 +44,7 @@ import { silentZeros } from "@/console/rendered-zeros";
 import { moduleGraph } from "./import-cycles";
 import { repositoryWrites } from "./shared-state";
 import { parametersOf } from "./decision-moments";
+import { citationsInTree } from "./cited-checks";
 import { momentsOf } from "./moments";
 import { reclamationSites } from "./run-residue";
 import { privateCopies } from "./private-copies";
@@ -202,6 +203,32 @@ export const MARKERS: readonly Marker[] = [
           variant: saw(fixtureText("zero-probe-component-empty")),
         };
       },
+    },
+  },
+  {
+    module: "src/quality/mutation-sampling.ts",
+    matches: "a decision operator in comment-stripped, literal-blanked source — `===`, `!==`, `&&`, `||` and the boundary comparisons W349 mutates",
+    standing: {
+      kind: "untried",
+      why:
+        "W383 moved this site onto the named composition and declared it in `SCAN_SITES`, and the marker it owes was not written with it — which is how this register found the site: the census reports a scan site with no marker on the run after the site arrives. Trying a second spelling here means deciding what a differently-spelled DECISION is, and the honest candidates are not text at all: `a > b` against `b < a`, a ternary against an `if`, a guard clause against a negated condition. Each is the same decision spelled another way and none of them is a variant of the operator this scan matches, so a probe would be measuring whether the mutation sampler's population is complete rather than whether its pattern is narrow. That is W349's question and it has its own register — the survivors list — which is why this row is `untried` rather than `blind`.",
+    },
+  },
+  {
+    module: "src/quality/cited-checks.ts",
+    matches: "a double-quoted string of the form `<file>.test.ts :: <assertion>`, in exactly two parts",
+    standing: {
+      kind: "blind",
+      looksLike:
+        "the same citation written with single quotes or in a template literal, which is a citation this tree could write tomorrow and which this scan does not read at all.",
+      plausibility: "idiomatic",
+      probe: (root) =>
+        twoSpellings(
+          root,
+          'export const ROWS = [{ module: "src/quality/planting.ts", citation: "src/quality/planting.test.ts :: refuses a root" }];\n',
+          "export const ROWS = [{ module: 'src/quality/planting.ts', citation: 'src/quality/planting.test.ts :: refuses a root' }];\n",
+          (copy) => citationsInTree(copy).some((c) => c.citing === PROBE_FILE),
+        ),
     },
   },
   {

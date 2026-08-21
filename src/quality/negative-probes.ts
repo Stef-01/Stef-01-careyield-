@@ -424,6 +424,14 @@ export const NEGATIVE_PROBES: readonly NegativeProbe[] = [
     },
   },
   {
+    register: "src/quality/cited-checks.ts",
+    negative: {
+      kind: "already_driven",
+      citation: "src/quality/cited-checks.test.ts :: does not report the same shape once the cited test runs the subject",
+      plants: "cited-probe-runs-it",
+    },
+  },
+  {
     register: "src/quality/shared-state.ts",
     negative: {
       kind: "already_driven",

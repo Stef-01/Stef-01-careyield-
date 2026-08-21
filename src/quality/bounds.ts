@@ -74,6 +74,7 @@ import { RENDERED_BOUND } from "@/console/rendered-zeros";
 import { HOOK_BOUND } from "./hook-reach";
 import { SHARED_BOUND } from "./shared-state";
 import { DECISION_BOUND } from "./decision-moments";
+import { CITED_BOUND } from "./cited-checks";
 import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
@@ -548,6 +549,40 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'ONE OF THEM IS A GUESS' — which of the three exclusions rests on a single call rather than on a derivation, so it counts the sentence's own admission rather than anything in the tree. It stays one however many list renders the console grows.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/cited-checks.ts",
+    name: "CITED_BOUND",
+    unit: "W388",
+    text: CITED_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "a call read through a harness",
+      reads: "`cited-checks.ts`, for a cited test that drives its subject through a shared planter rather than by naming its export",
+      // The clause that names something buildable, and what a pair of declared rows waits on.
+      // Naming is what this reads; following a harness to what it calls needs a second reading.
+      stillOpen: (root) =>
+        !/export function reachedThrough/.test(readFileSync(path.join(root, "src/quality/cited-checks.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/cited-checks.ts":
+            "// W388: a citation resolved but never run.\nexport function reachedThrough(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "two",
+        kind: "rate",
+        why: "'Two of the declared rows are the second kind' — how many entries in this register's own list are waiting on the remedy the sentence names, re-derived from that list rather than maintained. It moves when somebody builds the harness reading or writes a third such citation, and either way the row it counts is beside it.",
+      },
+      {
+        word: "three",
+        kind: "rate",
+        why: "'A THREE-PART ID' — the shape of an identifier this register refuses, per string, rather than a count of anything. It stays three however many such ids the tree grows, because three fields is what makes one an id instead of a citation.",
       },
     ],
   },

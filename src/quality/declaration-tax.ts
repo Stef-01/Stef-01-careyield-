@@ -207,6 +207,13 @@ export const DEMANDS: readonly Demand[] = [
     demands: () => false,
   },
   {
+    file: "src/quality/cited-checks.ts",
+    // A planted module owes a row here only if it HOLDS A CITATION, which the tax's probe does not.
+    // That is the register's point: what it wants is a citation pointing at a test that runs the
+    // thing, not a declaration saying it does not.
+    demands: () => false,
+  },
+  {
     file: "src/quality/shared-state.ts",
     // Its population is TEST FILES, and a planted module is not one — outside by construction. A
     // planted test file that wrote the repository would owe a change to the file rather than a row

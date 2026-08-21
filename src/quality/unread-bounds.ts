@@ -127,6 +127,15 @@ export const NAMED_CONDITIONS: readonly NamedCondition[] = [
     },
   },
   {
+    bound: "src/quality/cited-checks.ts::CITED_BOUND",
+    condition: "a body that reaches the subject THROUGH a shared harness does not satisfy it and should",
+    reading: {
+      kind: "read_by",
+      check: "src/quality/blind-spots.ts::falseBounds",
+      how: "W295'S WITNESS IS THE READING, and W388 wrote it on the way in. The probe plants a register citing `unit-headers.test.ts`, whose test drives the header scan THROUGH the shared planter rather than by naming the export — a real drive — and requires this register to report it as running nothing, beside a control citing a test that names its export and is not reported. So the sentence is measured on every run rather than argued, and `UNRUN_AT_W388` carries the two live instances by name with the same remedy against each. What is NOT read is the other half of the same clause: a body that MENTIONS an export without calling it satisfies this register and should not, and nothing plants that shape — it would need a reading of whether a name is in call position, which is the parse this tree has refused five times.",
+    },
+  },
+  {
     bound: "src/quality/decision-moments.ts::DECISION_BOUND",
     condition: "names no moment here and reads as inheriting whatever its caller was at",
     reading: {

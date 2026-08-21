@@ -784,6 +784,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W384's register is reviewer-facing: routes, expression names and sentences about what a page renders when a list is empty. It reads the console's copy without holding any, and nothing here renders.",
   },
   {
+    module: "src/quality/cited-checks.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W388's register is reviewer-facing: file names, test titles and sentences about what a citation points at. Nothing here renders and no practice sees it.",
+  },
+  {
     module: "src/quality/decision-moments.ts",
     operatorCopy: [],
     notCopy:

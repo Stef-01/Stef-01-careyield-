@@ -32,7 +32,7 @@
 //
 // FOUNDER GATE (plan §4): nothing crossed. Constructed trees in a temporary directory.
 
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { discoverSurfaces } from "@/compliance/surfaces";
 import { copySurfaceMembers } from "@/compliance/copy-y6";
@@ -50,7 +50,7 @@ import { acceptanceCarryingModules } from "./acceptances";
 import { violationReporters, withRoot } from "./refusal-branches";
 import { mutantsIn } from "./mutation-sampling";
 import { CITATION_BOUND, separatorDiff } from "./citations";
-import { PLANTING_BOUND, planterDiff } from "./planting";
+import { PLANTING_BOUND, copyTree, planterDiff, withPlantedIn } from "./planting";
 import { ENDING_BOUND, waitingModules } from "./self-ending";
 import { UNRUN_BOUND, unreachedByUnitSuite } from "./unrun";
 import { COUNT_BOUND, registerSizeAssertions } from "./register-counts";
@@ -67,6 +67,7 @@ import { DEFAULT_BOUND, defaultDefects, defaultedParameters } from "./defaulted-
 import { RENDERED_BOUND, silentZeros } from "@/console/rendered-zeros";
 import { HOOK_BOUND, unreachedReclaimers } from "./hook-reach";
 import { SHARED_BOUND, orderDependent } from "./shared-state";
+import { CITED_BOUND, citationsInTree, uncalledCitations } from "./cited-checks";
 import { CYCLE_BOUND, cyclicComponents, moduleGraph, runtimeMembers } from "./import-cycles";
 import { MOMENT_BOUND, momentsOf } from "./moments";
 import { TEMP_RESIDUE_BOUND, reclamationSites } from "./run-residue";
@@ -184,6 +185,44 @@ export const BLIND_SPOTS: Readonly<Record<string, Blindness>> = {
           };
         },
       ),
+  },
+
+  "src/quality/cited-checks.ts": {
+    kind: "demonstrated",
+    bound: CITED_BOUND,
+    witness:
+      "a citation pointing at a test that drives its subject THROUGH the shared planter rather than by naming its export — a real drive, which this register reads as running nothing",
+    control:
+      "the same citation pointing at a test that names the export, which it does read as run",
+    probe: () => {
+      // A COPY, NOT A BARE TREE. A citation names a real test file and resolves against it, so a
+      // root holding only the probe reports every citation unresolved and the control never fires.
+      // `src` ONLY, which is every file a citation in this tree can name and a third of the bytes:
+      // the full copy pushed the run into W347's class — a gate red with every assertion green —
+      // and the lever that comment names is main-thread pressure.
+      const copy = copyTree(process.cwd(), { directories: ["src"] });
+      // THE FIXTURE NAMES ARE LITERAL AT EACH CALL. `fixtureText(name)` behind a parameter is a
+      // call W307's citation check cannot resolve, and an uncited block is one nothing keeps in
+      // step with its loader.
+      const runs = (body: string) =>
+        withPlantedIn(copy, { "src/quality/cite-probe.ts": body }, () =>
+          // THE PROBE'S OWN ROWS ONLY. Handing the rule an empty declaration list drops every
+          // disposition the tree holds, so the baseline is thirty-five defects and both readings
+          // come back false — a control that fires for the wrong reason is no control.
+          uncalledCitations(copy, [], citationsInTree(copy), []).every(
+            (d) => d.citing !== "src/quality/cite-probe.ts",
+          ),
+        );
+      // `seen` is the register RECOGNISING the drive. The witness stays unseen while the bound holds.
+      try {
+        return {
+          witnessSeen: runs(fixtureText("cited-probe-through-a-harness")),
+          controlSeen: runs(fixtureText("cited-probe-runs-it")),
+        };
+      } finally {
+        rmSync(copy, { recursive: true, force: true });
+      }
+    },
   },
 
   "src/quality/shared-state.ts": {

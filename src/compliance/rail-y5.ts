@@ -60,7 +60,7 @@ export const Y5_REDERIVATIONS: readonly Y5Rederivation[] = [
     whyItSurvived:
       "The matcher cannot see a clinician at all — `MatchSlot` carries a slot id, a practice and a start time, so preferring one is not a line somebody could add, it is a field somebody would have to add to a declared shape. The API returns capacity rows ordered by (weekday, clinician), a declared basis with nothing clinical and nothing performance-related in it, and the order does not move when the figures do. What a caller does with the figures afterwards is theirs, which is W232's finding at a new boundary rather than a new breach.",
     assertedBy:
-      "src/compliance/rail-y5.test.ts :: the matcher cannot see a clinician, and capacity row order does not follow the figures",
+      "src/compliance/rail-y5.test.ts :: the matcher cannot see a clinician, and order does not follow figures",
   },
   {
     propertyId: "never-decides-care-transferred",
@@ -69,7 +69,7 @@ export const Y5_REDERIVATIONS: readonly Y5Rederivation[] = [
     whyItSurvived:
       "W244 refuses a `delivered` boolean and splits the ambiguity into four states with no `unknown`, so `sent_no_response` cannot collapse into an arrival. W239's ledger records what LEFT rather than what succeeded, and W134's acceptance rail is untouched by any of it — nothing in Q19 produces an acceptance, and the matcher produces none either.",
     assertedBy:
-      "src/compliance/rail-y5.test.ts :: nothing in Q17's matcher or Q19's rail produces an acceptance",
+      "src/compliance/rail-y5.test.ts :: produces no acceptance and no transfer anywhere in the matcher",
   },
   {
     propertyId: "never-concludes-from-silence",
@@ -78,7 +78,7 @@ export const Y5_REDERIVATIONS: readonly Y5Rederivation[] = [
     whyItSurvived:
       "Every one of them reports the absence rather than a value. W243 sweeps five years forward to prove no elapsed time turns silence into consent; W246 refuses to render a zero where nothing was attempted, because a zero is a measurement and this is the absence of one; W255 forwards nothing from a failed read rather than describing it; and the matcher offers nobody an appointment on the strength of an empty availability list — it produces a declared reason instead.",
     assertedBy:
-      "src/compliance/rail-y5.test.ts :: an absent availability produces a declared reason, never an inference",
+      "src/compliance/rail-y5.test.ts :: an absence produces a declared reason, never an inference",
   },
   {
     propertyId: "writes-no-clinical-text",
@@ -87,7 +87,7 @@ export const Y5_REDERIVATIONS: readonly Y5Rederivation[] = [
     whyItSurvived:
       "W236 re-derived the property over a RENDERED document string by string rather than by reading the renderer: every string is a declared vocabulary member, a declared code, an identifier copied from the input, or text a clinician wrote. W238 ships an empty catalogue and refuses an unbound code rather than guessing, because a binding is a clinical assertion. The matcher's own reasons are a closed copy map, and it has no field for prose.",
     assertedBy:
-      "src/compliance/rail-y5.test.ts :: the matcher's reasons are a closed vocabulary that passes W6's linter",
+      "src/compliance/rail-y5.test.ts :: has no field for prose and passes W6's linter on every reason",
   },
   {
     propertyId: "informs-never-advises",
@@ -96,7 +96,7 @@ export const Y5_REDERIVATIONS: readonly Y5Rederivation[] = [
     whyItSurvived:
       "W200's fix generalised, and this is the part worth recording. Its register decides membership by reading each module's own `// W<n>` header against `Y4_FIRST_UNIT`, so every Y5 module was compelled into the declared copy surface as it landed — without an edit to the detector and without anybody remembering. W226's capacity linter, W229's and W246's consoles, W243's consent verdicts and W255's refusal copy all entered that way, each declared at the moment it was written rather than swept up later. A hand-kept list would have covered the modules somebody remembered, which is exactly what it did in Y4.",
     assertedBy:
-      "src/compliance/rail-y5.test.ts :: every Y5 module is inside W200's declared copy surface, by the same detector",
+      "src/compliance/rail-y5.test.ts :: has every Y5 module inside the declared copy surface, by the same detector",
   },
 ];
 

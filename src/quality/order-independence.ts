@@ -227,7 +227,7 @@ export const FOLD_SITES: readonly FoldSite[] = [
     folds: 5,
     disposition: {
       kind: "tie_break_test",
-      test: "src/quality/order-regressions.test.ts :: W178 the fixture still discriminates the fix (every entry, both orders)",
+      test: "src/quality/order-regressions.test.ts :: the fixture still discriminates the fix",
     },
   },
   {
@@ -243,7 +243,7 @@ export const FOLD_SITES: readonly FoldSite[] = [
     folds: 1,
     disposition: {
       kind: "tie_break_test",
-      test: "src/referrals/store.test.ts :: W142 two return reports filed on the same date are AMBIGUOUS, not resolved by position",
+      test: "src/referrals/store.test.ts :: W142 a corrected return report is not lost to array order",
     },
   },
   {

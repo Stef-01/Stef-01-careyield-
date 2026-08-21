@@ -34,6 +34,7 @@ import { appliedExemptions } from "./exemption-reach";
 import { silentZeros } from "@/console/rendered-zeros";
 import { orderDependent } from "./shared-state";
 import { staleGuards } from "./decision-moments";
+import { citationsInTree, uncalledCitations } from "./cited-checks";
 import { unreachedReclaimers } from "./hook-reach";
 import { cyclicComponents } from "./import-cycles";
 import { momentsOf } from "./moments";
@@ -91,6 +92,19 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     holders: ["src/quality/blind-spots.ts", "src/quality/spelling-markers.ts"],
     why:
       "W368's scan walks the tree for a detector's defaulted exemption parameter, and both holders plant one — `blind-spots.ts` as the positive control for that register's own blind spot, `spelling-markers.ts` as the pair a second spelling of the parameter is measured against. Written inline, each holder became an exemption the register reported as applied and unmeasured, which W355 caught first: its defaulted-register scan read the same literals as real parameters nobody drives.",
+  },
+  {
+    detector: "src/quality/cited-checks.ts::uncalledCitations",
+    sees: (root) =>
+      uncalledCitations(root, [], citationsInTree(root), []).map((d) => `${d.citing}::${d.citation}`),
+    plant: { "src/quality/cite-probe.ts": fixtureText("cited-probe-runs-nothing") },
+    marker: "src/quality/cite-probe.ts",
+    // The suite holding the fixture holds citations of its own, so it appears in this detector's
+    // answer for the ordinary reason rather than because the fixture leaked into the tree.
+    holdersAppear: "for_other_reasons",
+    holders: ["src/quality/cited-checks.test.ts"],
+    why:
+      "The probes are REGISTERS holding citations, and this detector's population is every module under `src/` that holds one. Spelled inline in the suite, a probe's citation would be a citation this tree holds — it would join the population, be attributed to whatever row surrounded it, and appear in W388's own report. The fixture file is what keeps a planted citation out of the tree's own citation set, and it is the same reason `cited-checks.ts` excludes itself from its walk by name: a module that quotes citations to dispose of them cannot also be read as making them.",
   },
   {
     detector: "src/quality/decision-moments.ts::staleGuards",
@@ -169,7 +183,9 @@ export const SELF_SCANNING: readonly SelfScan[] = [
     sees: (root) => reclamationSites(root).map((s) => `${s.file}::${s.fn}`),
     plant: { "src/planted/sync.ts": fixtureText("removal-by-rmsync") },
     marker: "planted/sync",
-    holdersAppear: "never",
+    // W388 gave `blind-spots.ts` a removal of its own — its citation probe copies the tree — so the
+    // module holding this fixture is now a reclamation site for the ordinary reason.
+    holdersAppear: "for_other_reasons",
     holders: ["src/quality/blind-spots.ts", "src/quality/horizon-q29-gate.ts", "src/quality/run-residue.test.ts"],
     why:
       "W375's walk looks for an `rmSync` call under `src/`, and both holders plant one — `blind-spots.ts` as the control for that register's own blind spot, the suite as the proof that the walk reaches a file nobody told it about. Written inline, each holder became a removal site the register reported against a function that removes nothing.",

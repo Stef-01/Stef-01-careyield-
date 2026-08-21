@@ -179,6 +179,10 @@ export interface PlantedName {
  */
 export const PLANTED_NAMES: readonly PlantedName[] = [
   {
+    value: "src/quality/cite-probe.ts",
+    why: "W307's self-scan for W388 plants a register holding a citation into a copied tree and looks for it by name, so the marker is a file this repository must NOT hold: a real one would put a fabricated citation into the tree's own citation set, where W388 would attribute it to whatever row surrounded it and report it. The pair being fabricated is what keeps the demonstration a demonstration.",
+  },
+  {
     value: "src/engine/self-probe.ts::probeDecide",
     why: "W307's self-scan for W387 plants a patient rule into a constructed tree and looks for it by name, so the marker is the name of a file this repository must NOT hold: a real one would put a fabricated rule into the product's own population, where W373 would declare it and W387 would report it as a second instance of the defect it exists to name. The pair being fabricated is what keeps the demonstration a demonstration.",
   },
