@@ -262,6 +262,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/runtime-population.ts",
+    name: "DIVERGENCE_AT_W396",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a module gaining or losing an export the shared source reading cannot see, or somebody repairing the preparation that loses them",
+      whyStopping:
+        "A NAMED ROW PER DIVERGENCE, each carrying which reading is missing the name and what was measured, and the population is re-derived on every run by reading each module twice — once as text and once by loading it. A row ARRIVING means a register's exports have become partly invisible to every reading built on the shared preparation, which is how twenty-four of them arrived unnoticed. A row LEAVING is the outcome and fails too: the day somebody repairs the preparation these rows go stale together, and a register that quietly kept them would be recording as permanent the thing it exists to get fixed. It cannot be satisfied by retyping a digit: both readings are re-taken from the tree.",
+    },
+  },
+  {
     module: "src/quality/number-words.ts",
     name: "MISREAD_AT_W393",
     classification: {

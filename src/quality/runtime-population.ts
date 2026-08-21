@@ -20,7 +20,7 @@
 // the register would report its own rows going stale on the day somebody fixes it.
 //
 // TYPES ARE NOT A DIVERGENCE AND ARE EXCLUDED BY CONSTRUCTION. `export interface` and `export type`
-// are gone at runtime by design, so counting them would bury the finding under four hundred rows
+// are gone at runtime by design, so counting them would bury the finding under hundreds of rows
 // that mean nothing. What is left is VALUES: a name the source reading claims and the module does
 // not have, or a name the module has and the source reading cannot see.
 //

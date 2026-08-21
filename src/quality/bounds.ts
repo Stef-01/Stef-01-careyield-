@@ -77,6 +77,7 @@ import { DECISION_BOUND } from "./decision-moments";
 import { CITED_BOUND } from "./cited-checks";
 import { PATTERN_BOUND } from "./patterns";
 import { NUMBER_BOUND } from "./number-words";
+import { RUNTIME_BOUND as POPULATION_RUNTIME_BOUND } from "./runtime-population";
 import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
@@ -90,7 +91,10 @@ import { SUBJECT_BOUND } from "./subject-and-walk";
 import { DRIVE_BOUND } from "./assertion-drives";
 import { TREE_DERIVED_REGISTERS } from "./register-census";
 import { SWEEP_BOUND as PIN_SWEEP_BOUND } from "./pins";
-import { SWEEP_BOUND as TAUTOLOGY_SWEEP_BOUND, tautologiesIn } from "./tautology-sweep";
+import {
+  SWEEP_BOUND as TAUTOLOGY_SWEEP_BOUND,
+  tautologiesIn,
+} from "./tautology-sweep";
 import { COMPOSED_COPY_SITES, FIXTURE_BOUND } from "@/compliance/composed-copy";
 import { VOCABULARY_BOUND, sweepSurface } from "@/compliance/public-surfaces";
 import { RUNTIME_BOUND } from "@/console/zero-states";
@@ -125,7 +129,11 @@ import { DOSSIER_BOUND, dossierDiffFor } from "./dossier-derived";
 import { NAMED_CONDITIONS, UNREAD_BOUND } from "./unread-bounds";
 import { PRIVATE_COPY_BOUND, SHARED_PARSES } from "./private-copies";
 import { PLANTED_NAMES, TYPED_NAME_BOUND } from "./typed-names";
-import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SELF } from "./hardening-q26";
+import {
+  FINDINGS as Q26_FINDINGS,
+  Q26_HARDENING_BOUND,
+  SELF_REVIEWED as Q26_SELF,
+} from "./hardening-q26";
 import { Q28_HARDENING_BOUND } from "./hardening-q28";
 import { Q29_HARDENING_BOUND } from "./hardening-q29";
 import { Q28_MUTANT_BOUND } from "./quarter-mutants-q28";
@@ -183,7 +191,13 @@ export type Lifting =
    *
    * W306: it takes the root it reads, and `lifted` says how it could be seen saying false.
    */
-  | { kind: "remedy"; remedy: string; reads: string; stillOpen: (root: string) => boolean; lifted: Lifted }
+  | {
+      kind: "remedy";
+      remedy: string;
+      reads: string;
+      stillOpen: (root: string) => boolean;
+      lifted: Lifted;
+    }
   /**
    * Nothing would lift it — the limit is in the kind of claim, not in the tree.
    *
@@ -207,7 +221,11 @@ export interface StatedBound {
    * Both directions: a number in the sentence that nobody declared fails, and a declaration for a
    * number no longer in the sentence fails. `total` is refused outright — that is the rule.
    */
-  numbers: ReadonlyArray<{ word: string; kind: "rate" | "fixed_by_a_gate" | "unit_id"; why: string }>;
+  numbers: ReadonlyArray<{
+    word: string;
+    kind: "rate" | "fixed_by_a_gate" | "unit_id";
+    why: string;
+  }>;
 }
 
 /**
@@ -237,7 +255,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         kind: "constructed_tree",
         // A tree where a page in the walk has stopped rendering it: the notice is no longer a
         // property of the pages that ask, and the sentence describing the trade stops applying.
-        files: { "app/console/dashboard/page.tsx": "export default function Page() { return null; }\n" },
+        files: {
+          "app/console/dashboard/page.tsx":
+            "export default function Page() { return null; }\n",
+        },
       },
     },
     numbers: [],
@@ -314,8 +335,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: HATCH_BOUND,
     lifting: {
       kind: "remedy",
-      remedy: "a `Blindness` arm that demonstrates a bound by NOISE rather than by silence",
-      reads: "`blind-spots.ts`, for the arm that would let a false-positive bound be planted against",
+      remedy:
+        "a `Blindness` arm that demonstrates a bound by NOISE rather than by silence",
+      reads:
+        "`blind-spots.ts`, for the arm that would let a false-positive bound be planted against",
       // NOT `inherent`, AND W311'S WARNING IS WHY. Three quarters of this sentence really are about
       // judgements nothing derives, and the temptation was to file the whole thing under the kind
       // that can never go stale. But the half W345 actually discovered names a remedy somebody can
@@ -431,8 +454,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: Q26_MUTANT_BOUND,
     lifting: {
       kind: "remedy",
-      remedy: "one because sweeping it runs the sweep, one because the walk that builds mutants could not find its suite",
-      reads: "`quarter-mutants-q26.ts`, for an excluded module the population has taken back",
+      remedy:
+        "one because sweeping it runs the sweep, one because the walk that builds mutants could not find its suite",
+      reads:
+        "`quarter-mutants-q26.ts`, for an excluded module the population has taken back",
       // NOT `inherent`, and the difference from W332's entry is real. Its limits are about what
       // five textual operators can be, which no change to this tree lifts. THIS one's first clause
       // is about the modules the harness cannot reach today, and both exclusions are the kind of
@@ -442,7 +467,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       // sentence is describing a sweep that reaches everything the quarter added.
       stillOpen: (root) =>
         /EXCLUDED_AT_W349: readonly Excluded\[\] = \[\s*\{/.test(
-          readFileSync(path.join(root, "src/quality/quarter-mutants-q26.ts"), "utf8"),
+          readFileSync(
+            path.join(root, "src/quality/quarter-mutants-q26.ts"),
+            "utf8",
+          ),
         ),
       lifted: {
         kind: "constructed_tree",
@@ -498,14 +526,18 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: UNAPPLIED_BOUND,
     lifting: {
       kind: "remedy",
-      remedy: "a sentence saying what would make a bound plantable is not a field, and this register would have to read English to find it",
-      reads: "`blind-spots.ts`, for a `whyNotPlantable` that has become a field this register could read",
+      remedy:
+        "a sentence saying what would make a bound plantable is not a field, and this register would have to read English to find it",
+      reads:
+        "`blind-spots.ts`, for a `whyNotPlantable` that has become a field this register could read",
       // The one clause that names something buildable. A blind spot's remedy is prose today, so
       // nothing resolves it; the day it is a field beside the sentence, this register's population
       // grows and the bound is describing a tree that has moved. The predicate reads for that
       // field rather than for a unit, because what lifts the sentence is the shape changing.
       stillOpen: (root) =>
-        !/whenPlantable:/.test(readFileSync(path.join(root, "src/quality/blind-spots.ts"), "utf8")),
+        !/whenPlantable:/.test(
+          readFileSync(path.join(root, "src/quality/blind-spots.ts"), "utf8"),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -535,12 +567,18 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a reading of whether the words are ABOUT the subject",
-      reads: "`rendered-zeros.ts`, for an emptiness answered by a heading above the list rather than by the other arm of the conditional it sits in",
+      reads:
+        "`rendered-zeros.ts`, for an emptiness answered by a heading above the list rather than by the other arm of the conditional it sits in",
       // The clause that names something buildable, and what several declared rows are waiting on.
       // Widening to ancestors is not it — every page has an `<h1>` — so the predicate reads for a
       // derivation that resolves the words against the subject rather than against the position.
       stillOpen: (root) =>
-        !/export function wordsAbout/.test(readFileSync(path.join(root, "src/console/rendered-zeros.ts"), "utf8")),
+        !/export function wordsAbout/.test(
+          readFileSync(
+            path.join(root, "src/console/rendered-zeros.ts"),
+            "utf8",
+          ),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -558,6 +596,42 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     ],
   },
   {
+    module: "src/quality/runtime-population.ts",
+    name: "RUNTIME_BOUND",
+    unit: "W396",
+    text: POPULATION_RUNTIME_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "which construct desynchronises the preparation",
+      reads:
+        "`runtime-population.ts`, for the reading that would name which construct desynchronises the shared preparation rather than only measuring what it costs",
+      // The clause that names something buildable: the divergence is reported and the cause is not,
+      // because the declaration block prepares correctly in isolation and the candidates tried were
+      // cleared. A reading that walked the preparation's own state would settle it.
+      stillOpen: (root) =>
+        !/export function desyncAt/.test(
+          readFileSync(
+            path.join(root, "src/quality/runtime-population.ts"),
+            "utf8",
+          ),
+        ),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/runtime-population.ts":
+            "// W396: where the preparation loses its place.\nexport function desyncAt(): number {\n  return -1;\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'a register somebody trusted instead of looking' is ONE register — the count of instruments a reader is left with when a guessed cause replaces a measured one, which is a statement about what a wrong diagnosis costs rather than a count of anything in this tree. It stays one however many registers are added, because the point is that trusting any of them costs the same.",
+      },
+    ],
+  },
+  {
     module: "src/quality/number-words.ts",
     name: "NUMBER_BOUND",
     unit: "W393",
@@ -565,12 +639,15 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a scale word, not a unit",
-      reads: "`number-words.ts`, for a run of number-words above a thousand, which this reading would parse as its own tail exactly as W314 parses a hundred as its own",
+      reads:
+        "`number-words.ts`, for a run of number-words above a thousand, which this reading would parse as its own tail exactly as W314 parses a hundred as its own",
       // The clause that names something buildable, and it is one line of table rather than a unit.
       // What stops it being written now is that nothing in this repository's prose needs it, and a
       // scale added before a sentence wants it is a row nobody can drive.
       stillOpen: (root) =>
-        !/million:/.test(readFileSync(path.join(root, "src/quality/number-words.ts"), "utf8")),
+        !/million:/.test(
+          readFileSync(path.join(root, "src/quality/number-words.ts"), "utf8"),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -600,12 +677,15 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "written inline at its call site",
-      reads: "`patterns.ts`, for a population defined by a literal that is never given a name and so owes nobody a sentence",
+      reads:
+        "`patterns.ts`, for a population defined by a literal that is never given a name and so owes nobody a sentence",
       // The clause that names something buildable. Reading a NAMED constant is a line of scanning;
       // reading a literal at its call site means saying what population it stands for with no name
       // to hang the sentence on, which is a unit rather than a patch.
       stillOpen: (root) =>
-        !/export function inlinePatterns/.test(readFileSync(path.join(root, "src/quality/patterns.ts"), "utf8")),
+        !/export function inlinePatterns/.test(
+          readFileSync(path.join(root, "src/quality/patterns.ts"), "utf8"),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -635,11 +715,14 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a call read through a harness",
-      reads: "`cited-checks.ts`, for a cited test that drives its subject through a shared planter rather than by naming its export",
+      reads:
+        "`cited-checks.ts`, for a cited test that drives its subject through a shared planter rather than by naming its export",
       // The clause that names something buildable, and what a pair of declared rows waits on.
       // Naming is what this reads; following a harness to what it calls needs a second reading.
       stillOpen: (root) =>
-        !/export function reachedThrough/.test(readFileSync(path.join(root, "src/quality/cited-checks.ts"), "utf8")),
+        !/export function reachedThrough/.test(
+          readFileSync(path.join(root, "src/quality/cited-checks.ts"), "utf8"),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -669,12 +752,16 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the guard read rather than described",
-      reads: "`decision-moments.ts`, for which of a guard's exclusions depend on the date it is handed, derived from the guard's own body rather than from a sentence somebody wrote",
+      reads:
+        "`decision-moments.ts`, for which of a guard's exclusions depend on the date it is handed, derived from the guard's own body rather than from a sentence somebody wrote",
       // The clause that names something buildable. The row below asserts that every exclusion
       // `evaluateEligibility` applies is time-dependent; nothing opens it to check.
       stillOpen: (root) =>
         !/export function timeDependentExclusions/.test(
-          readFileSync(path.join(root, "src/quality/decision-moments.ts"), "utf8"),
+          readFileSync(
+            path.join(root, "src/quality/decision-moments.ts"),
+            "utf8",
+          ),
         ),
       lifted: {
         kind: "constructed_tree",
@@ -694,11 +781,14 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a path resolved rather than a binding named",
-      reads: "`shared-state.ts`, for a write whose target is known to be inside the repository because it resolves there rather than because the binding was called `ROOT`",
+      reads:
+        "`shared-state.ts`, for a write whose target is known to be inside the repository because it resolves there rather than because the binding was called `ROOT`",
       // The clause that names something buildable. `ROOT` is a habit, and a habit is what this
       // register reads. The predicate looks for the derivation that would settle it.
       stillOpen: (root) =>
-        !/export function resolvesInside/.test(readFileSync(path.join(root, "src/quality/shared-state.ts"), "utf8")),
+        !/export function resolvesInside/.test(
+          readFileSync(path.join(root, "src/quality/shared-state.ts"), "utf8"),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -723,12 +813,15 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a `finally` read as a moment",
-      reads: "`hook-reach.ts`, for a removal in a `finally` taken as a hook at a moment of its own rather than excluded from the population by the shape of the construct",
+      reads:
+        "`hook-reach.ts`, for a removal in a `finally` taken as a hook at a moment of its own rather than excluded from the population by the shape of the construct",
       // The clause that names something buildable. A `finally` is skipped by a kill exactly as an
       // `afterAll` is, and reading one needs a block whose extent the scan already knows how to
       // find. The predicate reads for the derivation that would settle it.
       stillOpen: (root) =>
-        !/export function finallyMoments/.test(readFileSync(path.join(root, "src/quality/hook-reach.ts"), "utf8")),
+        !/export function finallyMoments/.test(
+          readFileSync(path.join(root, "src/quality/hook-reach.ts"), "utf8"),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -753,12 +846,15 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a parse rather than a scan",
-      reads: "`import-cycles.ts`, for a use told apart by whether it sits in a function body rather than by whether a hole survives to be seen",
+      reads:
+        "`import-cycles.ts`, for a use told apart by whether it sits in a function body rather than by whether a hole survives to be seen",
       // The clause that names something buildable. `deferred` is an argument about WHERE a name is
       // read, and telling a top-level initialiser from a function body in text needs a parse. The
       // predicate reads for the derivation that would settle it.
       stillOpen: (root) =>
-        !/export function readsAtEval/.test(readFileSync(path.join(root, "src/quality/import-cycles.ts"), "utf8")),
+        !/export function readsAtEval/.test(
+          readFileSync(path.join(root, "src/quality/import-cycles.ts"), "utf8"),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -783,15 +879,19 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a parse rather than a scan",
-      reads: "`moments.ts`, for a call site attributed to the block it really sits in rather than to the last `it(` opened before it",
+      reads:
+        "`moments.ts`, for a call site attributed to the block it really sits in rather than to the last `it(` opened before it",
       // The clause that names something buildable, and the one this tree has refused four times.
       // The predicate reads for the derivation that would settle it.
       stillOpen: (root) =>
-        !/export function blockOf/.test(readFileSync(path.join(root, "src/quality/moments.ts"), "utf8")),
+        !/export function blockOf/.test(
+          readFileSync(path.join(root, "src/quality/moments.ts"), "utf8"),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
-          "src/quality/moments.ts": "// W378: the moment register.\nexport function blockOf(): string {\n  return \"\";\n}\n",
+          "src/quality/moments.ts":
+            '// W378: the moment register.\nexport function blockOf(): string {\n  return "";\n}\n',
         },
       },
     },
@@ -875,13 +975,17 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a unit that established two is re-read on one of them",
-      reads: "`horizon-q29-gate.ts`, for a row per POPULATION rather than a row per unit",
+      reads:
+        "`horizon-q29-gate.ts`, for a row per POPULATION rather than a row per unit",
       // The clause that names something buildable. The document's table lists units, and a unit
       // that built more than one population is re-read on whichever its row names. The predicate
       // reads for the register that would hold them all.
       stillOpen: (root) =>
         !/export const POPULATIONS_BY_SET/.test(
-          readFileSync(path.join(root, "src/quality/horizon-q29-gate.ts"), "utf8"),
+          readFileSync(
+            path.join(root, "src/quality/horizon-q29-gate.ts"),
+            "utf8",
+          ),
         ),
       lifted: {
         kind: "constructed_tree",
@@ -912,7 +1016,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a check that lists the temp directory and reports what it finds",
-      reads: "`run-residue.ts`, for a check that reads the temp directory rather than only the source that writes to it",
+      reads:
+        "`run-residue.ts`, for a check that reads the temp directory rather than only the source that writes to it",
       // The clause that names something buildable, and the reason two quarters missed the same
       // residue: every register watches source or the repository. The predicate reads for the
       // derivation that would look at the disk.
@@ -938,13 +1043,17 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "deriving a population from copy",
-      reads: "`patient-populations.ts`, for the population a sentence promises derived from the sentence rather than judged against it",
+      reads:
+        "`patient-populations.ts`, for the population a sentence promises derived from the sentence rather than judged against it",
       // The clause that names something buildable. A row proves the words are really shown to a
       // practice; what it cannot say is whether the rule's reach is inside what those words
       // promise. The predicate reads for the derivation that would settle it.
       stillOpen: (root) =>
         !/export function populationFromCopy/.test(
-          readFileSync(path.join(root, "src/quality/patient-populations.ts"), "utf8"),
+          readFileSync(
+            path.join(root, "src/quality/patient-populations.ts"),
+            "utf8",
+          ),
         ),
       lifted: {
         kind: "constructed_tree",
@@ -980,7 +1089,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a reachability closure from the console's own index",
-      reads: "`reached-pages.ts`, for a route reached by following links from where a person starts rather than linked from anywhere at all",
+      reads:
+        "`reached-pages.ts`, for a route reached by following links from where a person starts rather than linked from anywhere at all",
       // The clause that names something buildable. A row proves some file renders an `href`; what
       // it cannot say is that a person starting at the console can follow links to it. The
       // predicate reads for the derivation that would settle it, not for a unit id.
@@ -1012,13 +1122,17 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "asking who reads an empty register and driving them on a member",
-      reads: "`empty-populations.ts`, for an empty register whose consumers are shown to work rather than only whose sentence is shown to exist",
+      reads:
+        "`empty-populations.ts`, for an empty register whose consumers are shown to work rather than only whose sentence is shown to exist",
       // The clause that names something buildable. A row proves the module still argues its
       // emptiness; what it cannot say is whether anything still READS the list. The predicate
       // reads for the register that would hold those consumers, not for a unit id.
       stillOpen: (root) =>
         !/export const EMPTY_CONSUMERS/.test(
-          readFileSync(path.join(root, "src/quality/empty-populations.ts"), "utf8"),
+          readFileSync(
+            path.join(root, "src/quality/empty-populations.ts"),
+            "utf8",
+          ),
         ),
       lifted: {
         kind: "constructed_tree",
@@ -1044,14 +1158,18 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "deriving what a walk misses from the walk itself",
-      reads: "`subject-and-walk.ts`, for a walk's exclusions derived rather than quoted out of a sentence somebody wrote",
+      reads:
+        "`subject-and-walk.ts`, for a walk's exclusions derived rather than quoted out of a sentence somebody wrote",
       // The clause that names something buildable. Today a row proves an author WROTE an edge
       // sentence; what it cannot say is whether that sentence is the walk's real edge. A walk's
       // exclusions are derivable — `sourceModules` is `src/` minus tests and the shared skip list
       // says the rest — and the predicate reads for that derivation rather than for a unit.
       stillOpen: (root) =>
         !/export const WALK_SCOPE/.test(
-          readFileSync(path.join(root, "src/quality/subject-and-walk.ts"), "utf8"),
+          readFileSync(
+            path.join(root, "src/quality/subject-and-walk.ts"),
+            "utf8",
+          ),
         ),
       lifted: {
         kind: "constructed_tree",
@@ -1077,7 +1195,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a reachability walk rather than a name scan",
-      reads: "`populations.ts`, for a population derived from what a module can REACH rather than from the names its text contains",
+      reads:
+        "`populations.ts`, for a population derived from what a module can REACH rather than from the names its text contains",
       // The clause that names something buildable, and the tree already owns the mechanism:
       // `reachableFrom` in `security/reachability.ts` follows imports through helpers. A name scan
       // credits a module with a walk it never reaches and misses one it reaches through another
@@ -1115,7 +1234,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "moving a welded comparison out of its `.test.ts`",
-      reads: "`plan-ledger.ts`, for a ledger comparison that exists as a module at all rather than only inside its own test",
+      reads:
+        "`plan-ledger.ts`, for a ledger comparison that exists as a module at all rather than only inside its own test",
       // W371 BUILT THE PREVIOUS REMEDY AND THIS IS WHAT IS LEFT. `drivesItsCheck` now resolves each
       // citation to a drive and calls it, so the sentence no longer says nothing runs them. Two
       // rows still cannot be run, and for one reason: their comparison is written inline in a
@@ -1228,15 +1348,20 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: DEFAULT_BOUND,
     lifting: {
       kind: "remedy",
-      remedy: "running the function both ways and requiring the results to differ",
-      reads: "`defaulted-registers.ts`, for a drive that calls each function twice rather than reading the text of its call sites",
+      remedy:
+        "running the function both ways and requiring the results to differ",
+      reads:
+        "`defaulted-registers.ts`, for a drive that calls each function twice rather than reading the text of its call sites",
       // The clause that names something buildable. Today a parameter counts as driven when some
       // call writes text that is not the default's text — which says an argument was supplied, not
       // that the answer moved. The predicate reads for the derivation rather than for a unit,
       // because what lifts the sentence is the module growing a way to CALL the functions it reads.
       stillOpen: (root) =>
         !/export function answersDiffer/.test(
-          readFileSync(path.join(root, "src/quality/defaulted-registers.ts"), "utf8"),
+          readFileSync(
+            path.join(root, "src/quality/defaulted-registers.ts"),
+            "utf8",
+          ),
         ),
       lifted: {
         kind: "constructed_tree",
@@ -1262,14 +1387,17 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a reading of what a component renders",
-      reads: "`zero-meaning.ts`, for a population derived from the components a page renders rather than from the names of the expressions it interpolates",
+      reads:
+        "`zero-meaning.ts`, for a population derived from the components a page renders rather than from the names of the expressions it interpolates",
       // The clause that names something buildable. Today a count is found by what the expression
       // is CALLED — `.length`, `.size`, `.total`, a `count` suffix — so `/console/referrals`, whose
       // day-two zero is an empty LIST, has its most important zero outside the population. The
       // predicate reads for the derivation rather than for a unit, because what lifts the sentence
       // is the module growing a way to ask what a component puts on the screen.
       stillOpen: (root) =>
-        !/export function renderedBy/.test(readFileSync(path.join(root, "src/console/zero-meaning.ts"), "utf8")),
+        !/export function renderedBy/.test(
+          readFileSync(path.join(root, "src/console/zero-meaning.ts"), "utf8"),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -1298,14 +1426,17 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a derivation of the link graph",
-      reads: "`spec-stores.ts`, for a route set derived from what a page's links point at rather than from route strings",
+      reads:
+        "`spec-stores.ts`, for a route set derived from what a page's links point at rather than from route strings",
       // The one clause naming something buildable. Today `specRoutes` resolves two spellings of a
       // route STRING — a `goto` literal and a path register's `route:` field — and a page a spec
       // reaches by clicking a nav link is in neither. The predicate reads for the derivation rather
       // than for a unit, because what lifts the sentence is the module growing a way to answer
       // "where does this link go", and that is a named export or it does not exist.
       stillOpen: (root) =>
-        !/export function linkRoutes/.test(readFileSync(path.join(root, "src/quality/spec-stores.ts"), "utf8")),
+        !/export function linkRoutes/.test(
+          readFileSync(path.join(root, "src/quality/spec-stores.ts"), "utf8"),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
@@ -1331,7 +1462,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "threading the readback through every call site",
-      reads: "the staged specs, for a readback that runs before every walk rather than in one test of its own",
+      reads:
+        "the staged specs, for a readback that runs before every walk rather than in one test of its own",
       // The clause that names something buildable. The mechanical form of "every call site" is the
       // hook every test already runs through: a `test.beforeEach` that calls `expectPremise` puts
       // the assertion in front of each walk instead of beside them. So the predicate looks in the
@@ -1416,7 +1548,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "Choosing one spelling per claim is a unit each",
-      reads: "the tree, for the nearest unnormalised claim — a call throws — still spelled more than one way",
+      reads:
+        "the tree, for the nearest unnormalised claim — a call throws — still spelled more than one way",
       // W336 LIFTED THE PREVIOUS PREDICATE AND THIS IS ITS SUCCESSOR. The old one read emptiness,
       // which was the nearest unnormalised claim when W323 wrote the sentence and was held three
       // ways; W336 gave it one spelling, W306's driver reported the bound stale on the spot, and
@@ -1461,7 +1594,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       // stops describing this register the day every row names a check. W297's ratio guard is the
       // reason this was re-read rather than typed `inherent` — two bounds converting at once put
       // the no-remedy kind at parity, and the guard fired before a reader did, again.
-      stillOpen: () => NAMED_CONDITIONS.some((c) => c.reading.kind === "not_observable"),
+      stillOpen: () =>
+        NAMED_CONDITIONS.some((c) => c.reading.kind === "not_observable"),
       lifted: {
         kind: "derived_without_a_tree",
         why: "It reads W339's own declared register, an imported constant: whether a condition could be reported by reading this repository is a classification somebody argued rather than anything a walk finds, so no root can be handed to it. What lifts it is a later unit reading the last unobservable condition, which is an edit to this register rather than a change to any tree.",
@@ -1487,7 +1621,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: DIRECTION_BOUND,
     lifting: {
       kind: "remedy",
-      remedy: "THE ARGUED ROWS ARE CHECKED FOR BEING WRITTEN AND NOT FOR BEING RIGHT",
+      remedy:
+        "THE ARGUED ROWS ARE CHECKED FOR BEING WRITTEN AND NOT FOR BEING RIGHT",
       reads: "the register itself, for a row the census cannot settle",
       // THE LIVE CLAUSE IS THE ARGUED SET. That `loud` means one planted instance, and that a
       // register can be loud and wrong at once, are properties of what a proof IS — no derivation
@@ -1522,7 +1657,10 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       // properties of what this measurement IS. What moves is the POPULATION: the scan reads a
       // declared return type, and a wider one — the day somebody teaches it that a length taken by
       // a caller is a figure too — makes the sentence describe a register that no longer exists.
-      stillOpen: (root) => !countingFigures(root).includes("src/quality/unasked-facts.ts::unaskedFacts"),
+      stillOpen: (root) =>
+        !countingFigures(root).includes(
+          "src/quality/unasked-facts.ts::unaskedFacts",
+        ),
       lifted: {
         kind: "constructed_tree",
         // The remedy state, spelled as the one figure the sentence names: the count W340 takes,
@@ -1577,7 +1715,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: WELDED_BOUND,
     lifting: {
       kind: "remedy",
-      remedy: "the change being run on every `movable` row rather than on a chosen few",
+      remedy:
+        "the change being run on every `movable` row rather than on a chosen few",
       reads: "this register, for a `movable` row nobody has moved",
       // THE FIRST CLAUSE IS THE LIVE ONE, AND W389 HAD TO RE-AIM IT. The old predicate went false
       // at the THIRD moved row, on the reading that a class saying "nobody has run this change"
@@ -1591,11 +1730,18 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       // tree and requires the predicate to go false there, which a predicate closing over the live
       // register can never do.
       stillOpen: (root) =>
-        /standing: movable\(/.test(readFileSync(path.join(root, "src/quality/welded-comparisons.ts"), "utf8")),
+        /standing: movable\(/.test(
+          readFileSync(
+            path.join(root, "src/quality/welded-comparisons.ts"),
+            "utf8",
+          ),
+        ),
       lifted: {
         kind: "constructed_tree",
         files: {
-          "src/quality/welded-comparisons.ts": fixtureText("welded-comparisons-lifted"),
+          "src/quality/welded-comparisons.ts": fixtureText(
+            "welded-comparisons-lifted",
+          ),
         },
       },
     },
@@ -1621,11 +1767,17 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       // judgement is. What moves is the RESOLUTION: today a checker is resolved by name, and the
       // day something resolves it by what it WALKS, the sentence stops describing this register.
       stillOpen: (root) =>
-        resolveName(root, "export", "src/quality/derivable-lists.ts::checkerWalks") !== true,
+        resolveName(
+          root,
+          "export",
+          "src/quality/derivable-lists.ts::checkerWalks",
+        ) !== true,
       lifted: {
         kind: "constructed_tree",
         files: {
-          "src/quality/derivable-lists.ts": fixtureText("derivable-lists-lifted"),
+          "src/quality/derivable-lists.ts": fixtureText(
+            "derivable-lists-lifted",
+          ),
         },
       },
     },
@@ -1651,7 +1803,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       // POPULATION: the scan reads one spelling of an exemption, and a wider one — the day
       // somebody teaches it a skip list in an array — makes the sentence describe a register that
       // no longer exists.
-      stillOpen: (root) => !appliedExemptions(root).some((e) => e.endsWith("::EXCLUDED_ROUTES")),
+      stillOpen: (root) =>
+        !appliedExemptions(root).some((e) => e.endsWith("::EXCLUDED_ROUTES")),
       lifted: {
         kind: "constructed_tree",
         // The remedy state, spelled as an exemption in the shape the sentence says it cannot see
@@ -1661,7 +1814,9 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
           // W307's rule, and W355 is what enforced it here: spelled inline, the planted module's
           // source sat in THIS file as a literal, and the defaulted-register scan read it as a real
           // parameter nobody drives. A fixture is not a module.
-          "src/quality/exemption-reach-probe.ts": fixtureText("exemption-reach-lifted"),
+          "src/quality/exemption-reach-probe.ts": fixtureText(
+            "exemption-reach-lifted",
+          ),
         },
       },
     },
@@ -1681,14 +1836,20 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a generator over spellings rather than a table of them",
-      reads: "this register, for a marker with more than one alternative tried against it",
+      reads:
+        "this register, for a marker with more than one alternative tried against it",
       // THE FIRST CLAUSE IS THE LIVE ONE, and it is the only one of the three that a unit could
       // close. The second is a statement about what `plausibility` IS — a judgement read off the
       // formatter's behaviour rather than its configuration — and the third describes the
       // population this register chose. What moves is the table: one planted alternative per
       // marker is what makes `caught` weak, and the day a row carries a generated set of them the
       // sentence stops describing this register.
-      stillOpen: (root) => resolveName(root, "export", "src/quality/spelling-markers.ts::spellingVariants") !== true,
+      stillOpen: (root) =>
+        resolveName(
+          root,
+          "export",
+          "src/quality/spelling-markers.ts::spellingVariants",
+        ) !== true,
       lifted: {
         kind: "constructed_tree",
         // The remedy state, spelled as the export the sentence's remedy would have to add: a
@@ -1716,7 +1877,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the scan grows a normalisation",
-      reads: "this register's own module, for the export a normalisation would arrive as",
+      reads:
+        "this register's own module, for the export a normalisation would arrive as",
       // THE FOURTH CLAUSE IS THE LIVE ONE, and it is the only one that is somebody's to fix. That a
       // sentence given once is invisible is the population's definition; that a falsifier settles a
       // clause is what a falsifier IS; that the scan reads a field name is how any scan works. What
@@ -1725,7 +1887,12 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       // exports a normalisation, the sentence stops describing it.
       stillOpen: (root) => {
         const module = path.join(root, "src/quality/shared-excuses.ts");
-        return !existsSync(module) || !readFileSync(module, "utf8").includes("export function normalisedSentence");
+        return (
+          !existsSync(module) ||
+          !readFileSync(module, "utf8").includes(
+            "export function normalisedSentence",
+          )
+        );
       },
       lifted: {
         kind: "constructed_tree",
@@ -2035,7 +2202,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the fabrications this register excuses go to none",
-      reads: "the fabrications this register excuses, for one that has stopped being a fabrication",
+      reads:
+        "the fabrications this register excuses, for one that has stopped being a fabrication",
       // THE SENTENCE HAS TWO CLAUSES AND ONE OF THEM MOVES. That a name assembled from parts is
       // invisible is inherent to a text scan and inherited from W267's class. What is live is the
       // fabrication register: it is the only part of this bound that describes a set the tree can
@@ -2208,7 +2376,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "export the comparison from a module that takes its inputs",
-      reads: "the tree, for a `.test.ts` that reads the ledger and exports nothing for this to call",
+      reads:
+        "the tree, for a `.test.ts` that reads the ledger and exports nothing for this to call",
       // The bound's first clause is the one with a remedy somebody can build, and it is W289's,
       // unchanged since W315 stated it. It stops being true the day no test file reads the ledger
       // with its comparison welded inside it — at which point every ledger-dependent check is
@@ -2217,7 +2386,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       lifted: {
         kind: "constructed_tree",
         files: {
-          "src/quality/only.test.ts": 'it("t", () => { expect(1).toBe(1); });\n',
+          "src/quality/only.test.ts":
+            'it("t", () => { expect(1).toBe(1); });\n',
         },
       },
     },
@@ -2286,7 +2456,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "with the same remedy when such a pin arrives",
-      reads: "nothing — the predicate beside this line is the constant `true`, and W306 rewrote the sentence that claimed otherwise",
+      reads:
+        "nothing — the predicate beside this line is the constant `true`, and W306 rewrote the sentence that claimed otherwise",
       stillOpen: () => true,
       lifted: {
         kind: "never_derived",
@@ -2303,7 +2474,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the same remedy applies when such a plant arrives",
-      reads: "nothing — the predicate beside this line is the constant `true`, and W306 rewrote the sentence that claimed otherwise",
+      reads:
+        "nothing — the predicate beside this line is the constant `true`, and W306 rewrote the sentence that claimed otherwise",
       stillOpen: () => true,
       lifted: {
         kind: "never_derived",
@@ -2320,7 +2492,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the detector grows a scan and says so",
-      reads: "nothing — the predicate beside this line is the constant `true`, and W306 rewrote the sentence that claimed otherwise",
+      reads:
+        "nothing — the predicate beside this line is the constant `true`, and W306 rewrote the sentence that claimed otherwise",
       stillOpen: () => true,
       lifted: {
         kind: "never_derived",
@@ -2336,8 +2509,7 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: HEADER_CITATION_BOUND,
     lifting: {
       kind: "inherent",
-      why:
-        "Nothing lifts it, because the limit is in the kind of claim rather than in the tree. Whether a paragraph still describes the code it sits above is not mechanically decidable; whether the identifiers it cites exist is, and that is all the door does. The larger half was closed once, in W293, by banning counts from a header outright — a rule about one CLASS of stale claim, found by shipping one. There is no general version to build.",
+      why: "Nothing lifts it, because the limit is in the kind of claim rather than in the tree. Whether a paragraph still describes the code it sits above is not mechanically decidable; whether the identifiers it cites exist is, and that is all the door does. The larger half was closed once, in W293, by banning counts from a header outright — a rule about one CLASS of stale claim, found by shipping one. There is no general version to build.",
     },
     numbers: [],
   },
@@ -2348,8 +2520,7 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: HARDENING_BOUND,
     lifting: {
       kind: "inherent",
-      why:
-        "Nothing lifts it, because the limit is in the kind of claim rather than in the tree. A review is a reader's passes over a diff; no change to the code makes three lenses into exhaustive coverage, and a bound that claimed otherwise would be promising that the next reviewer finds nothing because this one did not. The mechanical half is W296's and carries its own separate bound.",
+      why: "Nothing lifts it, because the limit is in the kind of claim rather than in the tree. A review is a reader's passes over a diff; no change to the code makes three lenses into exhaustive coverage, and a bound that claimed otherwise would be promising that the next reviewer finds nothing because this one did not. The mechanical half is W296's and carries its own separate bound.",
     },
     numbers: [
       {
@@ -2366,8 +2537,7 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: PATH_BOUND,
     lifting: {
       kind: "inherent",
-      why:
-        "THE FIRST DRAFT OF THIS ENTRY CLAIMED A REMEDY AND THE REGISTER REFUSED IT. The predicate said the bound stays open while any declared gate goes unwalked by the e2e spec, and W306's driver reported it stale on the spot: the spec already walks all four, so the sentence would have been describing a tree that had moved before it was committed. The mistake was reading the mechanical clause as the whole bound. What this sentence is actually about is that a green walk over synthetic data says nothing about a practice — and what would lift THAT is a pilot, which is G4. A founder gate is not a change to this tree, so there is no root that makes this false and no predicate that could be honest about it. The mechanical clause beside it — a component call read from source is not a rendered element — is closed for the routes the spec walks and stated rather than remedied for the rest, because widening the walk is a decision about e2e runtime rather than a defect somebody should be nagged about.",
+      why: "THE FIRST DRAFT OF THIS ENTRY CLAIMED A REMEDY AND THE REGISTER REFUSED IT. The predicate said the bound stays open while any declared gate goes unwalked by the e2e spec, and W306's driver reported it stale on the spot: the spec already walks all four, so the sentence would have been describing a tree that had moved before it was committed. The mistake was reading the mechanical clause as the whole bound. What this sentence is actually about is that a green walk over synthetic data says nothing about a practice — and what would lift THAT is a pilot, which is G4. A founder gate is not a change to this tree, so there is no root that makes this false and no predicate that could be honest about it. The mechanical clause beside it — a component call read from source is not a rendered element — is closed for the routes the spec walks and stated rather than remedied for the rest, because widening the walk is a decision about e2e runtime rather than a defect somebody should be nagged about.",
     },
     numbers: [],
   },
@@ -2379,11 +2549,13 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the stored snapshot this deliberately does not keep",
-      reads: "the ledger, for a reader whose marker is older than the oldest week-unit it holds",
+      reads:
+        "the ledger, for a reader whose marker is older than the oldest week-unit it holds",
       // The bound says a marker older than the ledger's first week-unit gets everything back with
       // no way to tell that from a busy quarter. It stops being true if the ledger ever stops
       // holding W1 — at which point the oldest marker a reader can carry IS inside the ledger.
-      stillOpen: (root) => sinceReading(root, { lastUnit: "W1" }).kind === "since",
+      stillOpen: (root) =>
+        sinceReading(root, { lastUnit: "W1" }).kind === "since",
       lifted: {
         kind: "constructed_tree",
         // A ledger whose first week-unit is not W1: the oldest marker anybody holds now falls
@@ -2404,7 +2576,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the vocabulary grows and says so",
-      reads: "W314's own register, for a claim classified as open that nobody has derived yet",
+      reads:
+        "W314's own register, for a claim classified as open that nobody has derived yet",
       // The bound says a claim phrased outside the vocabulary is invisible and that the
       // classification is a judgement. It stops being true the day the register carries no open
       // rows — at that point every claim the scan finds is either derived or history, and the
@@ -2436,7 +2609,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the sweep for a SECOND file with that extension",
-      reads: "the tree, for a second file with the fixture extension beside the one the rule uses",
+      reads:
+        "the tree, for a second file with the fixture extension beside the one the rule uses",
       // The bound says one file is invisible to every walk and that the citation check is what
       // holds it down. It stops being true the day a second such file arrives, because then the
       // mechanism is a convention rather than a single audited place.
@@ -2465,12 +2639,16 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "the fix is not",
-      reads: "W291's reporter walk, for the raw read the bound says is still there",
+      reads:
+        "W291's reporter walk, for the raw read the bound says is still there",
       // The bound says one scan still reads raw text. It stops being true the day somebody narrows
       // that walk — which is exactly what W295 tried and had to revert.
       stillOpen: (root) =>
         /const text = readFileSync\(full, "utf8"\);/.test(
-          readFileSync(path.join(root, "src/quality/refusal-branches.ts"), "utf8"),
+          readFileSync(
+            path.join(root, "src/quality/refusal-branches.ts"),
+            "utf8",
+          ),
         ),
       lifted: {
         kind: "constructed_tree",
@@ -2537,7 +2715,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "reach the modules' own test fixtures",
-      reads: "the number of composed sites driven with real inputs against the number declared",
+      reads:
+        "the number of composed sites driven with real inputs against the number declared",
       stillOpen: () => COMPOSED_COPY_SITES.length > 5,
       lifted: {
         kind: "derived_without_a_tree",
@@ -2573,7 +2752,9 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       reads: "the sweep itself, given a drug name on a patient-facing surface",
       // The bound's own claim, re-derived: a surface can carry clinical content and pass. When
       // somebody widens the vocabulary this returns a finding and the sentence becomes false.
-      stillOpen: () => sweepSurface("/", "patient", "amoxicillin 500mg three times daily").length === 0,
+      stillOpen: () =>
+        sweepSurface("/", "patient", "amoxicillin 500mg three times daily")
+          .length === 0,
       lifted: {
         kind: "derived_without_a_tree",
         why: "It runs the sweep over a string this line holds, so the answer is a property of the vocabulary the module imports rather than of any tree. This is the strongest of the untreed predicates — it re-derives the bound's own claim by driving the detector — and it is still not liftable by a root, which is the distinction the kind exists to keep visible.",
@@ -2592,7 +2773,9 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       reads: "the page suite, for a spec that drives a failing read",
       stillOpen: (root) =>
         !pageSpecFiles(root).some((spec) =>
-          readFileSync(path.join(root, spec), "utf8").includes("could_not_load"),
+          readFileSync(path.join(root, spec), "utf8").includes(
+            "could_not_load",
+          ),
         ),
       lifted: {
         kind: "constructed_tree",
@@ -2626,11 +2809,15 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "an assertion-level detector over expected values",
-      reads: "W288's sweep, given the bare-literal assertion this bound says it cannot decide",
+      reads:
+        "W288's sweep, given the bare-literal assertion this bound says it cannot decide",
       // If W288 grows the shape this bound names, the sweep starts reporting a bare numeric
       // expected value and the sentence stops being true.
       stillOpen: () =>
-        tautologiesIn("probe.test.ts", 'it("a test", () => {\n  expect(rows.length).toBe(6);\n});\n').length === 0,
+        tautologiesIn(
+          "probe.test.ts",
+          'it("a test", () => {\n  expect(rows.length).toBe(6);\n});\n',
+        ).length === 0,
       lifted: {
         kind: "derived_without_a_tree",
         why: "It hands W288's shape rules a source string written on this line, so the answer depends on the imported detector and not on any file. Rooting it would mean planting a test file for `sweepTautologies` to walk, which tests the walk rather than the shape this bound is about.",
@@ -2662,9 +2849,12 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "a pass over the TypeScript AST with the checker attached",
-      reads: "first-party source, for a module that imports the TypeScript compiler",
+      reads:
+        "first-party source, for a module that imports the TypeScript compiler",
       stillOpen: (root) =>
-        !sourceModules(root).some((file) => /from ["']typescript["']/.test(readFileSync(file, "utf8"))),
+        !sourceModules(root).some((file) =>
+          /from ["']typescript["']/.test(readFileSync(file, "utf8")),
+        ),
       lifted: {
         kind: "constructed_tree",
         // THE COLLISION, PREDICTED AT W306 AND SOLVED AT W307. This predicate walks `src/` of the
@@ -2703,7 +2893,9 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
       remedy: "until the comparison moves out of the test file",
       reads: "the census, for registers whose assertion is still unprovable",
       stillOpen: () =>
-        TREE_DERIVED_REGISTERS.some((r) => r.assertion.kind === "assertion_unproven"),
+        TREE_DERIVED_REGISTERS.some(
+          (r) => r.assertion.kind === "assertion_unproven",
+        ),
       lifted: {
         kind: "derived_without_a_tree",
         why: "It reads W267's census, an imported constant listing what each register proves. The remedy — a comparison moved out of a test file — is recorded in that constant when it happens, so the lifting event is an edit to the register rather than a change to any tree this could be pointed at.",
@@ -2744,10 +2936,14 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     text: ACCEPTANCE_BOUND,
     lifting: {
       kind: "remedy",
-      remedy: "Moving those comparisons out of their test files is W289's remedy",
-      reads: "the acceptance registers, for one still re-derived only inside its own test",
+      remedy:
+        "Moving those comparisons out of their test files is W289's remedy",
+      reads:
+        "the acceptance registers, for one still re-derived only inside its own test",
       stillOpen: () =>
-        ACCEPTANCE_REGISTERS.some((r) => r.rederivation.kind === "rederived_in_its_own_test"),
+        ACCEPTANCE_REGISTERS.some(
+          (r) => r.rederivation.kind === "rederived_in_its_own_test",
+        ),
       lifted: {
         kind: "derived_without_a_tree",
         why: "It reads W294's own register of acceptance registers, an imported constant. The same shape as the drive bound beside it, and for the same reason: what would lift it is somebody re-classifying a register, which is an edit rather than a tree.",
@@ -2806,7 +3002,8 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
     lifting: {
       kind: "remedy",
       remedy: "The remedy for that is a reader",
-      reads: "W295's register, for a bound this one resolves that nothing has ever planted a witness against",
+      reads:
+        "W295's register, for a bound this one resolves that nothing has ever planted a witness against",
       stillOpen: () =>
         STATED_BOUNDS.some(
           (b) => BLIND_SPOTS[b.module]?.kind !== "demonstrated",
@@ -2933,19 +3130,33 @@ export function liftedDefects(
     const { stillOpen, lifted } = bound.lifting;
     if (lifted.kind === "constructed_tree") {
       if (withTree(lifted.files, (planted) => stillOpen(planted))) {
-        out.push({ bound: id, what: "reads a tree in which its remedy EXISTS and still reports it absent" });
+        out.push({
+          bound: id,
+          what: "reads a tree in which its remedy EXISTS and still reports it absent",
+        });
       }
       continue;
     }
     const here = stillOpen(root);
-    const elsewhere = [withTree({}, (bare) => stillOpen(bare)), withTree(everything, (all) => stillOpen(all))];
+    const elsewhere = [
+      withTree({}, (bare) => stillOpen(bare)),
+      withTree(everything, (all) => stillOpen(all)),
+    ];
     if (elsewhere.some((answer) => answer !== here)) {
-      out.push({ bound: id, what: `is declared ${lifted.kind} and answers differently for a different root` });
+      out.push({
+        bound: id,
+        what: `is declared ${lifted.kind} and answers differently for a different root`,
+      });
     } else if (lifted.kind === "never_derived" && here !== true) {
-      out.push({ bound: id, what: "is declared never_derived and is not the constant its declaration claims" });
+      out.push({
+        bound: id,
+        what: "is declared never_derived and is not the constant its declaration claims",
+      });
     }
   }
-  return out.sort((a, b) => `${a.bound}${a.what}`.localeCompare(`${b.bound}${b.what}`));
+  return out.sort((a, b) =>
+    `${a.bound}${a.what}`.localeCompare(`${b.bound}${b.what}`),
+  );
 }
 
 /**
@@ -2955,20 +3166,34 @@ export function liftedDefects(
  * declaration rather than a ban, because a number is not always a total — but an undeclared one is
  * the shape that goes wrong, and all three that had gone wrong were undeclared.
  */
-export function numberDefects(bounds: readonly StatedBound[] = STATED_BOUNDS): BoundDefect[] {
+export function numberDefects(
+  bounds: readonly StatedBound[] = STATED_BOUNDS,
+): BoundDefect[] {
   const out: BoundDefect[] = [];
   for (const bound of bounds) {
     const id = `${bound.module}::${bound.name}`;
-    const found = new Set(numberWordsIn(bound.text).map((w) => w.toLowerCase()));
+    const found = new Set(
+      numberWordsIn(bound.text).map((w) => w.toLowerCase()),
+    );
     const declared = new Set(bound.numbers.map((n) => n.word.toLowerCase()));
     for (const word of found) {
-      if (!declared.has(word)) out.push({ bound: id, what: `states "${word}" and does not say what it is` });
+      if (!declared.has(word))
+        out.push({
+          bound: id,
+          what: `states "${word}" and does not say what it is`,
+        });
     }
     for (const word of declared) {
-      if (!found.has(word)) out.push({ bound: id, what: `declares "${word}", which the sentence no longer uses` });
+      if (!found.has(word))
+        out.push({
+          bound: id,
+          what: `declares "${word}", which the sentence no longer uses`,
+        });
     }
   }
-  return out.sort((a, b) => `${a.bound}${a.what}`.localeCompare(`${b.bound}${b.what}`));
+  return out.sort((a, b) =>
+    `${a.bound}${a.what}`.localeCompare(`${b.bound}${b.what}`),
+  );
 }
 
 /**
@@ -2988,17 +3213,34 @@ export function unresolvedBounds(
   for (const bound of bounds) {
     const id = `${bound.module}::${bound.name}`;
     const n = Number(bound.unit.slice(1));
-    if (!units.has(n)) out.push({ bound: id, what: `names ${bound.unit}, which the ledger does not have` });
+    if (!units.has(n))
+      out.push({
+        bound: id,
+        what: `names ${bound.unit}, which the ledger does not have`,
+      });
     const file = path.join(root, bound.module);
-    const stated = existsSync(file) ? headerUnit(readFileSync(file, "utf8")) : null;
+    const stated = existsSync(file)
+      ? headerUnit(readFileSync(file, "utf8"))
+      : null;
     if (stated !== n) {
-      out.push({ bound: id, what: `names ${bound.unit} and the module's header says W${stated}` });
+      out.push({
+        bound: id,
+        what: `names ${bound.unit} and the module's header says W${stated}`,
+      });
     }
-    if (bound.lifting.kind === "remedy" && !bound.text.includes(bound.lifting.remedy)) {
-      out.push({ bound: id, what: `names a remedy the sentence does not contain` });
+    if (
+      bound.lifting.kind === "remedy" &&
+      !bound.text.includes(bound.lifting.remedy)
+    ) {
+      out.push({
+        bound: id,
+        what: `names a remedy the sentence does not contain`,
+      });
     }
   }
-  return out.sort((a, b) => `${a.bound}${a.what}`.localeCompare(`${b.bound}${b.what}`));
+  return out.sort((a, b) =>
+    `${a.bound}${a.what}`.localeCompare(`${b.bound}${b.what}`),
+  );
 }
 
 /** Every `export const *_BOUND` under `root/src`, as `module::name`. */
@@ -3006,10 +3248,13 @@ export function boundsInTree(root: string): string[] {
   const found: string[] = [];
   for (const file of sourceModules(root)) {
     const text = readFileSync(file, "utf8");
-    for (const match of text.matchAll(/^export const ([A-Z][A-Z0-9_]*_BOUND)\b/gm)) {
-      found.push(`${path.relative(root, file).split(path.sep).join("/")}::${match[1]}`);
+    for (const match of text.matchAll(
+      /^export const ([A-Z][A-Z0-9_]*_BOUND)\b/gm,
+    )) {
+      found.push(
+        `${path.relative(root, file).split(path.sep).join("/")}::${match[1]}`,
+      );
     }
   }
   return found.sort();
 }
-

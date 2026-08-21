@@ -558,6 +558,16 @@ export const MANIFEST: readonly ModuleEntry[] = [
     ],
   },
   {
+    module: "src/quality/runtime-population.ts",
+    // A NULL IS A CLAIM, and here it is the unit's own point. This module walks nothing and READS
+    // nothing: both readings of the population are handed in — the tree's own source reading and a
+    // module namespace from an `import()` — and what it adds is the comparison. A census row saying
+    // it derives from the tree would describe a walk it deliberately does not do, because a module
+    // that imported the registers it measures would be loading them into its own process.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/number-words.ts",
     census: {
       derives:

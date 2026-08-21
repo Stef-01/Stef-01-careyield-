@@ -838,6 +838,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W373's register QUOTES product copy in order to resolve it — the sentences a practice is shown about who a rule reaches — but it renders none of them: the quotes are compared against the files that do render them, and this module has no surface. Treating a quoted claim as a second copy site would make every resolution a duplicate of the thing it checks.",
   },
   {
+    module: "src/quality/runtime-population.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W396's register is reviewer-facing: module paths, export names, and sentences about what two readings of one file disagree over. It renders nothing and no practice sees it.",
+  },
+  {
     module: "src/quality/number-words.ts",
     operatorCopy: [],
     notCopy:
