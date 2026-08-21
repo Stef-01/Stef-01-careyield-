@@ -89,6 +89,7 @@ export function runnableSuites(root: string): string[] {
 export const SENSITIVE_SUITES: readonly CloseSensitive[] = [
   { suite: "src/founder/second-reading.test.ts", reads: "the rows that have changed since the founder last read the page, which a close is one way of changing" },
   { suite: "src/quality/close-sensitivity.test.ts", reads: "this register's own suite: it closes each row in flight and asks which suites turn, so a status is the thing it varies" },
+  { suite: "src/quality/quarter-mutants-q29.test.ts", reads: "every unit of its quarter, asserted to be a `done` row before the sweep measures the modules those units added — so a range whose units have not all landed is a population this register would be measuring early" },
   { suite: "src/quality/dossier-q19.test.ts", reads: "the quarter dossier's done count, which every close moves" },
   { suite: "src/quality/latent-y5.test.ts", reads: "the units a latent finding is anchored to, and whether each has landed" },
   { suite: "src/quality/ledger-integrity.test.ts", reads: "the ledger's own shape, including which statuses a row may carry" },
