@@ -711,6 +711,31 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/name-conventions.ts",
+    // W394's register of the naming habits other registers rest on. It DOES walk the tree —
+    // `conventionSites` reads every source module looking for a second register keyed to the same
+    // identifier — so it carries a census row rather than `census: null`, and it states a bound.
+    census: {
+      derives:
+        "Every module whose scanning code keys on an identifier this register has already named — a SECOND register resting on the same naming habit as one of the four declared here.",
+      checkedAgainst:
+        "The declared conventions themselves: each row's derivation must resolve, must still spell the identifier it is recorded as resting on, and must state what a file spelling it otherwise costs.",
+      proof: {
+        kind: "mutated_tree",
+        mutation:
+          "a row is recorded as resting on an identifier its module does not spell, and `conventionDefects` must report that the derivation no longer spells it",
+      },
+      assertion: {
+        kind: "driven_here",
+        claim:
+          "The one MEASURED cost is real: two planted suites writing the same repository path clash when their root constant is called `ROOT` and are invisible when it is called `REPO`, so the scan sees the convention and not the write.",
+        mutation:
+          "the probe is replaced by one reporting that the derivation finds the other spelling, and the register must report the row as recorded-as-missing-it-and-finding-it.",
+      },
+    },
+    branches: [],
+  },
+  {
     module: "src/quality/horizon-q30-gate.ts",
     // W389's re-read of Q30's moments. `census: null` for the same reason as Q29's gate below: it
     // walks nothing itself — the population is the horizon document's own table, read from the

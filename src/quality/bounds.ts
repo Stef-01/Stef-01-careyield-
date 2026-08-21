@@ -81,6 +81,7 @@ import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
 import { Q30_GATE_BOUND } from "./horizon-q30-gate";
+import { CONVENTION_BOUND } from "./name-conventions";
 import { TEMP_RESIDUE_BOUND } from "./run-residue";
 import { RULE_BOUND } from "./patient-populations";
 import { REACHED_BOUND } from "./reached-pages";
@@ -809,6 +810,38 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'one that is asserted', 'the block a call really sits in' — the unit of each phrase rather than a count anything maintains. `momentDefects` re-derives every member's moments on each build.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/name-conventions.ts",
+    name: "CONVENTION_BOUND",
+    unit: "W394",
+    text: CONVENTION_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "The population clause is the one nothing lifts, and it is not modesty: deriving `this comparison turns on a NAME rather than a structure` would itself be a scan matching literals, so an instrument built to find name-keyed registers would be keyed to how THOSE are written and would have the same blind spot one level up. `conventionSites` grows the second direction and only for an identifier somebody has already named — it finds a second register resting on `ROOT`, never a first resting on something nobody wrote down. The measured-versus-argued split is a fact about effort rather than about the tree, and stating it is what stops three quoted admissions reading as three measurements. The last clause is the one a reader would otherwise get backwards: a register of blind spots reads as though every entry hides a finding, and one of these manufactures one instead.",
+    },
+    numbers: [
+      {
+        word: "Four",
+        kind: "unit_id",
+        why: "How many name-keyed derivations one reader found and read. History rather than a live count — what this unit looked at cannot change — and the sentence's whole point is that the number says how hard it was looked for rather than how many there are, which is why the clause beside it refuses to treat the figure as a population.",
+      },
+      {
+        word: "two",
+        kind: "rate",
+        why: "'What separates the two' — the measured row and the argued ones, the two kinds of evidence this register carries. A distinction rather than a total: it stays two however many rows are added under either heading.",
+      },
+      {
+        word: "One",
+        kind: "unit_id",
+        why: "How many rows carry a measured cost rather than a quoted admission. Re-derived rather than typed: this module's suite filters the register for measured rows and asserts the length, so the word and the register cannot disagree.",
+      },
+      {
+        word: "three",
+        kind: "unit_id",
+        why: "The rows that quote their own module's admission instead, and the same three the last clause splits by direction. Checked the same way, against the register rather than against this sentence.",
       },
     ],
   },
