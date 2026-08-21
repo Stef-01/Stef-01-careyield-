@@ -186,6 +186,11 @@ export const SCAN_SITES: readonly ScanSite[] = [
     why: "A citation IS a literal, so blanking would erase the whole population. Comments are subtracted for the reason `citations.ts` records about itself: this tree discusses the citation format at length in prose beside the rows that use it, and a paragraph naming `<file> :: <assertion>` is a description rather than a citation. The same preparation reads the cited test's body, where the assertion titles are literals too.",
   },
   {
+    module: "src/quality/patterns.ts",
+    prep: { comments: "subtracted", literals: "kept" },
+    why: "The regex literal IS the subject, so blanking literals would leave this register reading a tree of empty slashes and declaring thirty-four populations it could not see. Comments are subtracted for the reason this whole tree keeps rediscovering, and here it is sharper than usual: the modules being read explain their own patterns in prose beside them — `assertion-vocabulary.ts` writes `COUNT = /\\.(?:length|size)$/` inside a `//` header to say the literal is shared with another module — and a sentence quoting a pattern is not a pattern. Only a BLOCK comment can carry one past the scan, because the declaration match is anchored to the start of a line; the suite drives that arm with a block comment after a line one turned out to prove nothing.",
+  },
+  {
     module: "src/quality/decision-moments.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "Comments MUST go: this tree writes a doc block INSIDE a parameter list — `buildInvitationPool` explains its ranking seam there — and a comma in that prose split the list before the preparation was used. Literals stay because nothing here reads one and blanking them would cost a pass over every product module for no answer; the scan reads parameter names and types, which survive either way, so `kept` is the cheaper of two readings that agree.",

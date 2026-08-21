@@ -558,6 +558,16 @@ export const MANIFEST: readonly ModuleEntry[] = [
     ],
   },
   {
+    module: "src/quality/patterns.ts",
+    // A NULL IS A CLAIM, and W387's argument applies here almost word for word. This module walks
+    // nothing: its population is W267's census, handed in as `members`, and it opens each of those
+    // files to read the named regex literals they declare and opens nothing else. A census row
+    // saying it derives from the tree would describe a walk it does not do — and the register it
+    // would be claiming membership of is the very list it takes as an argument.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/cited-checks.ts",
     census: {
       derives:

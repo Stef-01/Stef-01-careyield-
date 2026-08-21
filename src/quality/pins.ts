@@ -262,6 +262,16 @@ export const PINS: readonly DeclaredPin[] = [
     },
   },
   {
+    module: "src/quality/patterns.ts",
+    name: "PATTERNS_AT_W391",
+    classification: {
+      kind: "live_by_design",
+      movedBy: "a census member gaining or losing a named pattern, or an existing pattern's text being edited by one character",
+      whyStopping:
+        "A NAMED ROW PER PATTERN, each carrying the literal's own text and the sentence saying what it enumerates, re-derived from the tree's source on every run. A row arriving means a population has been defined and nobody has said what it is over; a row LEAVING OR CHANGING is the event this unit exists for — a regex edited by one character is a different population, silently, with the sentence above it still saying the old thing. It cannot be satisfied by retyping a digit: every entry is compared character for character against the literal the tree holds, and the second readings it names are resolved against real exports.",
+    },
+  },
+  {
     module: "src/quality/cited-checks.ts",
     name: "SUBJECTS_AT_W388",
     classification: {

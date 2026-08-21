@@ -153,6 +153,7 @@ export const LISTED_REGISTERS: readonly ListedRegister[] = [
   { id: "src/quality/negative-probes.ts::NEGATIVE_PROBES", membership: callable("src/quality/negative-probes.ts::negativeDiff") },
   { id: "src/quality/order-independence.ts::FOLD_SITES", membership: callable("src/quality/order-independence.ts::diffFoldRegister") },
   { id: "src/quality/patient-populations.ts::RULES_AT_W373", membership: callable("src/quality/patient-populations.ts::ruleDefects") },
+  { id: "src/quality/patterns.ts::PATTERNS_AT_W391", membership: callable("src/quality/patterns.ts::patternDefects") },
   { id: "src/quality/pins.ts::PINS", membership: callable("src/quality/pins.ts::pinDiff") },
   { id: "src/quality/populations.ts::POPULATIONS", membership: callable("src/quality/populations.ts::populationDefects") },
   { id: "src/quality/private-copies.ts::DECLARED_COPIES", membership: callable("src/quality/private-copies.ts::copyDefects") },

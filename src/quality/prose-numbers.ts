@@ -601,6 +601,10 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/order-independence.ts", text: "twelve fold modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/order-regressions.ts", text: "SEVEN entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/order-regressions.ts", text: "two of its entries", resolution: { kind: "at_the_unit" } },
+  // W391: how many of Q29's hardening findings wear the shape this quarter opens on — a pattern
+  // standing in for a population with nothing else able to read it. History about a pass that is
+  // closed, and the register beneath the sentence is what keeps the reading honest going forward.
+  { module: "src/quality/patterns.ts", text: "four findings", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/pins.ts", text: "eighteen blocked rows", resolution: { kind: "derived", derive: blockedRows } },
   { module: "src/quality/pins.ts", text: "two modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/planting.ts", text: "four registers", resolution: { kind: "at_the_unit" } },

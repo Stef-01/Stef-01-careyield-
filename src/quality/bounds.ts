@@ -75,6 +75,7 @@ import { HOOK_BOUND } from "./hook-reach";
 import { SHARED_BOUND } from "./shared-state";
 import { DECISION_BOUND } from "./decision-moments";
 import { CITED_BOUND } from "./cited-checks";
+import { PATTERN_BOUND } from "./patterns";
 import { CYCLE_BOUND } from "./import-cycles";
 import { MOMENT_BOUND } from "./moments";
 import { QUARTER_GATE_BOUND } from "./horizon-q29-gate";
@@ -551,6 +552,41 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "one",
         kind: "rate",
         why: "'ONE OF THEM IS A GUESS' — which of the three exclusions rests on a single call rather than on a derivation, so it counts the sentence's own admission rather than anything in the tree. It stays one however many list renders the console grows.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/patterns.ts",
+    name: "PATTERN_BOUND",
+    unit: "W391",
+    text: PATTERN_BOUND,
+    lifting: {
+      kind: "remedy",
+      remedy: "written inline at its call site",
+      reads: "`patterns.ts`, for a population defined by a literal that is never given a name and so owes nobody a sentence",
+      // The clause that names something buildable. Reading a NAMED constant is a line of scanning;
+      // reading a literal at its call site means saying what population it stands for with no name
+      // to hang the sentence on, which is a unit rather than a patch.
+      stillOpen: (root) =>
+        !/export function inlinePatterns/.test(readFileSync(path.join(root, "src/quality/patterns.ts"), "utf8")),
+      lifted: {
+        kind: "constructed_tree",
+        files: {
+          "src/quality/patterns.ts":
+            "// W391: a population defined without a name.\nexport function inlinePatterns(): string[] {\n  return [];\n}\n",
+        },
+      },
+    },
+    numbers: [
+      {
+        word: "one",
+        kind: "rate",
+        why: "'`bounds.ts` assembles ONE from fragments on purpose' — how many patterns in this tree are deliberately built rather than written, so that a scan cannot match itself. It counts a decision rather than a population, and it stays one however many named patterns the tree grows, because the reason to build one is the same reason every time.",
+      },
+      {
+        word: "two",
+        kind: "rate",
+        why: "'the gap between those TWO' — the two things a row here holds, a sentence saying what a pattern enumerates and the literal that does the enumerating. It is the arity of the row rather than a count of anything in the tree, and it stays two for as long as a declaration is a pattern paired with a claim about it.",
       },
     ],
   },
