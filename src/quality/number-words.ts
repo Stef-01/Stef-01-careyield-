@@ -290,9 +290,11 @@ export function misreadings(
   for (const { module, text } of prose) {
     const rows = claims.filter((c) => c.module === module);
     for (const run of runsIn(text)) {
-      const tail = tailAfterScale(run.words);
-      if (tail.length === run.words.length) continue;
-      const recorded = valueOf(tail);
+      // What a tens-and-units vocabulary could have read here. A run with no scale in it has a
+      // tail equal to itself, so the two agree and it drops out on the next line — which is why
+      // there is no separate guard for `has a scale`: it was written, it was broken, and every
+      // test stayed green. Defence nothing can distinguish from its absence is defence removed.
+      const recorded = valueOf(tailAfterScale(run.words));
       if (recorded === run.value) continue;
       const after = readable(
         text.slice(run.at + run.text.length, run.at + run.text.length + 60),
