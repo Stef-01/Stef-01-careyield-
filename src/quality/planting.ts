@@ -262,6 +262,8 @@ export function copyTree(root: string, options: CopyOptions = {}): string {
  * rather than a plant, and it cannot use `withPlantedIn` because the file it writes already exists.
  */
 export const WRITES_WITHOUT_A_PLANTER: Readonly<Record<string, string>> = {
+  "src/quality/runtime-population.test.ts":
+    "The planter removes what it wrote in a `finally`, and this suite AWAITS an `import()` of the file it plants — so the `finally` runs first and the loader is handed a path that no longer exists. It writes into a copied tree instead and removes the copy in `afterAll`, which is the same ownership the planter gives it: the directory carries the maker's pid and the run-level sweep reclaims it if a kill skips the hook. It also writes two paths rather than planting one twice, because a module namespace is cached by URL and the second import of one path returns the first body.",
   "src/quality/mutation-sampling.test.ts":
     "Substitutes a mutated module for a real one and writes the original back, rather than adding a file and removing it. `withPlantedIn` deletes what it wrote, which for an existing file would delete the file — so this one restores instead, in its own `finally`, per module rather than per mutant.",
   "src/quality/quarter-mutants.ts":
