@@ -44,6 +44,29 @@ import { sourceModules } from "./tree-walks";
 export const NOT_PRODUCT = ["src/quality/", "src/sim/", "src/synthetic/", "src/demo/"];
 
 /**
+ * A signature's parameter list, up to the parenthesis that closes it.
+ *
+ * W383: `[^)]*` STOPPED AT THE FIRST `)`, WHICH IS NOT THE END OF A PARAMETER LIST. A rule taking a
+ * callback — `(pick: (p: Patient) => boolean, panel: Patient[])` — or an object with a function in
+ * it truncated to `pick: (p: Patient`, and the panel in the SECOND parameter went unseen. Reading to
+ * the parenthesis before the return type or the body reaches the whole list.
+ */
+const SIGNATURE = /^export function (\w+)\(([\s\S]*?)\)\s*(?::|\{)/gm;
+
+/**
+ * A parameter typed as a collection of patients, in every spelling this tree can write it.
+ *
+ * W383, AND IT WAS WRONG IN BOTH DIRECTIONS. `Patient\s*\[\]` had no left boundary, so
+ * `SyntheticPatient[]` counted as a patient panel; and it knew one spelling, so
+ * `ReadonlyArray<Patient>` and `Array<Patient>` did not count at all. Neither error costs anything
+ * today — no product rule in this tree is written either way, which is why nothing caught it — and
+ * that is exactly the state this register must not be in. It decides which product rules are over a
+ * patient panel, so a rule that escapes the population escapes SILENTLY: nothing else in the tree
+ * would report it missing. W366 is the unit that named this class and landed in the same quarter.
+ */
+const PANEL = /(?<![A-Za-z])(?:readonly\s+)?(?:Patient\s*\[\]|(?:Readonly)?Array\s*<\s*Patient\s*>)/;
+
+/**
  * Every product rule handed a collection of patients.
  *
  * Read from the signature, because that is what "is over" means before anything runs: a function
@@ -55,8 +78,8 @@ export function patientRules(root: string): string[] {
     const rel = path.relative(root, file).split(path.sep).join("/");
     if (NOT_PRODUCT.some((d) => rel.startsWith(d))) continue;
     const source = readFileSync(file, "utf8");
-    for (const m of source.matchAll(/^export function (\w+)\(([^)]*)\)/gms)) {
-      if (/(?:readonly\s+)?Patient\s*\[\]/.test(m[2]!)) out.push(`${rel}::${m[1]!}`);
+    for (const m of source.matchAll(SIGNATURE)) {
+      if (PANEL.test(m[2]!)) out.push(`${rel}::${m[1]!}`);
     }
   }
   return out.sort();

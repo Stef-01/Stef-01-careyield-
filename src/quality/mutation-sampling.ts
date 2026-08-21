@@ -66,7 +66,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { stripComments } from "@/security/reachability";
 import { sourceModules } from "./tree-walks";
-import { blankLiterals } from "./scan-text";
+import { blankLiterals, prepareForScan } from "./scan-text";
 
 /** A single character-level edit that flips a decision the code makes. */
 export interface Operator {
@@ -123,8 +123,13 @@ export function siblingSuite(root: string, module: string): string | null {
  * keeps rediscovering: a module explaining `===` in prose is not a module comparing with it.
  */
 export function mutantsIn(module: string, source: string, suite: string): Mutant[] {
+  // W383: `prepareForScan` IS THIS COMPOSITION AND IT IS THE ONE WITH THE RULE ATTACHED. These two
+  // lines spelled out `blankLiterals(stripComments(source))` by hand — the right order, but written
+  // where `SCAN_ORDER_RULE` cannot reach it, so the stated rule that stops the swap protected every
+  // other scan site and not this one. `code` is still bound separately: the mutation OFFSETS below
+  // are into comment-stripped text with literals intact, which is a different string from `scan`.
   const code = stripComments(source);
-  const scan = blankLiterals(code);
+  const scan = prepareForScan(source);
   const out: Mutant[] = [];
   const taken = new Set<number>();
   for (const op of OPERATORS) {

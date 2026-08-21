@@ -221,6 +221,7 @@ export const REVIEWED_AT_W345: readonly Review[] = [
   // hatch to a register that watches for hatches nobody re-reads. Independence is a property of who
   // reads; the loop has the builders it has.
   { id: "bounds::src/quality/hardening-q28.ts::Q28_HARDENING_BOUND", verdict: { kind: "still_correct" } },
+  { id: "bounds::src/quality/hardening-q29.ts::Q29_HARDENING_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/hardening-q27.ts::Q27_HARDENING_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/hardening-q26.ts::Q26_HARDENING_BOUND", verdict: { kind: "still_correct" } },
   { id: "bounds::src/quality/hardening-q24.ts::HARDENING_BOUND", verdict: { kind: "still_correct" } },

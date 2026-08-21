@@ -122,6 +122,7 @@ import { PRIVATE_COPY_BOUND, SHARED_PARSES } from "./private-copies";
 import { PLANTED_NAMES, TYPED_NAME_BOUND } from "./typed-names";
 import { FINDINGS as Q26_FINDINGS, Q26_HARDENING_BOUND, SELF_REVIEWED as Q26_SELF } from "./hardening-q26";
 import { Q28_HARDENING_BOUND } from "./hardening-q28";
+import { Q29_HARDENING_BOUND } from "./hardening-q29";
 import { Q28_MUTANT_BOUND } from "./quarter-mutants-q28";
 import { Q27_HARDENING_BOUND } from "./hardening-q27";
 import { TIMELINE_BOUND, TIMELINE_CLAIMS } from "./timelines";
@@ -1638,6 +1639,48 @@ export const STATED_BOUNDS: readonly StatedBound[] = [
         word: "three",
         kind: "unit_id",
         why: "How many order claims are declared here, which is `TIMELINE_CLAIMS.length` and the register's own table. The bound's predicate reads the same length, so the sentence and the check move together and the suite reads the table rather than this word.",
+      },
+    ],
+  },
+  {
+    module: "src/quality/hardening-q29.ts",
+    name: "Q29_HARDENING_BOUND",
+    unit: "W383",
+    text: Q29_HARDENING_BOUND,
+    lifting: {
+      kind: "inherent",
+      why: "Every clause is a property of what a review pass IS rather than of how hard this one tried. Independence is about WHO reads, and the loop has the builders it has — five of this quarter's thirteen units are this reader's, and a second session reading them would be a different pass rather than a lifting of this sentence. The clause about the quarter's own lesson going unapplied is the sharpest thing here and it is still not liftable by a reader: what would settle it is a REGISTER that plants a second spelling against every text-keyed detector, which is a different instrument and a different unit. The finding count says how hard a range was read as much as how well it was built, which is why no total is stated. The uneven lenses follow from the quarter's content — twelve quality registers and one console derivation give a security lens the harness and little else, for the fourth quarter running. And the completeness clause is the one nothing can lift: a detector blind to a spelling is, by construction, the kind of thing a reader reading the same words does not notice missing.",
+    },
+    numbers: [
+      {
+        word: "ONE",
+        kind: "rate",
+        why: "'ONE QUARTER READ BY ONE READER' — the unit of the sentence rather than a count of anything the tree holds. It stays one however many findings the pass raises, which is W304's rule, and the later 'ONE OBJECT' is the same word doing the same work about the security lens.",
+      },
+      {
+        word: "one",
+        kind: "rate",
+        why: "The same unit in lower case: one console derivation, one reader, one pinned range. None of these counts a thing the tree holds — each says that the sentence is about a single instance of its subject.",
+      },
+      {
+        word: "FIVE",
+        kind: "unit_id",
+        why: "How many of the quarter's units this reader wrote, which `SELF_REVIEWED` holds by name and this pass's suite checks against the ledger row by row. History: the authorship of W365-W377 cannot change, so the number is fixed at the quarter rather than derived from a tree that moves.",
+      },
+      {
+        word: "THIRTEEN",
+        kind: "unit_id",
+        why: "The size of the quarter — W365 to W377 — which `QUARTER` holds as a range and this pass's suite checks `REVIEWED_UNITS` against. History: a quarter's extent is fixed the moment its close lands.",
+      },
+      {
+        word: "two",
+        kind: "unit_id",
+        why: "How far before this pass the reader built the register one finding is against — W372's derivable-lists, two units ahead of W374, which is the last unit of the range. A distance between two fixed unit numbers, so nothing the tree does later moves it.",
+      },
+      {
+        word: "twelve",
+        kind: "unit_id",
+        why: "How many quality registers Q29 added, against the one console derivation beside it — the clause exists to say that a pass reading this quarter reads machinery. History: what a closed quarter added cannot change, and the point the sentence makes with it survives the exact figure being one either way.",
       },
     ],
   },

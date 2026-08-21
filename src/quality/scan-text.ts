@@ -166,6 +166,11 @@ export interface ScanSite {
  */
 export const SCAN_SITES: readonly ScanSite[] = [
   {
+    module: "src/quality/mutation-sampling.ts",
+    prep: { comments: "subtracted", literals: "blanked" },
+    why: "W349's mutation sites, and the defaults are what it wants for the reason this tree keeps rediscovering: a module explaining `===` in prose is not a module comparing with it, and a `===` inside a string literal is not an operator either. It arrived in this register at W383 rather than at W349, and how is the point — it had been doing exactly this by hand, `stripComments` on one line and `blankLiterals` on the next, which is the right order written where `SCAN_ORDER_RULE` could not reach it. Declaring the site is what calling the named composition buys. Its OFFSETS are into the comment-stripped text with literals intact, which is a second string it still derives itself.",
+  },
+  {
     module: "src/compliance/composed-copy.ts",
     prep: { comments: "subtracted", literals: "kept" },
     why: "Its subject IS the literal — a prose sentence composed inside a render function — so blanking literals would empty the thing it exists to find. Comments are subtracted because a quoted phrase inside a comment explaining what wording to avoid is not copy, which is the collision W278 recorded at `feeCaveat`.",

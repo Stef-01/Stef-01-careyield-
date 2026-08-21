@@ -249,11 +249,12 @@ export const CYCLES_AT_W381: readonly DeclaredCycle[] = [
       "src/quality/hardening-q26.ts",
       "src/quality/hardening-q27.ts",
       "src/quality/hardening-q28.ts",
+      "src/quality/hardening-q29.ts",
       "src/quality/review-w279.ts",
     ],
     standing: {
       kind: "deferred",
-      why: "EACH QUARTER'S PASS CITES THE ONE BEFORE IT AND W322'S PASS CITES THE ONES AFTER, because a finding is re-derived rather than restated and the re-derivation reaches for whichever pass holds the evidence. Every value crossing it is read inside a function — a pass exports its findings as a constant and its neighbours call `finding(id)` — so nothing is read while the graph is still evaluating. Half of these are held in by type edges only.",
+      why: "EACH QUARTER'S PASS CITES THE ONE BEFORE IT AND W322'S PASS CITES THE ONES AFTER, because a finding is re-derived rather than restated and the re-derivation reaches for whichever pass holds the evidence. Every value crossing it is read inside a function — a pass exports its findings as a constant and its neighbours call `finding(id)` — so nothing is read while the graph is still evaluating. Half of these are held in by type edges only. W383 joined it on the day it landed, for the reason every pass does: `hardening-q22.ts` collects each quarter's findings into `HARDENING_REGISTERS` so one clock can read them all, and each pass imports that module back for the finding type and the shared `unaccountedFor`.",
     },
   },
   {

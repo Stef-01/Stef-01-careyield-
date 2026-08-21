@@ -172,4 +172,35 @@ describe("W314 the scan reads headers and doc comments, and nothing else", () =>
     );
     expect(found).toEqual(["seven registers=7"]);
   });
+
+  it("reads a hyphenated compound whole, rather than the unit on its right", () => {
+    // W383. THE HAND LIST DID NOT MISS THESE — IT MISREAD THEM. Every compound was typed into
+    // `WORDS` as somebody hit one, and `\b` matches at the hyphen, so a compound nobody had typed
+    // in was read as its TAIL: `twenty-seven routes` entered the register as SEVEN ROUTES and
+    // `SEVENTY-EIGHT FILES` as EIGHT. Four rows were live and wrong, all filed `at_the_unit`,
+    // where nothing re-derives and the misreading could not surface. The tens are crossed with the
+    // units now, so a compound this tree can write is either read whole or not at all.
+    const found = withRoot(
+      {
+        "src/planted/compound.ts":
+          "// W1: twenty-seven routes, seventy-eight files and ninety-nine registers.\n" +
+          'import path from "node:path";\nexport const a = path;\n',
+      },
+      (root) => proseClaims(root).map((c) => `${c.text}=${c.number}`),
+    );
+    expect([...found].sort()).toEqual(["ninety-nine registers=99", "seventy-eight files=78", "twenty-seven routes=27"]);
+  });
+
+  it("still reads a bare ten and a bare unit, so crossing them added rather than replaced", () => {
+    // The other direction: a derivation that only produced compounds would break every plain word
+    // in the register, and the arm above would not notice.
+    const found = withRoot(
+      {
+        "src/planted/plain.ts":
+          "// W1: twenty routes and nine files.\n" + 'import path from "node:path";\nexport const a = path;\n',
+      },
+      (root) => proseClaims(root).map((c) => `${c.text}=${c.number}`),
+    );
+    expect([...found].sort()).toEqual(["nine files=9", "twenty routes=20"]);
+  });
 });

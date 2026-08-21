@@ -151,6 +151,49 @@ describe("W373 every product rule handed the panel says which patients it is ove
     expect(found).toEqual(["src/planted/by-panel.ts::inviteFromPanel"]);
   });
 
+  it("reads the panel past a callback parameter, and in every spelling of the type", () => {
+    // W383. THE SCAN WAS NARROWER AND WIDER THAN ITS SUBJECT AND NOTHING SAID SO. `[^)]*` stopped
+    // at the first `)`, so a rule taking a callback hid its panel in the second parameter;
+    // `ReadonlyArray<Patient>` and `Array<Patient>` were spellings it did not know; and with no
+    // left boundary `SyntheticPatient[]` counted as a panel. Nothing escaped in the live tree,
+    // which is why nothing caught it — this register decides which product rules are over a
+    // patient panel, so a rule leaving the population leaves it silently.
+    const found = withTree(
+      {
+        "src/planted/after-callback.ts":
+          "import type { Patient } from \"@/synthetic/types\";\n" +
+          "export function afterCallback(pick: (p: Patient) => boolean, panel: Patient[]): Patient[] {\n" +
+          "  return panel.filter(pick);\n}\n",
+        "src/planted/readonly-array.ts":
+          "import type { Patient } from \"@/synthetic/types\";\n" +
+          "export function readonlyArray(panel: ReadonlyArray<Patient>): number {\n  return panel.length;\n}\n",
+        "src/planted/plain-array.ts":
+          "import type { Patient } from \"@/synthetic/types\";\n" +
+          "export function plainArray(panel: Array<Patient>): number {\n  return panel.length;\n}\n",
+      },
+      (root) => patientRules(root),
+    );
+    expect(found).toEqual([
+      "src/planted/after-callback.ts::afterCallback",
+      "src/planted/plain-array.ts::plainArray",
+      "src/planted/readonly-array.ts::readonlyArray",
+    ]);
+  });
+
+  it("refuses a type whose name merely ends in the one it is looking for", () => {
+    // The other direction, and the reason the boundary is a lookbehind rather than `\b`: a hyphen
+    // or a capital is not a word break, so `SyntheticPatient[]` matched the tail of the name.
+    const found = withTree(
+      {
+        "src/planted/prefixed.ts":
+          "interface SyntheticPatient { id: string }\n" +
+          "export function prefixed(panel: SyntheticPatient[]): number {\n  return panel.length;\n}\n",
+      },
+      (root) => patientRules(root),
+    );
+    expect(found).toEqual([]);
+  });
+
   it("reports a rule handed the panel that nothing describes", () => {
     const missing = RULES_AT_W373.filter((r) => r.rule !== "src/engine/pool.ts::rankCandidates");
     expect(ruleDefects(ROOT, RUNS, missing).filter((d) => d.rule.endsWith("::rankCandidates"))).toEqual([

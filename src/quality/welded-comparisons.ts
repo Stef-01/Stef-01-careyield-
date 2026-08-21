@@ -126,6 +126,7 @@ export const WELDED_CHECKS: readonly WeldedCheck[] = [
   { file: "src/quality/hardening-q26.test.ts", standing: passing() },
   { file: "src/quality/hardening-q27.test.ts", standing: movable(LIFT) },
   { file: "src/quality/hardening-q28.test.ts", standing: movable(LIFT) },
+  { file: "src/quality/hardening-q29.test.ts", standing: movable(LIFT) },
   { file: "src/quality/horizon-q22.test.ts", standing: movable(LIFT) },
   { file: "src/quality/horizon-q23.test.ts", standing: movable(LIFT) },
   { file: "src/quality/horizon-q24.test.ts", standing: movable(LIFT) },

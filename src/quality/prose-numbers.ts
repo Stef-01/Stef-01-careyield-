@@ -41,14 +41,44 @@ import { discoverFoldSites } from "./order-independence";
 import { TAX_AT_W308 } from "./declaration-tax";
 import { FINDINGS as HARDENING_Q24_FINDINGS } from "./hardening-q24";
 
-/** Number words this tree writes. Digits are matched separately. */
+const UNITS: Readonly<Record<string, number>> = {
+  one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9,
+};
+
+const TENS: Readonly<Record<string, number>> = {
+  twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90,
+};
+
+/**
+ * Number words this tree writes. Digits are matched separately.
+ *
+ * W383 DERIVED THE COMPOUNDS, AND THE HAND LIST WAS NOT MERELY INCOMPLETE — IT READ THE WRONG
+ * NUMBER. Every compound was typed in as somebody hit it: twenty-one, twenty-two, twenty-five,
+ * twenty-six, thirty-three, thirty-four, thirty-six, thirty-seven, fifty-two, fifty-four,
+ * sixty-eight. A compound that had not been typed in did not go unmatched, which is what a missing
+ * row usually costs — `\b` matches at the hyphen, so `twenty-seven routes` was read as SEVEN
+ * ROUTES and recorded that way, and `forty-nine files` as nine. Four live rows in the register below
+ * held a tail as though it were the whole number, both classified `at_the_unit`, where history is
+ * never re-derived and the misreading could not surface. This is W366's subject — a detector keyed
+ * to how a thing is WRITTEN — in the register whose whole job is numbers that go stale, and W366
+ * landed in the same quarter without sweeping here.
+ *
+ * Tens times units, so no compound this tree can write is absent and none can be read as its tail.
+ * A longest-first alternation was tried and removed: `twenty` is offered before `twenty-seven` and
+ * loses anyway, because the `\\s+` after the number fails on the hyphen and the engine backtracks
+ * into the longer branch. No test could tell the two orders apart, and defence nothing can
+ * distinguish from its absence is defence a reader has to take on trust.
+ */
 const WORDS: Readonly<Record<string, number>> = {
-  one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
-  eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17,
-  eighteen: 18, nineteen: 19, twenty: 20, "twenty-one": 21, "twenty-two": 22, "twenty-five": 25,
-  "twenty-six": 26, thirty: 30, "thirty-three": 33, "thirty-four": 34, "thirty-six": 36,
-  "thirty-seven": 37,
-  forty: 40, fifty: 50, "fifty-two": 52, "fifty-four": 54, sixty: 60, "sixty-eight": 68,
+  ...UNITS,
+  ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16,
+  seventeen: 17, eighteen: 18, nineteen: 19,
+  ...TENS,
+  ...Object.fromEntries(
+    Object.entries(TENS).flatMap(([tenWord, ten]) =>
+      Object.entries(UNITS).map(([unitWord, unit]) => [`${tenWord}-${unitWord}`, ten + unit]),
+    ),
+  ),
 };
 
 /**
@@ -507,12 +537,12 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/privacy/erasure-y5.ts", text: "thirty-seven modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "five registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/acceptances.ts", text: "Five registers", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/acceptances.ts", text: "twelve registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
+  { module: "src/quality/acceptances.ts", text: "thirteen registers", resolution: { kind: "derived", derive: acceptanceRegisters } },
   { module: "src/quality/assertion-vocabulary.ts", text: "fifty-two sites", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/close-gate.ts", text: "four modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "six entries", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "three walks", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/hardening-q28.ts", text: "54 files", resolution: { kind: "derived", derive: weldedTests } },
+  { module: "src/quality/hardening-q28.ts", text: "55 files", resolution: { kind: "derived", derive: weldedTests } },
   { module: "src/quality/blocked-surface.ts", text: "two copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/blocked-surface.ts", text: "Two of those copies", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/spelling-markers.ts", text: "two files", resolution: { kind: "not_a_tree_count" } },
@@ -545,11 +575,11 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/hardening-q22.ts", text: "eleven modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q22.ts", text: "Nine modules", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q22.ts", text: "THREE FINDINGS", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/hardening-q23.ts", text: "NINE FILES", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/hardening-q23.ts", text: "THIRTY-NINE FILES", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q23.ts", text: "three findings", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q23.ts", text: "twelve registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q23.ts", text: "two findings", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/hardening-q24.ts", text: "EIGHT FILES", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/hardening-q24.ts", text: "SEVENTY-EIGHT FILES", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/hardening-q24.ts", text: "eleven findings", resolution: { kind: "derived", derive: q24Findings } },
   { module: "src/quality/hardening-q24.ts", text: "Eleven findings", resolution: { kind: "derived", derive: q24Findings } },
   { module: "src/quality/hardening-q24.ts", text: "four findings", resolution: { kind: "at_the_unit" } },
@@ -584,7 +614,15 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/refusal-branches.ts", text: "Two branches", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/register-census.ts", text: "Four shipped detectors", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/register-counts.ts", text: "two registers", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/review-w279.ts", text: "seven routes", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/review-w279.ts", text: "twenty-seven routes", resolution: { kind: "at_the_unit" } },
+  // W383: quotations. This module's header quotes the misreadings it fixed, so the numbers in it
+  // are about what those OTHER modules say and what this pass found — history, not a live count.
+  { module: "src/quality/prose-numbers.ts", text: "forty-nine files", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/prose-numbers.ts", text: "twenty-seven routes", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/prose-numbers.ts", text: "Four live rows", resolution: { kind: "at_the_unit" } },
+  // W383's pass. Each says what that reading FOUND, which is history and does not go stale.
+  { module: "src/quality/hardening-q29.ts", text: "four live rows", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/hardening-q29.ts", text: "Two registers", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/route-coverage.ts", text: "fifty routes", resolution: {
       kind: "open",
       why: "Two modules state a route total and the two count under different inclusion rules. Deriving both against one walk would silently rewrite what one of the two sentences means, so both are left open together rather than one made to agree with a walk it never meant.",
@@ -600,7 +638,7 @@ export const CLAIMS: readonly DeclaredClaim[] = [
   { module: "src/quality/self-reference.ts", text: "two detectors", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tautology-sweep.ts", text: "Four sites", resolution: { kind: "derived", derive: acceptedTautologies } },
   { module: "src/quality/tautology-sweep.ts", text: "seven acceptance registers", resolution: { kind: "at_the_unit" } },
-  { module: "src/quality/tree-walks.ts", text: "seven files", resolution: { kind: "at_the_unit" } },
+  { module: "src/quality/tree-walks.ts", text: "twenty-seven files", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "SEVEN MODULES", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "seven walks", resolution: { kind: "at_the_unit" } },
   { module: "src/quality/tree-walks.ts", text: "SEVEN WALKS", resolution: { kind: "at_the_unit" } },

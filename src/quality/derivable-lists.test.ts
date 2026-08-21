@@ -136,7 +136,6 @@ describe("W372 W370's Q28-SIMP-1, discharged as a measurement", () => {
       "src/quality/close-gate.ts",
       "src/quality/empty-list-sweep.ts",
       "src/quality/founder-page-facts.ts",
-      "src/quality/mutation-sampling.ts",
       "src/quality/register-census.ts",
       "src/quality/register-counts.ts",
       "src/quality/self-defeating.ts",
@@ -146,12 +145,16 @@ describe("W372 W370's Q28-SIMP-1, discharged as a measurement", () => {
   });
 
   it("disagrees with the hand count that raised it, which is the unit's own subject", () => {
-    // W370 RAISED THIS AS `fourteen modules`, counted by hand off a `grep`. The derivation says
+    // W370 RAISED THIS AS `fourteen modules`, counted by hand off a `grep`. The derivation said
     // eleven: the hand count included the two `.test.ts` neighbours a file listing turns up and the
     // home of the preparation itself, none of which is a module scanning outside the register. A
     // finding raised from a list and a finding raised from a derivation are different findings, and
     // this unit exists because the difference is invisible from either one alone.
-    expect(undeclaredTextReaders(ROOT, DECLARED_SCAN_SITES).length).toBe(11);
+    // W383 TOOK ONE OFF IT, which is what a row leaving this list is supposed to look like:
+    // `mutation-sampling.ts` was writing out the shared preparation by hand, `Q29-SIMP-1` had it
+    // call the named composition, and declaring the site is what calling it costs. The list is a
+    // debt list and it went down by one for the right reason.
+    expect(undeclaredTextReaders(ROOT, DECLARED_SCAN_SITES).length).toBe(10);
     expect(undeclaredTextReaders(ROOT, DECLARED_SCAN_SITES).length).toBeLessThan(14);
   });
 

@@ -1060,6 +1060,12 @@ export const OPERATOR_COPY_SURFACES: readonly CopySurface[] = [
       "Deliberately empty. W372's register of which hand-listed registers the tree could derive and which it actually checks. Nobody but a developer reads it. Its longest strings are the argument for each row and `DERIVABLE_BOUND`; it constructs no record of any kind — every value it handles is a module path or a register name from this repository's own source — and no patient, condition or appointment reason appears in any of it.",
   },
   {
+    module: "src/quality/hardening-q29.ts",
+    operatorCopy: [],
+    notCopy:
+      "Deliberately empty. W383's record of Q29's hardening pass — the findings, their dispositions and the units read. Nobody but a developer reads it. Its longest strings are each finding's argument and `Q29_HARDENING_BOUND`; it constructs no record of any kind, and no patient, condition or appointment reason appears in any of it.",
+  },
+  {
     module: "src/quality/hardening-q28.ts",
     operatorCopy: [],
     notCopy:

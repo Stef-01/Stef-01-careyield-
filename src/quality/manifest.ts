@@ -466,6 +466,15 @@ export const MANIFEST: readonly ModuleEntry[] = [
     branches: [],
   },
   {
+    module: "src/quality/hardening-q29.ts",
+    // Q29's pass record: findings, dispositions and the units read. Same shape and the same reason
+    // for `census: null` as Q28's below — the ledger question goes through the shared
+    // `unaccountedFor`, which is handed the text, so it walks nothing. It is here because it
+    // states a bound.
+    census: null,
+    branches: [],
+  },
+  {
     module: "src/quality/hardening-q28.ts",
     // Q28's pass record: findings, dispositions and the units read. Same shape as Q27's below and
     // the same reason for `census: null` — the ledger question goes through the shared
